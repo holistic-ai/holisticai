@@ -11,6 +11,7 @@ from .inprocessing import (
     FairKmedianClustering,
     FairletClustering,
     FairRec,
+    FairScoreClassifier,
     GridSearchReduction,
     MetaFairClassifier,
     PopularityPropensityMF,
@@ -66,6 +67,7 @@ __all__ = [
     "DebiasingLearningMF",
     "PopularityPropensityMF",
     "FairRec",
+    "FairScoreClassifier",
     "DebiasingExposure",
     "FairTopK",
 ]

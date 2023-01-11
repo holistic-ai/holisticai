@@ -11,6 +11,8 @@ python = ">=3.7,<3.11"
 scikit-learn = ">=1.0.2"
 seaborn = ">=0.11.2"
 tqdm = "^4.64.1"
+cvxpy = {extras = ["cbc"], version = "^1.3.0"}
+cvxopt = "^1.3.0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^5.0.4"
