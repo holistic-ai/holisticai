@@ -1,5 +1,5 @@
 [tool.commitizen]
-version = "0.1.0"
+version = "0.1.1"
 changelog_incremental = true
 version_files = [
     "pyproject.toml:version"
@@ -7,7 +7,7 @@ version_files = [
 
 [tool.poetry]
 name = "holisticai"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["GBadila <gabriel.badila@holisticai.com>"]
 
