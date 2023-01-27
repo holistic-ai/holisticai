@@ -3,7 +3,7 @@ name: Pull Request
 on: pull_request
 
 jobs:
-  pr-release-pipeline:
+  pr-pipeline:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
