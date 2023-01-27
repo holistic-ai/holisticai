@@ -1,3 +1,9 @@
+## 0.3.0 (2023-01-27)
+
+### Feat
+
+- release new mitigation techniques (#4)
+
 ## 0.2.0 (2022-11-09)
 
 ### Feat
