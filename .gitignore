@@ -7,3 +7,5 @@
 **/.DS_Store
 
 dist/
+
+.python-version

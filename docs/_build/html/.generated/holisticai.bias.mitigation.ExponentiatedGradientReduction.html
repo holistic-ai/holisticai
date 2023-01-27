@@ -1,0 +1,513 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>holisticai.bias.mitigation.ExponentiatedGradientReduction &mdash; holisticai  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom_style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="holisticai.bias.mitigation.GridSearchReduction" href="holisticai.bias.mitigation.GridSearchReduction.html" />
+    <link rel="prev" title="holisticai.bias.mitigation.FairletClusteringPreprocessing" href="holisticai.bias.mitigation.FairletClusteringPreprocessing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> holisticai
+          
+
+          
+            
+            <img src="../_static/holistic_ai.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../metrics.html">Metrics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../mitigation.html">Mitigation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mitigation.html#pre-processing">Pre-processing</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../mitigation.html#in-processing">In-processing</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">holisticai.bias.mitigation.ExponentiatedGradientReduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.GridSearchReduction.html">holisticai.bias.mitigation.GridSearchReduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.MetaFairClassifier.html">holisticai.bias.mitigation.MetaFairClassifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.PrejudiceRemover.html">holisticai.bias.mitigation.PrejudiceRemover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.FairKCenterClustering.html">holisticai.bias.mitigation.FairKCenterClustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.FairKmedianClustering.html">holisticai.bias.mitigation.FairKmedianClustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.FairletClustering.html">holisticai.bias.mitigation.FairletClustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.VariationalFairClustering.html">holisticai.bias.mitigation.VariationalFairClustering</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mitigation.html#post-processing">Post-processing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting.html">Plotting</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../measuring_bias.html">Measuring bias</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mitigating_bias.html">Mitigating bias</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">holisticai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../mitigation.html">Mitigation</a> &raquo;</li>
+        
+      <li>holisticai.bias.mitigation.ExponentiatedGradientReduction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/.generated/holisticai.bias.mitigation.ExponentiatedGradientReduction.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="holisticai-bias-mitigation-exponentiatedgradientreduction">
+<h1>holisticai.bias.mitigation.ExponentiatedGradientReduction<a class="headerlink" href="#holisticai-bias-mitigation-exponentiatedgradientreduction" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">holisticai.bias.mitigation.</span></span><span class="sig-name descname"><span class="pre">ExponentiatedGradientReduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exponentiated gradient reduction is an in-processing technique that reduces
+fair classification to a sequence of cost-sensitive classification problems,
+returning a randomized classifier with the lowest empirical error subject to
+fair classification constraints.</p>
+<p class="rubric">References</p>
+<p>Agarwal, Alekh, et al. “A reductions approach to fair classification.”
+International Conference on Machine Learning. PMLR, 2018.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'EqualizedOdds'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ZeroOne'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bound</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Parameters</p>
+<dl>
+<dt>estimator: An estimator implementing methods</dt><dd><p><code class="docutils literal notranslate"><span class="pre">fit(X,</span> <span class="pre">y,</span> <span class="pre">sample_weight)</span></code> and <code class="docutils literal notranslate"><span class="pre">predict(X)</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is
+the matrix of features, <code class="docutils literal notranslate"><span class="pre">y</span></code> is the vector of labels, and
+<code class="docutils literal notranslate"><span class="pre">sample_weight</span></code> is a vector of weights; labels <code class="docutils literal notranslate"><span class="pre">y</span></code> and
+predictions returned by <code class="docutils literal notranslate"><span class="pre">predict(X)</span></code> are either 0 or 1 – e.g.
+scikit-learn classifiers.</p>
+</dd>
+<dt>constraints (str or BaseMoment): If string, keyword</dt><dd><p>denoting the <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMoment</span></code> object
+defining the disparity constraints:
+[</p>
+<blockquote>
+<div><p>“DemographicParity”,
+“EqualizedOdds”,
+“TruePositiveRateParity”,
+“FalsePositiveRateParity”,
+“ErrorRateParity”,</p>
+</div></blockquote>
+<p>]</p>
+</dd>
+<dt>eps: Allowed fairness constraint violation; the solution is</dt><dd><p>guaranteed to have the error within <code class="docutils literal notranslate"><span class="pre">2*best_gap</span></code> of the best
+error under constraint eps; the constraint violation is at most
+<code class="docutils literal notranslate"><span class="pre">2*(eps+best_gap)</span></code>.</p>
+</dd>
+</dl>
+<p>T: Maximum number of iterations.</p>
+<dl class="simple">
+<dt>nu: Convergence threshold for the duality gap, corresponding to a</dt><dd><p>conservative automatic setting based on the statistical
+uncertainty in measuring classification error.</p>
+</dd>
+</dl>
+<p>eta_mul: Initial setting of the learning rate.</p>
+<dl class="simple">
+<dt>drop_prot_attr: Boolean flag indicating whether to drop protected</dt><dd><p>attributes from training data.</p>
+</dd>
+<dt>loss<span class="classifier">str</span></dt><dd><p>String identifying loss function for constraints. Options include “ZeroOne”, “Square”, and “Absolute.”</p>
+</dd>
+<dt>min_val<span class="classifier">float</span></dt><dd><p>Loss function parameter for “Square” and “Absolute,” typically the minimum of the range of y values.</p>
+</dd>
+<dt>max_val: float</dt><dd><p>Loss function parameter for “Square” and “Absolute,” typically the maximum of the range of y values.</p>
+</dd>
+<dt>verbose<span class="classifier">int</span></dt><dd><p>If &gt;0, will show progress percentage.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.__init__" title="holisticai.bias.mitigation.ExponentiatedGradientReduction.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([constraints, eps, max_iter, nu, ...])</p></td>
+<td><p><p class="rubric">Parameters</p>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.fit" title="holisticai.bias.mitigation.ExponentiatedGradientReduction.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, y_true, group_a, group_b)</p></td>
+<td><p>Fit Exponentiated Gradient Reduction</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bias_param</span></code>(param_name[, default])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_estimator_param</span></code>(param_name[, default])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.get_params" title="holisticai.bias.mitigation.ExponentiatedGradientReduction.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_param_handler</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_parameters</span></code>(params_hdl)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.predict" title="holisticai.bias.mitigation.ExponentiatedGradientReduction.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(X)</p></td>
+<td><p>Prediction</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.predict_proba" title="holisticai.bias.mitigation.ExponentiatedGradientReduction.predict_proba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict_proba</span></code></a>(X)</p></td>
+<td><p>Predict Probabilities</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reformat_function</span></code>(func)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.score" title="holisticai.bias.mitigation.ExponentiatedGradientReduction.score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score</span></code></a>(X, y[, sample_weight])</p></td>
+<td><p>Return the mean accuracy on the given test data and labels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.set_params" title="holisticai.bias.mitigation.ExponentiatedGradientReduction.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_estimator</span></code>(estimator)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_bias_param</span></code>(param_name, param_value)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_estimator_param</span></code>(param_name, param_value)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BM_NAME</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CONSTRAINTS</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_true</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit Exponentiated Gradient Reduction</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>X<span class="classifier">matrix-like</span></dt><dd><p>Input matrix</p>
+</dd>
+<dt>y_true<span class="classifier">array-like</span></dt><dd><p>Target vector</p>
+</dd>
+<dt>group_a<span class="classifier">array-like</span></dt><dd><p>Group membership vector (binary)</p>
+</dd>
+<dt>group_b<span class="classifier">array-like</span></dt><dd><p>Group membership vector (binary)</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<p>Self</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>deep<span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<dl class="simple">
+<dt>params<span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prediction</p>
+<p class="rubric">Description</p>
+<p>Predict output for the given samples.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>X<span class="classifier">matrix-like</span></dt><dd><p>Input matrix.</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<p>numpy.ndarray: Predicted output</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict Probabilities</p>
+<p class="rubric">Description</p>
+<p>Probability estimate for the given samples.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>X<span class="classifier">matrix-like</span></dt><dd><p>Input matrix.</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<p>numpy.ndarray: probability output</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction.score">
+<span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean accuracy on the given test data and labels.</p>
+<p>In multi-label classification, this is the subset accuracy
+which is a harsh metric since you require for each sample that
+each label set be correctly predicted.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>X<span class="classifier">array-like of shape (n_samples, n_features)</span></dt><dd><p>Test samples.</p>
+</dd>
+<dt>y<span class="classifier">array-like of shape (n_samples,) or (n_samples, n_outputs)</span></dt><dd><p>True labels for <cite>X</cite>.</p>
+</dd>
+<dt>sample_weight<span class="classifier">array-like of shape (n_samples,), default=None</span></dt><dd><p>Sample weights.</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<dl class="simple">
+<dt>score<span class="classifier">float</span></dt><dd><p>Mean accuracy of <code class="docutils literal notranslate"><span class="pre">self.predict(X)</span></code> wrt. <cite>y</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.ExponentiatedGradientReduction.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.ExponentiatedGradientReduction.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>params<span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<dl class="simple">
+<dt>self<span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="holisticai.bias.mitigation.GridSearchReduction.html" class="btn btn-neutral float-right" title="holisticai.bias.mitigation.GridSearchReduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="holisticai.bias.mitigation.FairletClusteringPreprocessing.html" class="btn btn-neutral float-left" title="holisticai.bias.mitigation.FairletClusteringPreprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Holistic AI.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
