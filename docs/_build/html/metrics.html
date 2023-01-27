@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Metrics &mdash; holisticai  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom_style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="holisticai.bias.metrics.abroca" href=".generated/holisticai.bias.metrics.abroca.html" />
+    <link rel="prev" title="Holistic AI Library" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> holisticai
+          
+
+          
+            
+            <img src="_static/holistic_ai.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#binary-classification">Binary Classification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.abroca.html">holisticai.bias.metrics.abroca</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.accuracy_diff.html">holisticai.bias.metrics.accuracy_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.average_odds_diff.html">holisticai.bias.metrics.average_odds_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.classification_bias_metrics.html">holisticai.bias.metrics.classification_bias_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.cohen_d.html">holisticai.bias.metrics.cohen_d</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.disparate_impact.html">holisticai.bias.metrics.disparate_impact</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.equal_opportunity_diff.html">holisticai.bias.metrics.equal_opportunity_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.false_negative_rate_diff.html">holisticai.bias.metrics.false_negative_rate_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.false_positive_rate_diff.html">holisticai.bias.metrics.false_positive_rate_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.four_fifths.html">holisticai.bias.metrics.four_fifths</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.statistical_parity.html">holisticai.bias.metrics.statistical_parity</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.true_negative_rate_diff.html">holisticai.bias.metrics.true_negative_rate_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.z_test_diff.html">holisticai.bias.metrics.z_test_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.z_test_ratio.html">holisticai.bias.metrics.z_test_ratio</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#multiclass-classification">Multiclass Classification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.accuracy_matrix.html">holisticai.bias.metrics.accuracy_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.confusion_matrix.html">holisticai.bias.metrics.confusion_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.confusion_tensor.html">holisticai.bias.metrics.confusion_tensor</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.frequency_matrix.html">holisticai.bias.metrics.frequency_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_average_odds.html">holisticai.bias.metrics.multiclass_average_odds</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_bias_metrics.html">holisticai.bias.metrics.multiclass_bias_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_equality_of_opp.html">holisticai.bias.metrics.multiclass_equality_of_opp</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_statistical_parity.html">holisticai.bias.metrics.multiclass_statistical_parity</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_true_rates.html">holisticai.bias.metrics.multiclass_true_rates</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.precision_matrix.html">holisticai.bias.metrics.precision_matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.recall_matrix.html">holisticai.bias.metrics.recall_matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#regression">Regression</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_score_diff.html">holisticai.bias.metrics.avg_score_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.correlation_diff.html">holisticai.bias.metrics.correlation_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.disparate_impact_regression.html">holisticai.bias.metrics.disparate_impact_regression</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.mae_ratio.html">holisticai.bias.metrics.mae_ratio</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.max_statistical_parity.html">holisticai.bias.metrics.max_statistical_parity</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.no_disparate_impact_level.html">holisticai.bias.metrics.no_disparate_impact_level</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.regression_bias_metrics.html">holisticai.bias.metrics.regression_bias_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.rmse_ratio.html">holisticai.bias.metrics.rmse_ratio</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.statistical_parity_auc.html">holisticai.bias.metrics.statistical_parity_auc</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.statistical_parity_regression.html">holisticai.bias.metrics.statistical_parity_regression</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.zscore_diff.html">holisticai.bias.metrics.zscore_diff</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#clustering">Clustering</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_balance.html">holisticai.bias.metrics.cluster_balance</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_dist_entropy.html">holisticai.bias.metrics.cluster_dist_entropy</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_dist_kl.html">holisticai.bias.metrics.cluster_dist_kl</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_dist_l1.html">holisticai.bias.metrics.cluster_dist_l1</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.clustering_bias_metrics.html">holisticai.bias.metrics.clustering_bias_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.min_cluster_ratio.html">holisticai.bias.metrics.min_cluster_ratio</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.silhouette_diff.html">holisticai.bias.metrics.silhouette_diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.social_fairness_ratio.html">holisticai.bias.metrics.social_fairness_ratio</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#recommender">Recommender</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.aggregate_diversity.html">holisticai.bias.metrics.aggregate_diversity</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_f1_ratio.html">holisticai.bias.metrics.avg_f1_ratio</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_precision_ratio.html">holisticai.bias.metrics.avg_precision_ratio</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_recall_ratio.html">holisticai.bias.metrics.avg_recall_ratio</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_recommendation_popularity.html">holisticai.bias.metrics.avg_recommendation_popularity</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.exposure_entropy.html">holisticai.bias.metrics.exposure_entropy</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.exposure_kl.html">holisticai.bias.metrics.exposure_kl</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.exposure_l1.html">holisticai.bias.metrics.exposure_l1</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.gini_index.html">holisticai.bias.metrics.gini_index</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.mad_score.html">holisticai.bias.metrics.mad_score</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.recommender_bias_metrics.html">holisticai.bias.metrics.recommender_bias_metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.recommender_mae_ratio.html">holisticai.bias.metrics.recommender_mae_ratio</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.metrics.recommender_rmse_ratio.html">holisticai.bias.metrics.recommender_rmse_ratio</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mitigation.html">Mitigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="measuring_bias.html">Measuring bias</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitigating_bias.html">Mitigating bias</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">holisticai</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Metrics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/metrics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="metrics">
+<h1>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h1>
+<p><cite>holisticai.bias.metrics</cite> is a python module measuring <em>bias</em> in algorithms. Metrics are included for <em>classification</em>, <em>regression</em>, <em>clustering</em>, <em>recommender</em> and <em>multiclass</em> tasks.</p>
+<div class="section" id="binary-classification">
+<span id="id1"></span><h2>Binary Classification<a class="headerlink" href="#binary-classification" title="Permalink to this headline">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.abroca.html#holisticai.bias.metrics.abroca" title="holisticai.bias.metrics.abroca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.abroca</span></code></a>(group_a, ...)</p></td>
+<td><p>ABROCA (area between roc curves).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.accuracy_diff.html#holisticai.bias.metrics.accuracy_diff" title="holisticai.bias.metrics.accuracy_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.accuracy_diff</span></code></a>(...)</p></td>
+<td><p>Accuracy Difference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.average_odds_diff.html#holisticai.bias.metrics.average_odds_diff" title="holisticai.bias.metrics.average_odds_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.average_odds_diff</span></code></a>(...)</p></td>
+<td><p>Average Odds Difference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.classification_bias_metrics.html#holisticai.bias.metrics.classification_bias_metrics" title="holisticai.bias.metrics.classification_bias_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.classification_bias_metrics</span></code></a>(...)</p></td>
+<td><p>Classification bias metrics batch computation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.cohen_d.html#holisticai.bias.metrics.cohen_d" title="holisticai.bias.metrics.cohen_d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.cohen_d</span></code></a>(group_a, ...)</p></td>
+<td><p>Cohen D.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.disparate_impact.html#holisticai.bias.metrics.disparate_impact" title="holisticai.bias.metrics.disparate_impact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.disparate_impact</span></code></a>(...)</p></td>
+<td><p>Disparate Impact.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.equal_opportunity_diff.html#holisticai.bias.metrics.equal_opportunity_diff" title="holisticai.bias.metrics.equal_opportunity_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.equal_opportunity_diff</span></code></a>(...)</p></td>
+<td><p>Equality of opportunity difference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.false_negative_rate_diff.html#holisticai.bias.metrics.false_negative_rate_diff" title="holisticai.bias.metrics.false_negative_rate_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.false_negative_rate_diff</span></code></a>(...)</p></td>
+<td><p>False negative Rate difference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.false_positive_rate_diff.html#holisticai.bias.metrics.false_positive_rate_diff" title="holisticai.bias.metrics.false_positive_rate_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.false_positive_rate_diff</span></code></a>(...)</p></td>
+<td><p>False positive rate difference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.four_fifths.html#holisticai.bias.metrics.four_fifths" title="holisticai.bias.metrics.four_fifths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.four_fifths</span></code></a>(group_a, ...)</p></td>
+<td><p>Four Fifths.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.statistical_parity.html#holisticai.bias.metrics.statistical_parity" title="holisticai.bias.metrics.statistical_parity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.statistical_parity</span></code></a>(...)</p></td>
+<td><p>Statistical parity.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.true_negative_rate_diff.html#holisticai.bias.metrics.true_negative_rate_diff" title="holisticai.bias.metrics.true_negative_rate_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.true_negative_rate_diff</span></code></a>(...)</p></td>
+<td><p>True negative Rate difference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.z_test_diff.html#holisticai.bias.metrics.z_test_diff" title="holisticai.bias.metrics.z_test_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.z_test_diff</span></code></a>(group_a, ...)</p></td>
+<td><p>Z Test (Difference).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.z_test_ratio.html#holisticai.bias.metrics.z_test_ratio" title="holisticai.bias.metrics.z_test_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.z_test_ratio</span></code></a>(...)</p></td>
+<td><p>Z Test (Ratio).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="multiclass-classification">
+<span id="id2"></span><h2>Multiclass Classification<a class="headerlink" href="#multiclass-classification" title="Permalink to this headline">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.accuracy_matrix.html#holisticai.bias.metrics.accuracy_matrix" title="holisticai.bias.metrics.accuracy_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.accuracy_matrix</span></code></a>(...)</p></td>
+<td><p>Multiclass Accuracy Matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.confusion_matrix.html#holisticai.bias.metrics.confusion_matrix" title="holisticai.bias.metrics.confusion_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.confusion_matrix</span></code></a>(...)</p></td>
+<td><p>Confusion Matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.confusion_tensor.html#holisticai.bias.metrics.confusion_tensor" title="holisticai.bias.metrics.confusion_tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.confusion_tensor</span></code></a>(...)</p></td>
+<td><p>Confusion Tensor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.frequency_matrix.html#holisticai.bias.metrics.frequency_matrix" title="holisticai.bias.metrics.frequency_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.frequency_matrix</span></code></a>(...)</p></td>
+<td><p>Frequency Matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_average_odds.html#holisticai.bias.metrics.multiclass_average_odds" title="holisticai.bias.metrics.multiclass_average_odds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.multiclass_average_odds</span></code></a>(...)</p></td>
+<td><p>Multiclass Average Odds.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_bias_metrics.html#holisticai.bias.metrics.multiclass_bias_metrics" title="holisticai.bias.metrics.multiclass_bias_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.multiclass_bias_metrics</span></code></a>(...)</p></td>
+<td><p>Multiclass bias metrics batch computation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_equality_of_opp.html#holisticai.bias.metrics.multiclass_equality_of_opp" title="holisticai.bias.metrics.multiclass_equality_of_opp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.multiclass_equality_of_opp</span></code></a>(...)</p></td>
+<td><p>Multiclass Equality of Opportunity.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_statistical_parity.html#holisticai.bias.metrics.multiclass_statistical_parity" title="holisticai.bias.metrics.multiclass_statistical_parity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.multiclass_statistical_parity</span></code></a>(...)</p></td>
+<td><p>Multiclass statistical parity.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.multiclass_true_rates.html#holisticai.bias.metrics.multiclass_true_rates" title="holisticai.bias.metrics.multiclass_true_rates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.multiclass_true_rates</span></code></a>(...)</p></td>
+<td><p>Multiclass True Rates.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.precision_matrix.html#holisticai.bias.metrics.precision_matrix" title="holisticai.bias.metrics.precision_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.precision_matrix</span></code></a>(...)</p></td>
+<td><p>Multiclass Precision Matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.recall_matrix.html#holisticai.bias.metrics.recall_matrix" title="holisticai.bias.metrics.recall_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.recall_matrix</span></code></a>(...[, ...])</p></td>
+<td><p>Multiclass Recall Matrix.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="regression">
+<span id="id3"></span><h2>Regression<a class="headerlink" href="#regression" title="Permalink to this headline">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_score_diff.html#holisticai.bias.metrics.avg_score_diff" title="holisticai.bias.metrics.avg_score_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.avg_score_diff</span></code></a>(...)</p></td>
+<td><p>Average Score Difference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.correlation_diff.html#holisticai.bias.metrics.correlation_diff" title="holisticai.bias.metrics.correlation_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.correlation_diff</span></code></a>(...)</p></td>
+<td><p>Correlation difference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.disparate_impact_regression.html#holisticai.bias.metrics.disparate_impact_regression" title="holisticai.bias.metrics.disparate_impact_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.disparate_impact_regression</span></code></a>(...)</p></td>
+<td><p>Disparate Impact quantile (Regression version).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.mae_ratio.html#holisticai.bias.metrics.mae_ratio" title="holisticai.bias.metrics.mae_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.mae_ratio</span></code></a>(group_a, ...)</p></td>
+<td><p>MAE ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.max_statistical_parity.html#holisticai.bias.metrics.max_statistical_parity" title="holisticai.bias.metrics.max_statistical_parity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.max_statistical_parity</span></code></a>(...)</p></td>
+<td><p>Max absolute statistical parity.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.no_disparate_impact_level.html#holisticai.bias.metrics.no_disparate_impact_level" title="holisticai.bias.metrics.no_disparate_impact_level"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.no_disparate_impact_level</span></code></a>(...)</p></td>
+<td><p>No disparate impact level.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.regression_bias_metrics.html#holisticai.bias.metrics.regression_bias_metrics" title="holisticai.bias.metrics.regression_bias_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.regression_bias_metrics</span></code></a>(...)</p></td>
+<td><p>Regression bias metrics batch computation</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.rmse_ratio.html#holisticai.bias.metrics.rmse_ratio" title="holisticai.bias.metrics.rmse_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.rmse_ratio</span></code></a>(group_a, ...)</p></td>
+<td><p>RMSE ratio.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.statistical_parity_auc.html#holisticai.bias.metrics.statistical_parity_auc" title="holisticai.bias.metrics.statistical_parity_auc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.statistical_parity_auc</span></code></a>(...)</p></td>
+<td><p>Statistical parity (AUC).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.statistical_parity_regression.html#holisticai.bias.metrics.statistical_parity_regression" title="holisticai.bias.metrics.statistical_parity_regression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.statistical_parity_regression</span></code></a>(...)</p></td>
+<td><p>Statistical Parity quantile (Regression version).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.zscore_diff.html#holisticai.bias.metrics.zscore_diff" title="holisticai.bias.metrics.zscore_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.zscore_diff</span></code></a>(group_a, ...)</p></td>
+<td><p>ZScore Difference.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="clustering">
+<span id="id4"></span><h2>Clustering<a class="headerlink" href="#clustering" title="Permalink to this headline">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_balance.html#holisticai.bias.metrics.cluster_balance" title="holisticai.bias.metrics.cluster_balance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.cluster_balance</span></code></a>(...)</p></td>
+<td><p>Cluster Balance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_dist_entropy.html#holisticai.bias.metrics.cluster_dist_entropy" title="holisticai.bias.metrics.cluster_dist_entropy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.cluster_dist_entropy</span></code></a>(...)</p></td>
+<td><p>Minority Cluster Distribution Entropy.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_dist_kl.html#holisticai.bias.metrics.cluster_dist_kl" title="holisticai.bias.metrics.cluster_dist_kl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.cluster_dist_kl</span></code></a>(...)</p></td>
+<td><p>Cluster Distribution KL.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.cluster_dist_l1.html#holisticai.bias.metrics.cluster_dist_l1" title="holisticai.bias.metrics.cluster_dist_l1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.cluster_dist_l1</span></code></a>(...)</p></td>
+<td><p>Cluster Distribution Total Variation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.clustering_bias_metrics.html#holisticai.bias.metrics.clustering_bias_metrics" title="holisticai.bias.metrics.clustering_bias_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.clustering_bias_metrics</span></code></a>(...)</p></td>
+<td><p>Clustering bias metrics batch computation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.min_cluster_ratio.html#holisticai.bias.metrics.min_cluster_ratio" title="holisticai.bias.metrics.min_cluster_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.min_cluster_ratio</span></code></a>(...)</p></td>
+<td><p>Minimum Cluster Ratio.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.silhouette_diff.html#holisticai.bias.metrics.silhouette_diff" title="holisticai.bias.metrics.silhouette_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.silhouette_diff</span></code></a>(...)</p></td>
+<td><p>Silhouette Difference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.social_fairness_ratio.html#holisticai.bias.metrics.social_fairness_ratio" title="holisticai.bias.metrics.social_fairness_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.social_fairness_ratio</span></code></a>(...)</p></td>
+<td><p>Social Fairness Ratio.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="recommender">
+<span id="id5"></span><h2>Recommender<a class="headerlink" href="#recommender" title="Permalink to this headline">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.aggregate_diversity.html#holisticai.bias.metrics.aggregate_diversity" title="holisticai.bias.metrics.aggregate_diversity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.aggregate_diversity</span></code></a>(...)</p></td>
+<td><p>Aggregate Diversity.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_f1_ratio.html#holisticai.bias.metrics.avg_f1_ratio" title="holisticai.bias.metrics.avg_f1_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.avg_f1_ratio</span></code></a>(...[, ...])</p></td>
+<td><p>Average f1 ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_precision_ratio.html#holisticai.bias.metrics.avg_precision_ratio" title="holisticai.bias.metrics.avg_precision_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.avg_precision_ratio</span></code></a>(...)</p></td>
+<td><p>Average precision ratio</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_recall_ratio.html#holisticai.bias.metrics.avg_recall_ratio" title="holisticai.bias.metrics.avg_recall_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.avg_recall_ratio</span></code></a>(...)</p></td>
+<td><p>Average recall ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.avg_recommendation_popularity.html#holisticai.bias.metrics.avg_recommendation_popularity" title="holisticai.bias.metrics.avg_recommendation_popularity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.avg_recommendation_popularity</span></code></a>(...)</p></td>
+<td><p>Average Recommendation Popularity.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.exposure_entropy.html#holisticai.bias.metrics.exposure_entropy" title="holisticai.bias.metrics.exposure_entropy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.exposure_entropy</span></code></a>(...)</p></td>
+<td><p>Exposure Entropy.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.exposure_kl.html#holisticai.bias.metrics.exposure_kl" title="holisticai.bias.metrics.exposure_kl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.exposure_kl</span></code></a>(group_a, ...)</p></td>
+<td><p>Exposure KL Divergence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.exposure_l1.html#holisticai.bias.metrics.exposure_l1" title="holisticai.bias.metrics.exposure_l1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.exposure_l1</span></code></a>(group_a, ...)</p></td>
+<td><p>Exposure Total Variation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.gini_index.html#holisticai.bias.metrics.gini_index" title="holisticai.bias.metrics.gini_index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.gini_index</span></code></a>(mat_pred)</p></td>
+<td><p>GINI index.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.mad_score.html#holisticai.bias.metrics.mad_score" title="holisticai.bias.metrics.mad_score"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.mad_score</span></code></a>(group_a, ...)</p></td>
+<td><p>Mean Absolute Deviation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.recommender_bias_metrics.html#holisticai.bias.metrics.recommender_bias_metrics" title="holisticai.bias.metrics.recommender_bias_metrics"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.recommender_bias_metrics</span></code></a>([...])</p></td>
+<td><p>Recommender bias metrics batch computation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.recommender_mae_ratio.html#holisticai.bias.metrics.recommender_mae_ratio" title="holisticai.bias.metrics.recommender_mae_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.recommender_mae_ratio</span></code></a>(...)</p></td>
+<td><p>Recommender MAE ratio.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.metrics.recommender_rmse_ratio.html#holisticai.bias.metrics.recommender_rmse_ratio" title="holisticai.bias.metrics.recommender_rmse_ratio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.metrics.recommender_rmse_ratio</span></code></a>(...)</p></td>
+<td><p>Recommender RMSE ratio.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href=".generated/holisticai.bias.metrics.abroca.html" class="btn btn-neutral float-right" title="holisticai.bias.metrics.abroca" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Holistic AI Library" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Holistic AI.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
