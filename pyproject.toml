@@ -1,5 +1,5 @@
 [tool.commitizen]
-version = "0.1.4"
+version = "0.2.0"
 changelog_incremental = true
 version_files = [
     "pyproject.toml:version"
@@ -7,15 +7,22 @@ version_files = [
 
 [tool.poetry]
 name = "holisticai"
-version = "0.1.4"
-description = ""
-authors = ["GBadila <gabriel.badila@holisticai.com>"]
+version = "0.2.0"
+description = "Holistic AI Library"
+authors = ["Research Team"]
+maintainers = ["Research Team <researchteam@holisticai.com>"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.7,<3.11"
+scikit-learn = ">=1.0.2"
+seaborn = ">=0.11.2"
+tqdm = "^4.64.1"
+cvxpy = {extras = ["cbc"], version = "^1.3.0"}
+cvxopt = "^1.3.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^7.1.3"
 pre-commit = "^3.0.0"
 commitizen = "^2.40.0"
 flake8 = "^6.0.0"
