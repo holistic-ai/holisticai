@@ -250,7 +250,7 @@ class EqualizedOdds(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        A dictionary with two keys, y_pred and y_score, which refers to the predicted labels and their probabilities, respectively. 
         """
         params = self._load_data(y_pred=y_pred, group_a=group_a, group_b=group_b)
 
