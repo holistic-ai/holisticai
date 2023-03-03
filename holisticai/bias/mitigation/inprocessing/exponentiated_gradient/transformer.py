@@ -44,18 +44,15 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         max_val: float = None,
         upper_bound: float = 0.01,
         verbose: Optional[int] = 0,
+        estimator = None
     ):
 
         """
+
         Parameters
         ----------
-
-        estimator: An estimator implementing methods
-            ``fit(X, y, sample_weight)`` and ``predict(X)``, where ``X`` is
-            the matrix of features, ``y`` is the vector of labels, and
-            ``sample_weight`` is a vector of weights; labels ``y`` and
-            predictions returned by ``predict(X)`` are either 0 or 1 -- e.g.
-            scikit-learn classifiers.
+        estimator : sklearn-like
+            The model you want to mitigate bias for.
 
         constraints (str or BaseMoment): If string, keyword
             denoting the :class:`BaseMoment` object
@@ -107,8 +104,14 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         self.max_val = max_val
         self.upper_bound = upper_bound
         self.verbose = verbose
+        self.estimator = estimator
 
     def transform_estimator(self, estimator):
+
+        """
+        This method is deprecated but retained for backwards-compatibility. You should pass the estimator object directly in the constructor.
+        """
+
         self.estimator = estimator
         return self
 
