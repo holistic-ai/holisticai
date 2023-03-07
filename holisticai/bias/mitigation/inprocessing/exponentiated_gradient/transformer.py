@@ -44,7 +44,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         max_val: float = None,
         upper_bound: float = 0.01,
         verbose: Optional[int] = 0,
-        estimator = None
+        estimator=None,
     ):
 
         """
