@@ -13,7 +13,7 @@ from ...utils._validation import _check_binary, _multiclass_checks
 from ..metrics import frequency_matrix
 
 
-def frequency_plot(p_attr, y_pred):
+def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
     """
     Frequency plot.
 
@@ -53,7 +53,7 @@ def frequency_plot(p_attr, y_pred):
 
     # charting
     sns.set()
-
+   
     colors = get_colors(sr_list.shape[0])
     hai_palette = sns.color_palette(colors)
 
@@ -75,8 +75,14 @@ def frequency_plot(p_attr, y_pred):
         return None
 
     else:
-        fig, ax = plt.subplots()
-        fig.suptitle("Success Rate Plot (Class {})".format(name_classes[1]))
+        
+        if ax is None:
+            fig, ax = plt.subplots(figsize=size)
+            if title is not None:
+                fig.suptitle(title)
+            else:
+                fig.suptitle("Frequency Plot (Class {})".format(name_classes[1]))
+    
         sns.barplot(
             x=sr_list.index.to_list(),
             y=sr_list[name_classes[1]],
