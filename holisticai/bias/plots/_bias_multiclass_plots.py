@@ -53,7 +53,7 @@ def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
 
     # charting
     sns.set()
-   
+
     colors = get_colors(sr_list.shape[0])
     hai_palette = sns.color_palette(colors)
 
@@ -75,14 +75,14 @@ def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
         return None
 
     else:
-        
+
         if ax is None:
             fig, ax = plt.subplots(figsize=size)
             if title is not None:
                 fig.suptitle(title)
             else:
                 fig.suptitle("Frequency Plot (Class {})".format(name_classes[1]))
-    
+
         sns.barplot(
             x=sr_list.index.to_list(),
             y=sr_list[name_classes[1]],
