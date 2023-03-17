@@ -46,7 +46,9 @@ class DisparateImpactRemover(BMPre):
             sensitive_features, convert_numeric=True
         ).to_numpy()
         data = np.c_[p_attr, X].tolist()
-        dir = NumericalRepairer(feature_to_repair=0, repair_level=1.0, kdd=False)
+        dir = NumericalRepairer(
+            feature_to_repair=0, repair_level=self.repair_level, kdd=False
+        )
         new_data_matrix_np = dir.repair(data)
         return np.array([np.array(row[1:]) for row in new_data_matrix_np])
 
