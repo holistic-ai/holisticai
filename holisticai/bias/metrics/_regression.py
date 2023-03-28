@@ -7,6 +7,45 @@ from ...utils._formatting import slice_arrays_by_quantile
 from ...utils._validation import _check_non_empty, _regression_checks
 
 
+def _calc_success_rate(group_membership: np.array, threshold=float):
+    group_above_threshold = group_membership[group_membership > threshold]
+    sr = group_above_threshold.size / group_membership.size
+    return sr
+
+def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
+    """
+    Calculates the raw success rates for each group.
+    Parameters
+    ----------
+    group_a : array-like
+        Group membership vector (binary)
+    group_b : array-like
+        Group membership vector (binary)
+    y_pred : array-like
+        Predictions vector (binary)
+    threshold: float, str
+        The number above which the result is considered a success. Also accepts 'median' and 'mean'.
+    Returns
+    -------
+    dict
+        Dictionary with two keys, sr_a and sr_b (success rate for group a and b)
+    """
+    # Needs to be numpy array or the following operations won't be correct
+    if (type(threshold) == str) and threshold not in set(['median', 'mean']):
+        raise ValueError("Threshold not recognised")
+    if threshold=='median':
+        threshold = np.median(y_pred)
+    if threshold=='mean':
+        threshold = np.mean(y_pred)
+    group_a = np.array(group_a)
+    group_b = np.array(group_b)
+    y_pred = np.array(y_pred)
+    group_a_membership = y_pred[group_a==1]
+    group_b_membership = y_pred[group_b==1]
+    sr_a = _calc_success_rate(group_a_membership, threshold)
+    sr_b = _calc_success_rate(group_b_membership, threshold)  # success rate group_b
+    return {"sr_a": sr_a, "sr_b": sr_b}
+
 def disparate_impact_regression(group_a, group_b, y_pred, q=0.8):
     r"""
     Disparate Impact quantile (Regression version).
