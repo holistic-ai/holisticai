@@ -8,9 +8,7 @@ from ...utils._validation import _check_non_empty, _regression_checks
 
 
 def _calc_success_rate(group_membership: np.array, threshold=float):
-    group_above_threshold = group_membership[group_membership > threshold]
-    sr = group_above_threshold.size / group_membership.size
-    return sr
+    return (group_membership > threshold).mean()
 
 
 def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
