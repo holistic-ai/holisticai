@@ -41,6 +41,13 @@ def test_success_rate_regression():
     group_b = [0, 0, 1, 1]
     assert success_rate_regression(group_a, group_b, y_pred, threshold=21)['sr_a'] == 0.5
     assert success_rate_regression(group_a, group_b, y_pred, threshold='median')['sr_b'] == 0.5
+    try:
+        success_rate_regression(group_a, group_b, y_pred, threshold='typo')
+        print("Exception was NOT raised")
+        assert False
+    except ValueError:
+        print("Value error raised and caught successfully")
+
 
 
 def test_disparate_impact_regression():
