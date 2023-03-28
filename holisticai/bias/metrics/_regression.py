@@ -31,7 +31,7 @@ def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
         Dictionary with two keys, sr_a and sr_b (success rate for group a and b)
     """
     # Needs to be numpy array or the following operations won't be correct
-    if (type(threshold) == str) and threshold not in set(['median', 'mean']):
+    if (type(threshold) == str) and (threshold not in set(['median', 'mean'])):
         raise ValueError("Threshold not recognised")
     if threshold=='median':
         threshold = np.median(y_pred)
