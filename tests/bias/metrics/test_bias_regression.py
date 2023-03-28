@@ -8,7 +8,6 @@ from holisticai.bias.metrics import (
     avg_score_diff,
     avg_score_ratio,
     correlation_diff,
-    success_rate_regression,
     disparate_impact_regression,
     mae_ratio,
     max_statistical_parity,
@@ -16,6 +15,7 @@ from holisticai.bias.metrics import (
     rmse_ratio,
     statistical_parity_auc,
     statistical_parity_regression,
+    success_rate_regression,
     zscore_diff,
 )
 
@@ -35,19 +35,24 @@ def test_dummy():
     """dummy test"""
     pass
 
+
 def test_success_rate_regression():
     y_pred = [20, 30, 12, 45]
     group_a = [1, 1, 0, 0]
     group_b = [0, 0, 1, 1]
-    assert success_rate_regression(group_a, group_b, y_pred, threshold=21)['sr_a'] == 0.5
-    assert success_rate_regression(group_a, group_b, y_pred, threshold='median')['sr_b'] == 0.5
+    assert (
+        success_rate_regression(group_a, group_b, y_pred, threshold=21)["sr_a"] == 0.5
+    )
+    assert (
+        success_rate_regression(group_a, group_b, y_pred, threshold="median")["sr_b"]
+        == 0.5
+    )
     try:
-        success_rate_regression(group_a, group_b, y_pred, threshold='typo')
+        success_rate_regression(group_a, group_b, y_pred, threshold="typo")
         print("Exception was NOT raised")
         assert False
     except ValueError:
         print("Value error raised and caught successfully")
-
 
 
 def test_disparate_impact_regression():

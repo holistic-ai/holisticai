@@ -88,6 +88,7 @@ def statistical_parity(group_a, group_b, y_pred):
 
     return sr_a - sr_b
 
+
 def success_rate(group_a, group_b, y_pred):
     """
     Calculates the raw success rates for each group.
@@ -107,6 +108,7 @@ def success_rate(group_a, group_b, y_pred):
     sr_a = _group_success_rate(group_a, y_pred)  # success rate group_a
     sr_b = _group_success_rate(group_b, y_pred)  # success rate group_b
     return {"sr_a": sr_a, "sr_b": sr_b}
+
 
 def disparate_impact(group_a, group_b, y_pred):
     """

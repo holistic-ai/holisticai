@@ -10,12 +10,12 @@ from holisticai.bias.metrics import (
     average_odds_diff,
     cohen_d,
     disparate_impact,
-    success_rate,
     equal_opportunity_diff,
     false_negative_rate_diff,
     false_positive_rate_diff,
     four_fifths,
     statistical_parity,
+    success_rate,
     true_negative_rate_diff,
     z_test_diff,
     z_test_ratio,
@@ -46,9 +46,12 @@ def test_disparate_impact():
     b = 9 / 4
     assert_approx_equal(a, b)
 
+
 def test_success_rate():
-    sr_a = df_c[df_c['group_a']==1]['y_pred'].sum()/df_c[df_c['group_a']==1].shape[0]
-    assert success_rate(group_a, group_b, y_pred_c)['sr_a'] == sr_a
+    sr_a = (
+        df_c[df_c["group_a"] == 1]["y_pred"].sum() / df_c[df_c["group_a"] == 1].shape[0]
+    )
+    assert success_rate(group_a, group_b, y_pred_c)["sr_a"] == sr_a
 
 
 def test_four_fifths():
