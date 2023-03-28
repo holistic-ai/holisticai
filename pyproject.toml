@@ -14,7 +14,7 @@ maintainers = ["Research Team <researchteam@holisticai.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.11"
+python = ">=3.8,<3.11"
 scikit-learn = ">=1.0.2"
 seaborn = ">=0.11.2"
 tqdm = "^4.64.1"
