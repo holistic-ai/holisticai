@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_approx_equal
+import pytest
 
 # Regression
 from holisticai.bias.metrics import (
@@ -47,12 +48,9 @@ def test_success_rate_regression():
         success_rate_regression(group_a, group_b, y_pred, threshold="median")["sr_b"]
         == 0.5
     )
-    try:
+    with pytest.raises(ValueError) as e_info:
         success_rate_regression(group_a, group_b, y_pred, threshold="typo")
-        print("Exception was NOT raised")
-        assert False
-    except ValueError:
-        print("Value error raised and caught successfully")
+
 
 
 def test_disparate_impact_regression():
