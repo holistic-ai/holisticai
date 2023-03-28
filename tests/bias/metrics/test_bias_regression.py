@@ -1,6 +1,7 @@
 # Imports
 import numpy as np
 import pandas as pd
+import pytest
 from numpy.testing import assert_approx_equal
 
 # Regression
@@ -15,6 +16,7 @@ from holisticai.bias.metrics import (
     rmse_ratio,
     statistical_parity_auc,
     statistical_parity_regression,
+    success_rate_regression,
     zscore_diff,
 )
 
@@ -33,6 +35,21 @@ group_a, group_b, y_pred_r, y_true_r = extract_columns(
 def test_dummy():
     """dummy test"""
     pass
+
+
+def test_success_rate_regression():
+    y_pred = [20, 30, 12, 45]
+    group_a = [1, 1, 0, 0]
+    group_b = [0, 0, 1, 1]
+    assert (
+        success_rate_regression(group_a, group_b, y_pred, threshold=21)["sr_a"] == 0.5
+    )
+    assert (
+        success_rate_regression(group_a, group_b, y_pred, threshold="median")["sr_b"]
+        == 0.5
+    )
+    with pytest.raises(ValueError) as e_info:
+        success_rate_regression(group_a, group_b, y_pred, threshold="typo")
 
 
 def test_disparate_impact_regression():
