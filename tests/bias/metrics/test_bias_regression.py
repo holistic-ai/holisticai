@@ -8,6 +8,7 @@ from holisticai.bias.metrics import (
     avg_score_diff,
     avg_score_ratio,
     correlation_diff,
+    success_rate_regression,
     disparate_impact_regression,
     mae_ratio,
     max_statistical_parity,
@@ -33,6 +34,13 @@ group_a, group_b, y_pred_r, y_true_r = extract_columns(
 def test_dummy():
     """dummy test"""
     pass
+
+def test_success_rate_regression():
+    y_pred = [20, 30, 12, 45]
+    group_a = [1, 1, 0, 0]
+    group_b = [0, 0, 1, 1]
+    assert success_rate_regression(group_a, group_b, y_pred, threshold=21)['sr_a'] == 0.5
+    assert success_rate_regression(group_a, group_b, y_pred, threshold='median')['sr_b'] == 0.5
 
 
 def test_disparate_impact_regression():

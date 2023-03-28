@@ -22,7 +22,7 @@ def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
     group_b : array-like
         Group membership vector (binary)
     y_pred : array-like
-        Predictions vector (binary)
+        Predictions vector (numerical)
     threshold: float, str
         The number above which the result is considered a success. Also accepts 'median' and 'mean'.
     Returns
