@@ -1,8 +1,8 @@
 # Imports
 import numpy as np
 import pandas as pd
-from numpy.testing import assert_approx_equal
 import pytest
+from numpy.testing import assert_approx_equal
 
 # Regression
 from holisticai.bias.metrics import (
@@ -50,7 +50,6 @@ def test_success_rate_regression():
     )
     with pytest.raises(ValueError) as e_info:
         success_rate_regression(group_a, group_b, y_pred, threshold="typo")
-
 
 
 def test_disparate_impact_regression():
