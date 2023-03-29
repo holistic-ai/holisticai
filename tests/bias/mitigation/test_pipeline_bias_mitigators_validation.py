@@ -4,17 +4,12 @@ from sklearn.preprocessing import StandardScaler
 
 from holisticai.pipeline import Pipeline
 from holisticai.utils.transformers.bias import BIAS_TAGS
-from tests.testing_utils._tests_data_utils import load_preprocessed_adult
-from tests.testing_utils._tests_utils import data_info, evaluate_pipeline, fit
-
-seed = 42
-train_data, test_data = load_preprocessed_adult()
 
 
-def test_incorrect_preprocessing_tag_in_postprocessing():
-    from holisticai.bias.mitigation import EqualizedOdds
+def test_incorrect_pipeline_mitigators_tags():
+    from holisticai.bias.mitigation import EqualizedOdds, Reweighing
 
-    def get_pipeline():
+    def incorrect_post_processing_pipeline_tag_definition():
         return Pipeline(
             steps=[
                 ("scaler", StandardScaler()),
@@ -24,13 +19,13 @@ def test_incorrect_preprocessing_tag_in_postprocessing():
         )
 
     error_message = "Mitigator objects and name doesn't match"
-    pytest.raises(TypeError, get_pipeline, match=error_message)
+    pytest.raises(
+        TypeError,
+        incorrect_post_processing_pipeline_tag_definition,
+        match=error_message,
+    )
 
-
-def test_incorrect_preprocessing_object_in_postprocessing():
-    from holisticai.bias.mitigation import Reweighing
-
-    def get_pipeline():
+    def incorrect_post_processing_pipeline_mitigator_definition():
         return Pipeline(
             steps=[
                 ("scaler", StandardScaler()),
@@ -40,13 +35,13 @@ def test_incorrect_preprocessing_object_in_postprocessing():
         )
 
     error_message = "Mitigator objects and name doesn't match"
-    pytest.raises(TypeError, get_pipeline, match=error_message)
+    pytest.raises(
+        TypeError,
+        incorrect_post_processing_pipeline_mitigator_definition,
+        match=error_message,
+    )
 
-
-def test_incorrect_postprocessing_object_in_preprocessing():
-    from holisticai.bias.mitigation import EqualizedOdds
-
-    def get_pipeline():
+    def incorrect_inp_processing_pipeline_mitigator_definition():
         return Pipeline(
             steps=[
                 ("scaler", StandardScaler()),
@@ -56,4 +51,8 @@ def test_incorrect_postprocessing_object_in_preprocessing():
         )
 
     error_message = "Mitigator objects and name doesn't match"
-    pytest.raises(TypeError, get_pipeline, match=error_message)
+    pytest.raises(
+        TypeError,
+        incorrect_inp_processing_pipeline_mitigator_definition,
+        match=error_message,
+    )
