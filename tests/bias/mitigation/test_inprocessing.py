@@ -1,21 +1,22 @@
+import os
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import evaluate_pipeline, fit, small_categorical_dataset
 
+from holisticai.bias.mitigation import GridSearchReduction
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_data_utils import load_preprocessed_adult
-from tests.testing_utils._tests_utils import data_info, evaluate_pipeline, fit
 
 
 def build_gsr_pipeline():
-    from holisticai.bias.mitigation import GridSearchReduction
-
-    np.random.seed(100)
-
     model = LogisticRegression()
     inprocessing_model = GridSearchReduction(
-        constraints="EqualizedOdds", grid_size=20
+        constraints="EqualizedOdds", grid_size=5
     ).transform_estimator(model)
 
     pipeline = Pipeline(
@@ -28,7 +29,10 @@ def build_gsr_pipeline():
     return pipeline
 
 
-def test_reweighing(data_info):
+def test_GridSearchReduction(small_categorical_dataset):
+    np.random.seed(100)
     pipeline = build_gsr_pipeline()
-    pipeline = fit(pipeline, data_info)
-    evaluate_pipeline(pipeline, data_info, ["Statistical parity difference"], [0.05])
+    pipeline = fit(pipeline, small_categorical_dataset)
+    evaluate_pipeline(
+        pipeline, small_categorical_dataset, ["Statistical parity difference"], [0.05]
+    )

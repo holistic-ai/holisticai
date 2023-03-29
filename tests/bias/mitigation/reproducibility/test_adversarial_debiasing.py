@@ -5,18 +5,19 @@ sys.path.append(os.getcwd())
 
 import pytest
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import check_results, small_categorical_dataset
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult_v2
 
 seed = 42
-train_data, test_data = load_preprocessed_adult_v2()
 
 
-def running_without_pipeline():
+def running_without_pipeline(small_categorical_dataset):
+
     from holisticai.bias.mitigation import AdversarialDebiasing
 
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -45,9 +46,10 @@ def running_without_pipeline():
     return df
 
 
-def running_with_pipeline():
+def running_with_pipeline(small_categorical_dataset):
     from holisticai.bias.mitigation import AdversarialDebiasing
 
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     inprocessing_model = AdversarialDebiasing(
@@ -83,7 +85,7 @@ def running_with_pipeline():
 
 
 @pytest.mark.skip(reason="pytorch not installed")
-def test_reproducibility_with_and_without_pipeline():
-    df1 = running_without_pipeline()
-    df2 = running_with_pipeline()
+def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
+    df1 = running_without_pipeline(small_categorical_dataset)
+    df2 = running_with_pipeline(small_categorical_dataset)
     check_results(df1, df2)

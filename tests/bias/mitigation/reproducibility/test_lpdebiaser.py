@@ -3,26 +3,29 @@ import sys
 
 import numpy as np
 
-sys.path = ["./"] + sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import warnings
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import (
+    check_results,
+    small_categorical_dataset,
+    small_multiclass_dataset,
+)
 
 from holisticai.bias.metrics import classification_bias_metrics, multiclass_bias_metrics
 from holisticai.bias.mitigation import LPDebiaserBinary, LPDebiaserMulticlass
 from holisticai.pipeline import Pipeline
 from holisticai.utils.transformers.bias import SensitiveGroups
-from tests.testing_utils._tests_data_utils import load_preprocessed_us_crime
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult_v2
 
 warnings.filterwarnings("ignore")
 
 seed = 42
 
 
-def running_without_pipeline():
-    train_data, test_data = load_preprocessed_adult_v2()
+def running_without_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -53,8 +56,8 @@ def running_without_pipeline():
     return df
 
 
-def running_with_pipeline():
-    train_data, test_data = load_preprocessed_adult_v2()
+def running_with_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
 
     pipeline = Pipeline(
         steps=[
@@ -79,9 +82,8 @@ def running_with_pipeline():
     return df
 
 
-def running_without_pipeline_multiclass():
-    nb_classes = 5
-    train_data, test_data = load_preprocessed_us_crime(nb_classes=nb_classes)
+def running_without_pipeline_multiclass(small_multiclass_dataset):
+    train_data, test_data = small_multiclass_dataset
 
     X, y, group_a, group_b = train_data
 
@@ -112,9 +114,8 @@ def running_without_pipeline_multiclass():
     return df
 
 
-def running_with_pipeline_multiclass():
-    nb_classes = 5
-    train_data, test_data = load_preprocessed_us_crime(nb_classes=nb_classes)
+def running_with_pipeline_multiclass(small_multiclass_dataset):
+    train_data, test_data = small_multiclass_dataset
 
     pipeline = Pipeline(
         steps=[
@@ -148,21 +149,17 @@ def running_with_pipeline_multiclass():
     return df
 
 
-def test_reproducibility_with_and_without_pipeline_multiclass():
-    import numpy as np
-
+def test_reproducibility_with_and_without_pipeline_multiclass(small_multiclass_dataset):
     np.random.seed(seed)
-    df1 = running_without_pipeline()
+    df1 = running_without_pipeline_multiclass(small_multiclass_dataset)
     np.random.seed(seed)
-    df2 = running_with_pipeline()
+    df2 = running_with_pipeline_multiclass(small_multiclass_dataset)
     check_results(df1, df2)
 
 
-def test_reproducibility_with_and_without_pipeline_binary():
-    import numpy as np
-
+def test_reproducibility_with_and_without_pipeline_binary(small_categorical_dataset):
     np.random.seed(seed)
-    df1 = running_without_pipeline()
+    df1 = running_without_pipeline(small_categorical_dataset)
     np.random.seed(seed)
-    df2 = running_with_pipeline()
+    df2 = running_with_pipeline(small_categorical_dataset)
     check_results(df1, df2)

@@ -1,21 +1,22 @@
 import os
 import sys
 
-sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
+import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import check_results, small_categorical_dataset
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.bias.mitigation import RejectOptionClassification
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult_v2
 
 seed = 42
-train_data, test_data = load_preprocessed_adult_v2()
 
 
-def running_without_pipeline():
+def running_without_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -40,15 +41,16 @@ def running_without_pipeline():
     y_pred = post.transform(y_pred, y_proba, **transform_params)["y_pred"]
 
     df = classification_bias_metrics(
-        group_b.to_numpy().ravel(),
-        group_a.to_numpy().ravel(),
+        group_b,
+        group_a,
         y_pred,
-        y.to_numpy().ravel(),
+        y,
     )
     return df
 
 
-def running_with_pipeline():
+def running_with_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     pipeline = Pipeline(
         steps=[
             ("scaler", StandardScaler()),
@@ -69,19 +71,17 @@ def running_with_pipeline():
     }
     y_pred = pipeline.predict(X, **predict_params)
     df = classification_bias_metrics(
-        group_b.to_numpy().ravel(),
-        group_a.to_numpy().ravel(),
+        group_b,
+        group_a,
         y_pred,
-        y.to_numpy().ravel(),
+        y,
     )
     return df
 
 
-def test_reproducibility_with_and_without_pipeline():
-    import numpy as np
-
+def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
     np.random.seed(seed)
-    df1 = running_without_pipeline()
+    df1 = running_without_pipeline(small_categorical_dataset)
     np.random.seed(seed)
-    df2 = running_with_pipeline()
+    df2 = running_with_pipeline(small_categorical_dataset)
     check_results(df1, df2)

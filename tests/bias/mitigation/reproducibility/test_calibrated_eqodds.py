@@ -1,62 +1,54 @@
 import os
 import sys
 
-sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import warnings
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import check_results, small_categorical_dataset
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.bias.mitigation import CalibratedEqualizedOdds
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult_v2
 
 warnings.filterwarnings("ignore")
 
 seed = 42
-train_data, test_data = load_preprocessed_adult_v2()
 
 
-def running_without_pipeline():
+def running_without_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
 
-    X, y, group_a, group_b = train_data
+    X_train, y_train, group_a_train, group_b_train = train_data
 
     scaler = StandardScaler()
-    Xt = scaler.fit_transform(X)
+    X_train_scaled = scaler.fit_transform(X_train)
 
     model = LogisticRegression()
-    model.fit(Xt, y)
+    model.fit(X_train_scaled, y_train)
 
-    y_proba = model.predict_proba(Xt)
-
-    fit_params = {
-        "group_a": group_a,
-        "group_b": group_b,
-    }
+    y_train_proba = model.predict_proba(X_train_scaled)
 
     post = CalibratedEqualizedOdds("fpr")
-    post.fit(y, y_proba, **fit_params)
+    post.fit(y_train, y_train_proba, group_a=group_a_train, group_b=group_b_train)
 
     # Test
-    X, y, group_a, group_b = test_data
-    Xt = scaler.transform(X)
-    transform_params = {"group_a": group_a, "group_b": group_b}
+    X_test, y_test, group_a_test, group_b_test = test_data
+    X_test_scaled = scaler.transform(X_test)
 
-    y_pred = model.predict(Xt)
-    y_proba = model.predict_proba(Xt)
-    y_pred = post.transform(y_pred, y_proba, **transform_params)["y_pred"]
+    y_pred = model.predict(X_test_scaled)
+    y_test_proba = model.predict_proba(X_test_scaled)
+    y_pred = post.transform(
+        y_pred, y_test_proba, group_a=group_a_test, group_b=group_b_test
+    )["y_pred"]
 
-    df = classification_bias_metrics(
-        group_a.to_numpy().ravel(),
-        group_b.to_numpy().ravel(),
-        y_pred,
-        y.to_numpy().ravel(),
-    )
+    df = classification_bias_metrics(group_a_test, group_b_test, y_pred, y_test)
     return df
 
 
-def running_with_pipeline():
+def running_with_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     pipeline = Pipeline(
         steps=[
             ("scaler", StandardScaler()),
@@ -65,31 +57,23 @@ def running_with_pipeline():
         ]
     )
 
-    X, y, group_a, group_b = train_data
-    fit_params = {"bm__group_a": group_a, "bm__group_b": group_b}
+    X_train, y_train, group_a_train, group_b_train = train_data
+    pipeline.fit(X_train, y_train, bm__group_a=group_a_train, bm__group_b=group_b_train)
 
-    pipeline.fit(X, y, **fit_params)
-
-    X, y, group_a, group_b = test_data
-    predict_params = {
-        "bm__group_a": group_a,
-        "bm__group_b": group_b,
-    }
-    y_pred = pipeline.predict(X, **predict_params)
-    df = classification_bias_metrics(
-        group_a.to_numpy().ravel(),
-        group_b.to_numpy().ravel(),
-        y_pred,
-        y.to_numpy().ravel(),
+    X_test, y_test, group_a_test, group_b_test = test_data
+    y_pred = pipeline.predict(
+        X_test, bm__group_a=group_a_test, bm__group_b=group_b_test
     )
+
+    df = classification_bias_metrics(group_a_test, group_b_test, y_pred, y_test)
     return df
 
 
-def test_reproducibility_with_and_without_pipeline():
+def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
     import numpy as np
 
     np.random.seed(seed)
-    df1 = running_without_pipeline()
+    df1 = running_without_pipeline(small_categorical_dataset)
     np.random.seed(seed)
-    df2 = running_with_pipeline()
+    df2 = running_with_pipeline(small_categorical_dataset)
     check_results(df1, df2)
