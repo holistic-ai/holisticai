@@ -15,6 +15,7 @@ from ._classification import (
     false_positive_rate_diff,
     four_fifths,
     statistical_parity,
+    success_rate,
     true_negative_rate_diff,
     z_test_diff,
     z_test_ratio,
@@ -77,6 +78,7 @@ from ._regression import (
     rmse_ratio,
     statistical_parity_auc,
     statistical_parity_regression,
+    success_rate_regression,
     zscore_diff,
 )
 
@@ -92,6 +94,8 @@ __all__ = [
     "abroca",
     "statistical_parity_regression",
     "disparate_impact_regression",
+    "success_rate_regression",
+    "success_rate",
     "no_disparate_impact_level",
     "avg_score_diff",
     "avg_score_ratio",
