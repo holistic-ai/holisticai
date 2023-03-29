@@ -2,10 +2,9 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import evaluate_pipeline, fit, small_categorical_dataset
 
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_data_utils import load_preprocessed_adult
-from tests.testing_utils._tests_utils import data_info, evaluate_pipeline, fit
 
 
 def build_rew_pipeline():
@@ -23,7 +22,9 @@ def build_rew_pipeline():
     return pipeline
 
 
-def test_reweighing(data_info):
+def test_reweighing(small_categorical_dataset):
     pipeline = build_rew_pipeline()
-    pipeline = fit(pipeline, data_info)
-    evaluate_pipeline(pipeline, data_info, ["Statistical parity difference"], [0.05])
+    pipeline = fit(pipeline, small_categorical_dataset)
+    evaluate_pipeline(
+        pipeline, small_categorical_dataset, ["Statistical parity difference"], [0.05]
+    )

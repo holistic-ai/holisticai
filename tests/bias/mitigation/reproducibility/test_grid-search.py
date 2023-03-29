@@ -1,24 +1,25 @@
 import os
 import sys
 
-sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import (
+    check_results,
+    small_categorical_dataset,
+    small_regression_dataset,
+)
 
+from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics
 from holisticai.bias.mitigation import GridSearchReduction
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_data_utils import load_preprocessed_us_crime
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult_v2
 
 seed = 42
 
 
-def running_without_pipeline_classification():
-    from sklearn.linear_model import LogisticRegression
-
-    from holisticai.bias.metrics import classification_bias_metrics
-
-    train_data, test_data = load_preprocessed_adult_v2()
+def running_without_pipeline_classification(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -48,12 +49,8 @@ def running_without_pipeline_classification():
     return df
 
 
-def running_with_pipeline_classification():
-    from sklearn.linear_model import LogisticRegression
-
-    from holisticai.bias.metrics import classification_bias_metrics
-
-    train_data, test_data = load_preprocessed_adult_v2()
+def running_with_pipeline_classification(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     model = LogisticRegression()
     inprocessing_model = GridSearchReduction(
         constraints="ErrorRateParity", grid_size=20
@@ -87,12 +84,8 @@ def running_with_pipeline_classification():
     return df
 
 
-def running_without_pipeline_regression():
-    from sklearn.linear_model import LinearRegression
-
-    from holisticai.bias.metrics import regression_bias_metrics
-
-    train_data, test_data = load_preprocessed_us_crime()
+def running_without_pipeline_regression(small_regression_dataset):
+    train_data, test_data = small_regression_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -126,12 +119,9 @@ def running_without_pipeline_regression():
     return df
 
 
-def running_with_pipeline_regression():
-    from sklearn.linear_model import LinearRegression
+def running_with_pipeline_regression(small_regression_dataset):
 
-    from holisticai.bias.metrics import regression_bias_metrics
-
-    train_data, test_data = load_preprocessed_us_crime()
+    train_data, test_data = small_regression_dataset
     X, y, group_a, group_b = train_data
 
     model = LinearRegression()
@@ -171,14 +161,13 @@ def running_with_pipeline_regression():
     return df
 
 
-def test_reproducibility_with_and_without_pipeline():
-    df1 = running_without_pipeline_classification()
-    df2 = running_with_pipeline_classification()
+def test_reproducibility_with_and_without_pipeline(
+    small_categorical_dataset, small_regression_dataset
+):
+    df1 = running_without_pipeline_classification(small_categorical_dataset)
+    df2 = running_with_pipeline_classification(small_categorical_dataset)
     check_results(df1, df2)
 
-    df1 = running_without_pipeline_regression()
-    df2 = running_with_pipeline_regression()
+    df1 = running_without_pipeline_regression(small_regression_dataset)
+    df2 = running_with_pipeline_regression(small_regression_dataset)
     check_results(df1, df2)
-
-
-# test_reproducibility_with_and_without_pipeline()

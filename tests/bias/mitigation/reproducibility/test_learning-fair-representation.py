@@ -1,25 +1,25 @@
+import os
 import sys
 
-sys.path = ["./"] + sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import warnings
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import check_results, small_categorical_dataset
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.bias.mitigation import LearningFairRepresentation
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult
 
 warnings.filterwarnings("ignore")
-
 seed = 42
-train_data, test_data = load_preprocessed_adult()
 
 
-def running_without_pipeline():
+def running_without_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
     fit_params = {"group_a": group_a, "group_b": group_b}
     scaler = StandardScaler()
@@ -43,7 +43,8 @@ def running_without_pipeline():
     return df
 
 
-def running_with_pipeline():
+def running_with_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     pipeline = Pipeline(
         steps=[
             ("scaler", StandardScaler()),
@@ -70,7 +71,7 @@ def running_with_pipeline():
     return df
 
 
-def test_reproducibility_with_and_without_pipeline():
-    df1 = running_without_pipeline()
-    df2 = running_with_pipeline()
+def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
+    df1 = running_without_pipeline(small_categorical_dataset)
+    df2 = running_with_pipeline(small_categorical_dataset)
     check_results(df1, df2)
