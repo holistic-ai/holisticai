@@ -21,16 +21,17 @@ CLUSTERING_CATALOG = {"KCenter": KCenters, "KMedoids": KMedoids}
 
 class FairletClusteringPreprocessing(BaseEstimator, BMPre):
     """
-    Variational Fair Clustering helps you to find clusters with specified proportions
-    of different demographic groups pertaining to a sensitive attribute of the dataset
-    (group_a and group_b) for any well-known clustering method such as K-means, K-median
-    or Spectral clustering (Normalized cut).
-
+    Fairlet decomposition is a pre-processing approach that computes 
+    fair micro-clusters where fairness is guaranteed. They then use 
+    the fairlet centers as a newly transformed dataset from the original. 
+    This transformed fairlet-based dataset is then provided to vanilla
+    clustering algorithms, and hence, we obtain approximately
+    fair clustering outputs as a result of the fairlets themselves being fair.
 
     References
     ----------
-        Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI
-        Conference on Artificial Intelligence. Vol. 35. No. 12. 2021.
+        Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
+        Machine Learning. PMLR, 2019.
     """
 
     def __init__(
