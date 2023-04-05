@@ -11,6 +11,7 @@ from .plugin_estimator_and_recalibration.transformer import (
 )
 from .reject_option_classification import RejectOptionClassification
 from .wasserstein_barycenters.transformer import WassersteinBarycenter
+from .mcmf_clustering.transformer import MCMF
 
 __all__ = [
     "CalibratedEqualizedOdds",
@@ -23,6 +24,8 @@ __all__ = [
     "LPDebiaserMulticlass",
     "DebiasingExposure",
     "FairTopK",
+    "MCMF"
+
 ]
 
 import importlib
