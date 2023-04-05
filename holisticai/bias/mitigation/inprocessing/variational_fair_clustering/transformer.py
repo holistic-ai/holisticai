@@ -25,7 +25,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
 
     def __init__(
         self,
-        nb_clusters: Optional[int],
+        n_clusters: Optional[int],
         lipchitz_value: Optional[str] = 1,
         lmbda: Optional[float] = 0.7,
         method: Optional[str] = "kmeans",
@@ -36,7 +36,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         """
         Parameters
         ----------
-            nb_clusters : int
+            n_clusters : int
                 The number of clusters to form as well as the number of centroids to generate.
 
             lipchitz_value : float
@@ -59,7 +59,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         """
         # Constant parameters
         self.algorithm = FairClusteringAlgorithm(
-            K=nb_clusters,
+            K=n_clusters,
             L=lipchitz_value,
             lmbda=lmbda,
             method=method,
@@ -67,7 +67,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
             verbose=verbose,
         )
         self.seed = seed
-        self.nb_clusters = nb_clusters
+        self.n_clusters = n_clusters
         self.lipchitz_value = lipchitz_value
         self.lmbda = lmbda
         self.method = method
