@@ -5,6 +5,7 @@ from .eq_odds_postprocessing import EqualizedOdds
 from .fair_topk.transformer import FairTopK
 from .lp_debiaser.binary_balancer.transformer import LPDebiaserBinary
 from .lp_debiaser.multiclass_balancer.transformer import LPDebiaserMulticlass
+from .mcmf_clustering.transformer import MCMF
 from .ml_debiaser.transformer import MLDebiaser
 from .plugin_estimator_and_recalibration.transformer import (
     PluginEstimationAndCalibration,
@@ -23,6 +24,7 @@ __all__ = [
     "LPDebiaserMulticlass",
     "DebiasingExposure",
     "FairTopK",
+    "MCMF",
 ]
 
 import importlib
