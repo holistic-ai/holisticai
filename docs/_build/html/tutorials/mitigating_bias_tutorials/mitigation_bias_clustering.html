@@ -1060,7 +1060,7 @@ from holisticai.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 pipeline = Pipeline(steps=[
     (&#39;scaler&#39;, StandardScaler()),
-    (&#39;bm_inprocessing&#39;, VariationalFairClustering(nb_clusters=4, lmbda=4000, method=&#39;kmeans&#39;, verbose=True))])
+    (&#39;bm_inprocessing&#39;, VariationalFairClustering(n_clusters=4, lmbda=4000, method=&#39;kmeans&#39;, verbose=True))])
 pipeline.fit(X_train, bm__group_a = group_a_train, bm__group_b = group_b_train)
 </pre></div>
 </div>

@@ -24,7 +24,7 @@ def running_without_pipeline(small_categorical_dataset):
     scaler = StandardScaler()
     Xt = scaler.fit_transform(X)
 
-    model = VariationalFairClustering(nb_clusters=4, seed=seed)
+    model = VariationalFairClustering(n_clusters=4, seed=seed)
     model.fit(Xt, group_a=group_a, group_b=group_b)
 
     # Test
@@ -44,7 +44,7 @@ def running_with_pipeline(small_categorical_dataset):
     pipeline = Pipeline(
         steps=[
             ("scaler", StandardScaler()),
-            ("bm_inprocessing", VariationalFairClustering(nb_clusters=4, seed=seed)),
+            ("bm_inprocessing", VariationalFairClustering(n_clusters=4, seed=seed)),
         ]
     )
 
