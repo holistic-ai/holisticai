@@ -2,14 +2,14 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_data_utils import load_preprocessed_adult
+from testing_utils.tests_utils import evaluate_pipeline, fit, small_categorical_dataset
 
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_data_utils import load_preprocessed_adult
-from tests.testing_utils._tests_utils import data_info, evaluate_pipeline, fit
 
 
-def check_postprocessing_prediction(model, data_info):
-    train_data, test_data = data_info
+def check_postprocessing_prediction(model, small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     fit_params = {"bm__group_a": group_a, "bm__group_b": group_b}
@@ -74,18 +74,22 @@ def build_roc_pipeline(metric_name):
         ("weighted", (["False Positive Rate difference"], [0.05])),
     ],
 )
-def test_calibrated_equal_odds(data_info, cost_constraint, metric_evalution):
+def test_calibrated_equal_odds(
+    small_categorical_dataset, cost_constraint, metric_evalution
+):
     pipeline = build_ceop_pipeline(cost_constraint)
-    pipeline = fit(pipeline, data_info)
-    evaluate_pipeline(pipeline, data_info, *metric_evalution)
-    check_postprocessing_prediction(pipeline, data_info)
+    pipeline = fit(pipeline, small_categorical_dataset)
+    evaluate_pipeline(pipeline, small_categorical_dataset, *metric_evalution)
+    check_postprocessing_prediction(pipeline, small_categorical_dataset)
 
 
-def test_equal_odds(data_info):
+def test_equal_odds(small_categorical_dataset):
     pipeline = build_eop_pipeline()
-    pipeline = fit(pipeline, data_info)
-    evaluate_pipeline(pipeline, data_info, ["False Negative Rate difference"], [0.05])
-    check_postprocessing_prediction(pipeline, data_info)
+    pipeline = fit(pipeline, small_categorical_dataset)
+    evaluate_pipeline(
+        pipeline, small_categorical_dataset, ["False Negative Rate difference"], [0.05]
+    )
+    check_postprocessing_prediction(pipeline, small_categorical_dataset)
 
 
 @pytest.mark.parametrize(
@@ -96,7 +100,9 @@ def test_equal_odds(data_info):
         ("Equal opportunity difference", (["Equal opportunity difference"], [0.05])),
     ],
 )
-def test_reject_option_classification(data_info, metric_name, metric_evalution):
+def test_reject_option_classification(
+    small_categorical_dataset, metric_name, metric_evalution
+):
     pipeline = build_roc_pipeline(metric_name=metric_name)
-    pipeline = fit(pipeline, data_info)
-    evaluate_pipeline(pipeline, data_info, *metric_evalution)
+    pipeline = fit(pipeline, small_categorical_dataset)
+    evaluate_pipeline(pipeline, small_categorical_dataset, *metric_evalution)

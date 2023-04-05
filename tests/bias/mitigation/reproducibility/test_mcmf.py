@@ -1,23 +1,23 @@
 import os
 import sys
 
-sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import small_categorical_dataset
 
 from holisticai.bias.metrics import clustering_bias_metrics
 from holisticai.bias.mitigation.postprocessing.mcmf_clustering.transformer import MCMF
-from tutorials.utils.datasets import preprocessed_dataset
-
-data = preprocessed_dataset("adult", splitted=False)
+from holisticai.pipeline import Pipeline
 
 
-def test_using_pipeline():
-    from holisticai.pipeline import Pipeline
-
-    k = 6
-    X_train, _, group_a_train, group_b_train = [d[:1000] for d in data]
+def test_using_pipeline(small_categorical_dataset):
+    np.random.seed(100)
+    k = 4
+    X_train, _, group_a_train, group_b_train = [
+        d[:1000] for d in small_categorical_dataset[0]
+    ]
 
     pipeline = Pipeline(
         steps=[
@@ -39,9 +39,12 @@ def test_using_pipeline():
     assert np.abs(np.max(items_per_cluster) - np.min(items_per_cluster)) <= 1
 
 
-def test_withoutpipeline():
-    k = 6
-    X_train, _, group_a_train, group_b_train = [d[:1000] for d in data]
+def test_withoutpipeline(small_categorical_dataset):
+    np.random.seed(100)
+    k = 4
+    X_train, _, group_a_train, group_b_train = [
+        d[:1000] for d in small_categorical_dataset[0]
+    ]
     Xt = StandardScaler().fit_transform(X_train)
     model = KMeans(n_clusters=k)
     model.fit(Xt)

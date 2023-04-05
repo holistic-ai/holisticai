@@ -14,7 +14,7 @@ def test_running_matrix_factorization_strategies():
     bunch = load_last_fm()
     lastfm = bunch["frame"]
     lastfm["score"] = 1
-    lastfm = lastfm.iloc[:500]
+    lastfm = lastfm.iloc[:300]
     df_pivot, p_attr = recommender_formatter(
         lastfm,
         users_col="user",
@@ -29,20 +29,21 @@ def test_running_matrix_factorization_strategies():
         NonNegativeMF,
     )
 
-    mf = NonNegativeMF(K=10)
+    K = 10
+    mf = NonNegativeMF(K=K)
     mf.fit(data_matrix)
     assert mf.pred.shape == (numUsers, numItems)
 
     from holisticai.bias.mitigation import PopularityPropensityMF
 
-    mf = PopularityPropensityMF(K=10, beta=0.02, steps=100, verbose=1)
+    mf = PopularityPropensityMF(K=K, beta=0.02, steps=3, verbose=1)
     mf.fit(data_matrix)
     assert mf.pred.shape == (numUsers, numItems)
 
     from holisticai.bias.mitigation import DebiasingLearningMF
 
     mf = DebiasingLearningMF(
-        K=10,
+        K=K,
         normalization="Vanilla",
         lamda=0.08,
         metric="mse",

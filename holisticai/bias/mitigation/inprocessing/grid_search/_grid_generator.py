@@ -67,21 +67,15 @@ class GridGenerator:
         """Create an integer grid"""
         max_value = self._get_true_dim()
         self.accumulator = []
-        self.entry = np.zeros(self.dim)
-        self._accumulate_integer_grid(0, max_value)
+        while True:
+            self.entry = np.zeros(self.dim)
+            self._accumulate_integer_grid(0, max_value)
+            max_value += 1
+            if len(self.accumulator) >= self.grid_size:
+                break
+
         xs = np.array(self.accumulator)
         xs = xs * self.grid_limit / max_value
-
-        """
-        min_value = 0
-        if self.neg_values:
-            max_value = (max_value - 1 + 2 - 1) // 2
-            min_value = -max_value
-        xs = [np.arange(min_value, max_value + 1) for _ in range(nb_events)]
-        xs = np.meshgrid(*xs)
-        xs = np.stack([x.reshape(-1) for x in xs], axis=1)
-        xs = xs * self.grid_limit / max_value
-        """
         return xs
 
     def _accumulate_integer_grid(self, index, max_val):

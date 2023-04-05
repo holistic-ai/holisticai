@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path = ["./"] + sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import warnings
 
@@ -10,20 +10,18 @@ import pandas as pd
 from numpy.testing import assert_array_almost_equal
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import check_results, small_categorical_dataset
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.bias.mitigation import Reweighing
 from holisticai.pipeline import Pipeline
 from holisticai.utils import extract_columns
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult
 
 warnings.filterwarnings("ignore")
 
-train_data, test_data = load_preprocessed_adult()
 
-
-def running_without_pipeline():
-
+def running_without_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
     fit_params = {"group_a": group_a, "group_b": group_b}
     scaler = StandardScaler()
@@ -41,16 +39,16 @@ def running_without_pipeline():
     Xt = prep.transform(Xt)
     y_pred = model.predict(Xt)
     df = classification_bias_metrics(
-        group_b.to_numpy().ravel(),
-        group_a.to_numpy().ravel(),
+        group_b,
+        group_a,
         y_pred,
-        y.to_numpy().ravel(),
+        y,
     )
     return df
 
 
-def running_with_pipeline():
-
+def running_with_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     pipeline = Pipeline(
         steps=[
             ("scaler", StandardScaler()),
@@ -71,18 +69,18 @@ def running_with_pipeline():
     }
     y_pred = pipeline.predict(X, **predict_params)
     df = classification_bias_metrics(
-        group_b.to_numpy().ravel(),
-        group_a.to_numpy().ravel(),
+        group_b,
+        group_a,
         y_pred,
-        y.to_numpy().ravel(),
+        y,
     )
 
     return df
 
 
-def test_reproducibility_with_and_without_pipeline():
-    df1 = running_without_pipeline()
-    df2 = running_with_pipeline()
+def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
+    df1 = running_without_pipeline(small_categorical_dataset)
+    df2 = running_with_pipeline(small_categorical_dataset)
     check_results(df1, df2)
 
 
@@ -101,6 +99,3 @@ def test_reweighing():
         [2 / 3, 2 / 3, 2 / 3, 2, 1.5, 1.5, 0.75, 0.75, 0.75, 0.75]
     )
     assert_array_almost_equal(sample_weight, expected_output)
-
-
-test_reweighing()
