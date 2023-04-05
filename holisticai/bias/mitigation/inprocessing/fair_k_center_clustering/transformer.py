@@ -122,3 +122,6 @@ class FairKCenterClustering(BaseEstimator, BMImp):
     @property
     def all_centers(self):
         return np.concatenate([self.centers, self.initially_given], axis=0)
+
+    def predict(self, X):
+        return pairwise_distances(self.all_centroids, X, metric="l1").argmin(axis=0)
