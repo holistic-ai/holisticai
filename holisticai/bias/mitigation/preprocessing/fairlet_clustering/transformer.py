@@ -21,9 +21,9 @@ CLUSTERING_CATALOG = {"KCenter": KCenters, "KMedoids": KMedoids}
 
 class FairletClusteringPreprocessing(BaseEstimator, BMPre):
     """
-    Fairlet decomposition is a pre-processing approach that computes 
-    fair micro-clusters where fairness is guaranteed. They then use 
-    the fairlet centers as a newly transformed dataset from the original. 
+    Fairlet decomposition is a pre-processing approach that computes
+    fair micro-clusters where fairness is guaranteed. They then use
+    the fairlet centers as a newly transformed dataset from the original.
     This transformed fairlet-based dataset is then provided to vanilla
     clustering algorithms, and hence, we obtain approximately
     fair clustering outputs as a result of the fairlets themselves being fair.
