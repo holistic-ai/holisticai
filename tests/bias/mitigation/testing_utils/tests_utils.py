@@ -261,6 +261,10 @@ class Dclass:
 
 import pytest
 from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_data_utils import convert_float_to_categorical
+
+from holisticai.datasets import load_us_crime
 
 
 class MetricsHelper:
@@ -286,37 +290,135 @@ class MetricsHelper:
 
 
 @pytest.fixture
-def data_info():
-    dataset = load_adult()
-    df = pd.concat([dataset["data"], dataset["target"]], axis=1)
-    df = df.sample(n=600)
-
+def small_categorical_dataset():
     protected_variables = ["sex", "race"]
     output_variable = ["class"]
     favorable_label = 1
     unfavorable_label = 0
+    group = ["sex"]
 
-    y = df[output_variable].replace(
-        {">50K": favorable_label, "<=50K": unfavorable_label}
+    dataset = load_adult()
+    df = pd.concat([dataset["data"], dataset["target"]], axis=1)
+    df = pd.concat(
+        [
+            df[(df[group[0]] == "Male") & (df[output_variable[0]] == ">50K")]
+            .sample(5)
+            .reset_index(drop=True),
+            df[(df[group[0]] == "Male") & (df[output_variable[0]] == "<=50K")]
+            .sample(10)
+            .reset_index(drop=True),
+            df[(df[group[0]] == "Female") & (df[output_variable[0]] == ">50K")]
+            .sample(2)
+            .reset_index(drop=True),
+            df[(df[group[0]] == "Female") & (df[output_variable[0]] == "<=50K")]
+            .sample(5)
+            .reset_index(drop=True),
+        ],
+        axis=0,
+    )
+
+    y = (
+        df[output_variable]
+        .replace({">50K": favorable_label, "<=50K": unfavorable_label})
+        .values.ravel()
     )
     x = pd.get_dummies(df.drop(protected_variables + output_variable, axis=1))
 
-    group = ["sex"]
-    group_a = df[group] == "Female"
-    group_a = np.array(group_a).ravel()
-    group_b = df[group] == "Male"
-    group_b = np.array(group_b).ravel()
-    y = np.array(y).ravel()
-    data = [x, y, group_a, group_b]
+    groups = [df[group] == "Female", df[group] == "Male"]
+    data = [x, y] + [group.values.ravel() for group in groups]
 
-    dataset = train_test_split(*data, test_size=0.2, shuffle=True)
-    train_data = dataset[::2]
-    test_data = dataset[1::2]
+    train_data = test_data = data
     return train_data, test_data
 
 
-def fit(model, data_info):
-    train_data, test_data = data_info
+@pytest.fixture
+def small_multiclass_dataset():
+    nb_classes = 3
+    dataset = load_us_crime()
+    df = pd.concat([dataset["data"], dataset["target"]], axis=1)
+
+    df_clean = df.iloc[
+        :, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < 1000]
+    ].dropna()
+    group_a = df_clean["racePctWhite"] > 0.5
+    group_b = ~group_a
+    xor_groups = group_a ^ group_b
+
+    cols = [
+        c for c in df_clean.columns if not (c.startswith("race") or c.startswith("age"))
+    ]
+    df_clean = df_clean[cols].iloc[:, 3:].loc[xor_groups]
+    group_a, group_b = group_a[xor_groups].reset_index(drop=True), group_b[
+        xor_groups
+    ].reset_index(drop=True)
+
+    scalar = StandardScaler()
+    df_t = scalar.fit_transform(df_clean)
+    X = df_t[:, :-1]
+    y = (
+        df_t[:, -1]
+        if nb_classes is None
+        else convert_float_to_categorical(df_clean.iloc[:, -1], nb_classes)
+    )
+
+    data = []
+    for m in [X, y, group_a, group_b]:
+        x = pd.DataFrame(m.copy())
+        x = pd.concat(
+            [
+                x[(group_a == 1) & (y == 0)].iloc[:2],
+                x[(group_a == 1) & (y == 1)].iloc[:2],
+                x[(group_a == 1) & (y == 2)].iloc[:2],
+                x[(group_b == 1) & (y == 0)].iloc[:2],
+                x[(group_b == 1) & (y == 1)].iloc[:2],
+                x[(group_b == 1) & (y == 2)].iloc[:2],
+            ],
+            axis=0,
+        ).reset_index(drop=True)
+        data.append(x)
+    data = [
+        data[0],
+        data[1].values.ravel(),
+        data[2].values.ravel(),
+        data[3].values.ravel(),
+    ]
+    return data, data
+
+
+@pytest.fixture
+def small_regression_dataset():
+    dataset = load_us_crime()
+    df = pd.concat([dataset["data"], dataset["target"]], axis=1)
+    df_clean = df.iloc[
+        :, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < 1000]
+    ].dropna()
+    group_a = df_clean["racePctWhite"] > 0.5
+    group_b = ~group_a
+    xor_groups = group_a ^ group_b
+
+    cols = [
+        c for c in df_clean.columns if not (c.startswith("race") or c.startswith("age"))
+    ]
+    df_clean = df_clean[cols].iloc[:, 3:].loc[xor_groups]
+    group_a, group_b = group_a[xor_groups], group_b[xor_groups]
+
+    scalar = StandardScaler()
+    df_t = scalar.fit_transform(df_clean)
+    X = np.array(df_t[:, :-1])
+    y = np.array(df_t[:, -1])
+    a_index = list(np.where(group_a == 1)[0][:5])
+    b_index = list(np.where(group_b == 1)[0][:5])
+    indexes = a_index + b_index
+    X = np.stack([X[i] for i in indexes], axis=0)
+    y = np.array([y[i] for i in indexes])
+    group_a = np.array([group_a.values[i] for i in indexes])
+    group_b = np.array([group_b.values[i] for i in indexes])
+    train_data = test_data = X, y, group_a, group_b
+    return train_data, test_data
+
+
+def fit(model, small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     fit_params = {"bm__group_a": group_a, "bm__group_b": group_b}
@@ -324,10 +426,10 @@ def fit(model, data_info):
     return model
 
 
-def evaluate_pipeline(pipeline, data_info, metric_names, thresholds):
+def evaluate_pipeline(pipeline, small_categorical_dataset, metric_names, thresholds):
     from holisticai.bias import metrics
 
-    train_data, test_data = data_info
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
     predict_params = {"bm__group_a": group_a, "bm__group_b": group_b}
     y_pred = pipeline.predict(X, **predict_params)
@@ -346,7 +448,7 @@ def evaluate_pipeline(pipeline, data_info, metric_names, thresholds):
                 < threshold
             )
         elif metric_name == "Statistical parity difference":
-            assert metrics.statistical_parity(group_a, group_b, y_pred) < threshold
+            assert abs(metrics.statistical_parity(group_a, group_b, y_pred)) < threshold
         elif metric_name == "Average odds difference":
             assert metrics.average_odds_diff(group_a, group_b, y_pred, y) < threshold
         elif metric_name == "Equal opportunity difference":

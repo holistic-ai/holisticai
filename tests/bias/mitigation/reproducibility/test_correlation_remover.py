@@ -1,24 +1,22 @@
 import os
 import sys
 
-sys.path.append(os.getcwd())
-
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import check_results, small_regression_dataset
 
 from holisticai.bias.mitigation import CorrelationRemover
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_data_utils import load_preprocessed_us_crime
-from tests.testing_utils._tests_utils import check_results, load_preprocessed_adult_v2
 
 seed = 42
 
 
-def running_without_pipeline():
+def running_without_pipeline(small_regression_dataset):
     from sklearn.linear_model import LinearRegression
 
     from holisticai.bias.metrics import regression_bias_metrics
 
-    train_data, test_data = load_preprocessed_us_crime()
+    train_data, test_data = small_regression_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -52,12 +50,12 @@ def running_without_pipeline():
     return df
 
 
-def running_with_pipeline():
+def running_with_pipeline(small_regression_dataset):
     from sklearn.linear_model import LinearRegression
 
     from holisticai.bias.metrics import regression_bias_metrics
 
-    train_data, test_data = load_preprocessed_us_crime()
+    train_data, test_data = small_regression_dataset
     model = LinearRegression()
 
     pipeline = Pipeline(
@@ -89,10 +87,7 @@ def running_with_pipeline():
     return df
 
 
-def test_reproducibility_with_and_without_pipeline():
-    df1 = running_without_pipeline()
-    df2 = running_with_pipeline()
+def test_reproducibility_with_and_without_pipeline(small_regression_dataset):
+    df1 = running_without_pipeline(small_regression_dataset)
+    df2 = running_with_pipeline(small_regression_dataset)
     check_results(df1, df2)
-
-
-# test_reproducibility_with_and_without_pipeline()

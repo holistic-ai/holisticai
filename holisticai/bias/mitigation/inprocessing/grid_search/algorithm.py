@@ -117,7 +117,6 @@ class GridSearchAlgorithm:
                 y_reduction = self.constraint._y_as_series
 
             current_estimator = copy.deepcopy(self.estimator)
-
             current_estimator.fit(X, y_reduction, sample_weight=weights)
 
             predict_fn = lambda X: current_estimator.predict(X)
@@ -150,6 +149,7 @@ class Monitor:
         self.constraint_weight = float(constraint_weight)
         self.objective_weight = 1.0 - constraint_weight
         self.verbose = verbose
+        self.total_steps = 0
         self.step = 0
 
     def loss_fct(self, objective, gamma):

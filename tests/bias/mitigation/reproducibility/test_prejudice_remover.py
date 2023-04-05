@@ -5,26 +5,26 @@ warnings.simplefilter("ignore")
 import os
 import sys
 
-sys.path.append(os.getcwd())
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+from testing_utils.tests_utils import (
+    check_results,
+    metrics_dataframe,
+    small_categorical_dataset,
+)
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.bias.mitigation import PrejudiceRemover
 from holisticai.pipeline import Pipeline
-from tests.testing_utils._tests_utils import (
-    check_results,
-    load_preprocessed_adult,
-    metrics_dataframe,
-)
 
 seed = 42
-train_data, test_data = load_preprocessed_adult()
 
 
-def running_without_pipeline():
+def running_without_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -55,8 +55,8 @@ def running_without_pipeline():
     return df, edf
 
 
-def running_with_pipeline():
-
+def running_with_pipeline(small_categorical_dataset):
+    train_data, test_data = small_categorical_dataset
     inprocessing_model = PrejudiceRemover(
         init_type="StandarLR",
         maxiter=100,
@@ -91,15 +91,9 @@ def running_with_pipeline():
     return df, edf
 
 
-def test_reproducibility_with_and_without_pipeline():
+def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
     np.random.seed(10)
-    df1, edf1 = running_without_pipeline()
+    df1, edf1 = running_without_pipeline(small_categorical_dataset)
     np.random.seed(10)
-    df2, edf2 = running_with_pipeline()
-    # df = pd.concat([edf1,edf2], axis=1)
-    # df.columns = ['without pipeline' , 'with pipeline']
-    # print(df)
+    df2, edf2 = running_with_pipeline(small_categorical_dataset)
     check_results(df1, df2)
-
-
-# test_reproducibility_with_and_without_pipeline()
