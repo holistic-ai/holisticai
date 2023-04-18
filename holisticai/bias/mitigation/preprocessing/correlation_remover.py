@@ -4,7 +4,7 @@ from sklearn.base import TransformerMixin
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 
 
-class CorrelationRemover(TransformerMixin, BMPre):
+class CorrelationRemover(BMPre):
     """
     CorrelationRemover applies a linear transformation to the non-sensitive feature columns
     in order to remove their correlation with the sensitive feature columns while retaining
