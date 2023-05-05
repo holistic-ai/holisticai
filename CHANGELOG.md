@@ -1,3 +1,23 @@
+## 0.4.0 (2023-05-05)
+
+### Feat
+
+- Added efficacy metrics for (#33):
+    - binary-classification
+    - multiclassification
+    - regression
+    - clustering
+- Added Minimal Cluster Modification for Fairnes (MCMF) method (#26)
+- Added prediction function and update tutorial for Fair Top-K Clustering (#23)
+
+### Fix
+
+- added compatibility with sklearn 1.2.1 (#31)
+- updated n_cluster parameter notation (#25)
+- added fairlet preprocessing documentation (#24)
+- frequency_plot function can receive "ax" argument in matplotlib subplots (#12)
+- changed the constructor of ExponentiatedGradientReduction to accept an estimator parameter (#9)
+
 ## 0.3.0 (2023-01-27)
 
 ### Feat
