@@ -22,7 +22,7 @@ jobs:
           org: holistic-ai
       - name: Create bump and changelog
         id: cz
-        uses: commitizen-tools/commitizen-action@0.14.1
+        uses: commitizen-tools/commitizen-action@0.16.1
         with:
           github_token: ${{ steps.get_token.outputs.token }}
       - name: Print Version
