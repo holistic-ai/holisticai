@@ -1,11 +1,3 @@
-### Fix
-
-- added compatibility with sklearn 1.2.1 (#31)
-- normalize parameter name for "number of clusters" in clustering "n_cluster" (#25)
-- added fairlet preprocessing documentation (#24)
-- added parameter "ax" in frequency_plot function for matplotlib subplots (#12)
-- changed the constructor of ExponentiatedGradientReduction to accept an estimator parameter (#9)
-
 ## 0.3.0 (2023-01-27)
 
 ### Feat
