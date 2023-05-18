@@ -1,3 +1,19 @@
+## 0.4.0 (2023-05-18)
+
+### Feat
+- Added new detailed tutorials for regression, clustering, multiclassification and recommender system.
+- Added efficacy metrics for (#33):
+    - binary-classification
+    - multiclassification
+    - regression
+    - clustering
+- Added Minimal Cluster Modification for Fairnes (MCMF) method (#26)
+- Added prediction function and update tutorial for Fair Top-K Clustering (#23)
+
+### Fix
+
+- added compatibility with sklearn 1.2.1 (#31)
+
 ## 0.3.0 (2023-01-27)
 
 ### Feat
