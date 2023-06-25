@@ -953,12 +953,22 @@ def regression_bias_metrics(
     }
 
     out_metrics = [
-        [pf, fn(group_a, group_b, y_pred, **hypers[pf]), ref_vals[pf]]
+        [pf, fn(group_a, group_b, np.squeeze(y_pred), **hypers[pf]), ref_vals[pf]]
         for pf, fn in equal_outcome_metrics.items()
     ]
     if y_true is not None:
         opp_metrics = [
-            [pf, fn(group_a, group_b, y_pred, y_true, **hypers[pf]), ref_vals[pf]]
+            [
+                pf,
+                fn(
+                    group_a,
+                    group_b,
+                    np.squeeze(y_pred),
+                    np.squeeze(y_true),
+                    **hypers[pf]
+                ),
+                ref_vals[pf],
+            ]
             for pf, fn in equal_opportunity_metrics.items()
         ]
 
