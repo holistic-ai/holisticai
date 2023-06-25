@@ -258,3 +258,47 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
 
     # return
     return ax
+
+
+def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu"):
+    """Plot the correlation matrix of a given dataframe with respect to
+    a given target and a certain number of features.
+
+    Parameters
+    ----------
+    df : (DataFrame)
+        Pandas dataframe of the data
+    target_feature : (str)
+        Column name of the target feature
+    n_features (optional) : (int)
+        Number of features to plot with the closest correlation to the target
+    cmap (optional) : (str)
+        Color map to use
+
+    Returns
+    -------
+    matplotlib ax
+    """
+    """Prints the correlation matrix """
+
+    corrmat = df.corr()
+    cols = corrmat.nlargest(n_features, target_feature)[target_feature].index
+    cm = np.corrcoef(df[cols].values.T)
+    fig, ax = plt.subplots(figsize=(8, 8))
+    sns.set(font_scale=1.25)
+    hm = sns.heatmap(
+        cm,
+        cbar=True,
+        annot=True,
+        square=True,
+        fmt=".2f",
+        annot_kws={"size": 10},
+        yticklabels=cols.values,
+        xticklabels=cols.values,
+        cmap=cmap,
+    )
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    cbar = ax.collections[0].colorbar
+    cbar.remove()
+    fig.suptitle("Correlation matrix")
+    return ax
