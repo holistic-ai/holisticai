@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>holisticai.bias.mitigation.FairletClusteringPreprocessing &mdash; holisticai  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/custom_style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="holisticai.bias.mitigation.ExponentiatedGradientReduction" href="holisticai.bias.mitigation.ExponentiatedGradientReduction.html" />
+    <link rel="prev" title="holisticai.bias.mitigation.CorrelationRemover" href="holisticai.bias.mitigation.CorrelationRemover.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            holisticai
+              <img src="../_static/holistic_ai.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../metrics.html">Metrics</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../mitigation.html">Mitigation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mitigation.html#pre-processing">Pre-processing</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.Reweighing.html">holisticai.bias.mitigation.Reweighing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.LearningFairRepresentation.html">holisticai.bias.mitigation.LearningFairRepresentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="holisticai.bias.mitigation.CorrelationRemover.html">holisticai.bias.mitigation.CorrelationRemover</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">holisticai.bias.mitigation.FairletClusteringPreprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing"><code class="docutils literal notranslate"><span class="pre">FairletClusteringPreprocessing</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mitigation.html#in-processing">In-processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mitigation.html#post-processing">Post-processing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../plotting.html">Plotting</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../measuring_bias.html">Measuring bias</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mitigating_bias.html">Mitigating bias</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">holisticai</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../mitigation.html">Mitigation</a></li>
+      <li class="breadcrumb-item active">holisticai.bias.mitigation.FairletClusteringPreprocessing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/.generated/holisticai.bias.mitigation.FairletClusteringPreprocessing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="holisticai-bias-mitigation-fairletclusteringpreprocessing">
+<h1>holisticai.bias.mitigation.FairletClusteringPreprocessing<a class="headerlink" href="#holisticai-bias-mitigation-fairletclusteringpreprocessing" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.FairletClusteringPreprocessing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">holisticai.bias.mitigation.</span></span><span class="sig-name descname"><span class="pre">FairletClusteringPreprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing" title="Permalink to this definition"></a></dt>
+<dd><p>Fairlet decomposition is a pre-processing approach that computes
+fair micro-clusters where fairness is guaranteed. They then use
+the fairlet centers as a newly transformed dataset from the original.
+This transformed fairlet-based dataset is then provided to vanilla
+clustering algorithms, and hence, we obtain approximately
+fair clustering outputs as a result of the fairlets themselves being fair.</p>
+<p class="rubric">References</p>
+<p>Backurs, Arturs, et al. “Scalable fair clustering.” International Conference on
+Machine Learning. PMLR, 2019.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.FairletClusteringPreprocessing.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decomposition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">DecompositionMixin</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Vanilla'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.__init__" title="Permalink to this definition"></a></dt>
+<dd><p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>decomposition<span class="classifier">str</span></dt><dd><p>Fairlet decomposition strategy, available: Vanilla, Scalable, MCF</p>
+</dd>
+<dt>p<span class="classifier">int</span></dt><dd><p>fairlet decomposition parameter for Vanilla and Scalable strategy</p>
+</dd>
+<dt>q<span class="classifier">int</span></dt><dd><p>fairlet decomposition parameter for Vanilla and Scalable strategy</p>
+</dd>
+<dt>seed<span class="classifier">int</span></dt><dd><p>Random seed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.__init__" title="holisticai.bias.mitigation.FairletClusteringPreprocessing.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([decomposition, p, q, seed])</p></td>
+<td><p><p class="rubric">Parameters</p>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.fit_transform" title="holisticai.bias.mitigation.FairletClusteringPreprocessing.fit_transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_transform</span></code></a>(X, group_a, group_b[, ...])</p></td>
+<td><p>Fit the model</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_bias_param</span></code>(param_name[, default])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_estimator_param</span></code>(param_name[, default])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.get_params" title="holisticai.bias.mitigation.FairletClusteringPreprocessing.get_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code></a>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_param_handler</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_parameters</span></code>(params_hdl, estimator_hdl)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reformat_function</span></code>(func)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.set_params" title="holisticai.bias.mitigation.FairletClusteringPreprocessing.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code>(X)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_bias_param</span></code>(param_name, param_value)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_estimator_param</span></code>(param_name, param_value)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">BM_NAME</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.FairletClusteringPreprocessing.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.fit_transform" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the model</p>
+<p class="rubric">Description</p>
+<p>Learn a fair cluster.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>X<span class="classifier">matrix-like</span></dt><dd><p>input matrix</p>
+</dd>
+<dt>group_a<span class="classifier">array-like</span></dt><dd><p>binary mask vector</p>
+</dd>
+<dt>group_b<span class="classifier">array-like</span></dt><dd><p>binary mask vector</p>
+</dd>
+<dt>sample_weight (optional)<span class="classifier">array-like</span></dt><dd><p>Samples weights vector</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<p>the same object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.FairletClusteringPreprocessing.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.get_params" title="Permalink to this definition"></a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>deep<span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<dl class="simple">
+<dt>params<span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.bias.mitigation.FairletClusteringPreprocessing.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.bias.mitigation.FairletClusteringPreprocessing.set_params" title="Permalink to this definition"></a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as <code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code>). The latter have
+parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
+possible to update each component of a nested object.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>params<span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<dl class="simple">
+<dt>self<span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="holisticai.bias.mitigation.CorrelationRemover.html" class="btn btn-neutral float-left" title="holisticai.bias.mitigation.CorrelationRemover" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="holisticai.bias.mitigation.ExponentiatedGradientReduction.html" class="btn btn-neutral float-right" title="holisticai.bias.mitigation.ExponentiatedGradientReduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Holistic AI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
