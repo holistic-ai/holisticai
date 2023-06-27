@@ -1,3 +1,16 @@
+## 0.5.0 (2023-06-27)
+
+### Feat
+- Update readthedocs project.
+- Update plot functions to accepts axis a input arguments.
+- Implement Correlation matrix for visualization.
+- Resolve conflicts for pandas>=2.0.0 and numpy>=1.24.3
+
+### Fix
+- Resolve conflicts with python 3.11
+- Update notebook bia tutorials and dataset repository.
+- Update documentation for PluginEstimationAndCalibration.
+
 ## 0.4.0 (2023-05-18)
 
 ### Feat
