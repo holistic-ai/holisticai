@@ -32,7 +32,6 @@
       ~Pipeline.preprocessing_steps
       ~Pipeline.score
       ~Pipeline.score_samples
-      ~Pipeline.set_output
       ~Pipeline.set_params
       ~Pipeline.transform
    
