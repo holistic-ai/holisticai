@@ -260,7 +260,9 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     return ax
 
 
-def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu"):
+def correlation_matrix_plot(
+    df, target_feature, n_features=10, cmap="YlGnBu", ax=None, size=None, title=None
+):
     """Plot the correlation matrix of a given dataframe with respect to
     a given target and a certain number of features.
 
@@ -274,6 +276,12 @@ def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu"):
         Number of features to plot with the closest correlation to the target
     cmap (optional) : (str)
         Color map to use
+    ax (optional) : matplotlib axes
+        Pre-existing axes for the plot
+    size (optional) : (int, int)
+        Size of the figure
+    title (optional) : (str)
+        Title of the figure
 
     Returns
     -------
@@ -281,14 +289,19 @@ def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu"):
     """
     """Prints the correlation matrix """
 
+    sns.set(font_scale=1.25)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=size)
+        if title is not None:
+            fig.suptitle(title)
+        else:
+            fig.suptitle("Correlation matrix")
     corrmat = df.corr()
     cols = corrmat.nlargest(n_features, target_feature)[target_feature].index
     cm = np.corrcoef(df[cols].values.T)
-    fig, ax = plt.subplots(figsize=(8, 8))
-    sns.set(font_scale=1.25)
-    hm = sns.heatmap(
+    sns.heatmap(
         cm,
-        cbar=True,
+        cbar=False,
         annot=True,
         square=True,
         fmt=".2f",
@@ -298,7 +311,4 @@ def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu"):
         cmap=cmap,
     )
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-    cbar = ax.collections[0].colorbar
-    cbar.remove()
-    fig.suptitle("Correlation matrix")
     return ax
