@@ -106,7 +106,7 @@ class GridSearchAlgorithm:
         self.monitor.total_steps = grid.shape[1]
         for col_name in grid:
             lambda_vec = grid[col_name]
-            
+
             weights = self.constraint.signed_weights(lambda_vec)
             if not objective_in_the_span:
                 weights += self.objective.signed_weights()

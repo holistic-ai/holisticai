@@ -81,7 +81,7 @@ class RegressionConstraint(BaseMoment):
         self.tags[_LOSS] = self.reduction_loss.eval(
             self.tags[_LABEL], self.tags[_PREDICTION]
         )
-        tags = self.tags.set_index([_GROUP_ID,_EVENT])
+        tags = self.tags.set_index([_GROUP_ID, _EVENT])
         expect_attr = tags.groupby(_GROUP_ID).mean()
         return expect_attr[_LOSS]
 

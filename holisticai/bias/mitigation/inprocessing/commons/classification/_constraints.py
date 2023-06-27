@@ -111,7 +111,9 @@ class ClassificationConstraint(BaseMoment):
             The vector of Lagrange multipliers indexed by `index`
         """
 
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).groupby(level=_EVENT).sum() / self.event_prob
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).groupby(
+            level=_EVENT
+        ).sum() / self.event_prob
 
         lambda_group_event = (
             self.ratio * lambda_vec["+"] - lambda_vec["-"]
@@ -144,7 +146,7 @@ class ClassificationConstraint(BaseMoment):
 
     def _gamma_signed(self, pred):
         self.tags[_PRED] = pred
-        tags = self.tags.set_index([_GROUP_ID,_EVENT])
+        tags = self.tags.set_index([_GROUP_ID, _EVENT])
         expect_event = tags.groupby(level=_EVENT).mean()
         expect_group_event = tags.groupby(level=[_EVENT, _GROUP_ID]).mean()
         expect_group_event[_UPPER_BOUND_DIFF] = (

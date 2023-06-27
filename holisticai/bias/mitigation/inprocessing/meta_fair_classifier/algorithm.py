@@ -79,11 +79,11 @@ class MetaFairClassifierAlgorithm:
 
     def fit(self, X, y, sensitive_features, random_state=None):
         """Returns the model given the training data and input tau."""
-        
+
         y_true = y.copy()
         y_true[y == 0] = -1
         y_true = np.array(y_true)
-        
+
         groups_num = self.sens_groups.fit_transform(
             sensitive_features, convert_numeric=True
         )
