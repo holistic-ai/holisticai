@@ -5,8 +5,6 @@ Babel==2.12.1
 beautifulsoup4==4.12.2
 bleach==6.0.0
 build==0.10.0
-CacheControl==0.12.14
-certifi @ file:///croot/certifi_1671487769961/work/certifi
 cffi==1.15.1
 cfgv==3.3.1
 charset-normalizer==2.1.1
@@ -29,8 +27,6 @@ exceptiongroup==1.1.0
 fastjsonschema==2.17.1
 filelock==3.9.0
 flake8==5.0.4
-fonttools==4.38.0
--e git+https://github.com/holistic-ai/holisticai.git@1a5874f950de64ccdeb9e28d5fe40f9f0fce0af4#egg=holisticai
 html5lib==1.1
 identify==2.5.15
 idna==3.4
