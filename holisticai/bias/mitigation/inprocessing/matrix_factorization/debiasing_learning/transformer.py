@@ -118,7 +118,7 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
     def _init_parameters(self, partial_observations):
         averageObservedRating = np.ma.mean(partial_observations)
         completeRatings = np.ma.filled(
-            partial_observations.astype(np.float), averageObservedRating
+            partial_observations.astype(float), averageObservedRating
         )
         numUsers, numItems = np.shape(partial_observations)
         numUsers = completeRatings.shape[0]
