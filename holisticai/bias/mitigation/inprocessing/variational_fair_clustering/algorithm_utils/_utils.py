@@ -95,7 +95,7 @@ def create_affinity(X, knn, scale=None, savepath=None, W_path=None):
         else:
             data = np.exp((-dist[:, 1:] ** 2) / (2 * scale**2)).flatten()
 
-        W = sparse.csc_matrix((data, (row, col)), shape=(N, N), dtype=np.float)
+        W = sparse.csc_matrix((data, (row, col)), shape=(N, N), dtype=float)
         W = (W + W.transpose(copy=True)) / 2
         elapsed = timeit.default_timer() - start_time
         print(elapsed)
