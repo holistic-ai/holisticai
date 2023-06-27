@@ -197,10 +197,13 @@ is completed.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.pipeline.Pipeline.score_samples" title="holisticai.pipeline.Pipeline.score_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">score_samples</span></code></a>(X)</p></td>
 <td><p>Transform the data, and apply <cite>score_samples</cite> with the final estimator.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#holisticai.pipeline.Pipeline.set_params" title="holisticai.pipeline.Pipeline.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#holisticai.pipeline.Pipeline.set_output" title="holisticai.pipeline.Pipeline.set_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_output</span></code></a>(*[, transform])</p></td>
+<td><p>Set the output container when <cite>&quot;transform&quot;</cite> and <cite>&quot;fit_transform&quot;</cite> are called.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.pipeline.Pipeline.set_params" title="holisticai.pipeline.Pipeline.set_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code></a>(**kwargs)</p></td>
 <td><p>Set the parameters of this estimator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#holisticai.pipeline.Pipeline.transform" title="holisticai.pipeline.Pipeline.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#holisticai.pipeline.Pipeline.transform" title="holisticai.pipeline.Pipeline.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X)</p></td>
 <td><p>Transform the data, and apply <cite>transform</cite> with the final estimator.</p></td>
 </tr>
 </tbody>
@@ -628,6 +631,28 @@ of the pipeline.</p>
 <p class="rubric">Returns</p>
 <dl class="simple">
 <dt>y_score<span class="classifier">ndarray of shape (n_samples,)</span></dt><dd><p>Result of calling <cite>score_samples</cite> on the final estimator.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="holisticai.pipeline.Pipeline.set_output">
+<span class="sig-name descname"><span class="pre">set_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#holisticai.pipeline.Pipeline.set_output" title="Permalink to this definition"></a></dt>
+<dd><p>Set the output container when <cite>“transform”</cite> and <cite>“fit_transform”</cite> are called.</p>
+<p>Calling <cite>set_output</cite> will set the output of all estimators in <cite>steps</cite>.</p>
+<p class="rubric">Parameters</p>
+<dl class="simple">
+<dt>transform<span class="classifier">{“default”, “pandas”}, default=None</span></dt><dd><p>Configure output of <cite>transform</cite> and <cite>fit_transform</cite>.</p>
+<ul class="simple">
+<li><p><cite>“default”</cite>: Default output format of a transformer</p></li>
+<li><p><cite>“pandas”</cite>: DataFrame output</p></li>
+<li><p><cite>None</cite>: Transform configuration is unchanged</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Returns</p>
+<dl class="simple">
+<dt>self<span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
 </dd>
 </dl>
 </dd></dl>
