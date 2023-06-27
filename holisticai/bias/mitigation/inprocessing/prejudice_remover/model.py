@@ -85,7 +85,7 @@ class PRParamInitializer:
 
         if self.init_type == "Zero":
             # clear by zeros
-            coef = np.zeros(nb_group_values * nb_features, dtype=np.float)
+            coef = np.zeros(nb_group_values * nb_features, dtype=float)
 
         elif self.init_type == "Random":
             # at random
@@ -93,7 +93,7 @@ class PRParamInitializer:
 
         elif self.init_type == "StandarLR":
             # learned by standard LR
-            coef = np.empty(nb_group_values * nb_features, dtype=np.float)
+            coef = np.empty(nb_group_values * nb_features, dtype=float)
             coef = coef.reshape(nb_group_values, nb_features)
 
             clr = LogisticRegression(
@@ -105,7 +105,7 @@ class PRParamInitializer:
 
         elif self.init_type == "StandarLRbyGroup":
             # learned by standard LR
-            coef = np.empty(nb_group_values * nb_features, dtype=np.float)
+            coef = np.empty(nb_group_values * nb_features, dtype=float)
             coef = coef.reshape(nb_group_values, nb_features)
 
             for i in range(nb_group_values):

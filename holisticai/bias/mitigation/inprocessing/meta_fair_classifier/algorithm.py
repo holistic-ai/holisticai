@@ -78,17 +78,17 @@ class MetaFairClassifierAlgorithm:
         return self.constraint.forward(P=P, params=params, a=a, b=b)
 
     def fit(self, X, y, sensitive_features, random_state=None):
+        """Returns the model given the training data and input tau."""
+
         y_true = y.copy()
         y_true[y == 0] = -1
+        y_true = np.array(y_true)
 
         groups_num = self.sens_groups.fit_transform(
             sensitive_features, convert_numeric=True
         )
-
-        """Returns the model given the training data and input tau."""
-        train = np.concatenate(
-            [X, y_true[:, np.newaxis], groups_num[:, np.newaxis]], axis=1
-        )
+        groups_num = np.array(groups_num)
+        train = np.c_[X, y_true, groups_num]
         mean = np.mean(train, axis=0)
         cov = np.cov(train, rowvar=False)
         dist = multivariate_normal(mean, cov, allow_singular=True, seed=random_state)
