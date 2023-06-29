@@ -20,7 +20,7 @@ Install the library with:
 ```
 
 ## Troubleshooting
-on **macOS** could be necessary some package before install holisticai library:
+on **macOS** could be necessary some packages before install holisticai library:
 ```bash
 brew install cbc pkg-config
 python -m pip install cylp
