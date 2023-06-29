@@ -18,3 +18,11 @@ Install the library with:
 ```bash
     pip install holisticai
 ```
+
+## Troubleshooting
+on **macOS** could be necessary some package before install holisticai library:
+```bash
+brew install cbc pkg-config
+python -m pip install cylp
+brew install cmake
+```
