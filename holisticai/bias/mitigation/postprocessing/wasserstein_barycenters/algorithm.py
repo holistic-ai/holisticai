@@ -37,19 +37,7 @@ class WassersteinBarycenterAlgorithm:
         self.minY = np.min(self.YL)
         self.maxY = np.max(self.YL)
 
-    def _optimize_ts_slower(self, yt, i1, i2, n1, n2):
-        dist_best = np.inf
-        group1_indices = np.where(self.SL == self.group_values[i1])
-        tmp2 = np.sum(self.YL[self.SL == self.group_values[i2]] < yt) / n2
-        for t in np.linspace(self.minY, self.maxY, 100):
-            tmp1 = np.sum(self.YL[group1_indices] < t) / n1
-            dist = np.abs(tmp1 - tmp2)
-            if dist_best > dist:
-                dist_best = dist
-                ts = t
-        return ts
-
-    def _optimize_ts_faster(self, yt, i1, i2, n1, n2):
+    def _optimize_ts(self, yt, i1, i2, n1, n2):
         mask1 = self.SL == self.group_values[i1]
         mask2 = self.SL == self.group_values[i2]
         yl_masked2 = self.YL[mask2]
@@ -63,11 +51,11 @@ class WassersteinBarycenterAlgorithm:
 
     def _update_yt(self, yt, group):
         if group == self.group_values[self.im]:
-            ts = self._optimize_ts_faster(yt, self.iM, self.im, self.nM, self.nm)
+            ts = self._optimize_ts(yt, self.iM, self.im, self.nM, self.nm)
             yf = self.p * yt + (1 - self.p) * ts
 
         else:
-            ts = self._optimize_ts_faster(yt, self.im, self.iM, self.nm, self.nM)
+            ts = self._optimize_ts(yt, self.im, self.iM, self.nm, self.nM)
             yf = self.q * yt + (1 - self.q) * ts
         return yf
 
