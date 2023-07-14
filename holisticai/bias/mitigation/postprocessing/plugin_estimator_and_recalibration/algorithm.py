@@ -8,39 +8,12 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 from .algorithm_utils import f_lambda
 
-
 class PluginEstimationAndCalibrationAlgorithm:
     """Plugin Estimation and Calibration Algorithm
 
     This class implements the Plugin Estimation and Calibration Algorithm (PECA) for bias mitigation.
     This algorithm was proposed by Hardt et al. in their paper titled "Fair Regression via Plug-In Estimator and Recalibration".
     The paper can be found at: https://proceedings.neurips.cc/paper_files/paper/2020/file/ddd808772c035aed516d42ad3559be5f-Paper.pdf
-
-    Parameters
-    ----------
-    length : int, optional (default=25)
-        The length of the range of values to consider for the output predictions.
-        The range of values is [-length, length].
-    beta : float, optional (default=0.1)
-        The value of the beta parameter used in the calculation of the lambda values.
-
-    Attributes
-    ----------
-    multiplier : int
-        The multiplier used to convert the output predictions to the range [0, 1].
-    length : int
-        The length of the range of values to consider for the output predictions.
-        The range of values is [-length, length].
-    beta : float
-        The value of the beta parameter used in the calculation of the lambda values.
-    sensitive_groups : SensitiveGroups
-        The SensitiveGroups object used to transform the sensitive features.
-    epsilon : float
-        The value of the epsilon parameter used to avoid division by zero.
-    probabilities : list
-        The probabilities for each sensitive group.
-    lambda_values : np.ndarray
-        The lambda values used in the calculation of the output predictions.
 
     References
     ----------
@@ -50,13 +23,39 @@ class PluginEstimationAndCalibrationAlgorithm:
     """
 
     def __init__(self, L=25, beta=0.1):
-        self.multiplier = 1
-        self.length = np.floor(L / 2).astype(np.int32)
-        self.beta = beta
-        self.sensitive_groups = SensitiveGroups()
-        self.epsilon = np.finfo(float).eps
+        """
+        Parameters
+        ----------
+        length : int, optional (default=25)
+            The length of the range of values to consider for the output predictions.
+            The range of values is [-length, length].
+        beta : float, optional (default=0.1)
+            The value of the beta parameter used in the calculation of the lambda values.
 
-    # olhar o lambda e o fit_transform
+        Attributes
+        ----------
+        multiplier : int
+            The multiplier used to convert the output predictions to the range [0, 1].
+        length : int
+            The length of the range of values to consider for the output predictions.
+            The range of values is [-length, length].
+        beta : float
+            The value of the beta parameter used in the calculation of the lambda values.
+        sensitive_groups : SensitiveGroups
+            The SensitiveGroups object used to transform the sensitive features.
+        epsilon : float
+            The value of the epsilon parameter used to avoid division by zero.
+        probabilities : list
+            The probabilities for each sensitive group.
+        lambda_values : np.ndarray
+            The lambda values used in the calculation of the output predictions.
+            self.multiplier = 1
+            self.length = np.floor(L / 2).astype(np.int32)
+            self.beta = beta
+            self.sensitive_groups = SensitiveGroups()
+            self.epsilon = np.finfo(float).eps
+        """
+
     def fit(self, y_pred: np.ndarray, sensitive_features: np.ndarray):
         # Fit and transform the sensitive features
         transformed_sensitive_features = self.sensitive_groups.fit_transform(
