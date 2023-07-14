@@ -24,8 +24,7 @@ class PluginEstimationAndCalibrationAlgorithm:
     """
 
     def __init__(self, L=25, beta=0.1):
-        """
-        Parameters
+        """Parameters
         ----------
         length : int, optional (default=25)
             The length of the range of values to consider for the output predictions.
