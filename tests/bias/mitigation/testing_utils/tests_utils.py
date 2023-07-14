@@ -302,16 +302,16 @@ def small_categorical_dataset():
     df = pd.concat(
         [
             df[(df[group[0]] == "Male") & (df[output_variable[0]] == ">50K")]
-            .sample(5)
+            .sample(50)
             .reset_index(drop=True),
             df[(df[group[0]] == "Male") & (df[output_variable[0]] == "<=50K")]
-            .sample(10)
+            .sample(100)
             .reset_index(drop=True),
             df[(df[group[0]] == "Female") & (df[output_variable[0]] == ">50K")]
-            .sample(2)
+            .sample(20)
             .reset_index(drop=True),
             df[(df[group[0]] == "Female") & (df[output_variable[0]] == "<=50K")]
-            .sample(5)
+            .sample(50)
             .reset_index(drop=True),
         ],
         axis=0,

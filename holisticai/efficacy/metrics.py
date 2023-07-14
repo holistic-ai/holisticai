@@ -106,7 +106,7 @@ def classification_efficacy_metrics(y_pred, y_true=None, y_proba=None):
 
     perform = {
         "Accuracy": metrics.accuracy_score,
-        "Balanced accuracy": metrics.balanced_accuracy_score,
+        "Balanced Accuracy": metrics.balanced_accuracy_score,
         "Precision": metrics.precision_score,
         "Recall": metrics.recall_score,
         "F1-Score": metrics.f1_score,
@@ -114,7 +114,7 @@ def classification_efficacy_metrics(y_pred, y_true=None, y_proba=None):
 
     hyper = {
         "Accuracy": {},
-        "Balanced accuracy": {},
+        "Balanced Accuracy": {},
         "Precision": {},
         "Recall": {},
         "F1-Score": {},
@@ -126,7 +126,7 @@ def classification_efficacy_metrics(y_pred, y_true=None, y_proba=None):
 
     ref_vals = {
         "Accuracy": 1,
-        "Balanced accuracy": 1,
+        "Balanced Accuracy": 1,
         "Precision": 1,
         "Recall": 1,
         "F1-Score": 1,
@@ -252,7 +252,7 @@ def multiclassification_efficacy_metrics(
 
     perform = {
         "Accuracy": metrics.accuracy_score,
-        "Balanced accuracy": metrics.balanced_accuracy_score,
+        "Balanced Accuracy": metrics.balanced_accuracy_score,
         "Precision": metrics.precision_score,
         "Recall": metrics.recall_score,
         "F1-Score": metrics.f1_score,
@@ -260,7 +260,7 @@ def multiclassification_efficacy_metrics(
 
     hyper = {
         "Accuracy": {},
-        "Balanced accuracy": {},
+        "Balanced Accuracy": {},
         "Precision": {"average": "micro"},
         "Recall": {"average": "micro"},
         "F1-Score": {"average": "micro"},
@@ -275,7 +275,7 @@ def multiclassification_efficacy_metrics(
 
     ref_vals = {
         "Accuracy": 1,
-        "Balanced accuracy": 1,
+        "Balanced Accuracy": 1,
         "Precision": 1,
         "Recall": 1,
         "F1-Score": 1,

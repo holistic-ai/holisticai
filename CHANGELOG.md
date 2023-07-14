@@ -1,4 +1,17 @@
-## 0.4.0 (2023-05-05)
+## 0.5.0 (2023-06-27)
+
+### Feat
+- Update readthedocs project.
+- Update plot functions to accepts axis a input arguments.
+- Implement Correlation matrix for visualization.
+- Resolve conflicts for pandas>=2.0.0 and numpy>=1.24.3
+
+### Fix
+- Resolve conflicts with python 3.11
+- Update notebook bia tutorials and dataset repository.
+- Update documentation for PluginEstimationAndCalibration.
+
+## 0.4.0 (2023-05-18)
 
 ### Feat
 - Added new detailed tutorials for regression, clustering, multiclassification and recommender system.
@@ -13,10 +26,6 @@
 ### Fix
 
 - added compatibility with sklearn 1.2.1 (#31)
-- normalize parameter name for "number of clusters" in clustering "n_cluster" (#25)
-- added fairlet preprocessing documentation (#24)
-- added parameter "ax" in frequency_plot function for matplotlib subplots (#12)
-- changed the constructor of ExponentiatedGradientReduction to accept an estimator parameter (#9)
 
 ## 0.3.0 (2023-01-27)
 

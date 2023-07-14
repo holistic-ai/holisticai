@@ -20,6 +20,7 @@
       ~FairKCenterClustering.get_params
       ~FairKCenterClustering.has_param_handler
       ~FairKCenterClustering.link_parameters
+      ~FairKCenterClustering.predict
       ~FairKCenterClustering.reformat_function
       ~FairKCenterClustering.set_params
       ~FairKCenterClustering.update_bias_param

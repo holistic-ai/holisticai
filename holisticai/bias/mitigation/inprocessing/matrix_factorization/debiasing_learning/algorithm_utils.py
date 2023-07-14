@@ -144,7 +144,7 @@ class ParameterSerializer:
             allParams, (self.numUsers + self.numItems) * (self.num_dimensions + 1)
         )
         paramVector = np.concatenate((paramVector, [global_bias]))
-        return paramVector.astype(np.float)
+        return paramVector.astype(float)
 
     def deserialize(self, paramVector):
         globalBias = paramVector[-1]
@@ -257,8 +257,8 @@ def init_random_parameters(config, start_vec=None):
         itemVectorsInit = np.random.standard_normal(
             (config["numItems"], config["num_dimensions"])
         )
-        userBiasesInit = np.zeros(config["numUsers"], dtype=np.float)
-        itemBiasesInit = np.zeros(config["numItems"], dtype=np.float)
+        userBiasesInit = np.zeros(config["numUsers"], dtype=float)
+        itemBiasesInit = np.zeros(config["numItems"], dtype=float)
         globalBiasInit = 0
     else:
         userVectorsInit = start_vec[0]
