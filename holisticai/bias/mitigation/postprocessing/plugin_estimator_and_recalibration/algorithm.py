@@ -8,6 +8,7 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 from .algorithm_utils import f_lambda
 
+
 class PluginEstimationAndCalibrationAlgorithm:
     """Plugin Estimation and Calibration Algorithm
 
