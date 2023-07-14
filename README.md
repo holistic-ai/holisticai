@@ -26,3 +26,7 @@ brew install cbc pkg-config
 python -m pip install cylp
 brew install cmake
 ```
+
+## Contributing
+
+We welcome contributions to the Holistic AI library. If you are interested in contributing, please refer to our [contributing guide](CONTRIBUTING.md).
