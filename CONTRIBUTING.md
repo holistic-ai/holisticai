@@ -29,8 +29,14 @@ cd holisticai
 poetry install
 ```
 
-- Then, we can run the tests:
+-to send a PR first you have to run the tests:
 
 ```bash
 poetry run pytest
+```
+
+and format the code using pre-commit
+
+```bash
+pre-commit run --show-diff-on-failure --color=always --all-files
 ```

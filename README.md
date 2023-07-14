@@ -16,7 +16,7 @@ Currently, the library offers a set of techniques to easily measure and mitigate
 
 Install the library with:
 ```bash
-    pip install holisticai
+pip install holisticai
 ```
 
 ## Troubleshooting
