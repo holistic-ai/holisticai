@@ -1,6 +1,5 @@
 [tool.commitizen]
-version = "0.6
-5.0"
+version = "0.6.0"
 changelog_incremental = true
 version_files = [
     "pyproject.toml:version"
