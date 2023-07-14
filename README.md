@@ -7,7 +7,7 @@ The Holistic AI library is an open-source tool to assess and improve the trustwo
 
 Currently, the library offers a set of techniques to easily measure and mitigate Bias across numerous tasks. In the future, it will be extended to include tools for Efficacy, Robustness, Privacy and Explainability as well. This will allow a holistic assessment of AI systems.  
 
-- Documentation:https://holisticai.readthedocs.io/en/latest/ 
+- Documentation: https://holistic-ai.readthedocs.io/en/latest/
 - Tutorials: https://github.com/holistic-ai/holisticai/tree/main/tutorials
 - Source code: https://github.com/holistic-ai/holisticai/tree/main
 - Holistic Ai website: https://holisticai.com
@@ -15,5 +15,14 @@ Currently, the library offers a set of techniques to easily measure and mitigate
 ## Installation
 
 Install the library with:
-
+```bash
     pip install holisticai
+```
+
+## Troubleshooting
+on **macOS** could be necessary some packages before install holisticai library:
+```bash
+brew install cbc pkg-config
+python -m pip install cylp
+brew install cmake
+```

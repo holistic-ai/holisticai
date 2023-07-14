@@ -5,7 +5,12 @@ The :mod:`holisticai.bias.plots` module includes bias plotters.
 from ._bias_classification_plots import abroca_plot
 
 # Exploratory plots
-from ._bias_exploratory_plots import distribution_plot, group_pie_plot, histogram_plot
+from ._bias_exploratory_plots import (
+    correlation_matrix_plot,
+    distribution_plot,
+    group_pie_plot,
+    histogram_plot,
+)
 
 # Multiclass Plots
 from ._bias_multiclass_plots import (
@@ -53,4 +58,5 @@ __all__ = [
     "group_pie_plot",
     "distribution_plot",
     "histogram_plot",
+    "correlation_matrix_plot",
 ]

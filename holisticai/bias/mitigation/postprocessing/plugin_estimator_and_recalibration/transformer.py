@@ -19,16 +19,17 @@ class PluginEstimationAndCalibration(BMPost):
     """
 
     def __init__(self, L: Optional[int] = 25, beta: Optional[float] = 0.1):
-        """Create a Calibrated Equalized Odds Post-processing instance."""
+        """Create a Plugin Estimation and Calibration Post-processing instance."""
         self.algorithm = PluginEstimationAndCalibrationAlgorithm(L=L, beta=beta)
 
     def fit(self, y_pred: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
-        Compute parameters for calibrated equalized odds.
+        Compute a fair regression function by minimizing the squared error subject to a fairness constraint.
 
         Description
         ----------
-        Compute parameters for calibrated equalized odds algorithm.
+        Compute a fair predictor by estimating a regression function by standard methods and then estimate
+        the thresholds to solve the minimization problem.
 
         Parameters
         ----------
