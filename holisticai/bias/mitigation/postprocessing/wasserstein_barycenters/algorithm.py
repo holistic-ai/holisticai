@@ -38,14 +38,15 @@ class WassersteinBarycenterAlgorithm:
         self.maxY = np.max(self.YL)
 
     def _optimize_ts(self, yt, i1, i2, n1, n2):
-        dist_best = np.inf
-        for t in np.linspace(self.minY, self.maxY, 100):
-            tmp1 = np.sum(self.YL[self.SL == self.group_values[i1]] < t) / n1
-            tmp2 = np.sum(self.YL[self.SL == self.group_values[i2]] < yt) / n2
-            dist = np.abs(tmp1 - tmp2)
-            if dist_best > dist:
-                dist_best = dist
-                ts = t
+        mask1 = self.SL == self.group_values[i1]
+        mask2 = self.SL == self.group_values[i2]
+        yl_masked2 = self.YL[mask2]
+        tmp2 = np.sum(yl_masked2 < yt) / n2
+        yl_masked1 = self.YL[mask1]
+        t_values = np.linspace(self.minY, self.maxY, 100)
+        tmp1 = np.sum(yl_masked1[:, None] < t_values, axis=0) / n1
+        dist = np.abs(tmp1 - tmp2)
+        ts = t_values[np.argmin(dist)]
         return ts
 
     def _update_yt(self, yt, group):
@@ -62,5 +63,10 @@ class WassersteinBarycenterAlgorithm:
         ST = self.sens_groups.transform(sensitive_groups, convert_numeric=True)
         noise = self.eps * np.random.randn(len(y_pred)).squeeze()
         YT = y_pred + noise
+        import time
+
+        tic = time.time()
         YF = np.array([self._update_yt(yt, st) for yt, st in zip(YT, ST)])
+        toc = time.time()
+        print("Time taken: {}".format(toc - tic))
         return YF
