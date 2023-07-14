@@ -12,13 +12,17 @@ Currently, the library offers a set of techniques to easily measure and mitigate
 - Source code: https://github.com/holistic-ai/holisticai/tree/main
 - Holistic Ai website: https://holisticai.com
 
-## Installation
 
-Install the library with:
+# Installation:
+For metrics, you can use the default installation:
+
 ```bash
 pip install holisticai
 ```
-
+For bias visualization and mitigation, you need additional dependencies. You can install them with:
+ ```bash
+pip install holisticai[methods]
+```
 ## Troubleshooting
 on **macOS** could be necessary some packages before install holisticai library:
 ```bash
