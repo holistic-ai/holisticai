@@ -1,3 +1,14 @@
+## 0.6.0 (2023-07-14)
+
+### Feat
+- Update class and methods documentation.
+- Speedup wasserstein barycenters method.
+- Add new mode installation: default(only metrics) and methods(plots and mitigators)
+
+### Fix
+- Resolve conflicts with sklearn>=1.2.2
+- 
+
 ## 0.5.0 (2023-06-27)
 
 ### Feat

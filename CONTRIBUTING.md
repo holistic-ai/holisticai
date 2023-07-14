@@ -26,7 +26,7 @@ conda install pip poetry
 
 git clone git@github.com:holistic-ai/holisticai.git
 cd holisticai
-poetry install
+poetry install --all-extras
 ```
 
 -to send a PR first you have to run the tests:
