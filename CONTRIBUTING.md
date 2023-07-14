@@ -13,11 +13,25 @@ Although the holistic ai package can be developed on any operating system, we hi
 If you are a Windows user, you can use the Windows Subsystem for Linux (WSL) to install a Linux distribution on your machine. You can find instructions on how to install WSL [here](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
 
 
-## **Installation:**
+## **Installation (Using Conda):**
 
-First, you will need to install the `pyenv` package. This will allow you to install multiple versions of Python on your machine. You can install it by running the following instructions:
+First, you will need to install the `conda`. This will allow you to install multiple python environments on your machine. You can install it by running the following instructions:
 
-### Installing Pyenv
+Using Conda to create a new environment "holistic-ai"
+
+```bash
+conda create --name holistic-ai python==3.10
+conda activate holistic-ai
+conda install pip poetry
+
+git clone git@github.com:holistic-ai/holisticai.git
+cd holisticai
+poetry install
+```
+
+## **Installation (Using Pyenv):**
+
+First, you will need to install the `pyenv`. This will allow you to install multiple python environments on your machine. You can install it by running the following instructions:
 
 - Install the dependencies:
 ```bash
