@@ -55,6 +55,11 @@ class PluginEstimationAndCalibrationAlgorithm:
             self.sensitive_groups = SensitiveGroups()
             self.epsilon = np.finfo(float).eps
         """
+        self.multiplier = 1
+        self.length = np.floor(L / 2).astype(np.int32)
+        self.beta = beta
+        self.sensitive_groups = SensitiveGroups()
+        self.epsilon = np.finfo(float).eps
 
     def fit(self, y_pred: np.ndarray, sensitive_features: np.ndarray):
         # Fit and transform the sensitive features
