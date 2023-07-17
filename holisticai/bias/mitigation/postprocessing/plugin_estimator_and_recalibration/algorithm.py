@@ -93,7 +93,7 @@ class PluginEstimationAndCalibrationAlgorithm:
         )
         adjusted_predictions = y_pred * 2 - 1
         index_range = np.arange(-self.length, self.length + 1, 1)
-        
+
         transformed_sensitive_features = transformed_sensitive_features.to_list()
         minimizing_values = (
             np.expand_dims(self.probabilities[transformed_sensitive_features], axis=1)
