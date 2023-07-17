@@ -150,6 +150,7 @@ def _init_centroids(
         centers, _ = _kmeans_plusplus(
             X,
             n_clusters,
+            sample_weight=np.ones(shape=(X.shape[0],)),
             random_state=random_state,
             x_squared_norms=x_squared_norms,
         )
