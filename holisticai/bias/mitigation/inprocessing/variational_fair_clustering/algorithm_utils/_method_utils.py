@@ -1,12 +1,13 @@
 import numpy as np
+import sklearn
 from scipy import sparse
 from sklearn.metrics.pairwise import euclidean_distances as ecdist
 
-import sklearn
 
 def check_version(version_str):
-    major, minor, patch = map(int, version_str.split('.'))
+    major, minor, patch = map(int, version_str.split("."))
     return major, minor, patch
+
 
 SKLEARN_CURRENT_VERSION = sklearn.__version__
 
@@ -140,7 +141,7 @@ def _is_arraylike_not_scalar(array):
 def _init_centroids(
     X, n_clusters, init, random_state=np.random.RandomState(42), init_size=None
 ):
-    
+
     from sklearn.cluster._kmeans import _kmeans_plusplus
     from sklearn.utils.validation import check_array
 
@@ -155,8 +156,8 @@ def _init_centroids(
         n_samples = X.shape[0]
 
     if isinstance(init, str) and init == "k-means++":
-        if check_version(SKLEARN_CURRENT_VERSION) >= check_version('1.3.0'):
-            kargs = {'sample_weight':np.ones(shape=(X.shape[0],))}
+        if check_version(SKLEARN_CURRENT_VERSION) >= check_version("1.3.0"):
+            kargs = {"sample_weight": np.ones(shape=(X.shape[0],))}
         else:
             kargs = {}
 
