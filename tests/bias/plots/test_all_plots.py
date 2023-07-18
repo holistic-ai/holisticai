@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics
+
 # Regression Plots
 # Recommender Plots
 # Multiclass Plots
