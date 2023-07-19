@@ -39,7 +39,11 @@ from ._bias_regression_plots import (
 )
 
 # Report Plots
-from ._bias_report_plots import bias_report_classification, bias_report_regression
+from ._bias_report_plots import (
+    bias_report_classification,
+    bias_report_clustering,
+    bias_report_regression,
+)
 
 # All bias plotters
 __all__ = [
@@ -64,4 +68,5 @@ __all__ = [
     "correlation_matrix_plot",
     "bias_report_classification",
     "bias_report_regression",
+    "bias_report_clustering",
 ]

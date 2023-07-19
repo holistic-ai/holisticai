@@ -156,10 +156,9 @@ def _init_centroids(
         n_samples = X.shape[0]
 
     if isinstance(init, str) and init == "k-means++":
+        kargs = {}
         if check_version(SKLEARN_CURRENT_VERSION) >= check_version("1.3.0"):
             kargs = {"sample_weight": np.ones(shape=(X.shape[0],))}
-        else:
-            kargs = {}
 
         centers, _ = _kmeans_plusplus(
             X,
