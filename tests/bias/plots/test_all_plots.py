@@ -14,8 +14,7 @@ from holisticai.bias.metrics import classification_bias_metrics, regression_bias
 from holisticai.bias.plots import (
     abroca_plot,
     accuracy_bar_plot,
-    bias_report_classification,
-    bias_report_regression,
+    bias_metrics_report,
     disparate_impact_curve,
     disparate_impact_plot,
     distribution_plot,
@@ -278,8 +277,8 @@ def test_bias_report_regression(monkeypatch):
     mitigated = regression_bias_metrics(
         group_a, group_b, y_pred, y_true, metric_type="both"
     )
-    bias_report_regression(metrics)
-    bias_report_regression(metrics, mitigated)
+    bias_metrics_report("regression", metrics)
+    bias_metrics_report("regression", metrics, mitigated)
     assert True
 
 
@@ -297,6 +296,6 @@ def test_bias_report_classification(monkeypatch):
     mitigated = classification_bias_metrics(
         group_a, group_b, y_pred, y_true, metric_type="both"
     )
-    bias_report_classification(metrics)
-    bias_report_classification(metrics, mitigated)
+    bias_metrics_report("binary_classification", metrics)
+    bias_metrics_report("binary_classification", metrics, mitigated)
     assert True

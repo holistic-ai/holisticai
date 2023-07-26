@@ -46,345 +46,112 @@ RANGE_METRICS_CLUSTERING = {
 }
 
 
-def bias_report_regression(
-    metrics: pd.DataFrame, metrics_mitigated: pd.DataFrame = None
+RANGE_METRICS = {
+    "binary_classification": RANGE_METRICS_CLASSIFICATION,
+    "regression": RANGE_METRICS_REGRESSION,
+    "clustering": RANGE_METRICS_CLUSTERING,
+}
+
+
+def bias_metrics_report(
+    model_type: str,
+    table_metrics: pd.DataFrame,
+    table_metrics_mitigated: pd.DataFrame = None,
 ):
     """
-    Plot bias report for regression models.
+    Plot bias report for different model types.
 
     Parameters
     ----------
-    metrics : pandas.DataFrame
+    model_type : str
+        Type of model: 'binary_classification', 'regression', 'clustering'
+    table_metrics : pandas.DataFrame
         Dataframe containing bias metrics.
-    metrics_mitigated : bool, optional
+    table_metrics_mitigated : bool, optional
         Whether the bias metrics are for mitigated model or not, by default False
     """
-    metric_names = list(metrics.index)
+    metric_names = list(table_metrics.index)
+
+    if table_metrics_mitigated is None:
+        metrics_biased = table_metrics.copy()
+        columns = ["Baseline", "Reference"]
+        columns_plot = ["Baseline"]
+        metrics_biased.columns = columns
+        fill_range = [-1, 1]
+
+    else:
+        metrics_biased = pd.concat(
+            [table_metrics["Value"], table_metrics_mitigated[["Value", "Reference"]]],
+            axis=1,
+        )
+        columns = ["Baseline", "Mitigator", "Reference"]
+        columns_plot = ["Baseline", "Mitigator"]
+        metrics_biased.columns = columns
+        fill_range = [-0.5, 1.5]
 
     cols = 4
     rows = len(metric_names) // cols
     if len(metric_names) % cols != 0:
         rows += 1
 
-    fig, axes = plt.subplots(ncols=cols, nrows=rows, figsize=(15, 7))
-
-    if metrics_mitigated is None:
-        for i, name in enumerate(metric_names):
-            metrics_biased = metrics.copy()
-            metrics_biased.columns = ["Baseline", "Reference"]
-            metric_data = metrics_biased[metrics_biased.index == name]
-            row, col = divmod(i, cols)
-            axes[row, col].bar(
-                metric_data.index,
-                metric_data["Baseline"],
-                label="Baseline",
-                color=get_colors(1)[0],
-            )
-            axes[row, col].set_title(name)
-            axes[row, col].axhline(
-                y=metric_data["Reference"].values[0], color="black", linestyle="--"
-            )
-            axes[row, col].set_ylabel("Score")
-            axes[row, col].set_xticklabels([])
-
-            if i == len(metric_names) - 1 and i % cols != cols - 1:
-                for j in range(i % cols + 1, cols):
-                    axes[row, j].axis("off")
-
-            elif i == len(metric_names) - 1 and i % cols == cols - 1:
-                for j in range(cols):
-                    axes[row + 1, j].axis("off")
-
-            if name != "No Disparate Impact Level":
-                axes[row, col].fill_between(
-                    [-1, 1],
-                    metric_data["Reference"].values[0] - RANGE_METRICS_REGRESSION[name],
-                    metric_data["Reference"].values[0] + RANGE_METRICS_REGRESSION[name],
-                    color="g",
-                    alpha=0.1,
-                )
-
-            if i == 0:
-                axes[row, col].legend(
-                    [
-                        "Reference",
-                        "Fair",
-                    ],
-                    bbox_to_anchor=(-0.85, 1),
-                    loc="upper left",
-                    fontsize=12,
-                )
-
-            plt.tight_layout()
-
+    if rows >= 3:
+        fig_size = (12, 7)
     else:
-        for i, name in enumerate(metric_names):
-            mitigated = pd.concat(
-                [metrics["Value"], metrics_mitigated[["Value", "Reference"]]], axis=1
-            )
-            mitigated.columns = ["Baseline", "Mitigator", "Reference"]
-            metric_data = mitigated[mitigated.index == name]
-            row, col = divmod(i, cols)
+        fig_size = (12, 4)
 
-            sns.barplot(
-                data=metric_data[["Baseline", "Mitigator"]],
-                palette=get_colors(2),
-                ax=axes[row, col],
-            )
-            axes[row, col].set_title(name)
-            axes[row, col].axhline(
-                y=metric_data["Reference"].values[0], color="black", linestyle="--"
-            )
-            axes[row, col].set_ylabel("Score")
+    sns.set_style("darkgrid")
+    fig, axes = plt.subplots(ncols=cols, nrows=rows, figsize=fig_size)
 
-            if i == len(metric_names) - 1 and i % cols != cols - 1:
-                for j in range(i % cols + 1, cols):
-                    axes[row, j].axis("off")
-            elif i == len(metric_names) - 1 and i % cols == cols - 1:
-                for j in range(cols):
-                    axes[row + 1, j].axis("off")
+    for i, name in enumerate(metric_names):
+        metric_data = metrics_biased[metrics_biased.index == name]
+        row, col = divmod(i, cols)
+        sns.barplot(
+            data=metric_data[columns_plot],
+            palette=get_colors(2),
+            ax=axes[row, col],
+        )
+        axes[row, col].set_title(name)
+        axes[row, col].axhline(
+            y=metric_data["Reference"].values[0], color="black", linestyle="--"
+        )
+        axes[row, col].set_ylabel("Score")
 
-            if name != "No Disparate Impact Level":
-                axes[row, col].fill_between(
-                    [-0.5, 1.5],
-                    metric_data["Reference"].values[0] - RANGE_METRICS_REGRESSION[name],
-                    metric_data["Reference"].values[0] + RANGE_METRICS_REGRESSION[name],
-                    color="g",
-                    alpha=0.1,
-                )
+        if i == len(metric_names) - 1 and i % cols != cols - 1:
+            for j in range(i % cols + 1, cols):
+                axes[row, j].axis("off")
 
-            if i == 0:
-                axes[row, col].legend(
-                    ["Baseline", "Mitigator", "Reference", "Fair"],
-                    bbox_to_anchor=(-0.85, 1),
-                    loc="upper left",
-                    fontsize=12,
-                )
+        elif i == len(metric_names) - 1 and i % cols == cols - 1:
+            for j in range(cols):
+                axes[row + 1, j].axis("off")
 
-            plt.tight_layout()
-
-
-def bias_report_classification(metrics, metrics_mitigated=None):
-    """
-    Plot bias report for classification models.
-
-    Parameters
-    ----------
-    metrics : pandas.DataFrame
-        Dataframe containing bias metrics.
-    metrics_mitigated : bool, optional
-        Whether the bias metrics are for mitigated model or not, by default False
-    """
-    metric_names = list(metrics.index)
-
-    cols = 4
-    rows = len(metric_names) // cols
-    if len(metric_names) % cols != 0:
-        rows += 1
-
-    fig, axes = plt.subplots(ncols=cols, nrows=rows, figsize=(15, 8))
-    if metrics_mitigated is None:
-        for i, name in enumerate(metric_names):
-            metrics_biased = metrics.copy()
-            metrics_biased.columns = ["Baseline", "Reference"]
-            metric_data = metrics_biased[metrics_biased.index == name]
-            row, col = divmod(i, cols)
-            axes[row, col].bar(
-                metric_data.index,
-                metric_data["Baseline"],
-                label="Baseline",
-                color=get_colors(1)[0],
-            )
-            axes[row, col].set_title(name)
-            axes[row, col].axhline(
-                y=metric_data["Reference"].values[0], color="black", linestyle="--"
-            )
-            axes[row, col].set_ylabel("Score")
-            axes[row, col].set_xticklabels([])
-
-            if i == len(metric_names) - 1 and i % cols != cols - 1:
-                for j in range(i % cols + 1, cols):
-                    axes[row, j].axis("off")
-            elif i == len(metric_names) - 1 and i % cols == cols - 1:
-                for j in range(cols):
-                    axes[row + 1, j].axis("off")
-
+        if name != "No Disparate Impact Level":
             axes[row, col].fill_between(
-                [-1, 1],
-                metric_data["Reference"].values[0] - RANGE_METRICS_CLASSIFICATION[name],
-                metric_data["Reference"].values[0] + RANGE_METRICS_CLASSIFICATION[name],
-                color="g",
-                alpha=0.1,
+                fill_range,
+                metric_data["Reference"].values[0] - RANGE_METRICS[model_type][name],
+                metric_data["Reference"].values[0] + RANGE_METRICS[model_type][name],
+                color="slategray",
+                alpha=0.4,
             )
 
-            if i == 0:
-                axes[row, col].legend(
-                    [
-                        "Reference",
-                        "Fair",
-                    ],
-                    bbox_to_anchor=(-0.85, 1),
-                    loc="upper left",
-                    fontsize=12,
-                )
-
-            plt.tight_layout()
-
-    else:
-        for i, name in enumerate(metric_names):
-            mitigated = pd.concat(
-                [metrics["Value"], metrics_mitigated[["Value", "Reference"]]], axis=1
-            )
-            mitigated.columns = ["Baseline", "Mitigator", "Reference"]
-            metric_data = mitigated[mitigated.index == name]
-
-            row, col = divmod(i, cols)
-
-            sns.barplot(
-                data=metric_data[["Baseline", "Mitigator"]],
-                palette=get_colors(2),
-                ax=axes[row, col],
-            )
-            axes[row, col].set_title(name)
-            axes[row, col].axhline(
-                y=metric_data["Reference"].values[0], color="black", linestyle="--"
-            )
-            axes[row, col].set_ylabel("Score")
-
-            if i == len(metric_names) - 1 and i % cols != cols - 1:
-                for j in range(i % cols + 1, cols):
-                    axes[row, j].axis("off")
-            elif i == len(metric_names) - 1 and i % cols == cols - 1:
-                for j in range(cols):
-                    axes[row + 1, j].axis("off")
-
-            axes[row, col].fill_between(
-                [-0.5, 1.5],
-                metric_data["Reference"].values[0] - RANGE_METRICS_CLASSIFICATION[name],
-                metric_data["Reference"].values[0] + RANGE_METRICS_CLASSIFICATION[name],
-                color="g",
-                alpha=0.1,
+        if i == 0:
+            axes[row, col].legend(
+                [
+                    plt.Line2D(
+                        [0], [0], linestyle="--", color="black", lw=2, label="Reference"
+                    ),
+                    plt.Rectangle(
+                        [0, 0],
+                        1,
+                        1,
+                        fc="slategray",
+                        alpha=0.4,
+                        ec="None",
+                        label="Range",
+                    ),
+                ],
+                ["Reference", "Fair Area"],
+                loc="upper left",
+                bbox_to_anchor=(-1, 1.0),
             )
 
-            if i == 0:
-                axes[row, col].legend(
-                    ["Baseline", "Mitigator", "Reference", "Fair"],
-                    bbox_to_anchor=(-0.85, 1),
-                    loc="upper left",
-                    fontsize=12,
-                )
-
-            plt.tight_layout()
-
-
-def bias_report_clustering(metrics, metrics_mitigated=None):
-    """
-    Plot bias report for clustering models.
-
-    Parameters
-    ----------
-    data : pandas.DataFrame
-        Dataframe containing bias metrics.
-    mitigated : bool, optional
-        Whether the bias metrics are for mitigated model or not, by default False
-    """
-    metric_names = list(metrics.index)
-
-    cols = 4
-    rows = len(metric_names) // cols
-    if len(metric_names) % cols != 0:
-        rows += 1
-
-    fig, axes = plt.subplots(ncols=cols, nrows=rows, figsize=(15, 7))
-    if metrics_mitigated is None:
-        for i, name in enumerate(metric_names):
-            metrics_biased = metrics.copy()
-            metrics_biased.columns = ["Baseline", "Reference"]
-            metric_data = metrics_biased[metrics_biased.index == name]
-            row, col = divmod(i, cols)
-            axes[row, col].bar(
-                metric_data.index,
-                metric_data["Baseline"],
-                label="Baseline",
-                color=get_colors(1)[0],
-            )
-            axes[row, col].set_title(name)
-            axes[row, col].axhline(
-                y=metric_data["Reference"].values[0], color="black", linestyle="--"
-            )
-            axes[row, col].set_ylabel("Score")
-            axes[row, col].set_xticklabels([])
-
-            if i == len(metric_names) - 1 and i % cols != cols - 1:
-                for j in range(i % cols + 1, cols):
-                    axes[row, j].axis("off")
-            elif i == len(metric_names) - 1 and i % cols == cols - 1:
-                for j in range(cols):
-                    axes[row + 1, j].axis("off")
-
-            axes[row, col].fill_between(
-                [-1, 1],
-                metric_data["Reference"].values[0] - RANGE_METRICS_CLUSTERING[name],
-                metric_data["Reference"].values[0] + RANGE_METRICS_CLUSTERING[name],
-                color="g",
-                alpha=0.1,
-            )
-
-            if i == 0:
-                axes[row, col].legend(
-                    [
-                        "Reference",
-                        "Fair",
-                    ],
-                    bbox_to_anchor=(-0.85, 1),
-                    loc="upper left",
-                    fontsize=12,
-                )
-
-            plt.tight_layout()
-
-    else:
-        for i, name in enumerate(metric_names):
-            mitigated = pd.concat(
-                [metrics["Value"], metrics_mitigated[["Value", "Reference"]]], axis=1
-            )
-            mitigated.columns = ["Baseline", "Mitigator", "Reference"]
-            metric_data = mitigated[mitigated.index == name]
-
-            row, col = divmod(i, cols)
-
-            sns.barplot(
-                data=metric_data[["Baseline", "Mitigator"]],
-                palette=get_colors(2),
-                ax=axes[row, col],
-            )
-            axes[row, col].set_title(name)
-            axes[row, col].axhline(
-                y=metric_data["Reference"].values[0], color="black", linestyle="--"
-            )
-            axes[row, col].set_ylabel("Score")
-
-            if i == len(metric_names) - 1 and i % cols != cols - 1:
-                for j in range(i % cols + 1, cols):
-                    axes[row, j].axis("off")
-            elif i == len(metric_names) - 1 and i % cols == cols - 1:
-                for j in range(cols):
-                    axes[row + 1, j].axis("off")
-
-            axes[row, col].fill_between(
-                [-0.5, 1.5],
-                metric_data["Reference"].values[0] - RANGE_METRICS_CLUSTERING[name],
-                metric_data["Reference"].values[0] + RANGE_METRICS_CLUSTERING[name],
-                color="g",
-                alpha=0.1,
-            )
-
-            if i == 0:
-                axes[row, col].legend(
-                    ["Baseline", "Mitigator", "Reference", "Fair"],
-                    bbox_to_anchor=(-0.85, 1),
-                    loc="upper left",
-                    fontsize=12,
-                )
-
-            plt.tight_layout()
+        plt.tight_layout()
