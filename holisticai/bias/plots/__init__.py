@@ -38,6 +38,9 @@ from ._bias_regression_plots import (
     success_rate_curves,
 )
 
+# Report Plots
+from ._bias_report_plots import bias_metrics_report
+
 # All bias plotters
 __all__ = [
     "abroca_plot",
@@ -59,4 +62,7 @@ __all__ = [
     "distribution_plot",
     "histogram_plot",
     "correlation_matrix_plot",
+    "bias_report_classification",
+    "bias_report_regression",
+    "bias_report_clustering",
 ]
