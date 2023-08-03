@@ -1,7 +1,9 @@
+from typing import List
+
 from ._categorical_repairer import CategoricalRepairer
 from ._utils import FreedmanDiaconisBinSize as bin_calculator
 from ._utils import get_median, make_histogram_bins
-from typing import List
+
 
 class NumericalRepairer:
     """
@@ -9,7 +11,11 @@ class NumericalRepairer:
     """
 
     def __init__(
-        self, feature_to_repair: int, repair_level: float, kdd:bool=False, features_to_ignore:List[str]=[]
+        self,
+        feature_to_repair: int,
+        repair_level: float,
+        kdd: bool = False,
+        features_to_ignore: List[str] = [],
     ):
         """
         Parameters
@@ -27,9 +33,10 @@ class NumericalRepairer:
         self.repair_level = repair_level
         self.kdd = kdd
         self.features_to_ignore = features_to_ignore
-        
 
-    def _calculate_category_medians(self, index_bins: List[List[int]], data_to_repair: List[List[float]]) -> dict:
+    def _calculate_category_medians(
+        self, index_bins: List[List[int]], data_to_repair: List[List[float]]
+    ) -> dict:
         """
         Calculates the median value for each bin in the input dataset.
 
@@ -46,7 +53,9 @@ class NumericalRepairer:
             A dictionary containing the median value for each bin in the dataset.
         """
         return {
-            f'BIN_{i}': get_median([data_to_repair[j][self.feature_to_repair] for j in index_bin], self.kdd)
+            f"BIN_{i}": get_median(
+                [data_to_repair[j][self.feature_to_repair] for j in index_bin], self.kdd
+            )
             for i, index_bin in enumerate(index_bins)
         }
 
@@ -71,10 +80,10 @@ class NumericalRepairer:
         )
 
         category_medians = self._calculate_category_medians(index_bins, data_to_repair)
-        
+
         for i, index_bin in enumerate(index_bins):
             for j in index_bin:
-                binned_data[j][self.feature_to_repair] = f'BIN_{i}'
+                binned_data[j][self.feature_to_repair] = f"BIN_{i}"
 
         categoric_repairer = CategoricalRepairer(
             feature_to_repair=self.feature_to_repair,
@@ -84,12 +93,12 @@ class NumericalRepairer:
         )
 
         repaired_data = categoric_repairer.repair(binned_data)
-        
+
         for i, row in enumerate(repaired_data):
             row[self.feature_to_repair] = (
-                category_medians[row[self.feature_to_repair]] if self.repair_level > 0 
+                category_medians[row[self.feature_to_repair]]
+                if self.repair_level > 0
                 else data_to_repair[i][self.feature_to_repair]
             )
 
         return repaired_data
-    
