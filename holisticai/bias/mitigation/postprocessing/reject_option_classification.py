@@ -9,6 +9,10 @@ from holisticai.bias import metrics
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 
+def statistical_parity(group_a, group_b, y_pred, y_true):
+    return metrics.statistical_parity(group_a, group_b, y_pred)
+
+
 class RejectOptionClassification(BMPost):
     """
     Reject option classification gives favorable outcomes (y=1) to unpriviliged groups and unfavorable outcomes (y=0)to
@@ -34,7 +38,7 @@ class RejectOptionClassification(BMPost):
         metric_name: Optional[str] = "Statistical parity difference",
         metric_ub: Optional[float] = 0.05,
         metric_lb: Optional[float] = -0.05,
-        num_workers: Optional[int] = 8,
+        num_workers: Optional[int] = 4,
         verbose: Optional[int] = 0,
     ):
         """
@@ -152,9 +156,21 @@ class RejectOptionClassification(BMPost):
             self.low_class_thresh, self.high_class_thresh, self.num_class_thresh
         )
 
+        if self.metric_name == "Statistical parity difference":
+            fair_metric = statistical_parity
+
+        elif self.metric_name == "Average odds difference":
+            fair_metric = metrics.average_odds_diff
+
+        elif self.metric_name == "Equal opportunity difference":
+            fair_metric = metrics.equal_opportunity_diff
+
+        else:
+            raise ValueError("metric name not in the list of allowed metrics")
+
         args_iterator = [
             (
-                self.metric_name,
+                fair_metric,
                 y_true,
                 likelihoods,
                 group_a,
@@ -166,20 +182,21 @@ class RejectOptionClassification(BMPost):
         ]
 
         # Serial
-        configurations = []
-        self.num_cases = len(args_iterator)
-        for i, argv in enumerate(args_iterator):
-            configurations.append(evaluate_threshold(*argv))
-            self._log_progres(i)
+        # configurations = []
+        # self.num_cases = len(args_iterator)
+        # for i, argv in enumerate(args_iterator):
+        #    configurations.append(evaluate_threshold(*argv))
+        #    self._log_progres(i)
 
         # Pool
-        # from multiprocessing import Pool
-        # with Pool(self.num_workers) as p:
-        #    configurations = list(p.starmap(evaluate_threshold, args_iterator))
+        from multiprocessing import Pool
+
+        with Pool(self.num_workers) as p:
+            configurations = list(p.starmap(evaluate_threshold, args_iterator))
 
         # Joblib
         # from joblib import Parallel, delayed
-        # configurations = Parallel(n_jobs=self.num_workers, verbose=0)(
+        # configurations = Parallel(n_jobs=-1)(
         #    delayed(evaluate_threshold)(*args) for args in args_iterator
         # )
 
@@ -187,8 +204,8 @@ class RejectOptionClassification(BMPost):
 
         selected_configurations = list(
             filter(
-                lambda c: (c["fair_metric"] >= self.metric_lb)
-                and (c["fair_metric"] <= self.metric_ub),
+                lambda c: (c["fair_score"] >= self.metric_lb)
+                and (c["fair_score"] <= self.metric_ub),
                 configurations,
             )
         )
@@ -198,7 +215,7 @@ class RejectOptionClassification(BMPost):
                 selected_configurations, key=lambda c: c["balanced_accurracy"]
             )
         else:
-            best_config = min(configurations, key=lambda c: abs(c["fair_metric"]))
+            best_config = min(configurations, key=lambda c: abs(c["fair_score"]))
 
         self.ROC_margin = best_config["roc_margin"]
         self.classification_threshold = best_config["class_thresh"]
@@ -246,6 +263,7 @@ class RejectOptionClassification(BMPost):
         y_score = params["y_score"]
 
         new_y_pred = predict(
+            y_score > self.classification_threshold,
             y_score,
             group_a,
             group_b,
@@ -266,39 +284,27 @@ class RejectOptionClassification(BMPost):
 
 
 def evaluate_threshold(
-    metric_name, labels, likelihoods, group_a, group_b, class_thresh, num_roc_margin
+    fair_metric, labels, likelihoods, group_a, group_b, class_thresh, num_roc_margin
 ):
-    configurations = []
+    base_predictions = np.where(likelihoods > class_thresh, 1, 0)
     high_roc_margin = class_thresh if class_thresh <= 0.5 else 1.0 - class_thresh
-    for roc_margin in np.linspace(0.0, high_roc_margin, num_roc_margin):
-        # Predict using the current threshold and margin
-        predictions = predict(likelihoods, group_a, group_b, class_thresh, roc_margin)
-
-        if metric_name == "Statistical parity difference":
-            fair_metric = metrics.statistical_parity(group_b, group_a, predictions)
-
-        elif metric_name == "Average odds difference":
-            fair_metric = metrics.average_odds_diff(
-                group_b, group_a, predictions, labels
-            )
-
-        elif metric_name == "Equal opportunity difference":
-            fair_metric = metrics.equal_opportunity_diff(
-                group_b, group_a, predictions, labels
-            )
-
-        configurations.append(
-            {
-                "class_thresh": class_thresh,
-                "roc_margin": roc_margin,
-                "balanced_accurracy": balanced_accuracy_score(labels, predictions),
-                "fair_metric": fair_metric,
-            }
+    roc_margins = np.linspace(0.0, high_roc_margin, num_roc_margin)
+    configurations = []
+    for roc_margin in roc_margins:
+        prediction = predict(
+            base_predictions, likelihoods, group_a, group_b, class_thresh, roc_margin
         )
+        configuration = {
+            "class_thresh": class_thresh,
+            "roc_margin": roc_margin,
+            "balanced_accurracy": balanced_accuracy_score(labels, prediction),
+            "fair_score": fair_metric(group_b, group_a, prediction, labels),
+        }
+        configurations.append(configuration)
     return configurations
 
 
-def predict(likelihoods, group_a, group_b, threshold, roc_margin):
+def predict(predictions, likelihoods, group_a, group_b, threshold, roc_margin):
     # Indices of critical region around the classification boundary
     upper_threshold = threshold + roc_margin
     lower_threshold = threshold - roc_margin
@@ -307,7 +313,7 @@ def predict(likelihoods, group_a, group_b, threshold, roc_margin):
     )
 
     # New, fairer labels
-    new_predictions = np.where(likelihoods > threshold, 1, 0)
+    new_predictions = predictions.copy()
     new_predictions[np.logical_and(crit_region_inds, group_a)] = 1
     new_predictions[np.logical_and(crit_region_inds, group_b)] = 0
     return new_predictions
