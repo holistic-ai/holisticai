@@ -288,6 +288,12 @@ def correlation_matrix_plot(
     matplotlib ax
     """
     """Prints the correlation matrix """
+    try:
+        df = df.astype(int)
+    except:
+        raise TypeError(
+            "Dataframe 'df' cannot be converted to int. All the values must be numerical."
+        )
 
     sns.set(font_scale=1.25)
     if ax is None:

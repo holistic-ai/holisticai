@@ -23,14 +23,14 @@ class DisparateImpactRemover(BMPre):
         """
         Disparate Impact Remover Preprocessing Bias Mitigator
 
-        Description
-        -----------
-        Initialize Mitigator class
-
         Parameters
         ----------
-        repair_level : float
-                Repair amount 0.0 (min) -> 1.0 (max)
+        repair_level : float, default=1.0
+            The amount of repair to be applied. It should be between 0.0 and 1.0.
+
+        Description
+        -----------
+        Initializes the Disparate Impact Remover Preprocessing Bias Mitigator class.
         """
         self._assert_parameters(repair_level)
         self.repair_level = repair_level
@@ -41,15 +41,24 @@ class DisparateImpactRemover(BMPre):
             raise ValueError("'repair_level' must be between 0.0 and 1.0.")
 
     def repair_data(self, X, group_a, group_b):
+        # Combine the two group masks into a single matrix
         sensitive_features = np.c_[group_a, group_b]
+
+        # Convert the sensitive feature matrix to a numeric representation
         p_attr = self.sensgroup.fit_transform(
             sensitive_features, convert_numeric=True
         ).to_numpy()
+
+        # Combine the sensitive feature matrix with the input data matrix
         data = np.c_[p_attr, X].tolist()
+
+        # Apply numerical repair to the first column of the combined matrix
         dir = NumericalRepairer(
             feature_to_repair=0, repair_level=self.repair_level, kdd=False
         )
         new_data_matrix_np = dir.repair(data)
+
+        # Return only the repaired input data matrix (without the sensitive feature column)
         return np.array([np.array(row[1:]) for row in new_data_matrix_np])
 
     def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):

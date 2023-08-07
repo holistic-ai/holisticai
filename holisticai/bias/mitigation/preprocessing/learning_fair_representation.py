@@ -5,57 +5,75 @@ import numpy as np
 import scipy.optimize as optim
 from scipy.spatial.distance import cdist
 from scipy.special import softmax
+from tqdm import tqdm
 
 from holisticai.utils.transformers.bias import BMPreprocessing
 
 
-def get_xhat_y_hat(prototypes, w, x):
+def get_x_hat_y_hat(prototypes, w, x):
     M = softmax(-cdist(x, prototypes), axis=1)
     x_hat = np.matmul(M, prototypes)
-    y_hat = np.clip(
-        np.matmul(M, w.reshape((-1, 1))), np.finfo(float).eps, 1.0 - np.finfo(float).eps
+    y_hat = np.maximum(
+        np.minimum(np.matmul(M, w.reshape((-1, 1))), 1.0), np.finfo(float).eps
     )
     return M, x_hat, y_hat
 
 
 class ObjectiveFunction:
-    def __init__(self, verbose, print_interval):
-        self.verbose = verbose
-        self.step = 0
-        self.print_interval = print_interval
-
-    def log_progress(self, total_loss, L_x, L_y, L_z):
-        self.step += 1
-        if self.verbose and (self.step % self.print_interval) == 0:
-            sys.stdout.write(
-                f"step: {self.step}\tloss: {total_loss:.4f}\tL_x: {L_x:.4f}\tL_y: {L_y:.4f}\tL_z: {L_z:.4f}\n"
-            )
-            sys.stdout.flush()
-
-    def __call__(
-        self, parameters, x_a, x_b, y_a, y_b, k=10, A_x=0.01, A_y=0.1, A_z=0.5
+    def __init__(
+        self,
+        maxiter,
+        features_dim,
+        verbose,
+        x,
+        y,
+        m_a,
+        m_b,
+        k=10,
+        A_x=0.01,
+        A_y=0.1,
+        A_z=0.5,
     ):
+        self.verbose = verbose
+        self.x = x
+        self.y = y
+        self.one_minus_y = 1 - y
+        self.m_a = m_a
+        self.m_b = m_b
+        self.k = k
+        self.A = np.array([A_x, A_y, A_z])
+        self.prototypes_shape = (self.k, features_dim)
+        self.progress_bar = tqdm(total=maxiter, desc="Optimization Progress")
 
-        features_dim = x_a.shape[1]
+    def __call__(self, parameters):
+        w = parameters[: self.k]
+        prototypes = parameters[self.k :].reshape(self.prototypes_shape)
 
-        w = parameters[:k]
-        prototypes = parameters[k:].reshape((k, features_dim))
+        M, x_hat, y_hat = get_x_hat_y_hat(prototypes, w, self.x)
 
-        M_b, x_hat_b, y_hat_b = get_xhat_y_hat(prototypes, w, x_b)
-        M_a, x_hat_a, y_hat_a = get_xhat_y_hat(prototypes, w, x_a)
+        dx2 = (x_hat - self.x) ** 2
+        L_x = np.mean(dx2[self.m_b]) + np.mean(dx2[self.m_a])
 
-        y_hat = np.concatenate([y_hat_b, y_hat_a], axis=0)
-        y = np.concatenate([y_b.reshape((-1, 1)), y_a.reshape((-1, 1))], axis=0)
+        L_z = np.mean(
+            np.abs(np.mean(M[self.m_b], axis=0) - np.mean(M[self.m_a], axis=0))
+        )
 
-        L_x = np.mean((x_hat_b - x_b) ** 2) + np.mean((x_hat_a - x_a) ** 2)
-        L_z = np.mean(abs(np.mean(M_b, axis=0) - np.mean(M_a, axis=0)))
-        L_y = -np.mean(y * np.log(y_hat) + (1.0 - y) * np.log(1.0 - y_hat))
+        L_y = -np.mean(self.y * np.log(y_hat) + self.one_minus_y * np.log(1.0 - y_hat))
 
-        total_loss = A_x * L_x + A_y * L_y + A_z * L_z
+        L = np.array([L_x, L_y, L_z])
 
-        self.log_progress(total_loss, L_x, L_y, L_z)
+        total_loss = np.dot(self.A, L)
+
+        if self.verbose > 0:
+            self.log_progress(total_loss, L_x, L_y, L_z)
 
         return total_loss
+
+    def log_progress(self, total_loss, L_x, L_y, L_z):
+        self.progress_bar.update()
+        self.progress_bar.set_postfix_str(
+            f"loss: {total_loss:.3f} L_x: {L_x:.3f} L_y: {L_y:.3f} L_z: {L_z:.3f}"
+        )
 
 
 class LearningFairRepresentation(BMPreprocessing):
@@ -75,7 +93,6 @@ class LearningFairRepresentation(BMPreprocessing):
         Ax: Optional[float] = 0.01,
         Ay: Optional[float] = 1.0,
         Az: Optional[float] = 50.0,
-        print_interval: Optional[int] = 250,
         maxiter: Optional[int] = 5000,
         maxfun: Optional[int] = 5000,
         verbose: Optional[int] = 0,
@@ -98,8 +115,6 @@ class LearningFairRepresentation(BMPreprocessing):
             Fairness constraint term weight.
         Ay : float
             Output prediction error.
-        print_interval : int
-            Print optimization objective value every print_interval iterations.
         verbose : int
             If zero, then no output.
         seed : int
@@ -116,8 +131,8 @@ class LearningFairRepresentation(BMPreprocessing):
         self.learned_model = None
         self.maxiter = maxiter
         self.maxfun = maxfun
-        self.obj_fun = ObjectiveFunction(verbose=verbose, print_interval=print_interval)
         self.problem_type = "binary"
+        self.verbose = verbose
 
     def fit(
         self,
@@ -157,34 +172,34 @@ class LearningFairRepresentation(BMPreprocessing):
             group_a=group_a,
             group_b=group_b,
         )
-        y_true = params["y_true"]
+        y_true = params["y_true"].reshape([-1, 1])
         group_a = params["group_a"]
         group_b = params["group_b"]
         X = params["X"]
 
-        _, self.features_dim = np.shape(X)
+        features_dim = np.shape(X)[1]
+
         parameters_initialization = np.random.uniform(
-            size=self.k + self.features_dim * self.k
+            size=self.k + features_dim * self.k
         )
-        parameters_bounds = [(0, 1)] * self.k + [
-            (None, None)
-        ] * self.features_dim * self.k
+        parameters_bounds = [(0, 1)] * self.k + [(None, None)] * features_dim * self.k
         args = (
-            X[group_a == 1],
-            X[group_b == 1],
-            y_true[group_a == 1],
-            y_true[group_b == 1],
+            X,
+            y_true,
+            group_a == 1,
+            group_b == 1,
             self.k,
             self.Ax,
             self.Ay,
             self.Az,
         )
 
+        obj_fun = ObjectiveFunction(self.maxiter, features_dim, self.verbose, *args)
+
         self.learned_model = optim.fmin_l_bfgs_b(
-            self.obj_fun,
+            obj_fun,
             x0=parameters_initialization,
             epsilon=1e-5,
-            args=args,
             bounds=parameters_bounds,
             approx_grad=True,
             maxfun=self.maxfun,
@@ -193,9 +208,7 @@ class LearningFairRepresentation(BMPreprocessing):
         )[0]
 
         self.w = self.learned_model[: self.k]
-        self.prototypes = self.learned_model[self.k :].reshape(
-            (self.k, self.features_dim)
-        )
+        self.prototypes = self.learned_model[self.k :].reshape((self.k, features_dim))
         return self
 
     def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
@@ -224,8 +237,8 @@ class LearningFairRepresentation(BMPreprocessing):
         group_a = params["group_a"]
         group_b = params["group_b"]
 
-        _, x_hat_b, _ = get_xhat_y_hat(self.prototypes, self.w, X[group_b == 1])
-        _, x_hat_a, _ = get_xhat_y_hat(self.prototypes, self.w, X[group_a == 1])
+        _, x_hat_b, _ = get_x_hat_y_hat(self.prototypes, self.w, X[group_b == 1])
+        _, x_hat_a, _ = get_x_hat_y_hat(self.prototypes, self.w, X[group_a == 1])
 
         new_X = X.copy()
         new_X[group_b == 1] = x_hat_b
