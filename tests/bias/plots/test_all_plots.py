@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import pytest
 
 from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics
 
@@ -15,6 +16,7 @@ from holisticai.bias.plots import (
     abroca_plot,
     accuracy_bar_plot,
     bias_metrics_report,
+    correlation_matrix_plot,
     disparate_impact_curve,
     disparate_impact_plot,
     distribution_plot,
@@ -94,6 +96,48 @@ def test_histogram_plot(monkeypatch):
     _, ax = plt.subplots()
     histogram_plot(
         df["education"], p_attr=df["sex"], ax=ax, size=(10, 7), title="BLUBH"
+    )
+    assert True
+
+
+@pytest.mark.xfail(raises=TypeError)
+def test_correlation_plot_non_numerical_data(monkeypatch):
+    """test_correlation_plot"""
+    monkeypatch.setattr(plt, "show", lambda: None)
+    _, ax = plt.subplots()
+    correlation_matrix_plot(
+        df,
+        target_feature="class",
+        n_features=10,
+        cmap="YlGnBu",
+        ax=ax,
+        size=None,
+        title=None,
+    )
+
+
+def test_correlation_plot_numerical_data(monkeypatch):
+    """test_correlation_plot"""
+    monkeypatch.setattr(plt, "show", lambda: None)
+    _, ax = plt.subplots()
+    # ensure dataframes are numerical
+    df_ = df.copy()
+    df_clean = df_.iloc[
+        :, [i for i, n in enumerate(df_.isna().sum(axis=0).T.values) if n < 100]
+    ]
+    df_clean.drop(
+        columns=["sex", "race", "education", "marital-status", "relationship"],
+        inplace=True,
+    )
+    df_clean["class"].replace({">50K": 1, "<=50K": 0}, inplace=True)
+    correlation_matrix_plot(
+        df_clean,
+        target_feature="class",
+        n_features=5,
+        cmap="YlGnBu",
+        ax=None,
+        size=None,
+        title=None,
     )
     assert True
 
