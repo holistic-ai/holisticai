@@ -19,6 +19,11 @@ from ._classification import (
     true_negative_rate_diff,
     z_test_diff,
     z_test_ratio,
+    theil_index,
+    generalized_entropy_index,
+    coefficient_of_variation,
+    consistency_score,
+    
 )
 
 # Clustering
@@ -144,4 +149,8 @@ __all__ = [
     "multiclass_bias_metrics",
     "z_test_diff",
     "z_test_ratio",
+    "theil_index",
+    "generalized_entropy_index",
+    "coefficient_of_variation",
+    "consistency_score",
 ]

@@ -232,7 +232,6 @@ pandas Series or pandas 1d DataFrame".format(
             )
         )
 
-
 def _matrix_like_to_numpy(arr, name=""):
     """
     Coerce input to numpy (if possible)
