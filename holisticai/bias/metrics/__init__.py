@@ -8,22 +8,21 @@ from ._classification import (
     accuracy_diff,
     average_odds_diff,
     classification_bias_metrics,
+    coefficient_of_variation,
     cohen_d,
+    consistency_score,
     disparate_impact,
     equal_opportunity_diff,
     false_negative_rate_diff,
     false_positive_rate_diff,
     four_fifths,
+    generalized_entropy_index,
     statistical_parity,
     success_rate,
+    theil_index,
     true_negative_rate_diff,
     z_test_diff,
     z_test_ratio,
-    theil_index,
-    generalized_entropy_index,
-    coefficient_of_variation,
-    consistency_score,
-    
 )
 
 # Clustering

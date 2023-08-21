@@ -1,17 +1,20 @@
 # Base Imports
+import warnings
+
 import numpy as np
 import pandas as pd
-import warnings
+
 # Efficacy metrics
 from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
 from sklearn.neighbors import NearestNeighbors
+
 # utils
 from ...utils._validation import (
+    _array_like_to_numpy,
     _check_binary,
     _classification_checks,
+    _matrix_like_to_numpy,
     _regression_checks,
-    _array_like_to_numpy,
-    _matrix_like_to_numpy
 )
 
 
@@ -878,7 +881,14 @@ def abroca(group_a, group_b, y_score, y_true):
 
 
 def classification_bias_metrics(
-    group_a=None, group_b=None, y_pred=None, y_true=None, y_score=None, X=None, metric_type="group", **kargs
+    group_a=None,
+    group_b=None,
+    y_pred=None,
+    y_true=None,
+    y_score=None,
+    X=None,
+    metric_type="group",
+    **kargs
 ):
     """
     Classification bias metrics batch computation.
@@ -912,18 +922,17 @@ def classification_bias_metrics(
     Examples
     --------
     """
-    
+
     individual_metrics_format_1 = {
-        "Theil Index" : theil_index,
-        "Generalized Entropy Index" : generalized_entropy_index,
-        "Coefficient of Variation": coefficient_of_variation
+        "Theil Index": theil_index,
+        "Generalized Entropy Index": generalized_entropy_index,
+        "Coefficient of Variation": coefficient_of_variation,
     }
-    
+
     individual_metrics_format_2 = {
-        "Consistency Score" : consistency_score,
+        "Consistency Score": consistency_score,
     }
-    
-    
+
     equal_outcome_metrics = {
         "Statistical Parity": statistical_parity,
         "Disparate Impact": disparate_impact,
@@ -977,35 +986,37 @@ def classification_bias_metrics(
                 [pf, fn(group_a, group_b, y_score, y_true), ref_vals[pf]]
                 for pf, fn in soft_metrics.items()
             ]
-        
-        
+
     if metric_type == "individual":
         from collections import defaultdict
+
         metric_kargs = defaultdict(dict)
-        for k,value in kargs.items():
+        for k, value in kargs.items():
             metric, arg = k.split("__")
             metric_kargs[metric][arg] = value
-            
+
         indv_metrics = []
         if y_pred is not None:
             if y_true is not None:
                 indv_metrics += [
-                    [pf, fn(y_pred, y_true, **metric_kargs[fn.__name__]) , ref_vals[pf]]
+                    [pf, fn(y_pred, y_true, **metric_kargs[fn.__name__]), ref_vals[pf]]
                     for pf, fn in individual_metrics_format_1.items()
                 ]
-            
+
             if X is not None:
                 indv_metrics += [
-                    [pf, fn(X, y_pred, **metric_kargs[fn.__name__]) , ref_vals[pf]] 
+                    [pf, fn(X, y_pred, **metric_kargs[fn.__name__]), ref_vals[pf]]
                     for pf, fn in individual_metrics_format_2.items()
                 ]
-    
 
     if metric_type in ["group", "both"]:
-        if metric_type  == "both":
+        if metric_type == "both":
             # TODO: remove both for next version
-            warnings.warn("`both` option will be depreciated in the next versions, use group", DeprecationWarning)
-            
+            warnings.warn(
+                "`both` option will be depreciated in the next versions, use group",
+                DeprecationWarning,
+            )
+
         metrics = out_metrics + opp_metrics
         return pd.DataFrame(
             metrics, columns=["Metric", "Value", "Reference"]
@@ -1033,34 +1044,35 @@ def classification_bias_metrics(
 
 ### Inidivudal Metrics
 
+
 def benefit_function(y_pred, y_true) -> np.ndarray:
     return y_pred - y_true + 1
-    
+
+
 def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """
-    The Theil index 
-    
+    The Theil index
+
     Description
     -----------
-    The Theil index is a measure of inequality that is commonly used in economics. It is used to measure the inequality of a distribution, 
-    such as the distribution of income or wealth. The Theil index is based on the idea that inequality can be measured by the extent to 
-    which the distribution of a variable deviates from a hypothetical distribution in which everyone has an equal share. The Theil index is 
-    a special case of general entropy indices and is used for individual fairness too.
-    
+    The Theil index is a measure of inequality that is commonly used in economics. It is used to measure the inequality of a distribution,
+    such as the distribution of income or wealth. The Theil index is a special case of general entropy indices that allows to observe inequalities
+    at group level and individual level.
+
     Interpretation
     --------------
-    The Theil index ranges from 0 to 1. A value of 0 indicates perfect equality, while a value of 1 indicates perfect inequality.
-    
+    A high value implies high inequality while a value of 0 indicates perfect equality.
+
     Parameters
     ----------
     b : array-like of shape (n_samples,)
         The input array.
-    
+
     Returns
     -------
     float
         The Theil index of the input array.
-    
+
     Examples
     -------
     >>> import numpy as np
@@ -1069,23 +1081,25 @@ def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     >>> theil_index(b)
     0.3934099372078345
     """
-    return generalized_entropy_index(y_pred, y_true, alpha=1)   
+    return generalized_entropy_index(y_pred, y_true, alpha=1)
 
-def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int = 2) -> float:
+
+def generalized_entropy_index(
+    y_pred: np.ndarray, y_true: np.ndarray, alpha: int = 2
+) -> float:
     """
     Generalized entropy index
 
     Description
     -----------
-    Generalized entropy index is a measure of inequality that is proposed as a unified individual and group fairness measure. 
-    It is used to measure the extent of inequality in the distribution of a variable. The measure is based on the idea that 
-    inequality can be measured by the extent to which the distribution of a variable deviates from a hypothetical distribution 
-    in which everyone has an equal share. 
+    Generalized entropy index is a measure of inequality that is proposed as a unified individual and group fairness measure.
+    It is used to measure the extent of inequality in the distribution of a variable. The measure is based on the idea that
+    inequality can be measured by the extent to which the distribution of a variable deviates from a hypothetical distribution
+    in which everyone has an equal share.
 
     Interpretation
     --------------
-    The generalized entropy index ranges from 0 to 1. A value of 0 indicates perfect equality, while a value of 1 indicates 
-    perfect inequality.
+    A high value implies high inequality while a value of 0 indicates perfect equality.
 
     Parameters
     ----------
@@ -1113,24 +1127,29 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
     y_pred = _array_like_to_numpy(y_pred)
     y_true = _array_like_to_numpy(y_true)
     _check_binary(y_true)
-    
+
     b = benefit_function(y_pred, y_true)
     u = np.mean(b)
-    bu = b/u
-    
+    bu = b / u
+
     if alpha == 1:
         # rewrite equation to allow 0 b values
-        return np.mean(np.log(bu**b)/u)
-    
+        return np.mean(np.log(bu**b) / u)
+
     elif alpha == 0:
-        return -np.mean(np.log(bu)/u)
-    
+        return -np.mean(np.log(bu) / u)
+
     else:
-        return (1/(alpha * (alpha - 1)))*np.mean(bu**alpha - 1)
-     
+        return (1 / (alpha * (alpha - 1))) * np.mean(bu**alpha - 1)
+
+
 def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """
-    Calculates the coefficient of variation, which is two times the square root of the generalized entropy index with alpha=2.
+    Calculates the coefficient of variation, which is a special case that calculates two times the square root of the generalized entropy index with alpha=2.
+
+    Interpretation
+    --------------
+    A high value implies high inequality while a value of 0 indicates perfect equality.
 
     Args:
         y_true (np.ndarray): True labels.
@@ -1143,6 +1162,7 @@ def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     y_true = _array_like_to_numpy(y_true)
     _check_binary(y_true)
     return 2 * np.sqrt(generalized_entropy_index(y_pred, y_true, alpha=2))
+
 
 def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -> float:
     """
@@ -1159,12 +1179,14 @@ def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -
     X = _matrix_like_to_numpy(X)
     y_pred = _array_like_to_numpy(y_pred)
     _check_binary(y_pred)
-    
+
     # learn a KNN on the features
-    nbrs = NearestNeighbors(n_neighbors=n_neighbors, algorithm='ball_tree').fit(X)
+    nbrs = NearestNeighbors(n_neighbors=n_neighbors, algorithm="ball_tree").fit(X)
     _, indices = nbrs.kneighbors(X)
 
     # compute consistency score
-    consistency = 1 - np.mean([np.abs(yi - np.mean(y_pred[ids])) for yi,ids in zip(y_pred,indices)])
+    consistency = 1 - np.mean(
+        [np.abs(yi - np.mean(y_pred[ids])) for yi, ids in zip(y_pred, indices)]
+    )
 
     return consistency
