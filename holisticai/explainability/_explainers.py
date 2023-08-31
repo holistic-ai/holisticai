@@ -1,17 +1,94 @@
-from holisticai.utils.models.feature_importance.global_feature_importance.permutation_feature_importance import compute_permutation_feature_importance
-from holisticai.utils.models.feature_importance.global_feature_importance.surrogate_feature_importance import compute_surrogate_feature_importance
-from holisticai.utils.models.feature_importance.local_feature_importance.lime_feature_importance import compute_lime_feature_importance
+import warnings
 
-def Explainer(based_on, strategy_type, model_type, model, x, y):
-    if based_on == 'feature_importance':
+from holisticai.explainability.plots import bar, lolipop
+from holisticai.utils.models.feature_importance.global_feature_importance.permutation_feature_importance import (
+    compute_permutation_feature_importance,
+)
+from holisticai.utils.models.feature_importance.global_feature_importance.surrogate_feature_importance import (
+    compute_surrogate_feature_importance,
+)
+from holisticai.utils.models.feature_importance.local_feature_importance.lime_feature_importance import (
+    compute_lime_feature_importance,
+)
 
-        if strategy_type == 'permutation':
-            return compute_permutation_feature_importance(model_type, model, x, y)
-        
-        elif strategy_type == 'surrogate':
-            return compute_surrogate_feature_importance(model_type, model, x, y)
-        
-        elif strategy_type == 'lime':
-            return compute_lime_feature_importance(model_type, model, x, y)
-        else:
-            raise NotImplementedError
+warnings.filterwarnings("ignore")
+
+
+class Explainer:
+    def __init__(self, based_on, strategy_type, model_type, model, x, y):
+        if based_on == "feature_importance":
+
+            if strategy_type == "permutation":
+                self.explainer_handler = compute_permutation_feature_importance(
+                    model_type, model, x, y
+                )
+                self._strategy_type = "global"
+
+            elif strategy_type == "surrogate":
+                self.explainer_handler = compute_surrogate_feature_importance(
+                    model_type, model, x, y
+                )
+                self._strategy_type = "global"
+
+            elif strategy_type == "lime":
+                self.explainer_handler = compute_lime_feature_importance(
+                    model_type, model, x, y
+                )
+                self._strategy_type = "local"
+
+            else:
+                raise NotImplementedError
+
+    def metrics(self, top_k=None):
+        """
+        top_k: int
+            Number of features to select
+        """
+        params = self.explainer_handler.get_topk(top_k)
+        return self.explainer_handler.metrics(**params)
+
+    def bar_plot(self, max_display=None, title=None, top_k=None, figsize=(7, 5)):
+        """
+        Parameters
+        ----------
+        max_display: int
+            Maximum number of features to display
+        title: str
+            Title of the plot
+        top_k: int
+            Number of features to select
+        figsize: tuple
+            Size of the plot
+        """
+        params = self.explainer_handler.get_topk(top_k)
+        feat_imp = params["feature_importance"]
+        bar(
+            feat_imp,
+            max_display=max_display,
+            title=title,
+            figsize=figsize,
+            _type=self._strategy_type,
+        )
+
+    def lolipop_plot(self, max_display=None, title=None, top_k=None, figsize=(7, 5)):
+        """
+        Parameters
+        ----------
+        max_display: int
+            Maximum number of features to display
+        title: str
+            Title of the plot
+        top_k: int
+            Number of features to select
+        figsize: tuple
+            Size of the plot
+        """
+        params = self.explainer_handler.get_topk(top_k)
+        feat_imp = params["feature_importance"]
+        lolipop(
+            feat_imp,
+            max_display=max_display,
+            title=title,
+            figsize=figsize,
+            _type=self._strategy_type,
+        )

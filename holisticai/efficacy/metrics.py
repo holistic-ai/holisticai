@@ -356,6 +356,14 @@ def rmse_score(y_true, y_pred, **kargs):
     return np.sqrt(mean_squared_error(y_true, y_pred, **kargs))
 
 
+def smape(y_true, y_pred):
+    return (
+        1.0
+        / len(y_true)
+        * np.sum(2 * np.abs(y_pred - y_true) / (np.abs(y_true) + np.abs(y_pred)))
+    )
+
+
 def regression_efficacy_metrics(y_pred, y_true):
     """
     Regression efficacy metrics batch computation.
@@ -385,6 +393,7 @@ def regression_efficacy_metrics(y_pred, y_true):
         "MAE": metrics.mean_absolute_error,
         "MAPE": metrics.mean_absolute_percentage_error,
         "Max Error": metrics.max_error,
+        "SMAPE": smape,
     }
 
     hyper = {
@@ -393,6 +402,7 @@ def regression_efficacy_metrics(y_pred, y_true):
         "MAE": {"sample_weight": None, "multioutput": "uniform_average"},
         "MAPE": {"sample_weight": None, "multioutput": "uniform_average"},
         "Max Error": {},
+        "SMAPE": {},
     }
 
     ref_vals = {
@@ -400,6 +410,7 @@ def regression_efficacy_metrics(y_pred, y_true):
         "MAE": 0,
         "MAPE": 0,
         "Max Error": 0,
+        "SMAPE": 0,
     }
 
     metrics = [

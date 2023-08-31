@@ -1,13 +1,17 @@
-from holisticai.utils.models.metrics import BinaryClassificationMetrics, SimpleRegressionMetrics
-from holisticai.utils.models.feature_importance.wrappers import model_wrapper
-
-import pandas as pd
 import numpy as np
+import pandas as pd
+
+from holisticai.utils.models.feature_importance.wrappers import model_wrapper
+from holisticai.utils.models.metrics import (
+    BinaryClassificationMetrics,
+    SimpleRegressionMetrics,
+)
 
 METRICS = {
-    'binary_classification': BinaryClassificationMetrics(),
-    'regression': SimpleRegressionMetrics(),
+    "binary_classification": BinaryClassificationMetrics(),
+    "regression": SimpleRegressionMetrics(),
 }
+
 
 def inference(model_type, wdt, x):
     """
@@ -21,12 +25,15 @@ def inference(model_type, wdt, x):
     Returns:
         dict: The inference results.
     """
-    if model_type == 'binary_classification':
+    if model_type == "binary_classification":
         return {"yproba": wdt.predict_proba(x), "ypred": wdt.predict(x)}
-    elif model_type == 'regression':
+    elif model_type == "regression":
         return {"ypred": wdt.predict(x)}
     else:
-        raise ValueError("model_type must be either 'binary_classification' or 'regression'")
+        raise ValueError(
+            "model_type must be either 'binary_classification' or 'regression'"
+        )
+
 
 def compute_surrogate_efficacy_metrics(model_type, x, y, surrogate):
     """
@@ -42,23 +49,31 @@ def compute_surrogate_efficacy_metrics(model_type, x, y, surrogate):
     """
 
     eff_metric = METRICS[model_type]
-    wp = model_wrapper(problem_type = model_type, model_class='sklearn-1.02')
+    wp = model_wrapper(problem_type=model_type, model_class="sklearn-1.02")
     wdt = wp(surrogate)
-    wdt.mode('efficacy')
+    wdt.mode("efficacy")
     prediction = inference(model_type, wdt, x)
-    if wdt._estimator_type == 'classifier':
+    if wdt._estimator_type == "classifier":
         num_classes = len(wdt.classes_)
         if num_classes == 2:
             class_dict = dict(zip(wdt.classes_, range(num_classes)))
-            classes_id_vect = np.vectorize(lambda lbl : class_dict[lbl])
+            classes_id_vect = np.vectorize(lambda lbl: class_dict[lbl])
             y = classes_id_vect(y).ravel()
-            prediction['ypred'] = classes_id_vect(prediction['ypred']).ravel()
-    
-    if model_type == 'binary_classification':
-        metric = {'Surrogate Efficacy Classification': eff_metric(y, **prediction).T.reset_index(drop=True)['Accuracy']}
-    
-    elif model_type == 'regression':
-        metric = {'Surrogate Efficacy Regression': eff_metric(y, **prediction).T.reset_index(drop=True)['RMSE']}
-    
+            prediction["ypred"] = classes_id_vect(prediction["ypred"]).ravel()
+
+    if model_type == "binary_classification":
+        metric = {
+            "Surrogate Efficacy Classification": eff_metric(
+                y, **prediction
+            ).T.reset_index(drop=True)["Accuracy"]
+        }
+
+    elif model_type == "regression":
+        metric = {
+            "Surrogate Efficacy Regression": eff_metric(y, **prediction).T.reset_index(
+                drop=True
+            )["SMAPE"]
+        }
+
     metric = pd.DataFrame(metric)
-    return metric.rename(columns={0:'Value'})
+    return metric.rename(columns={0: "Value"})

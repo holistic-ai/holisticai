@@ -12,29 +12,33 @@ from holisticai.datasets import load_adult
 
 # data and simple preprocessing
 dataset = load_adult()['frame']
-X = pd.get_dummies(dataset.iloc[:1000,:].drop(columns=['class']), drop_first=True)
+dataset = dataset.iloc[0:1000,]
+X = pd.get_dummies(dataset.drop(columns=['class', 'fnlwgt']), drop_first=True)
 scaler = StandardScaler()
 X_standard = scaler.fit_transform(X)
+X_standard = pd.DataFrame(X_standard, columns=X.columns)
 
-y_clf = pd.DataFrame(dataset.iloc[:1000,:]['class'].apply(lambda x: 1 if x == '>50K' else 0))
-y_reg = pd.DataFrame(dataset.iloc[:1000,:]['fnlwgt'])
+y_clf = pd.DataFrame(dataset['class'].apply(lambda x: 1 if x == '>50K' else 0))
+y_reg = pd.DataFrame(dataset['fnlwgt'])
 y_reg = scaler.fit_transform(y_reg)
 
-# instantiate and fit models
+# regression
 reg = LinearRegression()
 reg.fit(X_standard, y_reg)
 
+# classification
 clf = LogisticRegression(random_state=42, max_iter=100)
 clf.fit(X_standard, y_clf)
 
+# import Explainer
 from holisticai.explainability import Explainer
 
-# instantiate explainer lime classification
+# instantiate explainer permutation
 explainer = Explainer(based_on='feature_importance', 
-                      strategy_type='lime', 
-                      model_type='binary_classification', 
-                      model=clf, 
+                      strategy_type='surrogate', 
+                      model_type='regression', 
+                      model=reg, 
                       x=X_standard, 
-                      y=y_clf)
+                      y=y_reg)
 
-explainer.metrics()
+print(explainer.metrics())
