@@ -1,14 +1,15 @@
 import warnings
 
 from holisticai.explainability.plots import bar, lolipop
+
+from .metrics.feature_importance.extractors.lime_feature_importance import (
+    compute_lime_feature_importance,
+)
 from .metrics.feature_importance.extractors.permutation_feature_importance import (
     compute_permutation_feature_importance,
 )
 from .metrics.feature_importance.extractors.surrogate_feature_importance import (
     compute_surrogate_feature_importance,
-)
-from .metrics.feature_importance.extractors.lime_feature_importance import (
-    compute_lime_feature_importance,
 )
 
 warnings.filterwarnings("ignore")

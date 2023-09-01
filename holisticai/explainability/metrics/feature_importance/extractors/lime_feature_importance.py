@@ -1,9 +1,23 @@
 import numpy as np
 import pandas as pd
-from holisticai.utils._validation import _array_like_to_series, _matrix_like_to_dataframe
 from lime import lime_tabular
-from .extractor_utils import BaseFeatureImportance, LocalFeatureImportance, get_top_k_lime, get_index_groups
-from ..local_importance._local_metrics import dataset_spread_stability, features_spread_stability
+
+from holisticai.utils._validation import (
+    _array_like_to_series,
+    _matrix_like_to_dataframe,
+)
+
+from ..local_importance._local_metrics import (
+    dataset_spread_stability,
+    features_spread_stability,
+)
+from .extractor_utils import (
+    BaseFeatureImportance,
+    LocalFeatureImportance,
+    get_index_groups,
+    get_top_k_lime,
+)
+
 
 def compute_lime_feature_importance(model_type, model, x, y):
     if not isinstance(x, pd.DataFrame):

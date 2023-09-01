@@ -14,7 +14,7 @@ from holisticai.datasets import load_adult
 
 # data and simple preprocessing
 dataset = load_adult()["frame"]
-#dataset = dataset.iloc[0:1000,]
+# dataset = dataset.iloc[0:1000,]
 
 X = pd.get_dummies(dataset.drop(columns=["class", "fnlwgt"]), drop_first=True)
 scaler = StandardScaler()
@@ -51,7 +51,6 @@ print(explainer.metrics(top_k=0.9))
 print(explainer.metrics(top_k=0.8))
 print(explainer.metrics(top_k=0.7))
 print(explainer.metrics(top_k=0.6))
-
 
 
 explainer = Explainer(

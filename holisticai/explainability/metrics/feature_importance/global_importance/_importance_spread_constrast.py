@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
+
 from ..utils import importance_spread
+
 
 def __importance_range_constrast(
     feature_importance_indexes: np.ndarray,
@@ -43,6 +45,7 @@ def __importance_order_constrast(
     m_order = np.cumsum(m_order) / np.arange(1, len(m_order) + 1)
 
     return m_order.mean()
+
 
 def feature_importance_contrast(
     feature_importance, conditional_feature_importance, mode=None

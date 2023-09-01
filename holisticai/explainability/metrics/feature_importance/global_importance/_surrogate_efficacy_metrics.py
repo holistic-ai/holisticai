@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
-from holisticai.efficacy.metrics import regression_efficacy_metrics, classification_efficacy_metrics
+
+from holisticai.efficacy.metrics import (
+    classification_efficacy_metrics,
+    regression_efficacy_metrics,
+)
+
 
 def compute_surrogate_efficacy_metrics(model_type, x, y, surrogate):
     """
@@ -19,12 +24,16 @@ def compute_surrogate_efficacy_metrics(model_type, x, y, surrogate):
 
     if model_type == "binary_classification":
         metric = {
-            "Surrogate Efficacy Classification": classification_efficacy_metrics(prediction, y).loc["Accuracy"]
+            "Surrogate Efficacy Classification": classification_efficacy_metrics(
+                prediction, y
+            ).loc["Accuracy"]
         }
 
     elif model_type == "regression":
         metric = {
-            "Surrogate Efficacy Regression": regression_efficacy_metrics(prediction, y).loc['SMAPE']
+            "Surrogate Efficacy Regression": regression_efficacy_metrics(
+                prediction, y
+            ).loc["SMAPE"]
         }
 
     metric = pd.DataFrame(metric)

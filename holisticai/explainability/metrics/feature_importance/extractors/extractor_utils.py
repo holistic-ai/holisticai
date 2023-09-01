@@ -1,6 +1,8 @@
-import pandas as pd
-from ..utils import four_fifths_list
 import numpy as np
+import pandas as pd
+
+from ..utils import four_fifths_list
+
 
 def four_fifths_list_lime(feature_importance, feature_importance_names, cutoff=None):
     """
@@ -46,7 +48,8 @@ def get_index_groups(model_type, y):
         return index_groups
     else:
         raise NotImplementedError
-    
+
+
 def get_top_k(df_feature_importance, top_k):
     feat_id = four_fifths_list(df_feature_importance, cutoff=top_k)
     df_feature_importance = df_feature_importance.loc[
@@ -57,9 +60,13 @@ def get_top_k(df_feature_importance, top_k):
 
 def get_top_k_lime(df_feature_importance, top_k):
 
-    mean_importance = df_feature_importance.groupby('Feature Label')['Importance'].mean().reset_index('Feature Label')
-    feat_imp = mean_importance['Importance']
-    feat_names = mean_importance['Feature Label']
+    mean_importance = (
+        df_feature_importance.groupby("Feature Label")["Importance"]
+        .mean()
+        .reset_index("Feature Label")
+    )
+    feat_imp = mean_importance["Importance"]
+    feat_names = mean_importance["Feature Label"]
     feat_id = four_fifths_list_lime(feat_imp, feat_names, cutoff=top_k)
 
     df_feature_importance = df_feature_importance.loc[

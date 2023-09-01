@@ -1,8 +1,13 @@
 import pandas as pd
-from ._surrogate_efficacy_metrics import compute_surrogate_efficacy_metrics
-from ._explainability_level import explainability_score
-from ._importance_spread_constrast import feature_importance_contrast, feature_importance_spread
+
 from ..utils import four_fifths_list
+from ._explainability_level import explainability_score
+from ._importance_spread_constrast import (
+    feature_importance_contrast,
+    feature_importance_spread,
+)
+from ._surrogate_efficacy_metrics import compute_surrogate_efficacy_metrics
+
 
 def fourth_fifths(feature_importance):
     feat_id = four_fifths_list(feature_importance)

@@ -2,7 +2,9 @@
 This module provides functions for computing surrogate feature importance and efficacy metrics.
 """
 
+import dtreeviz
 import pandas as pd
+
 from holisticai.utils._validation import (
     _array_like_to_series,
     _matrix_like_to_dataframe,
@@ -13,11 +15,10 @@ from ..global_importance import (
     global_explainability_score,
     importance_spread_divergence,
     importance_spread_ratio,
-    surrogate_efficacy
+    surrogate_efficacy,
 )
-
 from .extractor_utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k
-import dtreeviz
+
 
 def create_surrogate_model(model_type, x, y):
     """
@@ -134,35 +135,48 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
 
         return metrics_with_reference
-    
+
     def visualization(self, visualization_type):
-        if visualization_type=='Decision Tree sklearn':
+        if visualization_type == "Decision Tree sklearn":
             from sklearn import tree
+
             return tree.plot_tree(self.surrogate, feature_names=list(self.x.columns))
 
-        elif visualization_type=='Decision Tree graphviz':
-            from six import StringIO  
-            from sklearn.tree import export_graphviz
+        elif visualization_type == "Decision Tree graphviz":
+            import io
+
             import pydotplus
             from PIL import Image
-            import io
+            from six import StringIO
+            from sklearn.tree import export_graphviz
 
             dot_data = StringIO()
 
-            export_graphviz(self.surrogate, out_file=dot_data,  
-                            filled=True, rounded=True,
-                            special_characters=True, feature_names=self.x.columns)
+            export_graphviz(
+                self.surrogate,
+                out_file=dot_data,
+                filled=True,
+                rounded=True,
+                special_characters=True,
+                feature_names=self.x.columns,
+            )
             graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
             img_str = graph.create_png()
             return Image.open(io.BytesIO(img_str))
-        
-        elif visualization_type=='Decision Tree dtreeviz':
+
+        elif visualization_type == "Decision Tree dtreeviz":
             import dtreeviz
+
             x_np = self.x.values
             y_np = self.y.values.reshape([-1])
-            viz_model = dtreeviz.model(self.surrogate,
-                           X_train=x_np, y_train=y_np,
-                           feature_names=self.x.columns,
-                           target_name='output')
+            viz_model = dtreeviz.model(
+                self.surrogate,
+                X_train=x_np,
+                y_train=y_np,
+                feature_names=self.x.columns,
+                target_name="output",
+            )
 
-            return viz_model.view()     # render as SVG into internal object                  # pop up window
+            return (
+                viz_model.view()
+            )  # render as SVG into internal object                  # pop up window

@@ -25,8 +25,6 @@ def four_fifths_list(feature_importance, cutoff=None):
     return feature_names.loc[(feature_weight.cumsum() < cutoff).values]
 
 
-
-
 def importance_spread(feature_importance, divergence=False):
     """
     Parameters

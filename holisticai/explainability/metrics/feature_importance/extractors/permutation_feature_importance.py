@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.inspection import permutation_importance
+
 from holisticai.utils._validation import (
     _array_like_to_series,
     _matrix_like_to_dataframe,
@@ -14,8 +15,13 @@ from ..global_importance import (
     importance_spread_divergence,
     importance_spread_ratio,
 )
+from .extractor_utils import (
+    BaseFeatureImportance,
+    GlobalFeatureImportance,
+    get_index_groups,
+    get_top_k,
+)
 
-from .extractor_utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k, get_index_groups
 
 def feature_importance(model, x, y):
     n_repeats = 5
@@ -56,6 +62,7 @@ def compute_permutation_feature_importance(model_type, model, x, y):
     return PermutationFeatureImportance(
         model_type, model, x, y, features_importance, conditional_features_importance
     )
+
 
 class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance):
     def __init__(
