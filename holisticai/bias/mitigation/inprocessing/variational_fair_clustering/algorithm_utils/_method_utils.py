@@ -1,6 +1,15 @@
 import numpy as np
+import sklearn
 from scipy import sparse
 from sklearn.metrics.pairwise import euclidean_distances as ecdist
+
+
+def check_version(version_str):
+    major, minor, patch = map(int, version_str.split("."))
+    return major, minor, patch
+
+
+SKLEARN_CURRENT_VERSION = sklearn.__version__
 
 
 def reduce_func(D_chunk, start):
@@ -147,10 +156,14 @@ def _init_centroids(
         n_samples = X.shape[0]
 
     if isinstance(init, str) and init == "k-means++":
+        kargs = {}
+        if check_version(SKLEARN_CURRENT_VERSION) >= check_version("1.3.0"):
+            kargs = {"sample_weight": np.ones(shape=(X.shape[0],))}
+
         centers, _ = _kmeans_plusplus(
             X,
             n_clusters,
-            sample_weight=np.ones(shape=(X.shape[0],)),
+            **kargs,
             random_state=random_state,
             x_squared_norms=x_squared_norms,
         )

@@ -37,25 +37,29 @@ def loss_from_roc(y, probs, roc):
 def pred_from_pya(y_pred, p_attr, pya, binom=False):
     # Getting the groups and making the initially all-zero predictor
     groups = np.unique(p_attr)
-    out = deepcopy(y_pred)
+    out = y_pred.copy()
 
     for i, g in enumerate(groups):
-        group_ids = np.where((p_attr == g))[0]
+        group_ids = p_attr == g
 
         # Pulling the fitted switch probabilities for the group
         p = pya[i]
 
         # Indices in the group from which to choose swaps
-        pos = np.where((p_attr == g) & (y_pred == 1))[0]
-        neg = np.where((p_attr == g) & (y_pred == 0))[0]
+        pos = group_ids & (y_pred == 1)
+        neg = group_ids & (y_pred == 0)
 
         if not binom:
             # Randomly picking the positive predictions
-            pos_samp = np.random.choice(a=pos, size=int(p[1] * len(pos)), replace=False)
-            neg_samp = np.random.choice(a=neg, size=int(p[0] * len(neg)), replace=False)
+            pos_samp = np.random.choice(
+                a=np.flatnonzero(pos), size=int(p[1] * pos.sum()), replace=False
+            )
+            neg_samp = np.random.choice(
+                a=np.flatnonzero(neg), size=int(p[0] * neg.sum()), replace=False
+            )
             samp = np.concatenate((pos_samp, neg_samp)).flatten()
             out[samp] = 1
-            out[np.setdiff1d(group_ids, samp)] = 0
+            out[group_ids & ~np.isin(np.arange(len(y_pred)), samp)] = 0
 
     return out.astype(np.uint8)
 

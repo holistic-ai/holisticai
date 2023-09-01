@@ -3,14 +3,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics
+
 # Regression Plots
 # Recommender Plots
 # Multiclass Plots
-# Exploratory plots
+# Exploratory Plots
 # Classification Plots
+# Report Plots
 from holisticai.bias.plots import (
     abroca_plot,
     accuracy_bar_plot,
+    bias_metrics_report,
     disparate_impact_curve,
     disparate_impact_plot,
     distribution_plot,
@@ -257,4 +261,41 @@ def test_exposure_ratio_plot(monkeypatch):
         size=None,
         title=None,
     )
+    assert True
+
+
+def test_bias_report_regression(monkeypatch):
+    """test_bias_report_regression"""
+    monkeypatch.setattr(plt, "show", lambda: None)
+    group_a = df["sex"] == "Female"
+    group_b = df["sex"] == "Male"
+    y_true = df["age"]
+    y_pred = np.random.random(y_true.shape)
+    metrics = regression_bias_metrics(
+        group_a, group_b, y_pred, y_true, metric_type="both"
+    )
+    mitigated = regression_bias_metrics(
+        group_a, group_b, y_pred, y_true, metric_type="both"
+    )
+    bias_metrics_report("regression", metrics)
+    bias_metrics_report("regression", metrics, mitigated)
+    assert True
+
+
+def test_bias_report_classification(monkeypatch):
+    """test_bias_report_classification"""
+    monkeypatch.setattr(plt, "show", lambda: None)
+    group_a = df["sex"] == "Female"
+    group_b = df["sex"] == "Male"
+    df["class"] = df["class"].apply(lambda x: 1 if x == ">50K" else 0)
+    y_true = df["class"]
+    y_pred = np.random.randint(2, size=y_true.shape)
+    metrics = classification_bias_metrics(
+        group_a, group_b, y_pred, y_true, metric_type="both"
+    )
+    mitigated = classification_bias_metrics(
+        group_a, group_b, y_pred, y_true, metric_type="both"
+    )
+    bias_metrics_report("binary_classification", metrics)
+    bias_metrics_report("binary_classification", metrics, mitigated)
     assert True
