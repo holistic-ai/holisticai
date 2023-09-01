@@ -1,13 +1,13 @@
 import warnings
 
 from holisticai.explainability.plots import bar, lolipop
-from holisticai.utils.models.feature_importance.global_feature_importance.permutation_feature_importance import (
+from .metrics.feature_importance.extractors.permutation_feature_importance import (
     compute_permutation_feature_importance,
 )
-from holisticai.utils.models.feature_importance.global_feature_importance.surrogate_feature_importance import (
+from .metrics.feature_importance.extractors.surrogate_feature_importance import (
     compute_surrogate_feature_importance,
 )
-from holisticai.utils.models.feature_importance.local_feature_importance.lime_feature_importance import (
+from .metrics.feature_importance.extractors.lime_feature_importance import (
     compute_lime_feature_importance,
 )
 
@@ -92,3 +92,6 @@ class Explainer:
             figsize=figsize,
             _type=self._strategy_type,
         )
+
+    def visualization(self, visualization_type):
+        return self.explainer_handler.visualization(visualization_type)

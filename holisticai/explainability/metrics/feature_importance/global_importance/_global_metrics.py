@@ -1,17 +1,8 @@
 import pandas as pd
-
-from holisticai.explainability.metrics.utils import four_fifths_list
-from holisticai.utils.models.feature_importance.global_feature_importance.surrogate_efficacy_metrics import (
-    compute_surrogate_efficacy_metrics,
-)
-from holisticai.utils.models.feature_importance.global_metrics.global_explainability_level import (
-    explainability_score,
-)
-from holisticai.utils.models.feature_importance.global_metrics.global_importance_spread_constrast import (
-    feature_importance_contrast,
-    feature_importance_spread,
-)
-
+from ._surrogate_efficacy_metrics import compute_surrogate_efficacy_metrics
+from ._explainability_level import explainability_score
+from ._importance_spread_constrast import feature_importance_contrast, feature_importance_spread
+from ..utils import four_fifths_list
 
 def fourth_fifths(feature_importance):
     feat_id = four_fifths_list(feature_importance)
@@ -52,5 +43,4 @@ def global_explainability_score(model_type, model, x, y, feature_importance):
 
 
 def surrogate_efficacy(model_type, x, y, surrogate):
-    s_acc = compute_surrogate_efficacy_metrics(model_type, x, y, surrogate)
-    return s_acc.T.rename(columns={0: "Value"})
+    return compute_surrogate_efficacy_metrics(model_type, x, y, surrogate)

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from holisticai.explainability.metrics.utils import importance_spread
+from holisticai.explainability.metrics.feature_importance.utils import importance_spread
 
 
 def feature_importance_spread_lime(

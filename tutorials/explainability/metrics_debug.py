@@ -14,9 +14,8 @@ from holisticai.datasets import load_adult
 
 # data and simple preprocessing
 dataset = load_adult()["frame"]
-dataset = dataset.iloc[
-    0:1000,
-]
+#dataset = dataset.iloc[0:1000,]
+
 X = pd.get_dummies(dataset.drop(columns=["class", "fnlwgt"]), drop_first=True)
 scaler = StandardScaler()
 X_standard = scaler.fit_transform(X)
@@ -40,7 +39,24 @@ from holisticai.explainability import Explainer
 # instantiate explainer permutation
 explainer = Explainer(
     based_on="feature_importance",
-    strategy_type="surrogate",
+    strategy_type="lime",
+    model_type="binary_classification",
+    model=clf,
+    x=X_standard,
+    y=y_clf,
+)
+
+print(explainer.metrics())
+print(explainer.metrics(top_k=0.9))
+print(explainer.metrics(top_k=0.8))
+print(explainer.metrics(top_k=0.7))
+print(explainer.metrics(top_k=0.6))
+
+
+
+explainer = Explainer(
+    based_on="feature_importance",
+    strategy_type="lime",
     model_type="regression",
     model=reg,
     x=X_standard,

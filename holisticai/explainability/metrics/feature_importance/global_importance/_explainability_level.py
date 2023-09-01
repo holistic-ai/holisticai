@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
-
-from holisticai.explainability.metrics.utils import partial_dependence_creator
-
+from ..utils import partial_dependence_creator
 
 def compute_feature_scores(data, threshold):
     scores = [
