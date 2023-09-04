@@ -1065,8 +1065,10 @@ def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 
     Parameters
     ----------
-    b : array-like of shape (n_samples,)
-        The input array.
+    y_true : array-like of shape (n_samples,)
+        The true target values.
+    y_pred : array-like of shape (n_samples,)
+        The predicted target values.
 
     Returns
     -------
@@ -1077,9 +1079,10 @@ def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     -------
     >>> import numpy as np
     >>> from holisticai.bias.metrics import theil_index
-    >>> b = np.array([1, 2, 3, 4, 5])
-    >>> theil_index(b)
-    0.3934099372078345
+    >>> y_true = np.array([1, 2, 3, 4, 5])
+    >>> y_pred = np.array([1, 2, 3, 4, 5])
+    >>> theil_index(y_pred, y_true)
+    0.0
     """
     return generalized_entropy_index(y_pred, y_true, alpha=1)
 
