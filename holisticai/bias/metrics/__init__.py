@@ -75,6 +75,7 @@ from ._regression import (
     avg_score_ratio,
     correlation_diff,
     disparate_impact_regression,
+    jain_index,
     mae_ratio,
     max_statistical_parity,
     no_disparate_impact_level,
@@ -152,4 +153,5 @@ __all__ = [
     "generalized_entropy_index",
     "coefficient_of_variation",
     "consistency_score",
+    "jain_index",
 ]
