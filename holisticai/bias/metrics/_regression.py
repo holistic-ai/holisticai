@@ -1035,9 +1035,9 @@ def jain_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 
     Description
     -----------
-    The Jain index is an index proposed for resources allocation that measures the "equality" of user allocation. For our purposes,
+    The Jain index is an index proposed for resources allocation that measures the "equality" of user allocation [1]. For our purposes,
     from the point of view of fairness, it measures the equality of the error distributed in the model outcomes. Empirically, we
-    could say that a model with a Jain index of 1 is a model that distributes the error equally among all the samples. A model with
+    could say that a model with a Jain index of 1 is a model that distributes the error equally among all the samples.
 
     Please, use this metric with caution, as it is not a metric that has been proposed for fairness in machine learning models, but for resources allocation.
 
@@ -1056,6 +1056,10 @@ def jain_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     -------
     float
         The Jain index of the input array.
+
+    References
+    ----------
+    .. [1] Jain, R. (1984). A Quantitative Measure of Fairness and Discrimination for Resource Allocation in Shared Computer Systems. Eastern Research Laboratory, Digital Equipment Corporation.
 
     Examples
     -------

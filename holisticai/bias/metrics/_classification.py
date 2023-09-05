@@ -1095,7 +1095,7 @@ def generalized_entropy_index(
 
     Description
     -----------
-    Generalized entropy index is a measure of inequality that is proposed as a unified individual and group fairness measure.
+    Generalized entropy index is a measure of inequality that is proposed as a unified individual and group fairness measure [1].
     It is used to measure the extent of inequality in the distribution of a variable. The measure is based on the idea that
     inequality can be measured by the extent to which the distribution of a variable deviates from a hypothetical distribution
     in which everyone has an equal share.
@@ -1117,6 +1117,10 @@ def generalized_entropy_index(
     -------
     float
         The generalized entropy index of the input arrays.
+
+    References
+    ----------
+    [1] Speicher, T., Heidari, H., Grgic-Hlaca, N., Gummadi, K. P., & Weller, A. (2018, April). A Unified Approach to Quantifying Algorithmic Unfairness: Measuring Individual & Group Unfairness via Inequality Indices. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (pp. 2239-2248).
 
     Examples
     --------
