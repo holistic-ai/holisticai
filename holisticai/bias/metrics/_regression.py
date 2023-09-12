@@ -1059,7 +1059,7 @@ def jain_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 
     References
     ----------
-    .. [1] Jain, R. (1984). A Quantitative Measure of Fairness and Discrimination for Resource Allocation in Shared Computer Systems. Eastern Research Laboratory, Digital Equipment Corporation.
+    [1] Jain, R. (1984). A Quantitative Measure of Fairness and Discrimination for Resource Allocation in Shared Computer Systems. Eastern Research Laboratory, Digital Equipment Corporation.
 
     Examples
     -------
