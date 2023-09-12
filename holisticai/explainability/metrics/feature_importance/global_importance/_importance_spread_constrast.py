@@ -46,7 +46,6 @@ def __importance_order_constrast(
 
     return m_order.mean()
 
-
 def feature_importance_contrast(
     feature_importance, conditional_feature_importance, mode=None
 ):
