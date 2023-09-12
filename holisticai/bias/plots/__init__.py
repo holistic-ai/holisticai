@@ -65,4 +65,5 @@ __all__ = [
     "bias_report_classification",
     "bias_report_regression",
     "bias_report_clustering",
+    "bias_metrics_report",
 ]
