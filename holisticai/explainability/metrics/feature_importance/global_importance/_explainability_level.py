@@ -28,14 +28,14 @@ def compute_similarity(df, num_chunks):
 
     y_data = df["score"].values
     y_data = y_data[: num_chunks * chunk_size]
-    c = np.stack(np.split(y_data, 3), axis=0)
+    c = np.stack(np.split(y_data, num_chunks), axis=0)
     dc = c[:, 1:] - c[:, :-1]
 
     sims = []
     for i in [2, 1]:
         norm = np.linalg.norm(dc[i])
         if norm > 0:
-            sim = np.matmul(dc[i], dc[i - 1]) / norm
+            sim = np.matmul(dc[i], dc[i - 1]) / (np.linalg.norm(dc[i])*np.linalg.norm(dc[i-1]))
         else:
             sim = 1
         sims.append(sim)
@@ -78,7 +78,7 @@ def compute_partial_dependence(model, feature_importance, x, target=None):
         full_score[c] = v
         values.append(class_to_score[c] * full_score[c])
 
-    score = sum(values) / len(values)
+    score = sum(values)
 
     # for debbug
     # easy = int(full_score['Easy']*100)

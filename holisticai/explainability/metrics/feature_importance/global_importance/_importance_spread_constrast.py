@@ -51,9 +51,9 @@ def feature_importance_contrast(
     feature_importance, conditional_feature_importance, mode=None
 ):
 
-    feature_importance_indexes = list(feature_importance["Variable"].index)
+    feature_importance_indexes = list(feature_importance.index)
     conditional_feature_importance_indexes = {
-        k: list(v["Variable"].index) for k, v in conditional_feature_importance.items()
+        k: list(v.index) for k, v in conditional_feature_importance.items()
     }
 
     if mode == "range":
