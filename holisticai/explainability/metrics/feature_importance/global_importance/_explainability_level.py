@@ -35,7 +35,9 @@ def compute_similarity(df, num_chunks):
     for i in [2, 1]:
         norm = np.linalg.norm(dc[i])
         if norm > 0:
-            sim = np.matmul(dc[i], dc[i - 1]) / (np.linalg.norm(dc[i])*np.linalg.norm(dc[i-1]))
+            sim = np.matmul(dc[i], dc[i - 1]) / (
+                np.linalg.norm(dc[i]) * np.linalg.norm(dc[i - 1])
+            )
         else:
             sim = 1
         sims.append(sim)

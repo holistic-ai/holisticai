@@ -358,7 +358,9 @@ def rmse_score(y_true, y_pred, **kargs):
 
 def smape(y_true, y_pred):
     return (
-        1.0 / len(y_true) * np.sum(np.abs(y_pred - y_true) / (np.abs(y_true) + np.abs(y_pred)))
+        1.0
+        / len(y_true)
+        * np.sum(np.abs(y_pred - y_true) / (np.abs(y_true) + np.abs(y_pred)))
     )
 
 
