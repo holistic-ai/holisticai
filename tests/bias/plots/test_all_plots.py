@@ -100,9 +100,9 @@ def test_histogram_plot(monkeypatch):
     assert True
 
 
-@pytest.mark.xfail(raises=TypeError)
+@pytest.mark.xfail(raises=ValueError)
 def test_correlation_plot_non_numerical_data(monkeypatch):
-    """test_correlation_plot"""
+    """test_correlation_plot: This test should fail because the data is not numerical"""
     monkeypatch.setattr(plt, "show", lambda: None)
     _, ax = plt.subplots()
     correlation_matrix_plot(
@@ -135,11 +135,24 @@ def test_correlation_plot_numerical_data(monkeypatch):
         target_feature="class",
         n_features=5,
         cmap="YlGnBu",
-        ax=None,
+        ax=ax,
         size=None,
         title=None,
     )
     assert True
+
+
+@pytest.mark.xfail(raises=ValueError)
+def test_correlation_plot_numerical_data_no_feature(monkeypatch):
+    """test_correlation_plot: This test should fail because the feature is not in the dataframe"""
+    from sklearn.datasets import load_diabetes
+
+    dataset = load_diabetes()  # numerical dataset
+    X = dataset.data
+    feature_names = dataset.feature_names
+    X = pd.DataFrame(X, columns=feature_names)
+
+    correlation_matrix_plot(X, target_feature="ages", size=(12, 7))
 
 
 def test_frequency_plot(monkeypatch):
