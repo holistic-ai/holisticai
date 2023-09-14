@@ -1,7 +1,7 @@
 import pandas as pd
 
 from ..utils import four_fifths_list
-from ._explainability_level import explainability_score
+from ._explainability_level import explainability_ease_score
 from ._importance_spread_constrast import (
     feature_importance_contrast,
     feature_importance_spread,
@@ -42,8 +42,8 @@ def global_range_overlap_score(feature_importance, conditional_feature_importanc
     return range_overlap_score
 
 
-def global_explainability_score(model_type, model, x, y, feature_importance):
-    exp_score = explainability_score(model_type, model, x, y, feature_importance)
+def global_explainability_ease_score(model_type, model, x, y, feature_importance):
+    exp_score = explainability_ease_score(model_type, model, x, y, feature_importance)
     return exp_score
 
 

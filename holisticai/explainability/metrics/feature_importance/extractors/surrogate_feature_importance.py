@@ -12,7 +12,7 @@ from holisticai.utils._validation import (
 
 from ..global_importance import (
     fourth_fifths,
-    global_explainability_score,
+    global_explainability_ease_score,
     importance_spread_divergence,
     importance_spread_ratio,
     surrogate_efficacy,
@@ -110,7 +110,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
             "Fourth Fifths": 0,
             "Importance Spread Divergence": "-",
             "Importance Spread Ratio": 0,
-            "Global Explainability Score": 1,
+            "Global Explainability Ease Score": 1,
             "Surrogate Efficacy Classification": 1,
             "Surrogate Efficacy Regression": 0,
         }
@@ -120,7 +120,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
                 fourth_fifths(feature_importance),
                 importance_spread_divergence(feature_importance),
                 importance_spread_ratio(feature_importance),
-                global_explainability_score(
+                global_explainability_ease_score(
                     self.model_type, self.model, self.x, self.y, feature_importance
                 ),
                 surrogate_efficacy(self.model_type, self.x, self.y, self.surrogate),

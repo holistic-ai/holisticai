@@ -9,7 +9,7 @@ from holisticai.utils._validation import (
 
 from ..global_importance import (
     fourth_fifths,
-    global_explainability_score,
+    global_explainability_ease_score,
     global_overlap_score,
     global_range_overlap_score,
     importance_spread_divergence,
@@ -27,7 +27,13 @@ def feature_importance(model, x, y):
     n_repeats = 5
     random_state = 42
     feat_imp = permutation_importance(
-        model, x, y, n_repeats=n_repeats, random_state=random_state
+        model,
+        x,
+        y,
+        n_jobs=-1,
+        n_repeats=n_repeats,
+        random_state=random_state,
+        max_samples=1000,
     )
     df_feat_imp = pd.DataFrame(
         {
@@ -115,7 +121,7 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
             "Global Range Overlap Score [Q1-Q2]": 1,
             "Global Range Overlap Score [Q2-Q3]": 1,
             "Global Range Overlap Score [Q3-Q4]": 1,
-            "Global Explainability Score": 1,
+            "Global Explainability Ease Score": 1,
         }
 
         metrics = pd.concat(
@@ -129,7 +135,7 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
                 global_range_overlap_score(
                     feature_importance, conditional_feature_importance
                 ),
-                global_explainability_score(
+                global_explainability_ease_score(
                     self.model_type, self.model, self.x, self.y, feature_importance
                 ),
             ],

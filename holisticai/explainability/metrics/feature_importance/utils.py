@@ -155,6 +155,8 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
         "response_method": response_method,
         "method": method,
         "grid_resolution": grid_resolution,
+        "n_jobs": -1,
+        "subsample": 100,
     }
 
     if not target == None:

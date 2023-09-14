@@ -34,7 +34,9 @@ def get_index_groups(model_type, y):
         target array
     """
     if model_type == "binary_classification":
-        index_groups = {f"[label={value}]": y[y == value].index for value in y.unique()}
+        index_groups = {
+            f"[label={int(value)}]": y[y == value].index for value in y.unique()
+        }
         return index_groups
 
     elif model_type == "regression":
