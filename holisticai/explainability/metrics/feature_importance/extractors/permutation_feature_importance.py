@@ -29,6 +29,7 @@ from .extractor_utils import (
 def feature_importance(model, x, y):
     n_repeats = 5
     random_state = 42
+    max_samples = min(x.shape[0], 1000)
     feat_imp = permutation_importance(
         model,
         x,
@@ -36,7 +37,7 @@ def feature_importance(model, x, y):
         n_jobs=-1,
         n_repeats=n_repeats,
         random_state=random_state,
-        max_samples=1000,
+        max_samples=max_samples,
     )
     df_feat_imp = pd.DataFrame(
         {

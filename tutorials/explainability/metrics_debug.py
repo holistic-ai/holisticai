@@ -45,7 +45,7 @@ from holisticai.explainability import Explainer
 # instantiate explainer permutation
 explainer = Explainer(
     based_on="feature_importance",
-    strategy_type="lime",
+    strategy_type="surrogate",
     model_type="regression",
     model=model,
     x=X,
