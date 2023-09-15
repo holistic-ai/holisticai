@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from lime import lime_tabular
-
+from tqdm import tqdm
 from holisticai.utils._validation import (
     _array_like_to_series,
     _matrix_like_to_dataframe,
@@ -71,14 +71,15 @@ def lime_creator(
     """
     # load and do assignment
     if num_features is None:
-        num_features = np.min([X.shape[1], 50])
+        num_features = np.min([X.shape[1], 100])
 
     if num_samples is None:
-        num_samples = np.min([X.shape[0], 50])
-
+        num_samples = np.min([X.shape[0], 1000])
+    
+    import random
     per_group_sample = int(np.ceil(num_samples / len(index_groups)))
     ids_groups = {
-        str(label): np.random.choice(X.index[index], size=per_group_sample).tolist()
+        str(label): random.sample(X.index[index].tolist(), min(len(X.index[index].tolist()),per_group_sample))
         for label, index in index_groups.items()
     }
 
@@ -91,7 +92,7 @@ def lime_creator(
     )
 
     df = []
-    for label, indexes in ids_groups.items():
+    for label, indexes in tqdm(ids_groups.items()):
         for i in indexes:
             exp = explainer.explain_instance(
                 X.loc[i], scorer, num_features=X.shape[1], num_samples=100
@@ -100,7 +101,7 @@ def lime_creator(
 
             df_i = pd.DataFrame(exp_values, columns=["Feature Id", "Feature Weight"])
             df_i["Importance"] = df_i["Feature Weight"].abs()
-            df_i["Importance"] = df_i["Importance"] / df_i["Importance"].max()
+            df_i["Importance"] = df_i["Importance"] / df_i["Importance"].sum()
             df_i["Sample Id"] = i
             df_i["Feature Label"] = X.columns[df_i["Feature Id"].tolist()]
             df_i["Feature Rank"] = range(1, df_i.shape[0] + 1)
@@ -133,14 +134,14 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
             "conditional_feature_importance": cond_feat_imp,
         }
 
-    def metrics(self, feature_importance, conditional_feature_importance):
+    def metrics(self, feature_importance, conditional_feature_importance, detailed=None):
 
         reference_values = {
-            "Features Spread Stability": 0,
-            "Features Spread Ratio": 0,
+            "Features Spread Divergence": 0,
+            "Features Spread Stability": 1,
             "Features Spread Mean": 0,
-            "Dataset Spread Stability": 0,
-            "Dataset Spread Ratio": 0,
+            "Dataset Spread Divergence": 0,
+            "Dataset Spread Stability": 1,
             "Dataset Spread Mean": 0,
         }
 
@@ -163,3 +164,33 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
 
         return metrics_with_reference
+
+    def show_importance_stability(self, feature_importance, conditional_feature_importance):
+       
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+        
+        data_stability = dataset_spread_stability(feature_importance, conditional_feature_importance)
+        feature_stability = features_spread_stability(feature_importance, conditional_feature_importance)
+                
+        def format_data(d):
+            df = []
+            for g,x in d['imp_spread'].items():
+                if not g=='Global':
+                    a = pd.DataFrame(d['imp_spread'][g].copy())
+                    a['Output'] = g
+                    df.append(a)
+            df = pd.concat(df, axis=0)
+            df.columns = ['Importance Spread', 'Output']
+            return df
+
+        fig,axs = plt.subplots(1,2, figsize=(15,5))
+
+        axs[0].set_title('Data Stability')
+        df = format_data(data_stability)
+        sns.boxplot(data=df, x='Importance Spread', y="Output", ax=axs[0])
+
+        axs[1].set_title('Feature Stability')
+        df = format_data(feature_stability)
+        sns.boxplot(data=df, x='Importance Spread', y="Output", ax=axs[1])
+        return data_stability,feature_stability

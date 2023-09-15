@@ -9,31 +9,32 @@ warnings.filterwarnings("ignore")
 import pandas as pd
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.preprocessing import StandardScaler
-
+from sklearn.ensemble import GradientBoostingRegressor
+import numpy as np
+from sklearn.model_selection import train_test_split
 from holisticai.datasets import load_adult
+from sklearn.datasets import load_diabetes
 
+dataset = load_diabetes() # load dataset
+
+X = dataset.data # features
+y = dataset.target # target 
+feature_names = dataset.feature_names # feature names
+
+X = pd.DataFrame(X, columns=feature_names) # convert to dataframe
 # data and simple preprocessing
 dataset = load_adult()["frame"]
-dataset = dataset.iloc[
-    0:1000,
-]
+#dataset = dataset.iloc[0:1000,]
 
-X = pd.get_dummies(dataset.drop(columns=["class", "fnlwgt"]), drop_first=True)
-scaler = StandardScaler()
-X_standard = scaler.fit_transform(X)
-X_standard = pd.DataFrame(X_standard, columns=X.columns)
+seed = np.random.seed(42) # set seed for reproducibility
+# simple preprocessing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed) # train test split
 
-y_clf = pd.DataFrame(dataset["class"].apply(lambda x: 1 if x == ">50K" else 0))
-y_reg = pd.DataFrame(dataset["fnlwgt"])
-y_reg = scaler.fit_transform(y_reg)
+model = GradientBoostingRegressor() # instantiate model
+#model = LinearRegression() # instantiate model
+model.fit(X_train, y_train) # fit model
 
-# regression
-reg = LinearRegression()
-reg.fit(X_standard, y_reg)
-
-# classification
-clf = LogisticRegression(random_state=42, max_iter=100)
-clf.fit(X_standard, y_clf)
+y_pred = model.predict(X_test) # compute predictions
 
 # import Explainer
 from holisticai.explainability import Explainer
@@ -41,11 +42,11 @@ from holisticai.explainability import Explainer
 # instantiate explainer permutation
 explainer = Explainer(
     based_on="feature_importance",
-    strategy_type="permutation",
-    model_type="binary_classification",
-    model=clf,
-    x=X_standard,
-    y=y_clf,
+    strategy_type="lime",
+    model_type="regression",
+    model=model,
+    x=X,
+    y=y,
 )
 
 print(explainer.metrics())
