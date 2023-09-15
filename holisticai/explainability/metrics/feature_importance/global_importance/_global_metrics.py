@@ -1,8 +1,8 @@
 import pandas as pd
-from ..utils import four_fifths_list
-from ._explainability_level import explainability_ease_score
-from ..utils import four_fifths_list, feature_importance_spread
+
+from ..utils import feature_importance_spread, four_fifths_list
 from ._contrast_metrics import feature_importance_contrast
+from ._explainability_level import explainability_ease_score
 from ._surrogate_efficacy_metrics import compute_surrogate_efficacy_metrics
 
 
@@ -27,27 +27,42 @@ def importance_spread_ratio(feature_importance):
 
 def global_overlap_score(feature_importance, conditional_feature_importance, detailed):
     overlap_score = feature_importance_contrast(
-        feature_importance, conditional_feature_importance, mode='overlap', detailed=detailed
+        feature_importance,
+        conditional_feature_importance,
+        mode="overlap",
+        detailed=detailed,
     )
     return overlap_score
 
 
-def global_range_overlap_score(feature_importance, conditional_feature_importance, detailed):
+def global_range_overlap_score(
+    feature_importance, conditional_feature_importance, detailed
+):
     range_overlap_score = feature_importance_contrast(
-        feature_importance, conditional_feature_importance, mode="range", detailed=detailed
+        feature_importance,
+        conditional_feature_importance,
+        mode="range",
+        detailed=detailed,
     )
     return range_overlap_score
 
 
-def global_similarity_score(feature_importance, conditional_feature_importance, detailed):
+def global_similarity_score(
+    feature_importance, conditional_feature_importance, detailed
+):
     similarity_score = feature_importance_contrast(
-        feature_importance, conditional_feature_importance, mode="similarity", detailed=detailed
+        feature_importance,
+        conditional_feature_importance,
+        mode="similarity",
+        detailed=detailed,
     )
     return similarity_score
+
 
 def global_explainability_ease_score(model_type, model, x, y, feature_importance):
     exp_score = explainability_ease_score(model_type, model, x, y, feature_importance)
     return exp_score
+
 
 def surrogate_efficacy(model_type, x, y, surrogate):
     return compute_surrogate_efficacy_metrics(model_type, x, y, surrogate)

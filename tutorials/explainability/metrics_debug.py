@@ -6,35 +6,38 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-import pandas as pd
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import GradientBoostingRegressor
 import numpy as np
-from sklearn.model_selection import train_test_split
-from holisticai.datasets import load_adult
+import pandas as pd
 from sklearn.datasets import load_diabetes
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
-dataset = load_diabetes() # load dataset
+from holisticai.datasets import load_adult
 
-X = dataset.data # features
-y = dataset.target # target 
-feature_names = dataset.feature_names # feature names
+dataset = load_diabetes()  # load dataset
 
-X = pd.DataFrame(X, columns=feature_names) # convert to dataframe
+X = dataset.data  # features
+y = dataset.target  # target
+feature_names = dataset.feature_names  # feature names
+
+X = pd.DataFrame(X, columns=feature_names)  # convert to dataframe
 # data and simple preprocessing
 dataset = load_adult()["frame"]
-#dataset = dataset.iloc[0:1000,]
+# dataset = dataset.iloc[0:1000,]
 
-seed = np.random.seed(42) # set seed for reproducibility
+seed = np.random.seed(42)  # set seed for reproducibility
 # simple preprocessing
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed) # train test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=seed
+)  # train test split
 
-model = GradientBoostingRegressor() # instantiate model
-#model = LinearRegression() # instantiate model
-model.fit(X_train, y_train) # fit model
+model = GradientBoostingRegressor()  # instantiate model
+# model = LinearRegression() # instantiate model
+model.fit(X_train, y_train)  # fit model
 
-y_pred = model.predict(X_test) # compute predictions
+y_pred = model.predict(X_test)  # compute predictions
 
 # import Explainer
 from holisticai.explainability import Explainer

@@ -23,6 +23,7 @@ def four_fifths_list_lime(feature_importance, feature_importance_names, cutoff=N
     # entropy or divergence
     return feature_importance_names.loc[(feature_weight.cumsum() < cutoff).values]
 
+
 def classify_element(q1, q2, q3, labels, x):
     if x <= q1:
         return labels[0]
@@ -32,7 +33,8 @@ def classify_element(q1, q2, q3, labels, x):
         return labels[2]
     else:
         return labels[3]
-    
+
+
 def get_index_groups(model_type, y):
     """
     Parameters
@@ -52,12 +54,12 @@ def get_index_groups(model_type, y):
         labels = ["Q0-Q1", "Q1-Q2", "Q2-Q3", "Q3-Q4"]
         labels_values = [0.0, 0.25, 0.5, 0.75, 1.0]
         v = np.array(y.quantile(labels_values)).squeeze()
-        
+
         groups = y.apply(lambda x: classify_element(v[1], v[2], v[3], labels, x))
-        
+
         df = pd.concat([y, groups], axis=1)
-        df.columns = ['y', 'group']
-        index_groups = {f"[{k}]":list(v.index) for k,v in df.groupby('group')['y']}
+        df.columns = ["y", "group"]
+        index_groups = {f"[{k}]": list(v.index) for k, v in df.groupby("group")["y"]}
 
         return index_groups
     else:

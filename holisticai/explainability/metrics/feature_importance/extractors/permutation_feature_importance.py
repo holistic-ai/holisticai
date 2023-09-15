@@ -1,8 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.inspection import permutation_importance
-import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.inspection import permutation_importance
 
 from holisticai.utils._validation import (
     _array_like_to_series,
@@ -61,7 +61,7 @@ def compute_permutation_feature_importance(model_type, model, x, y):
 
     # Feature Importance
     features_importance = feature_importance(model, x, y)
-    
+
     # Conditional Feature Importance (classification:category, regression:quantile)
     index_groups = get_index_groups(model_type, y)
     conditional_features_importance = {
@@ -70,8 +70,15 @@ def compute_permutation_feature_importance(model_type, model, x, y):
     }
 
     return PermutationFeatureImportance(
-        model_type, model, x, y, features_importance, conditional_features_importance, index_groups
+        model_type,
+        model,
+        x,
+        y,
+        features_importance,
+        conditional_features_importance,
+        index_groups,
     )
+
 
 class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance):
     def __init__(
@@ -82,7 +89,7 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
         y,
         importance_weights,
         conditional_importance_weights,
-        index_groups
+        index_groups,
     ):
         self.model_type = model_type
         self.model = model
@@ -152,7 +159,7 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
                 ),
                 global_explainability_ease_score(
                     self.model_type, self.model, self.x, self.y, feature_importance
-                )
+                ),
             ],
             axis=0,
         )

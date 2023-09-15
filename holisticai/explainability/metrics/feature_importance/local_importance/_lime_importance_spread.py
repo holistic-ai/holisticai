@@ -6,7 +6,7 @@ from holisticai.explainability.metrics.feature_importance.utils import importanc
 def feature_importance_spread_lime(
     feature_importance, conditional_feature_importance, lime_importance
 ):
-    divergence=False
+    divergence = False
     if lime_importance == "dataset":
         metric_name = "Dataset"
         imp_spread = {
@@ -21,7 +21,8 @@ def feature_importance_spread_lime(
                 {
                     str(c): ccfi.groupby("Sample Id").apply(
                         lambda df: importance_spread(
-                            df.set_index("Feature Label")["Importance"], divergence=divergence
+                            df.set_index("Feature Label")["Importance"],
+                            divergence=divergence,
                         )
                     )
                 }
@@ -76,5 +77,5 @@ def feature_importance_spread_lime(
     return {
         "table": table.T.rename(columns={0: "Value"}),
         "result": result.T.rename(columns={0: "Value"}),
-        'imp_spread': imp_spread,
+        "imp_spread": imp_spread,
     }
