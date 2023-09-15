@@ -7,6 +7,7 @@ from ._global_metrics import (
     global_explainability_ease_score,
     global_overlap_score,
     global_range_overlap_score,
+    global_similarity_score,
     importance_spread_divergence,
     importance_spread_ratio,
     surrogate_efficacy,
@@ -20,5 +21,6 @@ __all__ = [
     "global_overlap_score",
     "global_range_overlap_score",
     "global_explainability_ease_score",
+    "global_similarity_score",
     "surrogate_efficacy",
 ]

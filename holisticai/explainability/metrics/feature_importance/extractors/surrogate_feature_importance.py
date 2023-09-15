@@ -17,6 +17,8 @@ from ..global_importance import (
     importance_spread_ratio,
     surrogate_efficacy,
 )
+
+from holisticai.explainability.plots import DecisionTreeVisualizer
 from .extractor_utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k
 
 
@@ -82,6 +84,7 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     )
 
     df_feat_imp["Importance"] = abs(df_feat_imp["Importance"])
+    df_feat_imp["Importance"] /= df_feat_imp["Importance"].sum()
     df_feat_imp = df_feat_imp.sort_values("Importance", ascending=False).copy()
 
     return SurrogateFeatureImportance(model_type, model, x, y, df_feat_imp, surrogate)
@@ -95,6 +98,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         self.y = y
         self.feature_importance = importance_weights
         self.surrogate = surrogate
+        self.tree_visualizer = DecisionTreeVisualizer()
 
     def get_topk(self, top_k):
         if top_k is None:
@@ -104,7 +108,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
 
         return {"feature_importance": feat_imp}
 
-    def metrics(self, feature_importance):
+    def metrics(self, feature_importance, detailed):
 
         reference_values = {
             "Fourth Fifths": 0,
@@ -136,47 +140,9 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
 
         return metrics_with_reference
 
-    def visualization(self, visualization_type):
-        if visualization_type == "Decision Tree sklearn":
-            from sklearn import tree
-
-            return tree.plot_tree(self.surrogate, feature_names=list(self.x.columns))
-
-        elif visualization_type == "Decision Tree graphviz":
-            import io
-
-            import pydotplus
-            from PIL import Image
-            from six import StringIO
-            from sklearn.tree import export_graphviz
-
-            dot_data = StringIO()
-
-            export_graphviz(
-                self.surrogate,
-                out_file=dot_data,
-                filled=True,
-                rounded=True,
-                special_characters=True,
-                feature_names=self.x.columns,
-            )
-            graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
-            img_str = graph.create_png()
-            return Image.open(io.BytesIO(img_str))
-
-        elif visualization_type == "Decision Tree dtreeviz":
-            import dtreeviz
-
-            x_np = self.x.values
-            y_np = self.y.values.reshape([-1])
-            viz_model = dtreeviz.model(
-                self.surrogate,
-                X_train=x_np,
-                y_train=y_np,
-                feature_names=self.x.columns,
-                target_name="output",
-            )
-
-            return (
-                viz_model.view()
-            )  # render as SVG into internal object                  # pop up window
+    def tree_visualization(self, backend='sklearn'):
+        if backend in self.tree_visualizer.visualization_backend:
+            return self.tree_visualizer.show(backend, self)    
+        else:
+            raise("Unknown backend")
+        

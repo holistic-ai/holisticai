@@ -25,6 +25,33 @@ def four_fifths_list(feature_importance, cutoff=None):
     return feature_names.loc[(feature_weight.cumsum() < cutoff).values]
 
 
+def feature_importance_spread(
+    features_importance, conditional_features_importance=None, divergence=False
+):
+    spread_type = "Divergence" if divergence else "Ratio"
+
+    feat_importance_spread = {
+        f"Importance Spread {spread_type}": [
+            importance_spread(features_importance["Importance"], divergence=divergence)
+        ]
+    }
+
+    if conditional_features_importance is not None:
+
+        feat_importance_spread.update(
+            {
+                f"Conditional Importance Spread {spread_type}[{c}]": [
+                    importance_spread(importance["Importance"], divergence=divergence)
+                ]
+                for c, importance in conditional_features_importance.items()
+            }
+        )
+
+    imp_spread = pd.DataFrame(feat_importance_spread)
+
+    return imp_spread.T.rename(columns={0: "Value"})
+
+
 def importance_spread(feature_importance, divergence=False):
     """
     Parameters

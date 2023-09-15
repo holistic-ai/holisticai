@@ -6,12 +6,13 @@ from holisticai.explainability.metrics.feature_importance.utils import importanc
 def feature_importance_spread_lime(
     feature_importance, conditional_feature_importance, lime_importance
 ):
+    divergence=False
     if lime_importance == "dataset":
         metric_name = "Dataset"
         imp_spread = {
             "Global": feature_importance.groupby("Sample Id").apply(
                 lambda df: importance_spread(
-                    df.set_index("Feature Label")["Importance"], divergence=True
+                    df.set_index("Feature Label")["Importance"], divergence=divergence
                 )
             )
         }
@@ -20,7 +21,7 @@ def feature_importance_spread_lime(
                 {
                     str(c): ccfi.groupby("Sample Id").apply(
                         lambda df: importance_spread(
-                            df.set_index("Feature Label")["Importance"], divergence=True
+                            df.set_index("Feature Label")["Importance"], divergence=divergence
                         )
                     )
                 }
@@ -28,13 +29,13 @@ def feature_importance_spread_lime(
     else:
         metric_name = "Features"
         imp_spread = {
-            "Global": feature_importance.groupby("Feature Label")["Feature Rank"].apply(
-                lambda x: importance_spread(x, divergence=True)
+            "Global": feature_importance.groupby("Feature Label")["Importance"].apply(
+                lambda x: importance_spread(x, divergence=divergence)
             )
         }
         for c, df_cls in conditional_feature_importance.items():
-            imp_spread[str(c)] = df_cls.groupby("Feature Label")["Feature Rank"].apply(
-                lambda x: importance_spread(x, divergence=True)
+            imp_spread[str(c)] = df_cls.groupby("Feature Label")["Importance"].apply(
+                lambda x: importance_spread(x, divergence=divergence)
             )
 
     spread_imp_divergence = {
@@ -65,9 +66,9 @@ def feature_importance_spread_lime(
     table = pd.DataFrame(table)
 
     result = {
-        f"{metric_name} Spread Stability": spread_imp_divergence["Global"],
+        f"{metric_name} Spread Divergence": spread_imp_divergence["Global"],
         f"{metric_name} Spread Mean": mean_imp_spread["Global"],
-        f"{metric_name} Spread Ratio": spread_imp_ratio["Global"],
+        f"{metric_name} Spread Stability": spread_imp_ratio["Global"],
     }
 
     result = pd.DataFrame(result, index=[0])
@@ -75,4 +76,5 @@ def feature_importance_spread_lime(
     return {
         "table": table.T.rename(columns={0: "Value"}),
         "result": result.T.rename(columns={0: "Value"}),
+        'imp_spread': imp_spread,
     }
