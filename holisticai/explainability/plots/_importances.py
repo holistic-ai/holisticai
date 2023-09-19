@@ -23,22 +23,3 @@ def contrast_matrix(xticks, values):
     _ = plt.setp(ax.get_yticklabels(), fontsize=10)
 
 
-def partial_dependence_plot(x, features, title, model, grid_resolution=20, ax=None):
-    import matplotlib.pyplot as plt
-    from sklearn.inspection import PartialDependenceDisplay
-
-    common_params = {
-        "subsample": 50,
-        "n_jobs": 2,
-        "grid_resolution": grid_resolution,
-        "random_state": 0,
-    }
-
-    if ax is None:
-        _, ax = plt.subplots(figsize=(10, 3), constrained_layout=True)
-
-    PartialDependenceDisplay.from_estimator(
-        model, x, features, kind="average", ax=ax, **common_params
-    )
-    ax.set_title(title)
-    plt.show()

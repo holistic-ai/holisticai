@@ -2,14 +2,10 @@
 This module provides functions for computing surrogate feature importance and efficacy metrics.
 """
 
-import dtreeviz
 import pandas as pd
 
 from holisticai.explainability.plots import DecisionTreeVisualizer
-from holisticai.utils._validation import (
-    _array_like_to_series,
-    _matrix_like_to_dataframe,
-)
+from ..utils import check_feature_importance
 
 from ..global_importance import (
     fourth_fifths,
@@ -61,11 +57,7 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     Returns:
         holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
     """
-    if not isinstance(x, pd.DataFrame):
-        x = _matrix_like_to_dataframe(x)
-
-    if not isinstance(y, pd.DataFrame):
-        y = _array_like_to_series(y)
+    x,y = check_feature_importance(x,y)
 
     y_pred = model.predict(x)
     surrogate = create_surrogate_model(model_type, x, y_pred)
@@ -139,8 +131,8 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
 
         return metrics_with_reference
 
-    def tree_visualization(self, backend="sklearn"):
+    def tree_visualization(self, backend="sklearn", **kargs):
         if backend in self.tree_visualizer.visualization_backend:
-            return self.tree_visualizer.show(backend, self)
+            return self.tree_visualizer.show(backend, self, **kargs)
         else:
             raise ("Unknown backend")

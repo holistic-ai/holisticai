@@ -3,11 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.inspection import permutation_importance
-
-from holisticai.utils._validation import (
-    _array_like_to_series,
-    _matrix_like_to_dataframe,
-)
+from holisticai.explainability.metrics.feature_importance.utils import check_feature_importance
 
 from ..global_importance import (
     fourth_fifths,
@@ -54,11 +50,7 @@ def feature_importance(model, x, y):
 
 
 def compute_permutation_feature_importance(model_type, model, x, y):
-    if not isinstance(x, pd.DataFrame):
-        x = _matrix_like_to_dataframe(x)
-
-    if not isinstance(y, pd.Series):
-        y = _array_like_to_series(y)
+    x,y = check_feature_importance(x,y)
 
     # Feature Importance
     features_importance = feature_importance(model, x, y)
@@ -66,7 +58,7 @@ def compute_permutation_feature_importance(model_type, model, x, y):
     # Conditional Feature Importance (classification:category, regression:quantile)
     index_groups = get_index_groups(model_type, y)
     conditional_features_importance = {
-        str(label): feature_importance(model, x.iloc[index], y.iloc[index])
+        str(label): feature_importance(model, x.loc[index], y.loc[index])
         for label, index in index_groups.items()
     }
 

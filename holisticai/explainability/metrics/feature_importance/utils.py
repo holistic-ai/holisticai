@@ -3,6 +3,21 @@ import pandas as pd
 from lime import lime_tabular
 from sklearn.inspection import PartialDependenceDisplay
 
+from holisticai.utils._validation import (
+    _array_like_to_series,
+    _matrix_like_to_dataframe,
+)
+
+def check_feature_importance(x, y):
+    if not isinstance(x, pd.DataFrame):
+        x = _matrix_like_to_dataframe(x)
+
+    if not isinstance(y, pd.Series):
+        y = _array_like_to_series(y)
+    
+    if not y.index.equals(x):
+        y.index = x.index
+    return x,y
 
 def four_fifths_list(feature_importance, cutoff=None):
     """
@@ -50,6 +65,14 @@ def feature_importance_spread(
     imp_spread = pd.DataFrame(feat_importance_spread)
 
     return imp_spread.T.rename(columns={0: "Value"})
+
+
+def gini_coefficient(x):
+    """Compute Gini coefficient of array of values"""
+    diffsum = 0
+    for i, xi in enumerate(x[:-1], 1):
+        diffsum += np.sum(np.abs(xi - x[i:]))
+    return diffsum / (len(x)**2 * np.mean(x))
 
 
 def importance_spread(feature_importance, divergence=False):
@@ -178,7 +201,6 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
         "X": x,
         "features": feature_ids,
         "feature_names": feature_names,
-        "percentiles": percentiles,
         "response_method": response_method,
         "method": method,
         "grid_resolution": grid_resolution,
@@ -188,7 +210,17 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
 
     if not target == None:
         kargs.update({"target": target})
-
+    else:
+        kargs.update({"percentiles": percentiles})
+    g = PartialDependenceDisplay.from_estimator(model, 
+                                                x, 
+                                                feature_ids, 
+                                                feature_names=feature_names,
+                                                percentiles=percentiles,
+                                                response_method=response_method, 
+                                                method=method, 
+                                                grid_resolution=grid_resolution) 
+    plt.close()
     g = PartialDependenceDisplay.from_estimator(**kargs)
     plt.close()
 

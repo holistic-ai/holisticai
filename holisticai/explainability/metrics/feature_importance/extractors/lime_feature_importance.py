@@ -2,11 +2,8 @@ import numpy as np
 import pandas as pd
 from lime import lime_tabular
 from tqdm import tqdm
-
-from holisticai.utils._validation import (
-    _array_like_to_series,
-    _matrix_like_to_dataframe,
-)
+import matplotlib.pyplot as plt
+from holisticai.explainability.metrics.feature_importance.utils import check_feature_importance
 
 from ..local_importance._local_metrics import (
     dataset_spread_stability,
@@ -19,13 +16,13 @@ from .extractor_utils import (
     get_top_k_lime,
 )
 
+from holisticai.explainability.metrics.feature_importance.local_importance._local_metrics import (
+    dataset_spread_stability,
+    features_spread_stability,
+)
 
 def compute_lime_feature_importance(model_type, model, x, y):
-    if not isinstance(x, pd.DataFrame):
-        x = _matrix_like_to_dataframe(x)
-
-    if not isinstance(y, pd.Series):
-        y = _array_like_to_series(y)
+    x , y = check_feature_importance(x, y)
 
     if model_type == "binary_classification":
         lime_mode = "classification"
@@ -81,8 +78,7 @@ def lime_creator(
 
     per_group_sample = int(np.ceil(num_samples / len(index_groups)))
     ids_groups = {
-        str(label): random.sample(
-            X.index[index].tolist(), min(len(X.index[index].tolist()), per_group_sample)
+        str(label): random.sample(index, min(len(index), per_group_sample)
         )
         for label, index in index_groups.items()
     }
@@ -99,7 +95,7 @@ def lime_creator(
     for label, indexes in tqdm(ids_groups.items()):
         for i in indexes:
             exp = explainer.explain_instance(
-                X.loc[i], scorer, num_features=X.shape[1], num_samples=100
+                X.loc[i], scorer, num_features=X.shape[1], num_samples=200
             )
             exp_values = list(exp.local_exp.values())[0]
 
@@ -139,32 +135,51 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
         }
 
     def metrics(
-        self, feature_importance, conditional_feature_importance, detailed=None
+        self, feature_importance, conditional_feature_importance, detailed=False
     ):
 
         reference_values = {
-            "Features Spread Divergence": 0,
-            "Features Spread Stability": 1,
-            "Features Spread Mean": 0,
-            "Dataset Spread Divergence": 0,
-            "Dataset Spread Stability": 1,
-            "Dataset Spread Mean": 0,
+            "Features Stability Gini": 0,
+            "Features Stability Ratio": 1,
+            "Features Stability Mean": 0,
+            "Dataset Stability Gini": 0,
+            "Dataset Stability Ratio": 1,
+            "Dataset Stability Mean": 0,
         }
 
-        metrics = pd.concat(
-            [
-                dataset_spread_stability(
-                    feature_importance, conditional_feature_importance
-                )["result"],
-                features_spread_stability(
-                    feature_importance, conditional_feature_importance
-                )["result"],
-            ],
-            axis=0,
-        )
+        if not detailed:
+            d_spread_stability = dataset_spread_stability(feature_importance, conditional_feature_importance)['result']
+            d_spread_stability = {k:v['Global'] for k,v in d_spread_stability.items()}
+            d_spread_stability = pd.DataFrame(d_spread_stability, index=[0])
+            d_spread_stability = d_spread_stability.T.rename(columns={0: "Value"})
+            
+            f_spread_stability = features_spread_stability(feature_importance, conditional_feature_importance)['result']
+            f_spread_stability = {k:v['Global'] for k,v in f_spread_stability.items()}
+            f_spread_stability = pd.DataFrame(f_spread_stability, index=[0])
+            f_spread_stability = f_spread_stability.T.rename(columns={0: "Value"})
+        else:
+            d_spread_stability = dataset_spread_stability(feature_importance, conditional_feature_importance)['result']
+            groups = list(d_spread_stability['Dataset Stability Gini'].keys())
+            d_spread_stability = pd.DataFrame(d_spread_stability).T.reset_index()
+            d_spread_stability = pd.melt(d_spread_stability, id_vars=['index'], value_vars=groups).reset_index()
+            d_spread_stability['Metric'] = d_spread_stability.apply(lambda x:f"{x['index']} {x['variable']}", axis=1)
+            d_spread_stability.sort_values('index', inplace=True)
+            d_spread_stability = d_spread_stability[['Metric','value']].set_index('Metric')
+            d_spread_stability = d_spread_stability.T.rename(columns={'value': "Value"}).T
+            
+            f_spread_stability = features_spread_stability(feature_importance, conditional_feature_importance)['result']
+            groups = list(f_spread_stability['Features Stability Gini'].keys())
+            f_spread_stability = pd.DataFrame(f_spread_stability).T.reset_index()
+            f_spread_stability = pd.melt(f_spread_stability, id_vars=['index'], value_vars=groups).reset_index()
+            f_spread_stability['Metric'] = f_spread_stability.apply(lambda x:f"{x['index']} {x['variable']}", axis=1)
+            f_spread_stability.sort_values('index', inplace=True)
+            f_spread_stability = f_spread_stability[['Metric','value']].set_index('Metric')
+            f_spread_stability = f_spread_stability.T.rename(columns={'value': "Value"}).T
+              
+        metrics = pd.concat([d_spread_stability,f_spread_stability], axis=0)
 
         reference_column = pd.DataFrame(
-            [reference_values.get(metric) for metric in metrics.index],
+            [reference_values.get(metric, reference_values[' '.join(metric.split(' ')[:3])]) for metric in metrics.index],
             columns=["Reference"],
         ).set_index(metrics.index)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
@@ -205,4 +220,96 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
         axs[1].set_title("Feature Stability")
         df = format_data(feature_stability)
         sns.boxplot(data=df, x="Importance Spread", y="Output", ax=axs[1])
-        return data_stability, feature_stability
+        #return axs, data_stability, feature_stability
+
+    def show_data_stability_boundaries(self, top_n = None, figsize=None):
+        if figsize is None:
+            figsize = (15,5)
+            
+        if top_n is None:
+            top_n = 10
+            
+        all_fimp = self.get_topk(None)
+        data_stability = dataset_spread_stability(**all_fimp)
+        
+        spread = data_stability['imp_spread']
+        cfimp = all_fimp['conditional_feature_importance']
+        fimp = all_fimp['feature_importance'].groupby('Feature Label')['Importance'].mean()
+
+        fig,axs = plt.subplots(2,len(spread)-1, figsize=figsize)
+
+        def show_importance(feature_importance, index, ax):  
+            Q=feature_importance
+            qs = Q[Q['Sample Id']==index]
+            qs.set_index('Feature Label')['Importance'].sort_values(ascending=True).iloc[-top_n:].plot(kind='barh', color='mediumslateblue', ax=ax)
+            return qs['Importance'].max()
+
+        i = 0
+        min_values = []
+        max_values = []
+        for g,s in spread.items():
+            max_index = s.idxmax()
+            min_index = s.idxmin()
+
+            if not (g=='Global'):
+                min_values.append(show_importance(cfimp[g], min_index, axs[0,i]))
+                axs[0,i].set_title(f'{g} Min Ratio [{s.loc[min_index]:.3f}]')
+                
+                max_values.append(show_importance(cfimp[g], max_index, axs[1,i]))
+                axs[1,i].set_title(f'{g} Max Ratio [{s.loc[max_index]:.3f}]')
+                
+                i+=1
+                
+        i = 0
+        xlim0 = max(min_values)
+        xlim1 = max(max_values)
+        xlim = max([xlim0, xlim1])
+        for g,s in spread.items():
+            if not (g=='Global'):
+                axs[0,i].set_xlim([0, xlim])
+                axs[1,i].set_xlim([0, xlim])
+                i+=1
+                
+    def show_features_stability_boundaries(self, figsize=None): 
+        from holisticai.explainability.metrics.feature_importance.local_importance._local_metrics import features_spread_stability
+        if figsize is None:
+            figsize = (15,5)
+            
+        all_fimp = self.get_topk(None)
+        feature_stability = features_spread_stability(**all_fimp)    
+
+        spread = feature_stability['imp_spread']
+        cfimp = all_fimp['conditional_feature_importance']
+        fimp = all_fimp['feature_importance']
+        fig,axs = plt.subplots(2,len(spread), figsize=figsize)
+        max_values = []
+        for i,(g,s) in enumerate(spread.items()):
+            min_index = s.idxmin()
+            max_index = s.idxmax()
+            
+            if not (g=='Global'):
+                fi = cfimp[g]
+            else:
+                fi = fimp
+            
+            importances = fi[fi['Feature Label']==min_index]['Importance']
+            max_value1 = importances.max()
+            importances.plot(kind='hist', ax=axs[0][i])
+            axs[0][i].set_title(f"{g} R[{min_index}]= {s.loc[min_index]:.3f}")
+            axs[0][i].set_xlabel('Importance')
+            
+            
+            importances = fi[fi['Feature Label']==max_index]['Importance']
+            importances.plot(kind='hist', ax=axs[1][i])
+            max_value2 = importances.max()
+            axs[1][i].set_title(f"{g} R[{max_index}]= {s.loc[max_index]:.3f}")
+            axs[1][i].set_xlabel('Importance')
+            
+            max_values.append(max([max_value1, max_value2]))
+            
+        i = 0
+        xlim = max(max_values)
+        for g,s in spread.items():
+            axs[0,i].set_xlim([0, xlim])
+            axs[1,i].set_xlim([0, xlim])
+            i+=1
