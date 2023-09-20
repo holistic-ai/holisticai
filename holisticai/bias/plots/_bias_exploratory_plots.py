@@ -6,7 +6,11 @@ import seaborn as sns
 
 # utils
 from ...utils import get_colors
-from ...utils._validation import _regression_checks
+from ...utils._validation import (
+    _check_columns,
+    _check_numerical_dataframe,
+    _regression_checks,
+)
 from ..metrics import confusion_matrix
 
 
@@ -266,6 +270,8 @@ def correlation_matrix_plot(
     """Plot the correlation matrix of a given dataframe with respect to
     a given target and a certain number of features.
 
+    Obs. The dataframe must contain only numerical features.
+
     Parameters
     ----------
     df : (DataFrame)
@@ -288,12 +294,8 @@ def correlation_matrix_plot(
     matplotlib ax
     """
     """Prints the correlation matrix """
-    try:
-        df = df.astype(int)
-    except:
-        raise TypeError(
-            "Dataframe 'df' cannot be converted to int. All the values must be numerical."
-        )
+    df = _check_numerical_dataframe(df)
+    _check_columns(df, target_feature)
 
     sns.set(font_scale=1.25)
     if ax is None:

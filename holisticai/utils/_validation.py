@@ -575,3 +575,50 @@ def _check_valid_y_proba(y_proba: np.ndarray):
     assert (
         correct_proba_values
     ), f"""probability values must be in the interval [0,1], found: {y_proba}"""
+
+
+def _check_numerical_dataframe(df: pd.DataFrame):
+    """
+    Check numerical DataFrame
+
+    Description
+    ----------
+    This function checks if a dataframe is numerical
+    or can be converted to numerical.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        input
+
+    Returns
+    -------
+    ValueError or converted DataFrame
+    """
+    try:
+        return df.astype(float)
+    except ValueError:
+        raise ValueError("DataFrame cannot be converted to numerical values")
+
+
+def _check_columns(df: pd.DataFrame, column: str):
+    """
+    Check columns
+
+    Description
+    ----------
+    This function checks if a column exists in a dataframe.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+        input
+    column : str
+        column name
+
+    Returns
+    -------
+    ValueError or None
+    """
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' does not exist in DataFrame")
