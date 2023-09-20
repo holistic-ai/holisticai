@@ -26,6 +26,7 @@ warnings.filterwarnings("ignore")
 
 class Explainer:
     def __init__(self, based_on, strategy_type, model_type, model, x, y):
+        self.model_type = model_type
         if based_on == "feature_importance":
 
             if strategy_type == "permutation":
@@ -125,37 +126,7 @@ class Explainer:
 
     
     def partial_dependence_plot(self, first=0, last=None, **plot_kargs):
-            
-        import matplotlib.pyplot as plt
-        from sklearn.inspection import PartialDependenceDisplay
-
-        top_k = None
-        if last == None:
-            last = first + 6
-
-        importances = self.explainer_handler.get_topk(top_k=top_k)
-        fimp = importances["feature_importance"]
-
-        features = list(fimp["Variable"])[first:last]
-
-        title = "Partial dependence plot"
-
-        common_params = {
-            "subsample": 50,
-            "n_jobs": 2,
-            "grid_resolution": 20,
-            "random_state": 0,
-            "kind":"average"
-        }
-
-        common_params.update(plot_kargs)
-        plt.rcParams['figure.constrained_layout.use'] = True
-        
-        pdp = PartialDependenceDisplay.from_estimator(
-            self.explainer_handler.model, self.explainer_handler.x, features, **common_params,
-        )
-        pdp.figure_.suptitle(title)
-        plt.show()
+        self.explainer_handler.partial_dependence_plot(first=first, last=last, **plot_kargs)
 
     def show_importance_stability(self):
         importances = self.explainer_handler.get_topk(top_k=None)

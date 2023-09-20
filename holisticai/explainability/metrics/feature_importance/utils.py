@@ -84,7 +84,7 @@ def importance_spread(feature_importance, divergence=False):
     divergence: bool
         if True calculate divergence instead of ratio
     """
-    if len(feature_importance) == 0:
+    if len(feature_importance) == 0 or sum(feature_importance)<1e-8:
         return 0 if divergence else 1
 
     importance = feature_importance
@@ -169,7 +169,7 @@ def importance_order_constrast(
     return m_order.mean()
 
 
-def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=None):
+def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=None, random_state=42):
     """
     Parameters
     ----------
@@ -192,13 +192,13 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
     matplotlib.rcParams["interactive"] == False
 
     feature_names = list(x.columns)
-    method = "brute"
-    percentiles = (0.05, 0.95)
+    method = "auto"
+    
     response_method = "auto"
 
     kargs = {
         "estimator": model,
-        "X": x,
+        "X": x, 
         "features": feature_ids,
         "feature_names": feature_names,
         "response_method": response_method,
@@ -208,20 +208,13 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
         "subsample": 100,
     }
 
-    if not target == None:
-        kargs.update({"target": target})
+    if target is None:
+        kargs.update({'percentiles': (0.5, 0.95)})
     else:
-        kargs.update({"percentiles": percentiles})
-    g = PartialDependenceDisplay.from_estimator(model, 
-                                                x, 
-                                                feature_ids, 
-                                                feature_names=feature_names,
-                                                percentiles=percentiles,
-                                                response_method=response_method, 
-                                                method=method, 
-                                                grid_resolution=grid_resolution) 
-    plt.close()
+        kargs.update({"target": target, 'percentiles': (0,1)})
+
     g = PartialDependenceDisplay.from_estimator(**kargs)
+
     plt.close()
 
     pd_results = {}

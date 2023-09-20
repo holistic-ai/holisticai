@@ -52,11 +52,12 @@ y_pred = model.predict(X_test)  # compute predictions
 # import Explainer
 from holisticai.explainability import Explainer
 # permutation feature importance
+# lime feature importance
 explainer = Explainer(based_on='feature_importance',
-                      strategy_type='permutation',
+                      strategy_type='lime',
                       model_type='binary_classification',
                       model = model, 
                       x = X, 
                       y = y)
 
-print(explainer.metrics(detailed=True))
+print(explainer.metrics())

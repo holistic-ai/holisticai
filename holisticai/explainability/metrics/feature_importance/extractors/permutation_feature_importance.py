@@ -114,25 +114,9 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
             "Fourth Fifths": 0,
             "Importance Spread Divergence": "-",
             "Importance Spread Ratio": 0,
-            "Global Overlap Score [label=0]": 1,
-            "Global Range Overlap Score [label=0]": 1,
-            "Global Overlap Score [label=1]": 1,
-            "Global Range Overlap Score [label=1]": 1,
             "Global Overlap Score": 1,
-            "Global Overlap Score [Q0-Q1]": 1,
-            "Global Overlap Score [Q1-Q2]": 1,
-            "Global Overlap Score [Q2-Q3]": 1,
-            "Global Overlap Score [Q3-Q4]": 1,
             "Global Range Overlap Score": 1,
-            "Global Range Overlap Score [Q0-Q1]": 1,
-            "Global Range Overlap Score [Q1-Q2]": 1,
-            "Global Range Overlap Score [Q2-Q3]": 1,
-            "Global Range Overlap Score [Q3-Q4]": 1,
             "Global Similarity Score": 1,
-            "Global Similarity Score [Q0-Q1]": 1,
-            "Global Similarity Score [Q1-Q2]": 1,
-            "Global Similarity Score [Q2-Q3]": 1,
-            "Global Similarity Score [Q3-Q4]": 1,
             "Global Explainability Ease Score": 1,
         }
 
@@ -156,11 +140,21 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
             ],
             axis=0,
         )
-
+        
+        def remove_label_markers(metric):
+            words = metric.split(' ')
+            if words[-1]=='Global':
+                metric = ' '.join([w for w in words[:-1]])
+            else:
+                metric = ' '.join([w for w in words if not w.startswith("[")])
+            return metric
+            
         reference_column = pd.DataFrame(
-            [reference_values.get(metric) for metric in metrics.index],
+            [reference_values.get(metric, reference_values[remove_label_markers(metric)]) for metric in metrics.index],
             columns=["Reference"],
         ).set_index(metrics.index)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
 
         return metrics_with_reference
+
+    

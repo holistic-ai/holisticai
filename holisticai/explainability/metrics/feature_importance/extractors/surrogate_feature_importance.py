@@ -123,8 +123,16 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
             axis=0,
         )
 
+        def remove_label_markers(metric):
+            words = metric.split(' ')
+            if words[-1]=='Global':
+                metric = ' '.join([w for w in words[:-1]])
+            else:
+                metric = ' '.join([w for w in words if not w.startswith("[")])
+            return metric
+            
         reference_column = pd.DataFrame(
-            [reference_values.get(metric) for metric in metrics.index],
+            [reference_values.get(metric, reference_values[remove_label_markers(metric)]) for metric in metrics.index],
             columns=["Reference"],
         ).set_index(metrics.index)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)

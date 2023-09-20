@@ -78,7 +78,7 @@ def lime_creator(
 
     per_group_sample = int(np.ceil(num_samples / len(index_groups)))
     ids_groups = {
-        str(label): random.sample(index, min(len(index), per_group_sample)
+        str(label): random.sample(list(index), min(len(index), per_group_sample)
         )
         for label, index in index_groups.items()
     }
@@ -178,8 +178,16 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
               
         metrics = pd.concat([d_spread_stability,f_spread_stability], axis=0)
 
+        def remove_label_markers(metric):
+            words = metric.split(' ')
+            if words[-1]=='Global':
+                metric = ' '.join([w for w in words[:-1]])
+            else:
+                metric = ' '.join([w for w in words if not w.startswith("[")])
+            return metric
+            
         reference_column = pd.DataFrame(
-            [reference_values.get(metric, reference_values[' '.join(metric.split(' ')[:3])]) for metric in metrics.index],
+            [reference_values.get(metric, reference_values[remove_label_markers(metric)]) for metric in metrics.index],
             columns=["Reference"],
         ).set_index(metrics.index)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
