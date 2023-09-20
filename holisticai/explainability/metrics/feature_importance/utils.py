@@ -209,7 +209,7 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
     }
 
     if target is None:
-        kargs.update({'percentiles': (0.5, 0.95)})
+        kargs.update({'percentiles': (0.05, 0.95)})
     else:
         kargs.update({"target": target, 'percentiles': (0,1)})
 

@@ -207,7 +207,9 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
         feature_stability = features_spread_stability(
             feature_importance, conditional_feature_importance
         )
-
+        
+        metric_name = "Importance Spread Ratio"
+        
         def format_data(d):
             df = []
             for g, x in d["imp_spread"].items():
@@ -216,18 +218,18 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
                     a["Output"] = g
                     df.append(a)
             df = pd.concat(df, axis=0)
-            df.columns = ["Importance Spread", "Output"]
+            df.columns = [metric_name, "Output"]
             return df
 
         fig, axs = plt.subplots(1, 2, figsize=(15, 5))
 
         axs[0].set_title("Data Stability")
         df = format_data(data_stability)
-        sns.boxplot(data=df, x="Importance Spread", y="Output", ax=axs[0])
+        sns.boxplot(data=df, x=metric_name, y="Output", ax=axs[0])
 
         axs[1].set_title("Feature Stability")
         df = format_data(feature_stability)
-        sns.boxplot(data=df, x="Importance Spread", y="Output", ax=axs[1])
+        sns.boxplot(data=df, x=metric_name, y="Output", ax=axs[1])
         #return axs, data_stability, feature_stability
 
     def show_data_stability_boundaries(self, top_n = None, figsize=None):

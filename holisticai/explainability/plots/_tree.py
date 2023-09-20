@@ -2,7 +2,7 @@ class DecisionTreeVisualizer:
     def __init__(self):
         self.visualization_backend = {
             "sklearn": self.sklearn_visualizer,
-            "graphviz": self.graphviz_visualizer,
+            "pydotplus": self.pydotplus_visualizer,
             "dtreeviz": self.dtreeviz_visualizer,
         }
 
@@ -13,7 +13,7 @@ class DecisionTreeVisualizer:
             fi_handler.surrogate, feature_names=list(fi_handler.x.columns), **kargs
         )
 
-    def graphviz_visualizer(self, fi_handler, **kargs):
+    def pydotplus_visualizer(self, fi_handler, **kargs):
         import io
 
         import pydotplus
@@ -54,4 +54,12 @@ class DecisionTreeVisualizer:
 
 
     def show(self, backend, fi_handler, **kargs):
+        check_installed_package(backend)
         return self.visualization_backend[backend](fi_handler, **kargs)
+
+def check_installed_package(backend):                       
+    import importlib
+    allowed_packages = ['pydotplus' , 'dtreeviz', 'sklearn']
+    backend_package = importlib.util.find_spec(backend)
+    if (backend and allowed_packages) and (backend_package is None):
+        raise("Package {backend} must be installed. Please install with: pip install {backend}")

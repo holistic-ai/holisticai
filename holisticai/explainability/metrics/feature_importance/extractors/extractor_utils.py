@@ -105,7 +105,7 @@ class GlobalFeatureImportance:
         fimp = importances["feature_importance"]
         features = list(fimp["Variable"])[first:last]
         title = "Partial dependence plot"
-        percentiles =  (0,1) if self.model_type=='binary_classification' else (0.5, 0.95)
+        percentiles =  (0,1) if self.model_type=='binary_classification' else (0.05, 0.95)
 
         common_params = {
             "subsample": 50,

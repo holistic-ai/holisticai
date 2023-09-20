@@ -109,7 +109,7 @@ class Explainer:
         Aditional parameters:
         for backend:
             sklearn: check sklearn.tree.plot_tree input parameters.
-            graphviz: check export_graphviz input parameters.
+            pydotplus: check export_graphviz input parameters.
             dtreeviz: check dtreeviz.model.view input parameters.
         """
         return self.explainer_handler.tree_visualization(backend, **kargs)

@@ -143,4 +143,5 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         if backend in self.tree_visualizer.visualization_backend:
             return self.tree_visualizer.show(backend, self, **kargs)
         else:
-            raise ("Unknown backend")
+            available_packages = ', '.join(list(self.tree_visualizer.visualization_backend.keys()))
+            raise Exception(f"Unknown backend. Available backends are: {available_packages}")
