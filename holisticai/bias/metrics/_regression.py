@@ -1,4 +1,6 @@
 # Base Imports
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -865,9 +867,7 @@ def mae_ratio(group_a, group_b, y_pred, y_true, q=0):
     return np.squeeze(mae_ratio)[()]
 
 
-def regression_bias_metrics(
-    group_a, group_b, y_pred, y_true=None, metric_type="equal_outcome"
-):
+def regression_bias_metrics(group_a, group_b, y_pred, y_true=None, metric_type="group"):
     """
     Regression bias metrics batch computation
 
@@ -894,6 +894,10 @@ def regression_bias_metrics(
     pandas DataFrame
         Metrics | Values | Reference
     """
+
+    individual_metrics = {
+        "Jain Index": jain_index,
+    }
 
     equal_outcome_metrics = {
         "Disparate Impact Q90": disparate_impact_regression,
@@ -932,6 +936,7 @@ def regression_bias_metrics(
         "MAE Ratio": 1,
         "MAE Ratio Q80": 1,
         "Correlation Difference": 0,
+        "Jain Index": 1,
     }
 
     hypers = {
@@ -957,21 +962,44 @@ def regression_bias_metrics(
     if y_true is not None:
         y_true = np.squeeze(y_true)
 
-    out_metrics = [
-        [pf, fn(group_a, group_b, y_pred, **hypers[pf]), ref_vals[pf]]
-        for pf, fn in equal_outcome_metrics.items()
-    ]
-    if y_true is not None:
-        opp_metrics = [
-            [
-                pf,
-                fn(group_a, group_b, y_pred, y_true, **hypers[pf]),
-                ref_vals[pf],
-            ]
-            for pf, fn in equal_opportunity_metrics.items()
-        ]
+    has_group_parameters = all([(p is not None) for p in [group_a, group_b, y_pred]])
 
-    if metric_type == "both":
+    if has_group_parameters:
+        out_metrics = [
+            [pf, fn(group_a, group_b, y_pred, **hypers[pf]), ref_vals[pf]]
+            for pf, fn in equal_outcome_metrics.items()
+        ]
+        if y_true is not None:
+            opp_metrics = [
+                [
+                    pf,
+                    fn(group_a, group_b, y_pred, y_true, **hypers[pf]),
+                    ref_vals[pf],
+                ]
+                for pf, fn in equal_opportunity_metrics.items()
+            ]
+
+    if metric_type == "individual":
+        indv_metrics = []
+        if y_pred is not None and y_true is not None:
+            indv_metrics += [
+                [pf, fn(y_pred, y_true), ref_vals[pf]]
+                for pf, fn in individual_metrics.items()
+            ]
+        else:
+            # in case of missing y_pred or y_true
+            raise ValueError(
+                "y_pred and y_true must be provided for individual metrics"
+            )
+
+    if metric_type in ["group", "both"]:
+        if metric_type == "both":
+            # TODO: remove both for next version
+            warnings.warn(
+                "`both` option will be depreciated in the next versions, use group",
+                DeprecationWarning,
+            )
+
         metrics = out_metrics + opp_metrics
         return pd.DataFrame(
             metrics, columns=["Metric", "Value", "Reference"]
@@ -987,7 +1015,64 @@ def regression_bias_metrics(
             opp_metrics, columns=["Metric", "Value", "Reference"]
         ).set_index("Metric")
 
+    elif metric_type == "individual":
+        return pd.DataFrame(
+            indv_metrics, columns=["Metric", "Value", "Reference"]
+        ).set_index("Metric")
+
     else:
         raise ValueError(
             "metric_type is not one of : both, equal_outcome, equal_opportunity"
         )
+
+
+#### Individual metrics
+
+
+def jain_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
+    """
+    The Jain index (Fairness index)
+
+    Description
+    -----------
+    The Jain index is an index proposed for resources allocation that measures the "equality" of user allocation [1]. For our purposes,
+    from the point of view of fairness, it measures the equality of the error distributed in the model outcomes. Empirically, we
+    could say that a model with a Jain index of 1 is a model that distributes the error equally among all the samples.
+
+    Please, use this metric with caution, as it is not a metric that has been proposed for fairness in machine learning models, but for resources allocation.
+
+    Interpretation
+    --------------
+    From the point of view of fairness, it measures the equality of the error distributed among the samples. A fairer model will have a Jain index closer to 1.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        The true target values.
+    y_pred : array-like of shape (n_samples,)
+        The predicted target values.
+
+    Returns
+    -------
+    float
+        The Jain index of the input array.
+
+    References
+    ----------
+    [1] Jain, R. (1984). A Quantitative Measure of Fairness and Discrimination for Resource Allocation in Shared Computer Systems. Eastern Research Laboratory, Digital Equipment Corporation.
+
+    Examples
+    -------
+    >>> import numpy as np
+    >>> from holisticai.bias.metrics import jain_index
+    >>> y_true = np.array([1, 2, 3, 4, 5])
+    >>> y_pred = np.array([1, 2, 3, 4, 4])
+    >>> jain_index(y_pred, y_true)
+    0.2
+    """
+    error = np.abs(y_true - y_pred)
+    jain = ((error.sum()) ** 2) / (len(error) * (error**2).sum())
+    if np.isnan(jain):
+        return 1.0
+    else:
+        return jain

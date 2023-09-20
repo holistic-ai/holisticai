@@ -10,6 +10,7 @@ from holisticai.bias.metrics import (
     avg_score_ratio,
     correlation_diff,
     disparate_impact_regression,
+    jain_index,
     mae_ratio,
     max_statistical_parity,
     no_disparate_impact_level,
@@ -214,4 +215,11 @@ def test_mae_ratioQ80():
     y_true_new = np.concatenate((y_true_r, z))
     a = mae_ratio(group_a_new, group_b_new, y_pred_new, y_true_new, q=0.8)
     b = 1.25
+    assert_approx_equal(a, b)
+
+
+def test_jain_index():
+    """test jain_index"""
+    a = jain_index(y_pred_r, y_true_r)
+    b = 0.9307692
     assert_approx_equal(a, b)
