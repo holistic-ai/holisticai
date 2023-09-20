@@ -22,10 +22,8 @@ class DecisionTreeVisualizer:
         from sklearn.tree import export_graphviz
 
         dot_data = StringIO()
-        default_params = {'filled':True,
-            'rounded':True,
-            'special_characters':True}
-        
+        default_params = {"filled": True, "rounded": True, "special_characters": True}
+
         default_params.update(kargs)
         export_graphviz(
             fi_handler.surrogate,
@@ -44,22 +42,25 @@ class DecisionTreeVisualizer:
         y_np = fi_handler.y.values.reshape([-1])
 
         viz_model = dtreeviz.model(
-                    fi_handler.surrogate,
-                    X_train=x_np,
-                    y_train=y_np,
-                    feature_names=fi_handler.x.columns,
-                    target_name="output",
-                )
+            fi_handler.surrogate,
+            X_train=x_np,
+            y_train=y_np,
+            feature_names=fi_handler.x.columns,
+            target_name="output",
+        )
         return viz_model.view(fontname="monospace", **kargs)
-
 
     def show(self, backend, fi_handler, **kargs):
         check_installed_package(backend)
         return self.visualization_backend[backend](fi_handler, **kargs)
 
-def check_installed_package(backend):                       
+
+def check_installed_package(backend):
     import importlib
-    allowed_packages = ['pydotplus' , 'dtreeviz', 'sklearn']
+
+    allowed_packages = ["pydotplus", "dtreeviz", "sklearn"]
     backend_package = importlib.util.find_spec(backend)
     if (backend and allowed_packages) and (backend_package is None):
-        raise("Package {backend} must be installed. Please install with: pip install {backend}")
+        raise (
+            "Package {backend} must be installed. Please install with: pip install {backend}"
+        )

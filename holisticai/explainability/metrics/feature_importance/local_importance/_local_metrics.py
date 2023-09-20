@@ -1,8 +1,8 @@
+import numpy as np
 import pandas as pd
 
 from ._lime_importance_spread import feature_importance_spread_lime
 
-import numpy as np
 
 def dataset_spread_stability(feature_importance, conditional_feature_importance):
     dfis = feature_importance_spread_lime(

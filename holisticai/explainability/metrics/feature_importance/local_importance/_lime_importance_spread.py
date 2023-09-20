@@ -1,19 +1,25 @@
-import pandas as pd
 import numpy as np
-from holisticai.explainability.metrics.feature_importance.utils import importance_spread,gini_coefficient
+import pandas as pd
+
+from holisticai.explainability.metrics.feature_importance.utils import (
+    gini_coefficient,
+    importance_spread,
+)
+
 
 def importance_distribution_variation(importance, mode):
-    if mode=="gini":
+    if mode == "gini":
         return gini_coefficient(importance)
-        
-    elif mode=="divergence":
+
+    elif mode == "divergence":
         return importance_spread(importance, divergence=True)
-    
-    elif mode=="ratio":
+
+    elif mode == "ratio":
         return importance_spread(importance, divergence=False)
-    
+
     else:
-        raise(f"Unknown distribution variation type: {mode}")
+        raise (f"Unknown distribution variation type: {mode}")
+
 
 def feature_importance_spread_lime(
     feature_importance, conditional_feature_importance, lime_importance
@@ -23,14 +29,19 @@ def feature_importance_spread_lime(
         metric_name = "Dataset"
         imp_spread = {
             "Global": feature_importance.groupby("Sample Id").apply(
-                lambda df: importance_distribution_variation(df.set_index("Feature Label")["Importance"], mode=mode)
+                lambda df: importance_distribution_variation(
+                    df.set_index("Feature Label")["Importance"], mode=mode
+                )
             )
         }
         for c, ccfi in conditional_feature_importance.items():
             imp_spread.update(
                 {
                     str(c): ccfi.groupby("Sample Id").apply(
-                        lambda df: importance_distribution_variation(df.set_index("Feature Label")["Importance"], mode=mode))
+                        lambda df: importance_distribution_variation(
+                            df.set_index("Feature Label")["Importance"], mode=mode
+                        )
+                    )
                 }
             )
     else:
@@ -46,10 +57,12 @@ def feature_importance_spread_lime(
             )
 
     spread_imp_ratio = {
-        k: importance_distribution_variation(v, mode="ratio") for k, v in imp_spread.items()
+        k: importance_distribution_variation(v, mode="ratio")
+        for k, v in imp_spread.items()
     }
     spread_imp_gini = {
-        k: importance_distribution_variation(v, mode="gini") for k, v in imp_spread.items()
+        k: importance_distribution_variation(v, mode="gini")
+        for k, v in imp_spread.items()
     }
     mean_imp_spread = {k: v.mean() for k, v in imp_spread.items()}
 

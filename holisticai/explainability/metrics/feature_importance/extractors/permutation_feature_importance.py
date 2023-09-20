@@ -3,7 +3,10 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.inspection import permutation_importance
-from holisticai.explainability.metrics.feature_importance.utils import check_feature_importance
+
+from holisticai.explainability.metrics.feature_importance.utils import (
+    check_feature_importance,
+)
 
 from ..global_importance import (
     fourth_fifths,
@@ -50,7 +53,7 @@ def feature_importance(model, x, y):
 
 
 def compute_permutation_feature_importance(model_type, model, x, y):
-    x,y = check_feature_importance(x,y)
+    x, y = check_feature_importance(x, y)
 
     # Feature Importance
     features_importance = feature_importance(model, x, y)
@@ -140,21 +143,24 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
             ],
             axis=0,
         )
-        
+
         def remove_label_markers(metric):
-            words = metric.split(' ')
-            if words[-1]=='Global':
-                metric = ' '.join([w for w in words[:-1]])
+            words = metric.split(" ")
+            if words[-1] == "Global":
+                metric = " ".join([w for w in words[:-1]])
             else:
-                metric = ' '.join([w for w in words if not w.startswith("[")])
+                metric = " ".join([w for w in words if not w.startswith("[")])
             return metric
-            
+
         reference_column = pd.DataFrame(
-            [reference_values.get(metric, reference_values[remove_label_markers(metric)]) for metric in metrics.index],
+            [
+                reference_values.get(
+                    metric, reference_values[remove_label_markers(metric)]
+                )
+                for metric in metrics.index
+            ],
             columns=["Reference"],
         ).set_index(metrics.index)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
 
         return metrics_with_reference
-
-    

@@ -93,7 +93,7 @@ def get_top_k_lime(df_feature_importance, top_k):
 
 class GlobalFeatureImportance:
     def partial_dependence_plot(self, first=0, last=None, **plot_kargs):
-            
+
         import matplotlib.pyplot as plt
         from sklearn.inspection import PartialDependenceDisplay
 
@@ -105,23 +105,28 @@ class GlobalFeatureImportance:
         fimp = importances["feature_importance"]
         features = list(fimp["Variable"])[first:last]
         title = "Partial dependence plot"
-        percentiles =  (0,1) if self.model_type=='binary_classification' else (0.05, 0.95)
+        percentiles = (
+            (0, 1) if self.model_type == "binary_classification" else (0.05, 0.95)
+        )
 
         common_params = {
             "subsample": 50,
             "n_jobs": 2,
             "grid_resolution": 20,
             "random_state": 0,
-            "kind":"average",
-            "percentiles":percentiles
+            "kind": "average",
+            "percentiles": percentiles,
         }
-        
+
         common_params.update(plot_kargs)
-        
-        plt.rcParams['figure.constrained_layout.use'] = True
-        
+
+        plt.rcParams["figure.constrained_layout.use"] = True
+
         pdp = PartialDependenceDisplay.from_estimator(
-            self.model, self.x, features, **common_params,
+            self.model,
+            self.x,
+            features,
+            **common_params,
         )
         pdp.figure_.suptitle(title)
         plt.show()

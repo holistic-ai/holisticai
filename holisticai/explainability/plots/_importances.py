@@ -21,5 +21,3 @@ def contrast_matrix(xticks, values):
     )
     _ = plt.setp(ax.get_xticklabels(), fontsize=10, ha="center")
     _ = plt.setp(ax.get_yticklabels(), fontsize=10)
-
-

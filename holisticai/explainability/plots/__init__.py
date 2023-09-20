@@ -8,4 +8,4 @@ from ._lolipop import lolipop
 from ._tree import DecisionTreeVisualizer
 
 # All explainability plotters
-__all__ = ["bar", "lolipop", "DecisionTreeVisualizer","contrast_matrix"]
+__all__ = ["bar", "lolipop", "DecisionTreeVisualizer", "contrast_matrix"]

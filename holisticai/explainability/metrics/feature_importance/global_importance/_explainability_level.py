@@ -97,7 +97,9 @@ def explainability_ease_score(model_type, model, x, target, feature_importance):
         target = list(sorted(set(model.classes_) - {0}))[0]
         result = pd.DataFrame.from_dict(
             {
-                "Global Explainability Ease Score": compute_partial_dependence(model, feature_importance, x, target)                
+                "Global Explainability Ease Score": compute_partial_dependence(
+                    model, feature_importance, x, target
+                )
             },
             orient="index",
         )

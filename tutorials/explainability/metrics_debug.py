@@ -1,7 +1,6 @@
 import sys
 
-import sys
-sys.path.insert(0, './')
+sys.path.insert(0, "./")
 
 import warnings
 
@@ -14,8 +13,7 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.datasets import load_us_crime
-from holisticai.datasets import load_adult
+from holisticai.datasets import load_adult, load_us_crime
 
 # Dataset
 dataset = load_adult()
@@ -37,11 +35,14 @@ data = [X, y, group_a, group_b]
 dataset = train_test_split(*data, test_size=0.2, shuffle=True)
 train_data = dataset[::2]
 test_data = dataset[1::2]
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) # train test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)  # train test split
 
-from sklearn.ensemble import GradientBoostingClassifier
 import numpy as np
-seed = np.random.seed(42) # set seed for reproducibility
+from sklearn.ensemble import GradientBoostingClassifier
+
+seed = np.random.seed(42)  # set seed for reproducibility
 
 model = GradientBoostingClassifier()  # instantiate model
 # model = LinearRegression() # instantiate model
@@ -51,13 +52,16 @@ y_pred = model.predict(X_test)  # compute predictions
 
 # import Explainer
 from holisticai.explainability import Explainer
+
 # permutation feature importance
 # lime feature importance
-explainer = Explainer(based_on='feature_importance',
-                      strategy_type='lime',
-                      model_type='binary_classification',
-                      model = model, 
-                      x = X, 
-                      y = y)
+explainer = Explainer(
+    based_on="feature_importance",
+    strategy_type="lime",
+    model_type="binary_classification",
+    model=model,
+    x=X,
+    y=y,
+)
 
 print(explainer.metrics())

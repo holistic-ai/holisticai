@@ -8,16 +8,18 @@ from holisticai.utils._validation import (
     _matrix_like_to_dataframe,
 )
 
+
 def check_feature_importance(x, y):
     if not isinstance(x, pd.DataFrame):
         x = _matrix_like_to_dataframe(x)
 
     if not isinstance(y, pd.Series):
         y = _array_like_to_series(y)
-    
+
     if not y.index.equals(x):
         y.index = x.index
-    return x,y
+    return x, y
+
 
 def four_fifths_list(feature_importance, cutoff=None):
     """
@@ -72,7 +74,7 @@ def gini_coefficient(x):
     diffsum = 0
     for i, xi in enumerate(x[:-1], 1):
         diffsum += np.sum(np.abs(xi - x[i:]))
-    return diffsum / (len(x)**2 * np.mean(x))
+    return diffsum / (len(x) ** 2 * np.mean(x))
 
 
 def importance_spread(feature_importance, divergence=False):
@@ -84,7 +86,7 @@ def importance_spread(feature_importance, divergence=False):
     divergence: bool
         if True calculate divergence instead of ratio
     """
-    if len(feature_importance) == 0 or sum(feature_importance)<1e-8:
+    if len(feature_importance) == 0 or sum(feature_importance) < 1e-8:
         return 0 if divergence else 1
 
     importance = feature_importance
@@ -169,7 +171,9 @@ def importance_order_constrast(
     return m_order.mean()
 
 
-def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=None, random_state=42):
+def partial_dependence_creator(
+    model, grid_resolution, x, feature_ids, target=None, random_state=42
+):
     """
     Parameters
     ----------
@@ -193,12 +197,12 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
 
     feature_names = list(x.columns)
     method = "auto"
-    
+
     response_method = "auto"
 
     kargs = {
         "estimator": model,
-        "X": x, 
+        "X": x,
         "features": feature_ids,
         "feature_names": feature_names,
         "response_method": response_method,
@@ -209,9 +213,9 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
     }
 
     if target is None:
-        kargs.update({'percentiles': (0.05, 0.95)})
+        kargs.update({"percentiles": (0.05, 0.95)})
     else:
-        kargs.update({"target": target, 'percentiles': (0,1)})
+        kargs.update({"target": target, "percentiles": (0, 1)})
 
     g = PartialDependenceDisplay.from_estimator(**kargs)
 

@@ -5,7 +5,6 @@ This module provides functions for computing surrogate feature importance and ef
 import pandas as pd
 
 from holisticai.explainability.plots import DecisionTreeVisualizer
-from ..utils import check_feature_importance
 
 from ..global_importance import (
     fourth_fifths,
@@ -14,6 +13,7 @@ from ..global_importance import (
     importance_spread_ratio,
     surrogate_efficacy,
 )
+from ..utils import check_feature_importance
 from .extractor_utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k
 
 
@@ -57,7 +57,7 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     Returns:
         holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
     """
-    x,y = check_feature_importance(x,y)
+    x, y = check_feature_importance(x, y)
 
     y_pred = model.predict(x)
     surrogate = create_surrogate_model(model_type, x, y_pred)
@@ -124,15 +124,20 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         )
 
         def remove_label_markers(metric):
-            words = metric.split(' ')
-            if words[-1]=='Global':
-                metric = ' '.join([w for w in words[:-1]])
+            words = metric.split(" ")
+            if words[-1] == "Global":
+                metric = " ".join([w for w in words[:-1]])
             else:
-                metric = ' '.join([w for w in words if not w.startswith("[")])
+                metric = " ".join([w for w in words if not w.startswith("[")])
             return metric
-            
+
         reference_column = pd.DataFrame(
-            [reference_values.get(metric, reference_values[remove_label_markers(metric)]) for metric in metrics.index],
+            [
+                reference_values.get(
+                    metric, reference_values[remove_label_markers(metric)]
+                )
+                for metric in metrics.index
+            ],
             columns=["Reference"],
         ).set_index(metrics.index)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
@@ -143,5 +148,9 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         if backend in self.tree_visualizer.visualization_backend:
             return self.tree_visualizer.show(backend, self, **kargs)
         else:
-            available_packages = ', '.join(list(self.tree_visualizer.visualization_backend.keys()))
-            raise Exception(f"Unknown backend. Available backends are: {available_packages}")
+            available_packages = ", ".join(
+                list(self.tree_visualizer.visualization_backend.keys())
+            )
+            raise Exception(
+                f"Unknown backend. Available backends are: {available_packages}"
+            )
