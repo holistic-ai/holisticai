@@ -1,17 +1,36 @@
+import numpy as np
 import pandas as pd
 
-from holisticai.explainability.metrics.feature_importance.utils import importance_spread
+from holisticai.explainability.metrics.feature_importance.utils import (
+    gini_coefficient,
+    importance_spread,
+)
+
+
+def importance_distribution_variation(importance, mode):
+    if mode == "gini":
+        return gini_coefficient(importance)
+
+    elif mode == "divergence":
+        return importance_spread(importance, divergence=True)
+
+    elif mode == "ratio":
+        return importance_spread(importance, divergence=False)
+
+    else:
+        raise (f"Unknown distribution variation type: {mode}")
 
 
 def feature_importance_spread_lime(
     feature_importance, conditional_feature_importance, lime_importance
 ):
+    mode = "ratio"
     if lime_importance == "dataset":
         metric_name = "Dataset"
         imp_spread = {
             "Global": feature_importance.groupby("Sample Id").apply(
-                lambda df: importance_spread(
-                    df.set_index("Feature Label")["Importance"], divergence=True
+                lambda df: importance_distribution_variation(
+                    df.set_index("Feature Label")["Importance"], mode=mode
                 )
             )
         }
@@ -19,8 +38,8 @@ def feature_importance_spread_lime(
             imp_spread.update(
                 {
                     str(c): ccfi.groupby("Sample Id").apply(
-                        lambda df: importance_spread(
-                            df.set_index("Feature Label")["Importance"], divergence=True
+                        lambda df: importance_distribution_variation(
+                            df.set_index("Feature Label")["Importance"], mode=mode
                         )
                     )
                 }
@@ -28,51 +47,32 @@ def feature_importance_spread_lime(
     else:
         metric_name = "Features"
         imp_spread = {
-            "Global": feature_importance.groupby("Feature Label")["Feature Rank"].apply(
-                lambda x: importance_spread(x, divergence=True)
+            "Global": feature_importance.groupby("Feature Label")["Importance"].apply(
+                lambda x: importance_distribution_variation(x, mode=mode)
             )
         }
         for c, df_cls in conditional_feature_importance.items():
-            imp_spread[str(c)] = df_cls.groupby("Feature Label")["Feature Rank"].apply(
-                lambda x: importance_spread(x, divergence=True)
+            imp_spread[str(c)] = df_cls.groupby("Feature Label")["Importance"].apply(
+                lambda x: importance_distribution_variation(x, mode=mode)
             )
 
-    spread_imp_divergence = {
-        k: importance_spread(v, divergence=True) for k, v in imp_spread.items()
-    }
     spread_imp_ratio = {
-        k: importance_spread(v, divergence=False) for k, v in imp_spread.items()
+        k: importance_distribution_variation(v, mode="ratio")
+        for k, v in imp_spread.items()
+    }
+    spread_imp_gini = {
+        k: importance_distribution_variation(v, mode="gini")
+        for k, v in imp_spread.items()
     }
     mean_imp_spread = {k: v.mean() for k, v in imp_spread.items()}
 
-    set_name = lambda x, c: x if c == "Global" else f"{x} {c}"
-    table = {
-        set_name(f"{metric_name} Spread Stability", c): [v]
-        for c, v in spread_imp_divergence.items()
-    }
-    table.update(
-        {
-            set_name(f"{metric_name} Spread Mean", c): [v]
-            for c, v in mean_imp_spread.items()
-        }
-    )
-    table.update(
-        {
-            set_name(f"{metric_name} Spread Ratio", c): [v]
-            for c, v in spread_imp_ratio.items()
-        }
-    )
-    table = pd.DataFrame(table)
-
     result = {
-        f"{metric_name} Spread Stability": spread_imp_divergence["Global"],
-        f"{metric_name} Spread Mean": mean_imp_spread["Global"],
-        f"{metric_name} Spread Ratio": spread_imp_ratio["Global"],
+        f"{metric_name} Stability Gini": spread_imp_gini,
+        f"{metric_name} Stability Mean": mean_imp_spread,
+        f"{metric_name} Stability Ratio": spread_imp_ratio,
     }
-
-    result = pd.DataFrame(result, index=[0])
 
     return {
-        "table": table.T.rename(columns={0: "Value"}),
-        "result": result.T.rename(columns={0: "Value"}),
+        "result": result,
+        "imp_spread": imp_spread,
     }

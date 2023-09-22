@@ -3,6 +3,23 @@ import pandas as pd
 from lime import lime_tabular
 from sklearn.inspection import PartialDependenceDisplay
 
+from holisticai.utils._validation import (
+    _array_like_to_series,
+    _matrix_like_to_dataframe,
+)
+
+
+def check_feature_importance(x, y):
+    if not isinstance(x, pd.DataFrame):
+        x = _matrix_like_to_dataframe(x)
+
+    if not isinstance(y, pd.Series):
+        y = _array_like_to_series(y)
+
+    if not y.index.equals(x):
+        y.index = x.index
+    return x, y
+
 
 def four_fifths_list(feature_importance, cutoff=None):
     """
@@ -25,6 +42,41 @@ def four_fifths_list(feature_importance, cutoff=None):
     return feature_names.loc[(feature_weight.cumsum() < cutoff).values]
 
 
+def feature_importance_spread(
+    features_importance, conditional_features_importance=None, divergence=False
+):
+    spread_type = "Divergence" if divergence else "Ratio"
+
+    feat_importance_spread = {
+        f"Importance Spread {spread_type}": [
+            importance_spread(features_importance["Importance"], divergence=divergence)
+        ]
+    }
+
+    if conditional_features_importance is not None:
+
+        feat_importance_spread.update(
+            {
+                f"Conditional Importance Spread {spread_type}[{c}]": [
+                    importance_spread(importance["Importance"], divergence=divergence)
+                ]
+                for c, importance in conditional_features_importance.items()
+            }
+        )
+
+    imp_spread = pd.DataFrame(feat_importance_spread)
+
+    return imp_spread.T.rename(columns={0: "Value"})
+
+
+def gini_coefficient(x):
+    """Compute Gini coefficient of array of values"""
+    diffsum = 0
+    for i, xi in enumerate(x[:-1], 1):
+        diffsum += np.sum(np.abs(xi - x[i:]))
+    return diffsum / (len(x) ** 2 * np.mean(x))
+
+
 def importance_spread(feature_importance, divergence=False):
     """
     Parameters
@@ -34,7 +86,7 @@ def importance_spread(feature_importance, divergence=False):
     divergence: bool
         if True calculate divergence instead of ratio
     """
-    if len(feature_importance) == 0:
+    if len(feature_importance) == 0 or sum(feature_importance) < 1e-8:
         return 0 if divergence else 1
 
     importance = feature_importance
@@ -119,7 +171,9 @@ def importance_order_constrast(
     return m_order.mean()
 
 
-def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=None):
+def partial_dependence_creator(
+    model, grid_resolution, x, feature_ids, target=None, random_state=42
+):
     """
     Parameters
     ----------
@@ -142,8 +196,8 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
     matplotlib.rcParams["interactive"] == False
 
     feature_names = list(x.columns)
-    method = "brute"
-    percentiles = (0.05, 0.95)
+    method = "auto"
+
     response_method = "auto"
 
     kargs = {
@@ -151,16 +205,20 @@ def partial_dependence_creator(model, grid_resolution, x, feature_ids, target=No
         "X": x,
         "features": feature_ids,
         "feature_names": feature_names,
-        "percentiles": percentiles,
         "response_method": response_method,
         "method": method,
         "grid_resolution": grid_resolution,
+        "n_jobs": -1,
+        "subsample": 100,
     }
 
-    if not target == None:
-        kargs.update({"target": target})
+    if target is None:
+        kargs.update({"percentiles": (0.05, 0.95)})
+    else:
+        kargs.update({"target": target, "percentiles": (0, 1)})
 
     g = PartialDependenceDisplay.from_estimator(**kargs)
+
     plt.close()
 
     pd_results = {}

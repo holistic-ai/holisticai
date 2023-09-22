@@ -1,51 +1,67 @@
 import sys
 
-sys.path.append("./")
+sys.path.insert(0, "./")
 
 import warnings
 
 warnings.filterwarnings("ignore")
 
+import numpy as np
 import pandas as pd
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.datasets import load_adult
+from holisticai.datasets import load_adult, load_us_crime
 
-# data and simple preprocessing
-dataset = load_adult()["frame"]
-dataset = dataset.iloc[
-    0:1000,
-]
+# Dataset
+dataset = load_adult()
 
-X = pd.get_dummies(dataset.drop(columns=["class", "fnlwgt"]), drop_first=True)
-scaler = StandardScaler()
-X_standard = scaler.fit_transform(X)
-X_standard = pd.DataFrame(X_standard, columns=X.columns)
+# Dataframe
+df = pd.concat([dataset["data"], dataset["target"]], axis=1)
+protected_variables = ["sex", "race"]
+output_variable = ["class"]
 
-y_clf = pd.DataFrame(dataset["class"].apply(lambda x: 1 if x == ">50K" else 0))
-y_reg = pd.DataFrame(dataset["fnlwgt"])
-y_reg = scaler.fit_transform(y_reg)
+# Simple preprocessing
+y = df[output_variable].replace({">50K": 1, "<=50K": 0})
+X = pd.get_dummies(df.drop(protected_variables + output_variable, axis=1))
+group = ["sex"]
+group_a = df[group] == "Female"
+group_b = df[group] == "Male"
+data = [X, y, group_a, group_b]
 
-# regression
-reg = LinearRegression()
-reg.fit(X_standard, y_reg)
+# Train test split
+dataset = train_test_split(*data, test_size=0.2, shuffle=True)
+train_data = dataset[::2]
+test_data = dataset[1::2]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)  # train test split
 
-# classification
-clf = LogisticRegression(random_state=42, max_iter=100)
-clf.fit(X_standard, y_clf)
+import numpy as np
+from sklearn.ensemble import GradientBoostingClassifier
+
+seed = np.random.seed(42)  # set seed for reproducibility
+
+model = GradientBoostingClassifier()  # instantiate model
+# model = LinearRegression() # instantiate model
+model.fit(X_train, y_train)  # fit model
+
+y_pred = model.predict(X_test)  # compute predictions
 
 # import Explainer
 from holisticai.explainability import Explainer
 
-# instantiate explainer permutation
+# permutation feature importance
+# lime feature importance
 explainer = Explainer(
     based_on="feature_importance",
-    strategy_type="permutation",
+    strategy_type="lime",
     model_type="binary_classification",
-    model=clf,
-    x=X_standard,
-    y=y_clf,
+    model=model,
+    x=X,
+    y=y,
 )
 
 print(explainer.metrics())

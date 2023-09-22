@@ -92,15 +92,14 @@ def compute_partial_dependence(model, feature_importance, x, target=None):
     return score
 
 
-def explainability_score(model_type, model, x, target, feature_importance):
+def explainability_ease_score(model_type, model, x, target, feature_importance):
     if model_type == "binary_classification":
-        targets = sorted(set(model.classes_) - {0})
+        target = list(sorted(set(model.classes_) - {0}))[0]
         result = pd.DataFrame.from_dict(
             {
-                "Global Explainability Score": compute_partial_dependence(
+                "Global Explainability Ease Score": compute_partial_dependence(
                     model, feature_importance, x, target
                 )
-                for target in targets
             },
             orient="index",
         )
@@ -108,7 +107,7 @@ def explainability_score(model_type, model, x, target, feature_importance):
     elif model_type == "regression":
         result = pd.DataFrame.from_dict(
             {
-                "Global Explainability Score": compute_partial_dependence(
+                "Global Explainability Ease Score": compute_partial_dependence(
                     model, feature_importance, x
                 )
             },

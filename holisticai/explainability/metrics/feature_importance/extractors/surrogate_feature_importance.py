@@ -2,21 +2,18 @@
 This module provides functions for computing surrogate feature importance and efficacy metrics.
 """
 
-import dtreeviz
 import pandas as pd
 
-from holisticai.utils._validation import (
-    _array_like_to_series,
-    _matrix_like_to_dataframe,
-)
+from holisticai.explainability.plots import DecisionTreeVisualizer
 
 from ..global_importance import (
     fourth_fifths,
-    global_explainability_score,
+    global_explainability_ease_score,
     importance_spread_divergence,
     importance_spread_ratio,
     surrogate_efficacy,
 )
+from ..utils import check_feature_importance
 from .extractor_utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k
 
 
@@ -60,11 +57,7 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     Returns:
         holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
     """
-    if not isinstance(x, pd.DataFrame):
-        x = _matrix_like_to_dataframe(x)
-
-    if not isinstance(y, pd.DataFrame):
-        y = _array_like_to_series(y)
+    x, y = check_feature_importance(x, y)
 
     y_pred = model.predict(x)
     surrogate = create_surrogate_model(model_type, x, y_pred)
@@ -82,6 +75,7 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     )
 
     df_feat_imp["Importance"] = abs(df_feat_imp["Importance"])
+    df_feat_imp["Importance"] /= df_feat_imp["Importance"].sum()
     df_feat_imp = df_feat_imp.sort_values("Importance", ascending=False).copy()
 
     return SurrogateFeatureImportance(model_type, model, x, y, df_feat_imp, surrogate)
@@ -95,6 +89,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         self.y = y
         self.feature_importance = importance_weights
         self.surrogate = surrogate
+        self.tree_visualizer = DecisionTreeVisualizer()
 
     def get_topk(self, top_k):
         if top_k is None:
@@ -104,13 +99,13 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
 
         return {"feature_importance": feat_imp}
 
-    def metrics(self, feature_importance):
+    def metrics(self, feature_importance, detailed):
 
         reference_values = {
             "Fourth Fifths": 0,
             "Importance Spread Divergence": "-",
             "Importance Spread Ratio": 0,
-            "Global Explainability Score": 1,
+            "Global Explainability Ease Score": 1,
             "Surrogate Efficacy Classification": 1,
             "Surrogate Efficacy Regression": 0,
         }
@@ -120,7 +115,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
                 fourth_fifths(feature_importance),
                 importance_spread_divergence(feature_importance),
                 importance_spread_ratio(feature_importance),
-                global_explainability_score(
+                global_explainability_ease_score(
                     self.model_type, self.model, self.x, self.y, feature_importance
                 ),
                 surrogate_efficacy(self.model_type, self.x, self.y, self.surrogate),
@@ -128,55 +123,34 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
             axis=0,
         )
 
+        def remove_label_markers(metric):
+            words = metric.split(" ")
+            if words[-1] == "Global":
+                metric = " ".join([w for w in words[:-1]])
+            else:
+                metric = " ".join([w for w in words if not w.startswith("[")])
+            return metric
+
         reference_column = pd.DataFrame(
-            [reference_values.get(metric) for metric in metrics.index],
+            [
+                reference_values.get(
+                    metric, reference_values[remove_label_markers(metric)]
+                )
+                for metric in metrics.index
+            ],
             columns=["Reference"],
         ).set_index(metrics.index)
         metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
 
         return metrics_with_reference
 
-    def visualization(self, visualization_type):
-        if visualization_type == "Decision Tree sklearn":
-            from sklearn import tree
-
-            return tree.plot_tree(self.surrogate, feature_names=list(self.x.columns))
-
-        elif visualization_type == "Decision Tree graphviz":
-            import io
-
-            import pydotplus
-            from PIL import Image
-            from six import StringIO
-            from sklearn.tree import export_graphviz
-
-            dot_data = StringIO()
-
-            export_graphviz(
-                self.surrogate,
-                out_file=dot_data,
-                filled=True,
-                rounded=True,
-                special_characters=True,
-                feature_names=self.x.columns,
+    def tree_visualization(self, backend="sklearn", **kargs):
+        if backend in self.tree_visualizer.visualization_backend:
+            return self.tree_visualizer.show(backend, self, **kargs)
+        else:
+            available_packages = ", ".join(
+                list(self.tree_visualizer.visualization_backend.keys())
             )
-            graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
-            img_str = graph.create_png()
-            return Image.open(io.BytesIO(img_str))
-
-        elif visualization_type == "Decision Tree dtreeviz":
-            import dtreeviz
-
-            x_np = self.x.values
-            y_np = self.y.values.reshape([-1])
-            viz_model = dtreeviz.model(
-                self.surrogate,
-                X_train=x_np,
-                y_train=y_np,
-                feature_names=self.x.columns,
-                target_name="output",
+            raise Exception(
+                f"Unknown backend. Available backends are: {available_packages}"
             )
-
-            return (
-                viz_model.view()
-            )  # render as SVG into internal object                  # pop up window

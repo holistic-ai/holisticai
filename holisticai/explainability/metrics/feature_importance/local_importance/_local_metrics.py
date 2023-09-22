@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from ._lime_importance_spread import feature_importance_spread_lime

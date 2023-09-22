@@ -24,6 +24,17 @@ def four_fifths_list_lime(feature_importance, feature_importance_names, cutoff=N
     return feature_importance_names.loc[(feature_weight.cumsum() < cutoff).values]
 
 
+def classify_element(q1, q2, q3, labels, x):
+    if x <= q1:
+        return labels[0]
+    elif q1 < x <= q2:
+        return labels[1]
+    elif q2 < x <= q3:
+        return labels[2]
+    else:
+        return labels[3]
+
+
 def get_index_groups(model_type, y):
     """
     Parameters
@@ -34,17 +45,22 @@ def get_index_groups(model_type, y):
         target array
     """
     if model_type == "binary_classification":
-        index_groups = {f"[label={value}]": y[y == value].index for value in y.unique()}
+        index_groups = {
+            f"[label={int(value)}]": list(y[y == value].index) for value in y.unique()
+        }
         return index_groups
 
     elif model_type == "regression":
         labels = ["Q0-Q1", "Q1-Q2", "Q2-Q3", "Q3-Q4"]
         labels_values = [0.0, 0.25, 0.5, 0.75, 1.0]
         v = np.array(y.quantile(labels_values)).squeeze()
-        index_groups = {
-            f"[{c}]": y[(y.values > v[i]) & (y.values < v[i + 1])].index
-            for (i, c) in enumerate(labels)
-        }
+
+        groups = y.apply(lambda x: classify_element(v[1], v[2], v[3], labels, x))
+
+        df = pd.concat([y, groups], axis=1)
+        df.columns = ["y", "group"]
+        index_groups = {f"[{k}]": list(v.index) for k, v in df.groupby("group")["y"]}
+
         return index_groups
     else:
         raise NotImplementedError
@@ -76,7 +92,44 @@ def get_top_k_lime(df_feature_importance, top_k):
 
 
 class GlobalFeatureImportance:
-    pass
+    def partial_dependence_plot(self, first=0, last=None, **plot_kargs):
+
+        import matplotlib.pyplot as plt
+        from sklearn.inspection import PartialDependenceDisplay
+
+        top_k = None
+        if last == None:
+            last = first + 6
+
+        importances = self.get_topk(top_k=top_k)
+        fimp = importances["feature_importance"]
+        features = list(fimp["Variable"])[first:last]
+        title = "Partial dependence plot"
+        percentiles = (
+            (0, 1) if self.model_type == "binary_classification" else (0.05, 0.95)
+        )
+
+        common_params = {
+            "subsample": 50,
+            "n_jobs": 2,
+            "grid_resolution": 20,
+            "random_state": 0,
+            "kind": "average",
+            "percentiles": percentiles,
+        }
+
+        common_params.update(plot_kargs)
+
+        plt.rcParams["figure.constrained_layout.use"] = True
+
+        pdp = PartialDependenceDisplay.from_estimator(
+            self.model,
+            self.x,
+            features,
+            **common_params,
+        )
+        pdp.figure_.suptitle(title)
+        plt.show()
 
 
 class LocalFeatureImportance:
