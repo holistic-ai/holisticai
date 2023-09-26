@@ -3,31 +3,31 @@ import warnings
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from holisticai.explainability.metrics.utils import check_feature_importance
 from holisticai.explainability.plots import bar, contrast_matrix, lolipop
 
-from .metrics.extractors.local_feature_importance import compute_local_feature_importance
-
+from .metrics.extractors.local_feature_importance import (
+    compute_local_feature_importance,
+)
 from .metrics.extractors.permutation_feature_importance import (
     compute_permutation_feature_importance,
 )
 from .metrics.extractors.surrogate_feature_importance import (
     compute_surrogate_feature_importance,
 )
-from .metrics.global_importance._contrast_metrics import (
-    important_constrast_matrix,
-)
-from holisticai.explainability.metrics.utils import check_feature_importance
+from .metrics.global_importance._contrast_metrics import important_constrast_matrix
+
 warnings.filterwarnings("ignore")
 
 
 class Explainer:
     def __init__(self, based_on, strategy_type, model_type, x, y, **kargs):
         self.model_type = model_type
-        model =  kargs.get('model', None)
-        
+        model = kargs.get("model", None)
+
         if based_on == "feature_importance":
             x, y = check_feature_importance(x, y)
-            
+
             if strategy_type == "permutation":
                 self.explainer_handler = compute_permutation_feature_importance(
                     model_type, model, x, y
@@ -40,35 +40,48 @@ class Explainer:
                 )
                 self._strategy_type = "global"
 
-            elif strategy_type == 'local':
-                self.explainer_handler = compute_local_feature_importance(model_type, x, y, **kargs)
+            elif strategy_type == "local":
+                self.explainer_handler = compute_local_feature_importance(
+                    model_type, x, y, **kargs
+                )
                 self._strategy_type = "local"
-                
-            elif strategy_type == 'lime':
-                from holisticai.explainability.metrics.utils import LimeTabularHandler, ShapTabularHandler
+
+            elif strategy_type == "lime":
+                from holisticai.explainability.metrics.utils import (
+                    LimeTabularHandler,
+                    ShapTabularHandler,
+                )
+
                 local_explainer_handler = LimeTabularHandler(
-                                                model.predict,
-                                                x.values,
-                                                feature_names=x.columns.tolist(),
-                                                discretize_continuous=True,
-                                                mode='regression')
-                self.explainer_handler = compute_local_feature_importance(model_type, x, y, local_explainer_handler=local_explainer_handler)
+                    model.predict,
+                    x.values,
+                    feature_names=x.columns.tolist(),
+                    discretize_continuous=True,
+                    mode="regression",
+                )
+                self.explainer_handler = compute_local_feature_importance(
+                    model_type, x, y, local_explainer_handler=local_explainer_handler
+                )
                 self._strategy_type = "local"
-                
-            elif strategy_type == 'shap':
-                from holisticai.explainability.metrics.utils import ShapTabularHandler
+
+            elif strategy_type == "shap":
                 import shap
+
+                from holisticai.explainability.metrics.utils import ShapTabularHandler
+
                 X100 = shap.utils.sample(x, 100)
                 local_explainer_handler = ShapTabularHandler(model.predict, X100)
-                self.explainer_handler = compute_local_feature_importance(model_type, x, y, local_explainer_handler=local_explainer_handler)
+                self.explainer_handler = compute_local_feature_importance(
+                    model_type, x, y, local_explainer_handler=local_explainer_handler
+                )
                 self._strategy_type = "local"
-                
+
             else:
                 raise NotImplementedError
 
     def __getitem__(self, key):
-        return self.metric_values.loc[key]['Value']
-            
+        return self.metric_values.loc[key]["Value"]
+
     def metrics(self, top_k=None, detailed=False):
         """
         top_k: int

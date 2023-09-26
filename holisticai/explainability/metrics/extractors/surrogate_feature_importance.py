@@ -13,8 +13,12 @@ from ..global_importance import (
     importance_spread_ratio,
     surrogate_efficacy,
 )
-
-from ..utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k, check_feature_importance
+from ..utils import (
+    BaseFeatureImportance,
+    GlobalFeatureImportance,
+    check_feature_importance,
+    get_top_k,
+)
 
 
 def create_surrogate_model(model_type, x, y):

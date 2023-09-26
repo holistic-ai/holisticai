@@ -42,6 +42,7 @@ class GlobalFeatureImportance:
 class LocalFeatureImportance:
     pass
 
+
 class BaseFeatureImportance:
     def __init__(
         self,

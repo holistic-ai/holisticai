@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
+
 from ..utils.explainer_utils import four_fifths_list
+
 
 def four_fifths_list_lime(feature_importance, feature_importance_names, cutoff=None):
     """
@@ -85,4 +87,3 @@ def get_top_k_lime(df_feature_importance, top_k):
         df_feature_importance["Feature Label"].isin(list(feat_id))
     ]
     return df_feature_importance
-

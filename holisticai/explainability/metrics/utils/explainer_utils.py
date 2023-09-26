@@ -7,6 +7,7 @@ from holisticai.utils._validation import (
     _matrix_like_to_dataframe,
 )
 
+
 def check_feature_importance(x, y, values=None):
     if not isinstance(x, pd.DataFrame):
         x = _matrix_like_to_dataframe(x)
@@ -16,15 +17,15 @@ def check_feature_importance(x, y, values=None):
 
     if not y.index.equals(x):
         y.index = x.index
-        
+
     if values is None:
         return x, y
     else:
         if not isinstance(x, pd.DataFrame):
-            values = pd.DataFrame(values, columns = x.columns, index=x.index)
+            values = pd.DataFrame(values, columns=x.columns, index=x.index)
         else:
-            values.index = x.index 
-        return x,y,values        
+            values.index = x.index
+        return x, y, values
 
 
 def four_fifths_list(feature_importance, cutoff=None):
