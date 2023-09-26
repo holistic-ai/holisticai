@@ -13,8 +13,8 @@ from ..global_importance import (
     importance_spread_ratio,
     surrogate_efficacy,
 )
-from ..utils import check_feature_importance
-from .extractor_utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k
+
+from ..utils import BaseFeatureImportance, GlobalFeatureImportance, get_top_k, check_feature_importance
 
 
 def create_surrogate_model(model_type, x, y):
@@ -57,8 +57,6 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     Returns:
         holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
     """
-    x, y = check_feature_importance(x, y)
-
     y_pred = model.predict(x)
     surrogate = create_surrogate_model(model_type, x, y_pred)
     feature_names = x.columns

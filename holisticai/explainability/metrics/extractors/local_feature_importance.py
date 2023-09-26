@@ -1,121 +1,64 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from lime import lime_tabular
 from tqdm import tqdm
 
-from holisticai.explainability.metrics.feature_importance.local_importance._local_metrics import (
+from holisticai.explainability.metrics.local_importance._local_metrics import (
     dataset_spread_stability,
     features_spread_stability,
 )
-from holisticai.explainability.metrics.feature_importance.utils import (
+
+from ..utils import (
     check_feature_importance,
+    get_index_groups,
+    get_top_k_lime,
+    BaseFeatureImportance,
+    LocalFeatureImportance
 )
 
 from ..local_importance._local_metrics import (
     dataset_spread_stability,
     features_spread_stability,
 )
-from .extractor_utils import (
-    BaseFeatureImportance,
-    LocalFeatureImportance,
-    get_index_groups,
-    get_top_k_lime,
-)
 
-
-def compute_lime_feature_importance(model_type, model, x, y):
-    x, y = check_feature_importance(x, y)
-
-    if model_type == "binary_classification":
-        lime_mode = "classification"
-        scorer = model.predict_proba
-
-    elif model_type == "regression":
-        lime_mode = "regression"
-        scorer = model.predict
-
-    index_groups = get_index_groups(model_type, y)
-    features_importance = lime_creator(
-        scorer=scorer, X=x, index_groups=index_groups, mode=lime_mode
-    )
+def compute_local_feature_importance(model_type, x, y, local_explainer_handler, num_samples=1000):
+    features_importance = compute_local_importants(model_type, x, y, local_explainer_handler, num_samples)
     conditional_features_importance = {
         str(c): gdf for c, gdf in features_importance.groupby("Sample Group")
     }
+    return TabularLocalFeatureImportance(features_importance, conditional_features_importance)
 
-    return LimeFeatureImportance(features_importance, conditional_features_importance)
-
-
-def lime_creator(
-    scorer,
-    X,
-    index_groups=None,
-    num_features=None,
-    num_samples=None,
-    mode="classification",
-):
-    """
-    Parameters
-    ----------
-    scorer: sklearn-like scorer
-        scorer function
-    X: np.array
-        input data
-    index_groups: dict
-        dictionary with groups
-    num_features: int
-        number of features to select
-    num_samples: int
-        number of samples to select
-    mode: str
-        classification or regression
-    """
-    # load and do assignment
-    if num_features is None:
-        num_features = np.min([X.shape[1], 100])
-
-    if num_samples is None:
-        num_samples = np.min([X.shape[0], 1000])
-
+def grouped_sample(X, index_groups, num_samples=1000):
+    num_samples = np.min([X.shape[0], num_samples])
     import random
-
     per_group_sample = int(np.ceil(num_samples / len(index_groups)))
     ids_groups = {
         str(label): random.sample(list(index), min(len(index), per_group_sample))
         for label, index in index_groups.items()
     }
+    return ids_groups
 
-    # calculate lime for several samples
-    explainer = lime_tabular.LimeTabularExplainer(
-        X.values,
-        feature_names=X.columns.tolist(),
-        discretize_continuous=True,
-        mode=mode,
-    )
+def stratified_sample(model_type, X, y, num_samples=1000):
+    group2index = get_index_groups(model_type, y)
+    group2index = grouped_sample(X, group2index, num_samples=num_samples)
+    indexes = [idx for indexes in group2index.values() for idx in indexes]
+    Xsel = X.loc[indexes]
+    return Xsel , {i:k for k,ids in group2index.items() for i in ids}
 
-    df = []
-    for label, indexes in tqdm(ids_groups.items()):
-        for i in indexes:
-            exp = explainer.explain_instance(
-                X.loc[i], scorer, num_features=X.shape[1], num_samples=200
-            )
-            exp_values = list(exp.local_exp.values())[0]
-
-            df_i = pd.DataFrame(exp_values, columns=["Feature Id", "Feature Weight"])
-            df_i["Importance"] = df_i["Feature Weight"].abs()
-            df_i["Importance"] = df_i["Importance"] / df_i["Importance"].sum()
-            df_i["Sample Id"] = i
-            df_i["Feature Label"] = X.columns[df_i["Feature Id"].tolist()]
-            df_i["Feature Rank"] = range(1, df_i.shape[0] + 1)
-            df_i["Sample Group"] = label
-            df.append(df_i)
-
-    df = pd.concat(df, axis=0, ignore_index=True)
-
+def compute_local_importants(model_type, X, y, local_explainer, num_samples=1000):
+    Xsel, index2group = stratified_sample(model_type, X, y, num_samples=num_samples)
+    imp = local_explainer(Xsel)
+    rank = pd.DataFrame(imp.values.argsort(axis=1)+1, index=imp.index, columns=imp.columns)
+    feat_names = imp.columns
+    feat2id = {f:i for i,f in enumerate(feat_names)}
+    df_imp = pd.melt(imp, value_vars=feat_names, ignore_index=False).rename({'variable':'Feature Label', 'value':'Importance'}, axis=1).reset_index(names=['Sample Id'])
+    df_rank = pd.melt(rank, value_vars=feat_names, ignore_index=False).rename({'variable':'Feature Label', 'value':'Feature Rank'}, axis=1).reset_index(names=['Sample Id'])
+    df = pd.merge(left=df_imp, right=df_rank, how='inner', on=['Sample Id', 'Feature Label'])
+    df['Feature Id'] = df['Feature Label'].apply(lambda x:feat2id[x])
+    df["Sample Group"] = df["Sample Id"].apply(lambda x:index2group[x])
     return df
-
-
-class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
+    
+class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
     def __init__(self, importance_weights, conditional_importance_weights):
         self.feature_importance = importance_weights
         self.conditional_feature_importance = conditional_importance_weights
@@ -164,6 +107,11 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
             f_spread_stability = pd.DataFrame(f_spread_stability, index=[0])
             f_spread_stability = f_spread_stability.T.rename(columns={0: "Value"})
         else:
+            def rename_metric(x):
+                if not (x['variable']=='Global'):
+                    return f"{x['index']} {x['variable']}"
+                return f"{x['index']}"
+            
             d_spread_stability = dataset_spread_stability(
                 feature_importance, conditional_feature_importance
             )["result"]
@@ -173,15 +121,15 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
                 d_spread_stability, id_vars=["index"], value_vars=groups
             ).reset_index()
             d_spread_stability["Metric"] = d_spread_stability.apply(
-                lambda x: f"{x['index']} {x['variable']}", axis=1
+                lambda x: rename_metric(x), axis=1
             )
             d_spread_stability.sort_values("index", inplace=True)
             d_spread_stability = d_spread_stability[["Metric", "value"]].set_index(
                 "Metric"
             )
-            d_spread_stability = d_spread_stability.T.rename(
+            d_spread_stability = d_spread_stability.rename(
                 columns={"value": "Value"}
-            ).T
+            )
 
             f_spread_stability = features_spread_stability(
                 feature_importance, conditional_feature_importance
@@ -191,16 +139,17 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
             f_spread_stability = pd.melt(
                 f_spread_stability, id_vars=["index"], value_vars=groups
             ).reset_index()
+            
             f_spread_stability["Metric"] = f_spread_stability.apply(
-                lambda x: f"{x['index']} {x['variable']}", axis=1
+                lambda x: rename_metric(x), axis=1
             )
             f_spread_stability.sort_values("index", inplace=True)
             f_spread_stability = f_spread_stability[["Metric", "value"]].set_index(
                 "Metric"
             )
-            f_spread_stability = f_spread_stability.T.rename(
+            f_spread_stability = f_spread_stability.rename(
                 columns={"value": "Value"}
-            ).T
+            )
 
         metrics = pd.concat([d_spread_stability, f_spread_stability], axis=0)
 
@@ -253,15 +202,16 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
             return df
 
         fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-
+        
         axs[0].set_title("Data Stability")
         df = format_data(data_stability)
         sns.boxplot(data=df, x=metric_name, y="Output", ax=axs[0])
-
+        axs[0].grid()
+        
         axs[1].set_title("Feature Stability")
         df = format_data(feature_stability)
         sns.boxplot(data=df, x=metric_name, y="Output", ax=axs[1])
-        # return axs, data_stability, feature_stability
+        axs[1].grid()
 
     def show_data_stability_boundaries(self, top_n=None, figsize=None):
         if figsize is None:
@@ -279,7 +229,7 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
             all_fimp["feature_importance"].groupby("Feature Label")["Importance"].mean()
         )
 
-        fig, axs = plt.subplots(2, len(spread) - 1, figsize=figsize)
+        fig, axs = plt.subplots(len(spread) - 1, 2, figsize=figsize)
 
         def show_importance(feature_importance, index, ax):
             Q = feature_importance
@@ -297,11 +247,11 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
             min_index = s.idxmin()
 
             if not (g == "Global"):
-                min_values.append(show_importance(cfimp[g], min_index, axs[0, i]))
-                axs[0, i].set_title(f"{g} Min Ratio [{s.loc[min_index]:.3f}]")
+                min_values.append(show_importance(cfimp[g], min_index, axs[i, 0]))
+                axs[i, 0].set_title(f"{g} Min Ratio [{s.loc[min_index]:.3f}]")
 
-                max_values.append(show_importance(cfimp[g], max_index, axs[1, i]))
-                axs[1, i].set_title(f"{g} Max Ratio [{s.loc[max_index]:.3f}]")
+                max_values.append(show_importance(cfimp[g], max_index, axs[i, 1]))
+                axs[i, 1].set_title(f"{g} Max Ratio [{s.loc[max_index]:.3f}]")
 
                 i += 1
 
@@ -311,12 +261,15 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
         xlim = max([xlim0, xlim1])
         for g, s in spread.items():
             if not (g == "Global"):
-                axs[0, i].set_xlim([0, xlim])
-                axs[1, i].set_xlim([0, xlim])
+                axs[i, 0].set_xlim([0, xlim])
+                axs[i, 1].set_xlim([0, xlim])
+                axs[i, 0].grid(True)
+                axs[i, 1].grid(True)
                 i += 1
+        fig.tight_layout()
 
     def show_features_stability_boundaries(self, figsize=None):
-        from holisticai.explainability.metrics.feature_importance.local_importance._local_metrics import (
+        from holisticai.explainability.metrics.local_importance._local_metrics import (
             features_spread_stability,
         )
 
@@ -329,7 +282,7 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
         spread = feature_stability["imp_spread"]
         cfimp = all_fimp["conditional_feature_importance"]
         fimp = all_fimp["feature_importance"]
-        fig, axs = plt.subplots(2, len(spread), figsize=figsize)
+        fig, axs = plt.subplots(len(spread), 2, figsize=figsize)
         max_values = []
         for i, (g, s) in enumerate(spread.items()):
             min_index = s.idxmin()
@@ -342,21 +295,24 @@ class LimeFeatureImportance(BaseFeatureImportance, LocalFeatureImportance):
 
             importances = fi[fi["Feature Label"] == min_index]["Importance"]
             max_value1 = importances.max()
-            importances.plot(kind="hist", ax=axs[0][i])
-            axs[0][i].set_title(f"{g} R[{min_index}]= {s.loc[min_index]:.3f}")
-            axs[0][i].set_xlabel("Importance")
+            importances.plot(kind="hist", ax=axs[i][0])
+            axs[i][0].set_title(f"{g} R[{min_index}]= {s.loc[min_index]:.3f}")
+            axs[i][0].set_xlabel("Importance")
 
             importances = fi[fi["Feature Label"] == max_index]["Importance"]
-            importances.plot(kind="hist", ax=axs[1][i])
+            importances.plot(kind="hist", ax=axs[i][1])
             max_value2 = importances.max()
-            axs[1][i].set_title(f"{g} R[{max_index}]= {s.loc[max_index]:.3f}")
-            axs[1][i].set_xlabel("Importance")
+            axs[i][1].set_title(f"{g} R[{max_index}]= {s.loc[max_index]:.3f}")
+            axs[i][1].set_xlabel("Importance")
 
             max_values.append(max([max_value1, max_value2]))
 
         i = 0
         xlim = max(max_values)
         for g, s in spread.items():
-            axs[0, i].set_xlim([0, xlim])
-            axs[1, i].set_xlim([0, xlim])
+            axs[i, 0].set_xlim([0, xlim])
+            axs[i, 1].set_xlim([0, xlim])
+            axs[i, 0].grid(True)
+            axs[i, 1].grid(True)
             i += 1
+        fig.tight_layout()

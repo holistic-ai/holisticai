@@ -271,7 +271,8 @@ def _matrix_like_to_dataframe(arr, name=""):
     try:
         out = np.squeeze(np.asarray(arr))
         if len(out.shape) == 2:
-            return pd.DataFrame(out)
+            columns = [f"Feature {f}" for f in range(len(out.shape[1]))]
+            return pd.DataFrame(out, columns=columns)
         else:
             raise ValueError("input is not matrix-like.")
     except:

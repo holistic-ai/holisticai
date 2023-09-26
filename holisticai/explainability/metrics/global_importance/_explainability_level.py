@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ..utils import partial_dependence_creator
+from ..utils.explainer_utils import partial_dependence_creator
 
 
 def compute_feature_scores(data, threshold):
