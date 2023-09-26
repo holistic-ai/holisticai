@@ -63,10 +63,5 @@ class WassersteinBarycenterAlgorithm:
         ST = self.sens_groups.transform(sensitive_groups, convert_numeric=True)
         noise = self.eps * np.random.randn(len(y_pred)).squeeze()
         YT = y_pred + noise
-        import time
-
-        tic = time.time()
         YF = np.array([self._update_yt(yt, st) for yt, st in zip(YT, ST)])
-        toc = time.time()
-        print("Time taken: {}".format(toc - tic))
         return YF
