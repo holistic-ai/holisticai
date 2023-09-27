@@ -315,12 +315,11 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
             importances = fi[fi["Feature Label"] == min_index]["Importance"]
             max_value1 = importances.max()
-            importances.plot(kind="hist", ax=axs[i][0])
-            axs[i][0].set_title(f"{g} R[{min_index}]= {s.loc[min_index]:.3f}")
+            importances.plot(kind="hist", ax=axs[i][0], color="mediumslateblue")
             axs[i][0].set_xlabel("Importance")
 
             importances = fi[fi["Feature Label"] == max_index]["Importance"]
-            importances.plot(kind="hist", ax=axs[i][1])
+            importances.plot(kind="hist", ax=axs[i][1], color="mediumslateblue")
             max_value2 = importances.max()
             axs[i][1].set_title(f"{g} R[{max_index}]= {s.loc[max_index]:.3f}")
             axs[i][1].set_xlabel("Importance")
