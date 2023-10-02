@@ -47,10 +47,7 @@ class Explainer:
                 self._strategy_type = "local"
 
             elif strategy_type == "lime":
-                from holisticai.explainability.metrics.utils import (
-                    LimeTabularHandler,
-                    ShapTabularHandler,
-                )
+                from holisticai.explainability.metrics.utils import LimeTabularHandler
 
                 local_explainer_handler = LimeTabularHandler(
                     model.predict,
@@ -168,9 +165,11 @@ class Explainer:
         fimp = importances["feature_importance"]
         self.explainer_handler.show_importance_stability(fimp, cfimp)
 
-    def show_data_stability_boundaries(self, top_n=None, figsize=None):
+    def show_data_stability_boundaries(
+        self, n_rows=2, n_cols=4, top_n=None, figsize=None
+    ):
         self.explainer_handler.show_data_stability_boundaries(
-            top_n=top_n, figsize=figsize
+            n_rows, n_cols, top_n=top_n, figsize=figsize
         )
 
     def feature_importance_table(self, sorted_by="Global", top_n=10):
@@ -206,5 +205,7 @@ class Explainer:
         )
         return dfs
 
-    def show_features_stability_boundaries(self, figsize=None):
-        self.explainer_handler.show_features_stability_boundaries(figsize=figsize)
+    def show_features_stability_boundaries(self, n_cols=4, n_rows=2, figsize=None):
+        self.explainer_handler.show_features_stability_boundaries(
+            n_cols=n_cols, n_rows=n_rows, figsize=figsize
+        )

@@ -233,7 +233,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         sns.boxplot(data=df, x=metric_name, y="Output", ax=axs[1])
         axs[1].grid()
 
-    def show_data_stability_boundaries(self, top_n=None, figsize=None):
+    def show_data_stability_boundaries(self, n_rows, n_cols, top_n=None, figsize=None):
         if figsize is None:
             figsize = (15, 5)
 
@@ -249,7 +249,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             all_fimp["feature_importance"].groupby("Feature Label")["Importance"].mean()
         )
 
-        fig, axs = plt.subplots(len(spread) - 1, 2, figsize=figsize)
+        fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=figsize)
 
         def show_importance(feature_importance, index, ax):
             Q = feature_importance
@@ -267,11 +267,11 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             min_index = s.idxmin()
 
             if not (g == "Global"):
-                min_values.append(show_importance(cfimp[g], min_index, axs[i, 0]))
-                axs[i, 0].set_title(f"{g} Min Ratio [{s.loc[min_index]:.3f}]")
+                min_values.append(show_importance(cfimp[g], min_index, axs[0, i]))
+                axs[0, i].set_title(f"{g} Min Ratio [{s.loc[min_index]:.3f}]")
 
-                max_values.append(show_importance(cfimp[g], max_index, axs[i, 1]))
-                axs[i, 1].set_title(f"{g} Max Ratio [{s.loc[max_index]:.3f}]")
+                max_values.append(show_importance(cfimp[g], max_index, axs[1, i]))
+                axs[1, i].set_title(f"{g} Max Ratio [{s.loc[max_index]:.3f}]")
 
                 i += 1
 
@@ -281,14 +281,14 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         xlim = max([xlim0, xlim1])
         for g, s in spread.items():
             if not (g == "Global"):
-                axs[i, 0].set_xlim([0, xlim])
-                axs[i, 1].set_xlim([0, xlim])
-                axs[i, 0].grid(True)
-                axs[i, 1].grid(True)
+                axs[0, i].set_xlim([0, xlim])
+                axs[1, i].set_xlim([0, xlim])
+                axs[0, i].grid(True)
+                axs[1, i].grid(True)
                 i += 1
         fig.tight_layout()
 
-    def show_features_stability_boundaries(self, figsize=None):
+    def show_features_stability_boundaries(self, n_rows, n_cols, figsize=None):
         from holisticai.explainability.metrics.local_importance._local_metrics import (
             features_spread_stability,
         )
@@ -302,7 +302,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         spread = feature_stability["imp_spread"]
         cfimp = all_fimp["conditional_feature_importance"]
         fimp = all_fimp["feature_importance"]
-        fig, axs = plt.subplots(len(spread), 2, figsize=figsize)
+        fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=figsize)
         max_values = []
         for i, (g, s) in enumerate(spread.items()):
             min_index = s.idxmin()
@@ -315,24 +315,24 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
             importances = fi[fi["Feature Label"] == min_index]["Importance"]
             max_value1 = importances.max()
-            importances.plot(kind="hist", ax=axs[i][0])
-            axs[i][0].set_title(f"{g} R[{min_index}]= {s.loc[min_index]:.3f}")
-            axs[i][0].set_xlabel("Importance")
+            importances.plot(kind="hist", ax=axs[0][i], color="mediumslateblue")
+            axs[0][i].set_title(f"{g} R[{min_index}]= {s.loc[min_index]:.3f}")
+            axs[0][i].set_xlabel("Importance")
 
             importances = fi[fi["Feature Label"] == max_index]["Importance"]
-            importances.plot(kind="hist", ax=axs[i][1])
+            importances.plot(kind="hist", ax=axs[1][i], color="mediumslateblue")
             max_value2 = importances.max()
-            axs[i][1].set_title(f"{g} R[{max_index}]= {s.loc[max_index]:.3f}")
-            axs[i][1].set_xlabel("Importance")
+            axs[1][i].set_title(f"{g} R[{max_index}]= {s.loc[max_index]:.3f}")
+            axs[1][i].set_xlabel("Importance")
 
             max_values.append(max([max_value1, max_value2]))
 
         i = 0
         xlim = max(max_values)
         for g, s in spread.items():
-            axs[i, 0].set_xlim([0, xlim])
-            axs[i, 1].set_xlim([0, xlim])
-            axs[i, 0].grid(True)
-            axs[i, 1].grid(True)
+            axs[0, i].set_xlim([0, xlim])
+            axs[1, i].set_xlim([0, xlim])
+            axs[0, i].grid(True)
+            axs[1, i].grid(True)
             i += 1
         fig.tight_layout()

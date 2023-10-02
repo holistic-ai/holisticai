@@ -23,6 +23,7 @@ class GlobalFeatureImportance:
             "random_state": 0,
             "kind": "average",
             "percentiles": percentiles,
+            "line_kw": {"color": "mediumslateblue", "label": "Average"},
         }
 
         common_params.update(plot_kargs)
@@ -36,7 +37,6 @@ class GlobalFeatureImportance:
             **common_params,
         )
         pdp.figure_.suptitle(title)
-        plt.show()
 
 
 class LocalFeatureImportance:

@@ -38,3 +38,15 @@ class ShapTabularHandler:
         values = self.explainer(Xsel).values
         importances = abs(values) / abs(values).sum(axis=1, keepdims=True)
         return pd.DataFrame(importances, columns=Xsel.columns, index=Xsel.index)
+
+
+class ShapTextHandler:
+    def __init__(self, *args, **kargs):
+        import shap
+
+        self.explainer = shap.Explainer(*args, **kargs)
+
+    def __call__(self, Xsel):
+        values = self.explainer(Xsel).values
+        importances = abs(values) / abs(values).sum(axis=1, keepdims=True)
+        return pd.DataFrame(importances, columns=Xsel.columns, index=Xsel.index)

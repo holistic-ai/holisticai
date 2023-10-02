@@ -17,41 +17,41 @@ from sklearn.preprocessing import StandardScaler
 
 from holisticai.datasets import load_adult, load_us_crime
 
-# a classic housing price dataset
-X, y = shap.datasets.california(n_points=1000)
+# Dataset
+dataset = load_adult()
 
-X100 = shap.utils.sample(X, 100)  # 100 instances for use as the background distribution
+# Dataframe
+df = pd.concat([dataset["data"], dataset["target"]], axis=1)
+protected_variables = ["sex", "race"]
+output_variable = ["class"]
+
+# Simple preprocessing
+y = df[output_variable].replace({">50K": 1, "<=50K": 0})
+X = pd.get_dummies(
+    df.drop(protected_variables + output_variable, axis=1), dtype="float"
+)
+
+y = y.iloc[:100, :]
+X = X.iloc[:100, :]
 
 # a simple linear model
-model = sklearn.linear_model.LinearRegression()
+model = LogisticRegression()
 model.fit(X, y)
-# compute the SHAP values for the linear model
-explainer = shap.Explainer(model.predict, X100)
-shap_values = explainer(X).values
-
-y_pred = model.predict(X)
 
 from holisticai.explainability import Explainer
-from holisticai.explainability.metrics.utils import (
-    LimeTabularHandler,
-    ShapTabularHandler,
-)
 
-local_explainer_handler = LimeTabularHandler(
-    model.predict,
-    X.values,
-    feature_names=X.columns.tolist(),
-    discretize_continuous=True,
-    mode="regression",
-)
-
-lime_explainer_metrics = Explainer(
+explainer = Explainer(
     based_on="feature_importance",
-    strategy_type="local",
-    model_type="regression",
+    strategy_type="lime",
+    model_type="binary_classification",
+    model=model,
     x=X,
-    y=y_pred,
-    local_explainer_handler=local_explainer_handler,
+    y=y,
 )
 
-lime_explainer_metrics.metrics(detailed=True)
+import matplotlib.pyplot as plt
+
+explainer.show_features_stability_boundaries(ncols=2, figsize=(15, 5))
+plt.show()
+explainer.show_data_stability_boundaries(top_n=10, ncols=2, figsize=(15, 5))
+plt.show()
