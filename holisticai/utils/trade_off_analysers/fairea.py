@@ -10,12 +10,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from holisticai.bias.metrics import average_odds_diff, statistical_parity
+from holisticai.utils._validation import _check_same_shape
 
 from .utils_fairea import (
     do_line_segments_intersect,
     get_area,
     get_baseline_bounds,
-    get_closer_bounds,
     line,
 )
 
@@ -33,8 +33,11 @@ class Fairea:
         verbose=False,
     ):
         """
-        Creates the object for the fairea class. This class is used to
-        calculate the trade-off between accuracy and fairness of a model.
+        Creates the object for the fairea class. This class is used to calculate
+        the trade-off between accuracy and fairness of a classification model.
+
+        Description
+        -----------
         This is done by creating a baseline model for the dataset by mutating
         predictions of the original model and then adding models with mitigation
         that are compared with the baseline model. Finally, the trade-off is
@@ -44,15 +47,23 @@ class Fairea:
 
         Parameters
         ----------
-        fair_metric: fairness metric to be used: statistical parity (sp) or
-                        average odds difference (aod)
-        acc_metric: accuracy metric to be used: accuracy (acc) or roc-auc (auc)
-        data_splits: number of splits to be used for cross-validation
-        repetitions: number of repetitions of mutation to be performed
-        odds: dictionary of odds to be used for mutation
-        options: list of options to be used for mutation
-        degrees: number of degrees to be used for mutation
-        verbose: whether to print the progress or not
+        fair_metric: string
+                    fairness metric to be used: statistical parity (sp) or
+                    average odds difference (aod)
+        acc_metric: string
+                    accuracy metric to be used: accuracy (acc) or roc-auc (auc)
+        data_splits: int
+                    number of splits to be used for cross-validation
+        repetitions: int
+                    number of repetitions of mutation to be performed
+        odds: dict
+                dictionary of odds to be used for mutation
+        options: list
+                list of options to be used for mutation
+        degrees: int
+                number of degrees to be used for mutation
+        verbose: boolean
+                whether to print the progress or not
 
         """
         self.data_splits = data_splits
@@ -79,11 +90,17 @@ class Fairea:
 
         Parameters
         ----------
-        x: input data
-        y: target data
-        group_a: protected attribute for group a
-        group_b: protected attribute for group b
+        x: array, shape=(n_samples, n_features)
+            input data
+        y: array, shape=(n_samples)
+            target data
+        group_a: array, shape=(n_samples)
+                protected attribute for group a
+        group_b: array, shape=(n_samples)
+                protected attribute for group b
         """
+        _check_same_shape([group_a, group_b, x, y], names="group_a, group_b, x, y")
+
         self.baseline_acc, self.baseline_fairness = self.__create_baseline(
             x, y, group_a, group_b
         )
@@ -108,10 +125,14 @@ class Fairea:
 
         Parameters
         ----------
-        preds: predictions of the model
-        to_mutate: number of labels to mutate
-        ids: ids of the predictions to be mutated
-        o: odds to be used for mutation
+        preds: array, shape=(n_samples)
+            predictions of the model
+        to_mutate: int
+            number of labels to mutate
+        ids: list
+            ids of the predictions to be mutated
+        o: list
+            odds to be used for mutation
 
         Returns
         -------
@@ -131,10 +152,14 @@ class Fairea:
 
         Parameters
         ----------
-        x: input data
-        y: target data
-        group_a: protected attribute for group a
-        group_b: protected attribute for group b
+        x: array, shape=(n_samples, n_features)
+            input data
+        y: array, shape=(n_samples)
+            target data
+        group_a: array, shape=(n_samples)
+            protected attribute for group a
+        group_b: array, shape=(n_samples)
+            protected attribute for group b
 
         Returns
         -------
@@ -212,21 +237,30 @@ class Fairea:
         )
         return acc_base, fair_base
 
-    def add_mitigator(self, model_name, y_test, y_pred, group_a_ts, group_b_ts):
+    def add_scores(self, model_name, y_true, y_pred, group_a_ts, group_b_ts):
         """
-        Adds a new model to be compared with the baseline model.
+        Adds the scores of a new model to be compared with the baseline model.
 
         Parameters
         ----------
-        clf: model to be added
-        y_test: target data
-        group_a_ts: protected attribute for group a
-        group_b_ts: protected attribute for group b
-        model_name: name of the model to be added
+        model_name: str
+                name of the model to be added
+        y_true: array, shape=(n_samples)
+                target data
+        y_pred: array, shape=(n_samples)
+                predictions of the model
+        group_a_ts: array, shape=(n_samples)
+                protected attribute for group a
+        group_b_ts: array, shape=(n_samples)
+                protected attribute for group b
         """
-        acc = self.acc_fn(y_test, y_pred)
+        _check_same_shape(
+            [group_a_ts, group_b_ts, y_pred, y_true],
+            names="group_a, group_b, y_pred, y_true",
+        )
+        acc = self.acc_fn(y_true, y_pred)
         if self.fair_metric == "aod":
-            fair = abs(self.fair_fn(group_a_ts, group_b_ts, y_pred, y_test))
+            fair = abs(self.fair_fn(group_a_ts, group_b_ts, y_pred, y_true))
         else:
             fair = abs(self.fair_fn(group_a_ts, group_b_ts, y_pred))
         self.methods[model_name] = (fair, acc)
@@ -243,10 +277,16 @@ class Fairea:
 
         Parameters
         ----------
-        cmap: color map to be used for plotting
-        ax: axis to be used for plotting
-        size: size of the plot
-        title: title of the plot
+        cmap: string
+            color map to be used for plotting
+        ax: matplotlib axis
+            axis to be used for plotting
+        size: tuple
+            size of the plot
+        title: string
+            title of the plot
+        normalize: boolean
+            whether to normalize the data or not
         """
         if ax is None:
             fig, ax = plt.subplots(figsize=size)
@@ -286,11 +326,16 @@ class Fairea:
 
         Parameters
         ----------
-        cmap: color map to be used for plotting
-        ax: axis to be used for plotting
-        size: size of the plot
-        title: title of the plot
-        normalize: whether to normalize the data or not
+        cmap: string
+            color map to be used for plotting
+        ax: matplotlib axis
+            axis to be used for plotting
+        size: tuple
+            size of the plot
+        title: string
+            title of the plot
+        normalize: boolean
+            whether to normalize the data or not
         """
         if ax is None:
             fig, ax = plt.subplots(figsize=size)
@@ -339,9 +384,12 @@ class Fairea:
 
         Parameters
         ----------
-        p: point of the model
-        fairness_norm: normalized fairness of the model
-        acc_norm: normalized accuracy of the model
+        p: tuple
+            point of the model
+        fairness_norm: list
+            normalized fairness of the model
+        acc_norm: list
+            normalized accuracy of the model
 
         Returns
         -------
