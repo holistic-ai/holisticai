@@ -18,7 +18,7 @@ For metrics, you can use the default installation:
 
 ```bash
 pip install holisticai
-pip install holisticai[bias_mitigators] # For bias visualization and mitigation
+pip install holisticai[bias] # For bias visualization and mitigation
 pip install holisticai[explainability] # For explainability metrics
 ```
 

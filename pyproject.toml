@@ -26,7 +26,7 @@ shap = {version=">=0.42.1",  optional = true}
 lime = {version=">=0.2.0.1",  optional = true}
 
 [tool.poetry.extras]
-bias_mitigators = ["tqdm", "cvxpy", "cvxopt", "seaborn", "networkx"]
+bias = ["tqdm", "cvxpy", "cvxopt", "seaborn", "networkx"]
 explainability = ["shap","lime"]
 
 [tool.poetry.group.dev.dependencies]
