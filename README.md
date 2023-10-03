@@ -18,11 +18,10 @@ For metrics, you can use the default installation:
 
 ```bash
 pip install holisticai
+pip install holisticai[bias_mitigators] # For bias visualization and mitigation
+pip install holisticai[explainability] # For explainability metrics
 ```
-For bias visualization and mitigation, you need additional dependencies. You can install them with:
- ```bash
-pip install holisticai[methods]
-```
+
 ## Troubleshooting
 on **macOS** could be necessary some packages before install holisticai library:
 ```bash
