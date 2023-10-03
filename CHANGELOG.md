@@ -1,3 +1,15 @@
+## 0.7.0 (2023-10-03)
+
+### Feat
+- New Technical Risk Module: Explainability
+    - Global Metrics based on: Permutation Feature Importance and Surrogate Feature Importance
+    - Local Metrics based on: Lime and Shap
+- Individual Bias Metrics for classification and regression.
+
+### Fix
+- Improving PluginEstimationCalibration and update docstrings
+- Clean code in Bias Mitigators
+
 ## 0.6.0 (2023-07-14)
 
 ### Feat
@@ -7,7 +19,6 @@
 
 ### Fix
 - Resolve conflicts with sklearn>=1.2.2
-- 
 
 ## 0.5.0 (2023-06-27)
 

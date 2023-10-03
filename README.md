@@ -21,7 +21,7 @@ pip install holisticai
 ```
 For bias visualization and mitigation, you need additional dependencies. You can install them with:
  ```bash
-pip install holisticai[methods]
+pip install holisticai[bias]
 ```
 ## Troubleshooting
 on **macOS** could be necessary some packages before install holisticai library:

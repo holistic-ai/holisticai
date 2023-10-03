@@ -1,5 +1,5 @@
 [tool.commitizen]
-version = "0.6.0"
+version = "0.7.0"
 changelog_incremental = true
 version_files = [
     "pyproject.toml:version"
@@ -7,7 +7,7 @@ version_files = [
 
 [tool.poetry]
 name = "holisticai"
-version = "0.6.0"
+version = "0.7.0"
 description = "Holistic AI Library"
 authors = ["Research Team"]
 maintainers = ["Research Team <researchteam@holisticai.com>"]
