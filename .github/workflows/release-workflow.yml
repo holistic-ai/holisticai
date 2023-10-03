@@ -34,4 +34,4 @@ jobs:
           poetry config pypi-token.pypi $pypi_token
       - name: Deploy to PyPI
         run: |
-          poetry publish --build
+          poetry publish --build --skip-existing
