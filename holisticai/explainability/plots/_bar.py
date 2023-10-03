@@ -58,4 +58,3 @@ def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
     )
     ax.set_title(title)
     plt.tight_layout()
-    plt.show()

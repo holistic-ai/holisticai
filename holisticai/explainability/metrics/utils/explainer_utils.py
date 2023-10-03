@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from lime import lime_tabular
 from sklearn.inspection import PartialDependenceDisplay
 
 from holisticai.utils._validation import (
@@ -9,7 +8,7 @@ from holisticai.utils._validation import (
 )
 
 
-def check_feature_importance(x, y):
+def check_feature_importance(x, y, values=None):
     if not isinstance(x, pd.DataFrame):
         x = _matrix_like_to_dataframe(x)
 
@@ -18,7 +17,15 @@ def check_feature_importance(x, y):
 
     if not y.index.equals(x):
         y.index = x.index
-    return x, y
+
+    if values is None:
+        return x, y
+    else:
+        if not isinstance(x, pd.DataFrame):
+            values = pd.DataFrame(values, columns=x.columns, index=x.index)
+        else:
+            values.index = x.index
+        return x, y, values
 
 
 def four_fifths_list(feature_importance, cutoff=None):

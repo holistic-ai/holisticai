@@ -4,10 +4,6 @@ import pandas as pd
 import seaborn as sns
 from sklearn.inspection import permutation_importance
 
-from holisticai.explainability.metrics.feature_importance.utils import (
-    check_feature_importance,
-)
-
 from ..global_importance import (
     fourth_fifths,
     global_explainability_ease_score,
@@ -17,7 +13,7 @@ from ..global_importance import (
     importance_spread_divergence,
     importance_spread_ratio,
 )
-from .extractor_utils import (
+from ..utils import (
     BaseFeatureImportance,
     GlobalFeatureImportance,
     get_index_groups,
@@ -53,8 +49,6 @@ def feature_importance(model, x, y):
 
 
 def compute_permutation_feature_importance(model_type, model, x, y):
-    x, y = check_feature_importance(x, y)
-
     # Feature Importance
     features_importance = feature_importance(model, x, y)
 

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ..utils import feature_importance_spread, four_fifths_list
+from ..utils.explainer_utils import feature_importance_spread, four_fifths_list
 from ._contrast_metrics import feature_importance_contrast
 from ._explainability_level import explainability_ease_score
 from ._surrogate_efficacy_metrics import compute_surrogate_efficacy_metrics

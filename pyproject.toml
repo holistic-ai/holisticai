@@ -25,7 +25,7 @@ networkx = {version=">=3.1",  optional = true}
 lime = "^0.2.0.1"
 
 [tool.poetry.extras]
-methods = ["tqdm", "cvxpy", "cvxopt", "seaborn", "networkx"]
+bias = ["tqdm", "cvxpy", "cvxopt", "seaborn", "networkx"]
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^5.0.4"

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from holisticai.explainability.metrics.feature_importance.utils import (
+from holisticai.explainability.metrics.utils.explainer_utils import (
     gini_coefficient,
     importance_spread,
 )
