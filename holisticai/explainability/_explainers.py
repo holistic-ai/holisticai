@@ -47,8 +47,8 @@ class Explainer:
                 self._strategy_type = "local"
 
             elif strategy_type == "lime":
-                self.check_installed_package('lime')
-                
+                self.check_installed_package("lime")
+
                 from holisticai.explainability.metrics.utils import LimeTabularHandler
 
                 local_explainer_handler = LimeTabularHandler(
@@ -64,7 +64,7 @@ class Explainer:
                 self._strategy_type = "local"
 
             elif strategy_type == "shap":
-                self.check_installed_package('shap')
+                self.check_installed_package("shap")
                 import shap
 
                 from holisticai.explainability.metrics.utils import ShapTabularHandler
@@ -88,7 +88,6 @@ class Explainer:
             raise (
                 "Package {backend} must be installed. Please install with: pip install {backend}"
             )
-
 
     def __getitem__(self, key):
         return self.metric_values.loc[key]["Value"]
