@@ -218,7 +218,9 @@ class Explainer:
         )
         return dfs
 
-    def show_features_stability_boundaries(self, n_cols=None, n_rows=None, figsize=None):
+    def show_features_stability_boundaries(
+        self, n_cols=None, n_rows=None, figsize=None
+    ):
         self.explainer_handler.show_features_stability_boundaries(
             n_cols=n_cols, n_rows=n_rows, figsize=figsize
         )

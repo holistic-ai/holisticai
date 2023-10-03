@@ -302,11 +302,11 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         spread = feature_stability["imp_spread"]
         cfimp = all_fimp["conditional_feature_importance"]
         fimp = all_fimp["feature_importance"]
-                
+
         if n_cols is None:
             n_cols = len(spread)
             n_rows = 2
-            
+
         fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=figsize)
         max_values = []
         for i, (g, s) in enumerate(spread.items()):
