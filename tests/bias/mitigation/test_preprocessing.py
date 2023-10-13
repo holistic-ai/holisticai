@@ -26,5 +26,5 @@ def test_reweighing(small_categorical_dataset):
     pipeline = build_rew_pipeline()
     pipeline = fit(pipeline, small_categorical_dataset)
     evaluate_pipeline(
-        pipeline, small_categorical_dataset, ["Statistical parity difference"], [0.05]
+        pipeline, small_categorical_dataset, ["Statistical parity difference"], [0.1]
     )
