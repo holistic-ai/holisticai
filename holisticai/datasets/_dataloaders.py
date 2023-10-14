@@ -150,6 +150,7 @@ def load_adult(data_home=None, return_X_y=False, as_frame=True):
             contains the target samples.  If `as_frame=True`, both arrays are pandas
             objects, i.e. `X` a dataframe and `y` a series.
     """
+
     if data_home is None:
         data_home = get_data_home()
 
