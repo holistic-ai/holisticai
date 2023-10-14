@@ -17,11 +17,9 @@ Currently, the library offers a set of techniques to easily measure and mitigate
 For metrics, you can use the default installation:
 
 ```bash
-pip install holisticai
-```
-For bias visualization and mitigation, you need additional dependencies. You can install them with:
- ```bash
-pip install holisticai[bias]
+pip install holisticai # basic installation
+pip install holisticai[bias] # bias mitigation support
+pip install holisticai[all] # install all packages for bias and explainability
 ```
 ## Troubleshooting
 on **macOS** could be necessary some packages before install holisticai library:
