@@ -22,6 +22,40 @@ warnings.filterwarnings("ignore")
 
 class Explainer:
     def __init__(self, based_on, strategy_type, model_type, x, y, **kargs):
+        """
+        The Explainer class is designed to compute various feature importance strategies and explainability metrics based on different types of models.
+
+        Parameters
+        ----------
+        based_on: str
+            Indicates the basis for explainability computation. It can be "feature_importance".
+
+        strategy_type: str
+            The strategy to be used for explainability computation, such as "permutation", "surrogate", "local", "lime", or "shap".
+
+        model_type: str
+            The type of model used for explainability.
+
+        x: matrix-like
+            The feature dataset.
+
+        y: array-like
+            The target dataset.
+
+        **kargs: Additional arguments specific to each explainability strategy.
+
+        Note:
+        - This class supports various explainability strategies, including permutation, surrogate, local, Lime, and Shap, depending on the provided options.
+        - The primary goal is to provide a convenient interface for computing and storing feature importance explanations and explainability metrics for machine learning models.
+
+        Example usage:
+
+        ```
+        explainer = Explainer(based_on="feature_importance", strategy_type="permutation", model_type="regression", x=X, y=y, model=my_model)
+        explainer.metrics()
+        ```
+        """
+
         self.model_type = model_type
         model = kargs.get("model", None)
 
@@ -149,12 +183,15 @@ class Explainer:
 
     def tree_visualization(self, backend, **kargs):
         """
-        Aditional parameters:
-        for backend:
-            sklearn: check sklearn.tree.plot_tree input parameters.
-            pydotplus: check export_graphviz input parameters.
-            dtreeviz: check dtreeviz.model.view input parameters.
+        Parameters
+        ----------
+
+        backend: str
+            - sklearn: check sklearn.tree.plot_tree input parameters.
+            - pydotplus: check export_graphviz input parameters.
+            - dtreeviz: check dtreeviz.model.view input parameters.
         """
+
         return self.explainer_handler.tree_visualization(backend, **kargs)
 
     def contrast_visualization(self, show_connections=False):

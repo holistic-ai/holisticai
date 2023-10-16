@@ -21,6 +21,7 @@ from .inprocessing import (
 
 # postprocessing algorithm classes
 from .postprocessing import (
+    MCMF,
     CalibratedEqualizedOdds,
     DebiasingExposure,
     EqualizedOdds,
@@ -70,6 +71,7 @@ __all__ = [
     "FairScoreClassifier",
     "DebiasingExposure",
     "FairTopK",
+    "MCMF",
 ]
 
 import importlib
