@@ -1,35 +1,17 @@
 import os
-import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
+from testing_utils.tests_utils import small_recommender_dataset
+
+from holisticai.bias.mitigation import FairRec
 
 np.random.seed(42)
 
 
-def test_two_sided_fairness():
-    from holisticai.datasets import load_last_fm
-    from holisticai.utils import recommender_formatter
-
-    bunch = load_last_fm()
-    lastfm = bunch["frame"]
-    lastfm["score"] = 1
-    lastfm = lastfm.iloc[:100]
-    df_pivot, p_attr = recommender_formatter(
-        lastfm,
-        users_col="user",
-        groups_col="sex",
-        items_col="artist",
-        scores_col="score",
-        aggfunc="mean",
-    )
-    data_matrix = df_pivot.fillna(0).to_numpy()
+def test_two_sided_fairness(small_recommender_dataset):
+    data_matrix, _ = small_recommender_dataset
     numUsers, _ = data_matrix.shape
 
-    from holisticai.bias.mitigation import FairRec
-
-    # size of recommendation
     rec_size = 10
 
     for alpha in np.arange(0, 1, 0.1):
