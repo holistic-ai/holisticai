@@ -6,7 +6,7 @@ import warnings
 
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import check_results, small_categorical_dataset
+from testing_utils.tests_utils import check_results, small_clustering_dataset
 
 from holisticai.bias.metrics import clustering_bias_metrics
 from holisticai.bias.mitigation import VariationalFairClustering
@@ -17,8 +17,8 @@ warnings.filterwarnings("ignore")
 seed = 42
 
 
-def running_without_pipeline(small_categorical_dataset):
-    train_data, test_data = small_categorical_dataset
+def running_without_pipeline(small_clustering_dataset):
+    train_data, test_data = small_clustering_dataset
     X, y, group_a, group_b = train_data
 
     scaler = StandardScaler()
@@ -39,8 +39,8 @@ def running_without_pipeline(small_categorical_dataset):
     return df
 
 
-def running_with_pipeline(small_categorical_dataset):
-    train_data, test_data = small_categorical_dataset
+def running_with_pipeline(small_clustering_dataset):
+    train_data, test_data = small_clustering_dataset
     pipeline = Pipeline(
         steps=[
             ("scaler", StandardScaler()),
@@ -66,9 +66,9 @@ def running_with_pipeline(small_categorical_dataset):
     return df
 
 
-def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
+def test_reproducibility_with_and_without_pipeline(small_clustering_dataset):
     np.random.seed(seed)
-    df1 = running_without_pipeline(small_categorical_dataset)
+    df1 = running_without_pipeline(small_clustering_dataset)
     np.random.seed(seed)
-    df2 = running_with_pipeline(small_categorical_dataset)
+    df2 = running_with_pipeline(small_clustering_dataset)
     check_results(df1, df2)
