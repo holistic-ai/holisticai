@@ -258,6 +258,16 @@ def small_regression_dataset():
     return load_test_dataset("regression", "small")
 
 
+@pytest.fixture
+def small_clustering_dataset():
+    return load_test_dataset("clustering", "small")
+
+
+@pytest.fixture
+def small_recommender_dataset():
+    return load_test_dataset("recommender", "small")
+
+
 def fit(model, small_categorical_dataset):
     train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
