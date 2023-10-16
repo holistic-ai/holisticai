@@ -486,8 +486,3 @@ def load_test_dataset(dataset="binary", size="small"):
         return process_recommender_dataset(size=size)
     else:
         raise ValueError(f"Unknown dataset: {dataset}")
-
-
-@pytest.fixture
-def load_small_categorical_dataset():
-    return load_test_dataset("binary", "small")
