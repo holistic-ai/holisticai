@@ -2,14 +2,13 @@ import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_data_utils import load_preprocessed_adult
 from testing_utils.tests_utils import evaluate_pipeline, fit, small_categorical_dataset
 
 from holisticai.pipeline import Pipeline
 
 
 def check_postprocessing_prediction(model, small_categorical_dataset):
-    train_data, test_data = small_categorical_dataset
+    train_data, _ = small_categorical_dataset
     X, y, group_a, group_b = train_data
 
     fit_params = {"bm__group_a": group_a, "bm__group_b": group_b}
