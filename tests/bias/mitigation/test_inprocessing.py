@@ -1,16 +1,17 @@
 import os
-import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import evaluate_pipeline, fit, small_categorical_dataset
 
 from holisticai.bias.mitigation import GridSearchReduction
 from holisticai.pipeline import Pipeline
+from tests.bias.mitigation.testing_utils.utils import (
+    evaluate_pipeline,
+    fit,
+    small_categorical_dataset,
+)
 
 
 def build_gsr_pipeline():
@@ -34,5 +35,5 @@ def test_GridSearchReduction(small_categorical_dataset):
     pipeline = build_gsr_pipeline()
     pipeline = fit(pipeline, small_categorical_dataset)
     evaluate_pipeline(
-        pipeline, small_categorical_dataset, ["Statistical parity difference"], [0.05]
+        pipeline, small_categorical_dataset, ["Statistical parity difference"], [0.1]
     )

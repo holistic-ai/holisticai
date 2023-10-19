@@ -10,12 +10,15 @@ import pandas as pd
 from numpy.testing import assert_array_almost_equal
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import check_results, small_categorical_dataset
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.bias.mitigation import Reweighing
 from holisticai.pipeline import Pipeline
 from holisticai.utils import extract_columns
+from tests.bias.mitigation.testing_utils.utils import (
+    check_results,
+    small_categorical_dataset,
+)
 
 warnings.filterwarnings("ignore")
 

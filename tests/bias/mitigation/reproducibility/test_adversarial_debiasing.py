@@ -5,10 +5,13 @@ sys.path.append(os.getcwd())
 
 import pytest
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import check_results, small_categorical_dataset
 
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.pipeline import Pipeline
+from tests.bias.mitigation.testing_utils.utils import (
+    check_results,
+    small_categorical_dataset,
+)
 
 seed = 42
 
