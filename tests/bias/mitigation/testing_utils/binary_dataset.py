@@ -2,7 +2,7 @@ import pandas as pd
 
 from holisticai.datasets import load_adult
 
-from .tests_data_utils import (
+from .data_utils import (
     get_protected_values,
     post_process_dataframe,
     post_process_dataset,

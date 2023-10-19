@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from .tests_data_utils import post_process_dataframe, post_process_dataset
-from .tests_regression_dataset import process_regression_dataset
+from .data_utils import post_process_dataframe, post_process_dataset
+from .regression_dataset import process_regression_dataset
 
 
 def convert_float_to_categorical(target, nb_classes, numeric_classes=True):

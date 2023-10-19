@@ -3,7 +3,7 @@ import pandas as pd
 
 from holisticai.datasets import load_us_crime
 
-from .tests_data_utils import post_process_dataframe, post_process_dataset, remove_nans
+from .data_utils import post_process_dataframe, post_process_dataset, remove_nans
 
 
 def preprocess_us_crime_dataset(df, protected_attribute, threshold=0.5):

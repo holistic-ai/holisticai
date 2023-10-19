@@ -2,12 +2,12 @@ import pandas as pd
 import pytest
 from sklearn import metrics
 
-from .tests_binary_dataset import process_binary_dataset
-from .tests_clustering_dataset import process_clustering_dataset
-from .tests_data_utils import MetricsHelper
-from .tests_multiclass_dataset import process_multiclass_dataset
-from .tests_recommender_dataset import process_recommender_dataset
-from .tests_regression_dataset import process_regression_dataset
+from .binary_dataset import process_binary_dataset
+from .clustering_dataset import process_clustering_dataset
+from .data_utils import MetricsHelper
+from .multiclass_dataset import process_multiclass_dataset
+from .recommender_dataset import process_recommender_dataset
+from .regression_dataset import process_regression_dataset
 
 # dictionnary of metrics
 metrics_dict = {
