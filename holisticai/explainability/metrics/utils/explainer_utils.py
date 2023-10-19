@@ -28,17 +28,17 @@ def check_feature_importance(x, y, values=None):
         return x, y, values
 
 
-def four_fifths_list(feature_importance, cutoff=None):
+def alpha_importance_list(feature_importance, alpha=None):
     """
     Parameters
     ----------
     feature_importance: np.array
         array with raw feature importance
-    cutoff: float
+    alpha: float
         threshold for feature importance
     """
-    if cutoff is None:
-        cutoff = 0.80
+    if alpha is None:
+        alpha = 0.8
 
     importance = feature_importance["Importance"]
     feature_names = feature_importance["Variable"]
@@ -46,7 +46,27 @@ def four_fifths_list(feature_importance, cutoff=None):
     feature_weight = importance / sum(importance)
 
     # entropy or divergence
-    return feature_names.loc[(feature_weight.cumsum() < cutoff).values]
+    return feature_names.loc[(feature_weight < alpha).values]
+
+
+def alpha_importance_list_lime(
+    feature_importance, feature_importance_names, alpha=None
+):
+    """
+    Parameters
+    ----------
+    feature_importance: np.array
+        array with raw feature importance
+    feature_importance_names: list
+        list with names
+    alpha: float
+        threshold for feature importance
+    """
+    if alpha is None:
+        alpha = 0.80
+
+    feature_weight = feature_importance / sum(feature_importance)
+    return feature_importance_names.loc[(feature_weight.cumsum() < alpha).values]
 
 
 def feature_importance_spread(

@@ -16,8 +16,8 @@ from ..global_importance import (
 from ..utils import (
     BaseFeatureImportance,
     GlobalFeatureImportance,
+    get_alpha,
     get_index_groups,
-    get_top_k,
 )
 
 
@@ -89,23 +89,20 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
         self.conditional_feature_importance = conditional_importance_weights
         self.index_groups = index_groups
 
-    def get_topk(self, top_k):
-        if top_k is None:
+    def get_alpha_feature_importance(self, alpha):
+        if alpha is None:
             feat_imp = self.feature_importance
             cond_feat_imp = self.conditional_feature_importance
         else:
-            feat_imp = get_top_k(self.feature_importance, top_k)
+            feat_imp = get_alpha(self.feature_importance, alpha)
             cond_feat_imp = {
-                label: get_top_k(value, top_k)
+                label: get_alpha(value, alpha)
                 for label, value in self.conditional_feature_importance.items()
             }
 
-        return {
-            "feature_importance": feat_imp,
-            "conditional_feature_importance": cond_feat_imp,
-        }
+        return feat_imp, cond_feat_imp
 
-    def metrics(self, feature_importance, conditional_feature_importance, detailed):
+    def metrics(self, alpha, detailed):
 
         reference_values = {
             "Fourth Fifths": 0,
@@ -116,23 +113,20 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
             "Global Similarity Score": 1,
             "Global Explainability Ease Score": 1,
         }
+        alpha_feat_imp, alpha_cond_feat_imp = self.get_alpha_feature_importance(alpha)
 
         metrics = pd.concat(
             [
-                fourth_fifths(feature_importance),
-                importance_spread_divergence(feature_importance),
-                importance_spread_ratio(feature_importance),
-                global_overlap_score(
-                    feature_importance, conditional_feature_importance, detailed
-                ),
+                fourth_fifths(self.feature_importance),
+                importance_spread_divergence(self.feature_importance),
+                importance_spread_ratio(self.feature_importance),
+                global_overlap_score(alpha_feat_imp, alpha_cond_feat_imp, detailed),
                 global_range_overlap_score(
-                    feature_importance, conditional_feature_importance, detailed
+                    alpha_feat_imp, alpha_cond_feat_imp, detailed
                 ),
-                global_similarity_score(
-                    feature_importance, conditional_feature_importance, detailed
-                ),
+                global_similarity_score(alpha_feat_imp, alpha_cond_feat_imp, detailed),
                 global_explainability_ease_score(
-                    self.model_type, self.model, self.x, self.y, feature_importance
+                    self.model_type, self.model, self.x, self.y, self.feature_importance
                 ),
             ],
             axis=0,

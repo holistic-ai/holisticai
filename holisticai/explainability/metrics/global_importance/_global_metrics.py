@@ -1,18 +1,24 @@
 import pandas as pd
 
-from ..utils.explainer_utils import feature_importance_spread, four_fifths_list
+from ..utils.explainer_utils import alpha_importance_list, feature_importance_spread
 from ._contrast_metrics import feature_importance_contrast
 from ._explainability_level import explainability_ease_score
 from ._surrogate_efficacy_metrics import compute_surrogate_efficacy_metrics
 
 
-def fourth_fifths(feature_importance):
-    feat_id = four_fifths_list(feature_importance)
-    len_80 = len(feat_id)
+def alpha_importance(feature_importance, alpha=0.8):
+    feat_id = alpha_importance_list(feature_importance, alpha)
+    len_alpha = len(feat_id)
     len_100 = len(feature_importance)
-    len_80_100 = len_80 / len_100
-    pfi_80_100 = pd.DataFrame({"Fourth Fifths": [len_80_100]})
-    return pfi_80_100.T.rename(columns={0: "Value"})
+    len_alpha_100 = len_alpha / len_100
+    pfi_alpha_100 = pd.DataFrame({"Alpha Importance": [len_alpha_100]})
+    return pfi_alpha_100.T.rename(columns={0: "Value"})
+
+
+def fourth_fifths(feature_importance):
+    alpha_imp = alpha_importance(feature_importance, alpha=0.8)
+    alpha_imp.rename({"Alpha Importance": "Fourth Fifths"}, inplace=True)
+    return alpha_imp
 
 
 def importance_spread_divergence(feature_importance):
