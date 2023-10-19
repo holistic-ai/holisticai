@@ -1,9 +1,9 @@
 import os
 
 import numpy as np
-from testing_utils.tests_utils import small_recommender_dataset
 
 from holisticai.bias.mitigation import FairRec
+from tests.bias.mitigation.testing_utils.utils import small_recommender_dataset
 
 np.random.seed(42)
 

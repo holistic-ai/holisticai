@@ -6,11 +6,14 @@ import warnings
 
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import check_results, small_clustering_dataset
 
 from holisticai.bias.metrics import clustering_bias_metrics
 from holisticai.bias.mitigation import VariationalFairClustering
 from holisticai.pipeline import Pipeline
+from tests.bias.mitigation.testing_utils.utils import (
+    check_results,
+    small_clustering_dataset,
+)
 
 warnings.filterwarnings("ignore")
 

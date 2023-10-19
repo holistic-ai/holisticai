@@ -5,11 +5,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import small_clustering_dataset
 
 from holisticai.bias.metrics import clustering_bias_metrics
 from holisticai.bias.mitigation.postprocessing.mcmf_clustering.transformer import MCMF
 from holisticai.pipeline import Pipeline
+from tests.bias.mitigation.testing_utils.utils import small_clustering_dataset
 
 
 def test_using_pipeline(small_clustering_dataset):

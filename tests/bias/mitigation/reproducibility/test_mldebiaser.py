@@ -6,16 +6,16 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import (
-    check_results,
-    small_categorical_dataset,
-    small_multiclass_dataset,
-)
 
 from holisticai.bias.metrics import classification_bias_metrics, multiclass_bias_metrics
 from holisticai.bias.mitigation import MLDebiaser
 from holisticai.pipeline import Pipeline
 from holisticai.utils.transformers.bias import SensitiveGroups
+from tests.bias.mitigation.testing_utils.utils import (
+    check_results,
+    small_categorical_dataset,
+    small_multiclass_dataset,
+)
 
 seed = 42
 
