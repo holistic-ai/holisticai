@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mitigating Bias in regression setting with holisticai Pipeline &mdash; holisticai  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/nbsphinx-code-cells.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/custom_style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Mitigating Bias in clustering" href="mitigation_bias_clustering.html" />
+    <link rel="prev" title="Mitigating Bias in Binary Classification with holisticai Pipeline" href="mitigating_bias_classification_pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            holisticai
+              <img src="../../_static/holistic_ai.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../metrics.html">Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mitigation.html">Mitigation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../plotting.html">Plotting</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pipeline.html">Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../measuring_bias.html">Measuring bias</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../mitigating_bias.html">Mitigating bias</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mitigating_bias_classification.html"><strong>Mitigating Bias in Binary Classification Setting</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitigating_bias_classification_pipeline.html"><strong>Mitigating Bias in Binary Classification with holisticai Pipeline</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>Mitigating Bias in regression setting with holisticai Pipeline</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Data-Preprocessing">Data Preprocessing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Baseline">Baseline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Grid-Search">Grid Search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Exponentiated-Gradient">Exponentiated Gradient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Correlation-Remover">Correlation Remover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Wassertein-Barycenters">Wassertein Barycenters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mitigation_bias_clustering.html"><strong>Mitigating Bias in clustering</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="mitigation_bias_multiclass.html"><strong>Mitigating Bias in multiclass classification</strong></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">holisticai</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../mitigating_bias.html">Mitigating bias</a></li>
+      <li class="breadcrumb-item active"><strong>Mitigating Bias in regression setting with holisticai Pipeline</strong></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/mitigating_bias_tutorials/mitigation_bias_regression_pipeline.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Mitigating-Bias-in-regression-setting-with-holisticai-Pipeline">
+<h1><strong>Mitigating Bias in regression setting with holisticai Pipeline</strong><a class="headerlink" href="#Mitigating-Bias-in-regression-setting-with-holisticai-Pipeline" title="Permalink to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># sys path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;../../&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_openml</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">holisticai.bias.metrics</span> <span class="kn">import</span> <span class="n">regression_bias_metrics</span>
+<span class="kn">from</span> <span class="nn">holisticai.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<section id="Data-Preprocessing">
+<h2>Data Preprocessing<a class="headerlink" href="#Data-Preprocessing" title="Permalink to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">holisticai.datasets</span> <span class="kn">import</span> <span class="n">load_us_crime</span>
+
+<span class="k">def</span> <span class="nf">load_dataset</span><span class="p">():</span>
+  <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_us_crime</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+  <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="k">if</span> <span class="n">n</span><span class="o">&lt;</span><span class="mi">1000</span><span class="p">]]</span>
+  <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df_clean</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+  <span class="c1">#gs = [&#39;racepctblack&#39;, &#39;racePctWhite&#39;]</span>
+  <span class="n">gs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;racePctWhite&#39;</span><span class="p">]</span>
+  <span class="n">groups</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">race</span> <span class="ow">in</span> <span class="n">gs</span><span class="p">:</span>
+    <span class="n">groups</span><span class="p">[</span><span class="n">race</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="n">race</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">&gt;</span><span class="mf">0.5</span><span class="p">)</span>
+
+  <span class="n">group_a</span> <span class="o">=</span>  <span class="n">groups</span><span class="p">[</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+  <span class="n">group_b</span> <span class="o">=</span>  <span class="mi">1</span><span class="o">-</span><span class="n">group_a</span><span class="c1">#groups[gs[1]]</span>
+  <span class="n">xor_groups</span>  <span class="o">=</span> <span class="n">group_a</span> <span class="o">^</span> <span class="n">group_b</span>
+
+  <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df_clean</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;race&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">))]</span>
+  <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">3</span><span class="p">:]</span>
+  <span class="n">df_clean</span> <span class="o">=</span> <span class="n">df_clean</span><span class="p">[</span><span class="n">xor_groups</span><span class="p">]</span>
+  <span class="n">group_a</span> <span class="o">=</span> <span class="n">group_a</span><span class="p">[</span><span class="n">xor_groups</span><span class="p">]</span>
+  <span class="n">group_b</span> <span class="o">=</span> <span class="n">group_b</span><span class="p">[</span><span class="n">xor_groups</span><span class="p">]</span>
+
+  <span class="n">scalar</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+  <span class="n">df_t</span> <span class="o">=</span> <span class="n">scalar</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_clean</span><span class="p">)</span>
+  <span class="n">X</span> <span class="o">=</span> <span class="n">df_t</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">df_t</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+  <span class="n">X_train</span><span class="p">,</span><span class="n">X_test</span><span class="p">,</span><span class="n">y_train</span><span class="p">,</span><span class="n">y_test</span><span class="p">,</span> <span class="n">group_a_tr</span><span class="p">,</span> <span class="n">group_a_ts</span><span class="p">,</span> <span class="n">group_b_tr</span><span class="p">,</span> <span class="n">group_b_ts</span> <span class="o">=</span> \
+      <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+  <span class="n">train_data</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">group_a_tr</span><span class="p">,</span> <span class="n">group_b_tr</span>
+  <span class="n">test_data</span>  <span class="o">=</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">group_a_ts</span><span class="p">,</span> <span class="n">group_b_ts</span>
+  <span class="k">return</span> <span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span>
+
+<span class="n">train_data</span><span class="p">,</span> <span class="n">test_data</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Baseline">
+<h2>Baseline<a class="headerlink" href="#Baseline" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">LinearRegression</span><span class="p">()),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">train_data</span>
+
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">test_data</span>
+
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">regression_bias_metrics</span><span class="p">(</span>
+    <span class="n">group_a</span><span class="p">,</span>
+    <span class="n">group_b</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">metric_type</span><span class="o">=</span><span class="s1">&#39;both&#39;</span>
+<span class="p">)</span>
+<span class="n">y_baseline</span> <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_baseline</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_baseline</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Value</th>
+      <th>Reference</th>
+    </tr>
+    <tr>
+      <th>Metric</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Disparate Impact Q90</th>
+      <td>0.016953</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q80</th>
+      <td>0.100673</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q50</th>
+      <td>0.424518</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity Q50</th>
+      <td>-0.703821</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>No Disparate Impact Level</th>
+      <td>-0.825434</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Average Score Difference</th>
+      <td>-1.492622</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z Score Difference</th>
+      <td>-2.465747</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Max Statistical Parity</th>
+      <td>0.768248</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity AUC</th>
+      <td>0.439341</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio</th>
+      <td>0.651463</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio Q80</th>
+      <td>0.850160</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio</th>
+      <td>0.557317</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio Q80</th>
+      <td>0.809228</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Correlation Difference</th>
+      <td>-0.048799</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Grid-Search">
+<h2>Grid Search<a class="headerlink" href="#Grid-Search" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">holisticai.bias.mitigation</span> <span class="kn">import</span> <span class="n">GridSearchReduction</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">inprocessing_model</span> <span class="o">=</span> <span class="n">GridSearchReduction</span><span class="p">(</span><span class="n">constraints</span><span class="o">=</span><span class="s2">&quot;BoundedGroupLoss&quot;</span><span class="p">,</span>
+                                         <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;Square&#39;</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span>
+                                         <span class="n">grid_size</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">transform_estimator</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;bm_inprocessing&quot;</span><span class="p">,</span> <span class="n">inprocessing_model</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">train_data</span>
+<span class="n">fit_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span>
+<span class="p">}</span>
+
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">test_data</span>
+<span class="n">predict_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">predict_params</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">regression_bias_metrics</span><span class="p">(</span>
+    <span class="n">group_a</span><span class="p">,</span>
+    <span class="n">group_b</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">metric_type</span><span class="o">=</span><span class="s1">&#39;both&#39;</span>
+<span class="p">)</span>
+<span class="n">y_grid_search</span>  <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_grid_search</span> <span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_grid_search</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+c:\Users\Cristian\anaconda3\envs\metrics\lib\site-packages\tqdm\auto.py:22: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Value</th>
+      <th>Reference</th>
+    </tr>
+    <tr>
+      <th>Metric</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Disparate Impact Q90</th>
+      <td>0.036898</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q80</th>
+      <td>0.112587</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q50</th>
+      <td>0.424518</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity Q50</th>
+      <td>-0.668775</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>No Disparate Impact Level</th>
+      <td>-0.850086</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Average Score Difference</th>
+      <td>-1.480181</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z Score Difference</th>
+      <td>-2.234824</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Max Statistical Parity</th>
+      <td>0.704611</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity AUC</th>
+      <td>0.422870</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio</th>
+      <td>0.676440</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio Q80</th>
+      <td>0.909909</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio</th>
+      <td>0.606120</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio Q80</th>
+      <td>0.956540</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Correlation Difference</th>
+      <td>-0.058733</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Exponentiated-Gradient">
+<h2>Exponentiated Gradient<a class="headerlink" href="#Exponentiated-Gradient" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">holisticai.bias.mitigation</span> <span class="kn">import</span> <span class="n">ExponentiatedGradientReduction</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">inprocessing_model</span> <span class="o">=</span> <span class="n">ExponentiatedGradientReduction</span><span class="p">(</span><span class="n">constraints</span><span class="o">=</span><span class="s2">&quot;BoundedGroupLoss&quot;</span><span class="p">,</span>
+                                         <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;Square&#39;</span><span class="p">,</span> <span class="n">min_val</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_val</span><span class="o">=</span><span class="mf">1.3</span><span class="p">,</span> <span class="n">upper_bound</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+                                         <span class="p">)</span><span class="o">.</span><span class="n">transform_estimator</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;bm_inprocessing&quot;</span><span class="p">,</span> <span class="n">inprocessing_model</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">train_data</span>
+<span class="n">fit_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span>
+<span class="p">}</span>
+
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">test_data</span>
+<span class="n">predict_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">predict_params</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">regression_bias_metrics</span><span class="p">(</span>
+    <span class="n">group_a</span><span class="p">,</span>
+    <span class="n">group_b</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">metric_type</span><span class="o">=</span><span class="s1">&#39;both&#39;</span>
+<span class="p">)</span>
+<span class="n">y_exp_grad</span>  <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_exp_grad</span> <span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_exp_grad</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Value</th>
+      <th>Reference</th>
+    </tr>
+    <tr>
+      <th>Metric</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Disparate Impact Q90</th>
+      <td>0.052273</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q80</th>
+      <td>0.139394</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q50</th>
+      <td>0.434266</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity Q50</th>
+      <td>-0.598682</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>No Disparate Impact Level</th>
+      <td>-0.918579</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Average Score Difference</th>
+      <td>-1.437193</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z Score Difference</th>
+      <td>-1.870203</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Max Statistical Parity</th>
+      <td>0.633070</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity AUC</th>
+      <td>0.390744</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio</th>
+      <td>0.745835</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio Q80</th>
+      <td>1.035089</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio</th>
+      <td>0.709659</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio Q80</th>
+      <td>1.135107</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Correlation Difference</th>
+      <td>-0.085534</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Correlation-Remover">
+<h2>Correlation Remover<a class="headerlink" href="#Correlation-Remover" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">holisticai.bias.mitigation</span> <span class="kn">import</span> <span class="n">CorrelationRemover</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;bm_preprocessing&quot;</span><span class="p">,</span> <span class="n">CorrelationRemover</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">train_data</span>
+<span class="n">fit_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span>
+<span class="p">}</span>
+
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">test_data</span>
+<span class="n">predict_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">predict_params</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">regression_bias_metrics</span><span class="p">(</span>
+    <span class="n">group_a</span><span class="p">,</span>
+    <span class="n">group_b</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">metric_type</span><span class="o">=</span><span class="s1">&#39;both&#39;</span>
+<span class="p">)</span>
+<span class="n">y_correm</span>  <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_correm</span> <span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_correm</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Value</th>
+      <th>Reference</th>
+    </tr>
+    <tr>
+      <th>Metric</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Disparate Impact Q90</th>
+      <td>0.209091</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q80</th>
+      <td>0.219814</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q50</th>
+      <td>0.499692</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity Q50</th>
+      <td>-0.440975</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>No Disparate Impact Level</th>
+      <td>-0.763841</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Average Score Difference</th>
+      <td>-0.943252</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z Score Difference</th>
+      <td>-1.388035</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Max Statistical Parity</th>
+      <td>0.529644</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity AUC</th>
+      <td>0.305583</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio</th>
+      <td>0.565712</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio Q80</th>
+      <td>0.809563</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio</th>
+      <td>0.512898</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio Q80</th>
+      <td>0.886396</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Correlation Difference</th>
+      <td>-0.033565</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Wassertein-Barycenters">
+<h2>Wassertein Barycenters<a class="headerlink" href="#Wassertein-Barycenters" title="Permalink to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">holisticai.bias.mitigation</span> <span class="kn">import</span> <span class="n">WassersteinBarycenter</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;bm_postprocessing&quot;</span><span class="p">,</span> <span class="n">WassersteinBarycenter</span><span class="p">()),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">train_data</span>
+<span class="n">fit_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span>
+<span class="p">}</span>
+
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">test_data</span>
+<span class="n">predict_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">predict_params</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">regression_bias_metrics</span><span class="p">(</span>
+    <span class="n">group_a</span><span class="p">,</span>
+    <span class="n">group_b</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">metric_type</span><span class="o">=</span><span class="s1">&#39;both&#39;</span>
+<span class="p">)</span>
+<span class="n">y_wb</span>  <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_wb</span> <span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_wb</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Value</th>
+      <th>Reference</th>
+    </tr>
+    <tr>
+      <th>Metric</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Disparate Impact Q90</th>
+      <td>0.985714</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q80</th>
+      <td>0.906061</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q50</th>
+      <td>0.863170</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity Q50</th>
+      <td>-0.020422</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>No Disparate Impact Level</th>
+      <td>1.021537</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Average Score Difference</th>
+      <td>-0.063446</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z Score Difference</th>
+      <td>-0.103833</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Max Statistical Parity</th>
+      <td>0.112516</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity AUC</th>
+      <td>0.042851</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio</th>
+      <td>0.391934</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio Q80</th>
+      <td>0.428850</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio</th>
+      <td>0.360770</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio Q80</th>
+      <td>0.418453</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Correlation Difference</th>
+      <td>-0.023593</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">holisticai.bias.mitigation</span> <span class="kn">import</span> <span class="n">PluginEstimationAndCalibration</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;scalar&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;bm_postprocessing&quot;</span><span class="p">,</span> <span class="n">PluginEstimationAndCalibration</span><span class="p">()),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">train_data</span>
+<span class="n">fit_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span>
+<span class="p">}</span>
+
+<span class="n">pipeline</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">**</span><span class="n">fit_params</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">group_a</span><span class="p">,</span> <span class="n">group_b</span> <span class="o">=</span> <span class="n">test_data</span>
+<span class="n">predict_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bm__group_a&quot;</span><span class="p">:</span> <span class="n">group_a</span><span class="p">,</span>
+    <span class="s2">&quot;bm__group_b&quot;</span><span class="p">:</span> <span class="n">group_b</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="o">**</span><span class="n">predict_params</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">regression_bias_metrics</span><span class="p">(</span>
+    <span class="n">group_a</span><span class="p">,</span>
+    <span class="n">group_b</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">metric_type</span><span class="o">=</span><span class="s1">&#39;both&#39;</span>
+<span class="p">)</span>
+<span class="n">y_pec</span>  <span class="o">=</span> <span class="n">y_pred</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_pec</span> <span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_pec</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Value</th>
+      <th>Reference</th>
+    </tr>
+    <tr>
+      <th>Metric</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Disparate Impact Q90</th>
+      <td>0.743434</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q80</th>
+      <td>0.985714</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q50</th>
+      <td>1.000000</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity Q50</th>
+      <td>-0.002899</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>No Disparate Impact Level</th>
+      <td>0.740741</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Average Score Difference</th>
+      <td>0.032142</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z Score Difference</th>
+      <td>0.102848</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Max Statistical Parity</th>
+      <td>0.281950</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity AUC</th>
+      <td>0.047021</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio</th>
+      <td>0.516212</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio Q80</th>
+      <td>0.394376</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio</th>
+      <td>0.597684</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio Q80</th>
+      <td>0.365134</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Correlation Difference</th>
+      <td>0.132010</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_baseline</span><span class="p">,</span> <span class="n">df_grid_search</span><span class="p">,</span> <span class="n">df_exp_grad</span><span class="p">,</span> <span class="n">df_correm</span><span class="p">,</span> <span class="n">df_wb</span><span class="p">,</span> <span class="n">df_pec</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">]]</span>
+<span class="n">result</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Baseline&#39;</span><span class="p">,</span><span class="s1">&#39;GridSearch&#39;</span><span class="p">,</span><span class="s2">&quot;Exp Grad&quot;</span><span class="p">,</span><span class="s2">&quot;Corr. Remv.&quot;</span><span class="p">,</span><span class="s2">&quot;WassersteinBarycenter&quot;</span><span class="p">,</span><span class="s2">&quot;PluginEstimationAndCalibration&quot;</span><span class="p">,</span><span class="s1">&#39;Reference&#39;</span><span class="p">]</span>
+<span class="n">result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Baseline</th>
+      <th>GridSearch</th>
+      <th>Exp Grad</th>
+      <th>Corr. Remv.</th>
+      <th>WassersteinBarycenter</th>
+      <th>PluginEstimationAndCalibration</th>
+      <th>Reference</th>
+    </tr>
+    <tr>
+      <th>Metric</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Disparate Impact Q90</th>
+      <td>0.016953</td>
+      <td>0.036898</td>
+      <td>0.052273</td>
+      <td>0.209091</td>
+      <td>0.985714</td>
+      <td>0.743434</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q80</th>
+      <td>0.100673</td>
+      <td>0.112587</td>
+      <td>0.139394</td>
+      <td>0.219814</td>
+      <td>0.906061</td>
+      <td>0.985714</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Disparate Impact Q50</th>
+      <td>0.424518</td>
+      <td>0.424518</td>
+      <td>0.434266</td>
+      <td>0.499692</td>
+      <td>0.863170</td>
+      <td>1.000000</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity Q50</th>
+      <td>-0.703821</td>
+      <td>-0.668775</td>
+      <td>-0.598682</td>
+      <td>-0.440975</td>
+      <td>-0.020422</td>
+      <td>-0.002899</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>No Disparate Impact Level</th>
+      <td>-0.825434</td>
+      <td>-0.850086</td>
+      <td>-0.918579</td>
+      <td>-0.763841</td>
+      <td>1.021537</td>
+      <td>0.740741</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Average Score Difference</th>
+      <td>-1.492622</td>
+      <td>-1.480181</td>
+      <td>-1.437193</td>
+      <td>-0.943252</td>
+      <td>-0.063446</td>
+      <td>0.032142</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Z Score Difference</th>
+      <td>-2.465747</td>
+      <td>-2.234824</td>
+      <td>-1.870203</td>
+      <td>-1.388035</td>
+      <td>-0.103833</td>
+      <td>0.102848</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Max Statistical Parity</th>
+      <td>0.768248</td>
+      <td>0.704611</td>
+      <td>0.633070</td>
+      <td>0.529644</td>
+      <td>0.112516</td>
+      <td>0.281950</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Statistical Parity AUC</th>
+      <td>0.439341</td>
+      <td>0.422870</td>
+      <td>0.390744</td>
+      <td>0.305583</td>
+      <td>0.042851</td>
+      <td>0.047021</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio</th>
+      <td>0.651463</td>
+      <td>0.676440</td>
+      <td>0.745835</td>
+      <td>0.565712</td>
+      <td>0.391934</td>
+      <td>0.516212</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>RMSE Ratio Q80</th>
+      <td>0.850160</td>
+      <td>0.909909</td>
+      <td>1.035089</td>
+      <td>0.809563</td>
+      <td>0.428850</td>
+      <td>0.394376</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio</th>
+      <td>0.557317</td>
+      <td>0.606120</td>
+      <td>0.709659</td>
+      <td>0.512898</td>
+      <td>0.360770</td>
+      <td>0.597684</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>MAE Ratio Q80</th>
+      <td>0.809228</td>
+      <td>0.956540</td>
+      <td>1.135107</td>
+      <td>0.886396</td>
+      <td>0.418453</td>
+      <td>0.365134</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Correlation Difference</th>
+      <td>-0.048799</td>
+      <td>-0.058733</td>
+      <td>-0.085534</td>
+      <td>-0.033565</td>
+      <td>-0.023593</td>
+      <td>0.132010</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mitigating_bias_classification_pipeline.html" class="btn btn-neutral float-left" title="Mitigating Bias in Binary Classification with holisticai Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mitigation_bias_clustering.html" class="btn btn-neutral float-right" title="Mitigating Bias in clustering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Holistic AI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

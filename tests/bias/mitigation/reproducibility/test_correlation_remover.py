@@ -3,10 +3,13 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from sklearn.preprocessing import StandardScaler
-from testing_utils.tests_utils import check_results, small_regression_dataset
 
 from holisticai.bias.mitigation import CorrelationRemover
 from holisticai.pipeline import Pipeline
+from tests.bias.mitigation.testing_utils.utils import (
+    check_results,
+    small_regression_dataset,
+)
 
 seed = 42
 

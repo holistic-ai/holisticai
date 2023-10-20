@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mitigation &mdash; holisticai  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/custom_style.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="holisticai.bias.mitigation.Reweighing" href=".generated/holisticai.bias.mitigation.Reweighing.html" />
+    <link rel="prev" title="holisticai.bias.metrics.recommender_rmse_ratio" href=".generated/holisticai.bias.metrics.recommender_rmse_ratio.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            holisticai
+              <img src="_static/holistic_ai.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Mitigation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pre-processing">Pre-processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.Reweighing.html">holisticai.bias.mitigation.Reweighing</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.LearningFairRepresentation.html">holisticai.bias.mitigation.LearningFairRepresentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.CorrelationRemover.html">holisticai.bias.mitigation.CorrelationRemover</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairletClusteringPreprocessing.html">holisticai.bias.mitigation.FairletClusteringPreprocessing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#in-processing">In-processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.ExponentiatedGradientReduction.html">holisticai.bias.mitigation.ExponentiatedGradientReduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.GridSearchReduction.html">holisticai.bias.mitigation.GridSearchReduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.MetaFairClassifier.html">holisticai.bias.mitigation.MetaFairClassifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.PrejudiceRemover.html">holisticai.bias.mitigation.PrejudiceRemover</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairKCenterClustering.html">holisticai.bias.mitigation.FairKCenterClustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairKmedianClustering.html">holisticai.bias.mitigation.FairKmedianClustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairletClustering.html">holisticai.bias.mitigation.FairletClustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.VariationalFairClustering.html">holisticai.bias.mitigation.VariationalFairClustering</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#post-processing">Post-processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.CalibratedEqualizedOdds.html">holisticai.bias.mitigation.CalibratedEqualizedOdds</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.EqualizedOdds.html">holisticai.bias.mitigation.EqualizedOdds</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.RejectOptionClassification.html">holisticai.bias.mitigation.RejectOptionClassification</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.LPDebiaserBinary.html">holisticai.bias.mitigation.LPDebiaserBinary</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.LPDebiaserMulticlass.html">holisticai.bias.mitigation.LPDebiaserMulticlass</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.MLDebiaser.html">holisticai.bias.mitigation.MLDebiaser</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.PluginEstimationAndCalibration.html">holisticai.bias.mitigation.PluginEstimationAndCalibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href=".generated/holisticai.bias.mitigation.WassersteinBarycenter.html">holisticai.bias.mitigation.WassersteinBarycenter</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="measuring_bias.html">Measuring bias</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mitigating_bias.html">Mitigating bias</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">holisticai</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Mitigation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/mitigation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mitigation">
+<h1>Mitigation<a class="headerlink" href="#mitigation" title="Permalink to this heading"></a></h1>
+<p><cite>holisticai.bias.mitigation</cite> is a python module mitigating <em>bias</em> in algorithms. Our classes cover <em>pre-processing</em>, <em>post-processing</em> and <em>post-processing</em>.</p>
+<section id="pre-processing">
+<span id="preprocessing"></span><h2>Pre-processing<a class="headerlink" href="#pre-processing" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.Reweighing.html#holisticai.bias.mitigation.Reweighing" title="holisticai.bias.mitigation.Reweighing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.Reweighing</span></code></a>(*args, ...)</p></td>
+<td><p>Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before classification.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.LearningFairRepresentation.html#holisticai.bias.mitigation.LearningFairRepresentation" title="holisticai.bias.mitigation.LearningFairRepresentation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.LearningFairRepresentation</span></code></a>(...)</p></td>
+<td><p>Learning fair representations finds a latent representation which encodes the data well while obfuscates information about protected attributes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.CorrelationRemover.html#holisticai.bias.mitigation.CorrelationRemover" title="holisticai.bias.mitigation.CorrelationRemover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.CorrelationRemover</span></code></a>(...)</p></td>
+<td><p>CorrelationRemover applies a linear transformation to the non-sensitive feature columns in order to remove their correlation with the sensitive feature columns while retaining as much information as possible (as measured by the least-squares error).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairletClusteringPreprocessing.html#holisticai.bias.mitigation.FairletClusteringPreprocessing" title="holisticai.bias.mitigation.FairletClusteringPreprocessing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.FairletClusteringPreprocessing</span></code></a>(...)</p></td>
+<td><p>Fairlet decomposition is a pre-processing approach that computes fair micro-clusters where fairness is guaranteed.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="in-processing">
+<span id="inprocessing"></span><h2>In-processing<a class="headerlink" href="#in-processing" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.ExponentiatedGradientReduction.html#holisticai.bias.mitigation.ExponentiatedGradientReduction" title="holisticai.bias.mitigation.ExponentiatedGradientReduction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.ExponentiatedGradientReduction</span></code></a>(...)</p></td>
+<td><p>Exponentiated gradient reduction is an in-processing technique that reduces fair classification to a sequence of cost-sensitive classification problems, returning a randomized classifier with the lowest empirical error subject to fair classification constraints.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.GridSearchReduction.html#holisticai.bias.mitigation.GridSearchReduction" title="holisticai.bias.mitigation.GridSearchReduction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.GridSearchReduction</span></code></a>(...)</p></td>
+<td><p>Grid search technique can be used for fair classification or fair regression.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.MetaFairClassifier.html#holisticai.bias.mitigation.MetaFairClassifier" title="holisticai.bias.mitigation.MetaFairClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.MetaFairClassifier</span></code></a>(...)</p></td>
+<td><p>The meta algorithm here takes the fairness metric as part of the input and returns a classifier optimized w.r.t.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.PrejudiceRemover.html#holisticai.bias.mitigation.PrejudiceRemover" title="holisticai.bias.mitigation.PrejudiceRemover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.PrejudiceRemover</span></code></a>(...)</p></td>
+<td><p>Prejudice remover is an in-processing technique that adds a discrimination-aware regularization term to the learning objective.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairKCenterClustering.html#holisticai.bias.mitigation.FairKCenterClustering" title="holisticai.bias.mitigation.FairKCenterClustering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.FairKCenterClustering</span></code></a>(...)</p></td>
+<td><p>Fair K-Center Clustering inprocessing bias mitigation implements an approximation algorithm for the k-centers problem under the fairness contraint with running time linear in the size of the dataset and k (number of cluster).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairKmedianClustering.html#holisticai.bias.mitigation.FairKmedianClustering" title="holisticai.bias.mitigation.FairKmedianClustering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.FairKmedianClustering</span></code></a>(...)</p></td>
+<td><p>Fair K-median clustering inprocessing bias mitigation is an approximation algorithms for group representative k-median clustering.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.FairletClustering.html#holisticai.bias.mitigation.FairletClustering" title="holisticai.bias.mitigation.FairletClustering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.FairletClustering</span></code></a>(...)</p></td>
+<td><p>Fairlet Clustering inprocessing bias mitigation works in two steps: - The pointset is partitioned into subsets called fairlets that satisfy the fairness requirement and approximately preserve the k-median objective.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.VariationalFairClustering.html#holisticai.bias.mitigation.VariationalFairClustering" title="holisticai.bias.mitigation.VariationalFairClustering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.VariationalFairClustering</span></code></a>(...)</p></td>
+<td><p>Variational Fair Clustering helps you to find clusters with specified proportions of different demographic groups pertaining to a sensitive attribute of the dataset (group_a and group_b) for any well-known clustering method such as K-means, K-median or Spectral clustering (Normalized cut).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="post-processing">
+<span id="postprocessing"></span><h2>Post-processing<a class="headerlink" href="#post-processing" title="Permalink to this heading"></a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.CalibratedEqualizedOdds.html#holisticai.bias.mitigation.CalibratedEqualizedOdds" title="holisticai.bias.mitigation.CalibratedEqualizedOdds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.CalibratedEqualizedOdds</span></code></a>(...)</p></td>
+<td><p>Calibrated equalized odds postprocessing optimizes over calibrated classifier score outputs to find probabilities with which to change output labels with an equalized odds objective.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.EqualizedOdds.html#holisticai.bias.mitigation.EqualizedOdds" title="holisticai.bias.mitigation.EqualizedOdds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.EqualizedOdds</span></code></a>(...)</p></td>
+<td><p>Equalized odds postprocessing use linear programming to find the probability with which change favorable labels (y=1) to unfavorable labels (y=0) in the output estimator to optimize equalized odds.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.RejectOptionClassification.html#holisticai.bias.mitigation.RejectOptionClassification" title="holisticai.bias.mitigation.RejectOptionClassification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.RejectOptionClassification</span></code></a>(...)</p></td>
+<td><p>Reject option classification gives favorable outcomes (y=1) to unpriviliged groups and unfavorable outcomes (y=0)to priviliged groups in a confidence band around the decision boundary with the highest uncertainty.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.LPDebiaserBinary.html#holisticai.bias.mitigation.LPDebiaserBinary" title="holisticai.bias.mitigation.LPDebiaserBinary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.LPDebiaserBinary</span></code></a>(...)</p></td>
+<td><p>Linear Programmin Debiaser is a postprocessing algorithms designed to debias pretrained classifiers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.LPDebiaserMulticlass.html#holisticai.bias.mitigation.LPDebiaserMulticlass" title="holisticai.bias.mitigation.LPDebiaserMulticlass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.LPDebiaserMulticlass</span></code></a>(...)</p></td>
+<td><p>Linear Programmin Debiaser is a postprocessing algorithms designed to debias pretrained classifiers.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.MLDebiaser.html#holisticai.bias.mitigation.MLDebiaser" title="holisticai.bias.mitigation.MLDebiaser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.MLDebiaser</span></code></a>(*args, ...)</p></td>
+<td><p>MLDebiaser postprocessing debias predictions w.r.t.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.PluginEstimationAndCalibration.html#holisticai.bias.mitigation.PluginEstimationAndCalibration" title="holisticai.bias.mitigation.PluginEstimationAndCalibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.PluginEstimationAndCalibration</span></code></a>(...)</p></td>
+<td><p>Plugin Estimation and Calibration postprocessing optimizes over calibrated regressor outputs via a smooth optimization.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href=".generated/holisticai.bias.mitigation.WassersteinBarycenter.html#holisticai.bias.mitigation.WassersteinBarycenter" title="holisticai.bias.mitigation.WassersteinBarycenter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">holisticai.bias.mitigation.WassersteinBarycenter</span></code></a>(...)</p></td>
+<td><p>Fair Regression with Wasserstein Barycenters learning a real-valued function that satisfies the Demographic Parity constraint.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href=".generated/holisticai.bias.metrics.recommender_rmse_ratio.html" class="btn btn-neutral float-left" title="holisticai.bias.metrics.recommender_rmse_ratio" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href=".generated/holisticai.bias.mitigation.Reweighing.html" class="btn btn-neutral float-right" title="holisticai.bias.mitigation.Reweighing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Holistic AI.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

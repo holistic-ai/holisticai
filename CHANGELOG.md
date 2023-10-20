@@ -1,3 +1,9 @@
+## 0.7.1 (2023-10-13)
+
+### Fix
+- Update readthedocs code
+- Update pre-commit config
+
 ## 0.7.0 (2023-10-03)
 
 ### Feat

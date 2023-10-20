@@ -3,27 +3,13 @@ import sys
 
 import numpy as np
 
-sys.path.append(os.getcwd())
+from tests.bias.mitigation.testing_utils.utils import small_recommender_dataset
+
 np.random.seed(42)
 
 
-def test_running_matrix_factorization_strategies():
-    from holisticai.datasets import load_last_fm
-    from holisticai.utils import recommender_formatter
-
-    bunch = load_last_fm()
-    lastfm = bunch["frame"]
-    lastfm["score"] = 1
-    lastfm = lastfm.iloc[:300]
-    df_pivot, p_attr = recommender_formatter(
-        lastfm,
-        users_col="user",
-        groups_col="sex",
-        items_col="artist",
-        scores_col="score",
-        aggfunc="mean",
-    )
-    data_matrix = df_pivot.fillna(0).to_numpy()
+def test_running_matrix_factorization_strategies(small_recommender_dataset):
+    data_matrix, _ = small_recommender_dataset
     numUsers, numItems = data_matrix.shape
     from holisticai.utils.models.recommender.matrix_factorization.non_negative import (
         NonNegativeMF,
