@@ -5,50 +5,10 @@ from sklearn.preprocessing import MinMaxScaler
 
 from holisticai.datasets import load_adult
 from holisticai.utils.trade_off_analysers import Fairea
+from tests.bias.mitigation.testing_utils.utils import small_categorical_dataset
 
 
-def small_categorical_dataset():
-    protected_variables = ["sex", "race"]
-    output_variable = ["class"]
-    favorable_label = 1
-    unfavorable_label = 0
-    group = ["sex"]
-
-    dataset = load_adult()
-    df = pd.concat([dataset["data"], dataset["target"]], axis=1)
-    df = pd.concat(
-        [
-            df[(df[group[0]] == "Male") & (df[output_variable[0]] == ">50K")]
-            .sample(50)
-            .reset_index(drop=True),
-            df[(df[group[0]] == "Male") & (df[output_variable[0]] == "<=50K")]
-            .sample(100)
-            .reset_index(drop=True),
-            df[(df[group[0]] == "Female") & (df[output_variable[0]] == ">50K")]
-            .sample(20)
-            .reset_index(drop=True),
-            df[(df[group[0]] == "Female") & (df[output_variable[0]] == "<=50K")]
-            .sample(50)
-            .reset_index(drop=True),
-        ],
-        axis=0,
-    )
-
-    y = (
-        df[output_variable]
-        .replace({">50K": favorable_label, "<=50K": unfavorable_label})
-        .values.ravel()
-    )
-    x = pd.get_dummies(df.drop(protected_variables + output_variable, axis=1))
-
-    groups = [df[group] == "Female", df[group] == "Male"]
-    data = [x, y] + [group.values.ravel() for group in groups]
-
-    train_data = test_data = data
-    return train_data, test_data
-
-
-def test_fairea_pipeline():
+def test_fairea_pipeline(small_categorical_dataset):
     """
     Test the Fairea class and its methods.
     """
@@ -56,7 +16,7 @@ def test_fairea_pipeline():
     fairea = Fairea()
 
     # Generate some example input data using the small_categorical_dataset function
-    train_data, test_data = small_categorical_dataset()
+    train_data, test_data = small_categorical_dataset
     x_train, y_train, group_a_train, group_b_train = train_data
     x_test, y_test, group_a_test, group_b_test = test_data
 
