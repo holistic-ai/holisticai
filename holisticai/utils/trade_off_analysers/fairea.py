@@ -21,15 +21,28 @@ from .utils_fairea import (
 
 
 class Fairea:
+    """
+    Fairea class for calculating the trade-off between accuracy and fairness of a classification model.
+
+    Fairea uses a model behaviour mutation method to create a baseline that can be used to compare quantitatively
+    the fairness-accuracy trade-off for different bias mitigation algorithms and then evaluate their effectiveness
+    in the given scenario. To perform this analysis, the approach consists of three separate steps:
+
+    - A baseline is created by fitting a model without mitigation and then applying a model behaviour mutation to gradually
+        changes the model outputs..
+    - Map the given fitted bias mitigation models into five mitigation regions to classify their effectiveness.
+    - Assess the effectiveness trade-off by measuring the gap between the mitigators' effectiveness and the baseline.
+
+    References:
+        Max Hort, Jie M. Zhang, Federica Sarro, and Mark Harman. 2021. Fairea: a model behaviour mutation approach to
+        benchmarking bias mitigation methods. In Proceedings of the 29th ACM Joint Meeting on European Software Engineering
+        Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE 2021)
+    """
+
     def __init__(
         self,
         fair_metric="sp",
         acc_metric="acc",
-        data_splits=10,
-        repetitions=10,
-        odds={"0": [1, 0], "1": [0, 1]},
-        options=[0, 1],
-        degrees=10,
         verbose=False,
     ):
         """
@@ -51,26 +64,12 @@ class Fairea:
                     fairness metric to be used: statistical parity (sp) or
                     average odds difference (aod)
         acc_metric: string
-                    accuracy metric to be used: accuracy (acc) or roc-auc (auc)
-        data_splits: int
-                    number of splits to be used for cross-validation
-        repetitions: int
-                    number of repetitions of mutation to be performed
-        odds: dict
-                dictionary of odds to be used for mutation
-        options: list
-                list of options to be used for mutation
-        degrees: int
-                number of divisions in the range of 0-1 to be used for degrees mutation
+                    accuracy metric to be used in the baseline creation and trade-off comparison: accuracy (acc) or roc-auc (auc)
+
         verbose: boolean
                 whether to print the progress or not
 
         """
-        self.data_splits = data_splits
-        self.repetitions = repetitions
-        self.odds = odds
-        self.options = options
-        self.degrees = degrees
         self.verbose = verbose
         if acc_metric == "acc":
             self.acc_fn = accuracy_score
@@ -86,7 +85,19 @@ class Fairea:
         self.best = None
         self.mitigation_regions = dict()
 
-    def create_baseline(self, x, y, group_a, group_b):
+    def create_baseline(
+        self,
+        x,
+        y,
+        group_a,
+        group_b,
+        test_size=0.3,
+        data_splits=10,
+        repetitions=10,
+        odds={"0": [1, 0], "1": [0, 1]},
+        options=[0, 1],
+        degrees=10,
+    ):
         """
         Creates the baseline model for the dataset.
 
@@ -100,11 +111,32 @@ class Fairea:
                 protected attribute for group a
         group_b: array, shape = (n_samples,)
                 protected attribute for group b
+        test_size: float
+            percentage size of the test set (in range 0,1)
+        data_splits: int
+            number of splits to be used for cross-validation
+        repetitions: int
+                    number of repetitions of mutation to be performed
+        odds: dict
+                dictionary of odds to be used for mutation
+        options: list
+                list of options to be used for mutation
+        degrees: int
+                number of divisions in the range of 0-1 to be used for degrees mutation
         """
         _check_same_shape([group_a, group_b, x, y], names="group_a, group_b, x, y")
 
         self.baseline_acc, self.baseline_fairness = self.__create_baseline(
-            x, y, group_a, group_b
+            x,
+            y,
+            group_a,
+            group_b,
+            test_size=test_size,
+            data_splits=data_splits,
+            repetitions=repetitions,
+            odds=odds,
+            options=options,
+            degrees=degrees,
         )
         self.acc_scaler = MinMaxScaler()
         self.fair_scaler = MinMaxScaler()
@@ -121,7 +153,7 @@ class Fairea:
         """
         return self.baseline_acc, self.baseline_fairness
 
-    def __mutate_preds(self, preds, to_mutate, ids, o):
+    def __mutate_preds(self, preds, to_mutate, ids, odds, options):
         """
         Mutates the predictions of the model.
 
@@ -133,14 +165,16 @@ class Fairea:
             number of labels to mutate
         ids: list
             ids of the predictions to be mutated
-        o: list
+        odds: list
             odds to be used for mutation
+        options: list
+            list of options to be used for mutation
 
         Returns
         -------
         changed: mutated predictions
         """
-        rand = np.random.choice(self.options, to_mutate, p=o)
+        rand = np.random.choice(options, to_mutate, p=odds)
         # Select prediction ids that are being mutated
         to_change = np.random.choice(ids, size=to_mutate, replace=False)
         changed = np.copy(preds)
@@ -148,7 +182,19 @@ class Fairea:
             changed[t] = r
         return changed
 
-    def __create_baseline(self, x, y, group_a, group_b, test_size=0.3):
+    def __create_baseline(
+        self,
+        x,
+        y,
+        group_a,
+        group_b,
+        test_size=0.3,
+        data_splits=10,
+        repetitions=10,
+        odds={"0": [1, 0], "1": [0, 1]},
+        options=[0, 1],
+        degrees=10,
+    ):
         """
         Creates the baseline model for the dataset by applying the mutations.
 
@@ -162,6 +208,18 @@ class Fairea:
             protected attribute for group a
         group_b: array, shape = (n_samples,)
             protected attribute for group b
+        test_size: float
+            percentage size of the test set (in range 0,1)
+        data_splits: int
+            number of splits to be used for cross-validation
+        repetitions: int
+                    number of repetitions of mutation to be performed
+        odds: dict
+                dictionary of odds to be used for mutation
+        options: list
+                list of options to be used for mutation
+        degrees: int
+                number of divisions in the range of 0-1 to be used for degrees mutation
 
         Returns
         -------
@@ -175,7 +233,7 @@ class Fairea:
 
         results = defaultdict(lambda: defaultdict(list))
 
-        for s in range(self.data_splits):
+        for s in range(data_splits):
             if self.verbose:
                 print("Current datasplit:", s)
             np.random.seed(s)
@@ -198,19 +256,19 @@ class Fairea:
             pipe.fit(X_train, y_train)
             pred = pipe.predict(X_test).reshape(-1, 1)
 
-            degrees = np.linspace(0, 1, self.degrees + 1)
+            degrees_ = np.linspace(0, 1, degrees + 1)
 
             # Mutate labels for each degree
-            for degree in degrees:
+            for degree in degrees_:
                 # total number of labels to mutate
                 to_mutate = int(l * degree)
 
-                for name, o in self.odds.items():
+                for name, o in odds.items():
                     # Store each mutation attempt
                     hist = []
-                    for _ in range(self.repetitions):
+                    for _ in range(repetitions):
                         # Generate mutated labels
-                        mutated = self.__mutate_preds(pred, to_mutate, ids, o)
+                        mutated = self.__mutate_preds(pred, to_mutate, ids, o, options)
                         # Determine accuracy and fairness of mutated model
                         acc = self.acc_fn(y_test, mutated)
                         if self.fair_metric == "aod":
@@ -223,10 +281,10 @@ class Fairea:
                     results[name][degree] += hist
 
         acc_base = np.array(
-            [np.mean([row[0] for row in results["0"][degree]]) for degree in degrees]
+            [np.mean([row[0] for row in results["0"][degree]]) for degree in degrees_]
         )
         fair_base = np.array(
-            [np.mean([row[1] for row in results["0"][degree]]) for degree in degrees]
+            [np.mean([row[1] for row in results["0"][degree]]) for degree in degrees_]
         )
         return acc_base, fair_base
 
@@ -263,7 +321,7 @@ class Fairea:
         )
 
     def plot_baseline(
-        self, cmap="YlGnBu", ax=None, size=None, title=None, normalize=False
+        self, cmap="YlGnBu", ax=None, figsize=None, title=None, normalize=False
     ):
         """
         Plots the baseline model.
@@ -274,7 +332,7 @@ class Fairea:
             color map to be used for plotting
         ax: matplotlib axis
             axis to be used for plotting
-        size: tuple
+        figsize: tuple
             size of the plot
         title: string
             title of the plot
@@ -282,7 +340,7 @@ class Fairea:
             whether to normalize the data or not
         """
         if ax is None:
-            fig, ax = plt.subplots(figsize=size)
+            fig, ax = plt.subplots(figsize=figsize)
         ax.set_title(title)
         ax.set_xlabel("Fairness")
         ax.set_ylabel("Accuracy")
@@ -311,7 +369,7 @@ class Fairea:
         return ax
 
     def plot_methods(
-        self, cmap="YlGnBu", ax=None, size=None, title=None, normalize=False
+        self, cmap="YlGnBu", ax=None, figsize=None, title=None, normalize=False
     ):
         """
         Plots the baseline with the added models.
@@ -323,7 +381,7 @@ class Fairea:
             color map to be used for plotting
         ax: matplotlib axis
             axis to be used for plotting
-        size: tuple
+        figsize: tuple
             size of the plot
         title: string
             title of the plot
@@ -331,7 +389,7 @@ class Fairea:
             whether to normalize the data or not
         """
         if ax is None:
-            fig, ax = plt.subplots(figsize=size)
+            fig, ax = plt.subplots(figsize=figsize)
         ax.set_title(title)
         ax.set_xlabel("Fairness")
         ax.set_ylabel("Accuracy")
@@ -413,7 +471,7 @@ class Fairea:
         else:
             return "inverted"
 
-    def region_classification(self):
+    def trade_off_region_classification(self):
         """
         Classifies the region of each model.
 
@@ -434,7 +492,7 @@ class Fairea:
         df.style.set_properties(**{"font-weight": "bold"})
         return df
 
-    def determine_area(self):
+    def compute_trade_off_area(self):
         """
         Determines the area of each model and saves the best method.
 
@@ -465,7 +523,7 @@ class Fairea:
         self.best = df.index[0]
         return df
 
-    def get_best(self):
+    def get_best_model(self):
         """
         Returns the best model.
         """
