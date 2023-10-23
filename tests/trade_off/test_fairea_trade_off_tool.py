@@ -21,7 +21,15 @@ def test_fairea_pipeline(small_categorical_dataset):
     x_test, y_test, group_a_test, group_b_test = test_data
 
     # Create the baseline model
-    fairea.create_baseline(x_train, y_train, group_a_train, group_b_train)
+    fairea.create_baseline(
+        x_train,
+        y_train,
+        group_a_train,
+        group_b_train,
+        data_splits=5,
+        repetitions=5,
+        degrees=5,
+    )
 
     # Check that the baseline accuracy and fairness were calculated correctly
     assert (fairea.baseline_acc <= 1).all()
@@ -56,8 +64,8 @@ def test_fairea_pipeline(small_categorical_dataset):
     assert isinstance(ax, plt.Axes)
 
     # Check if the methods are returning the expected value types
-    assert isinstance(fairea.get_best(), (str, type(None)))
+    assert isinstance(fairea.get_best_model(), (str, type(None)))
 
-    assert isinstance(fairea.region_classification(), pd.DataFrame)
+    assert isinstance(fairea.trade_off_region_classification(), pd.DataFrame)
 
-    assert isinstance(fairea.determine_area(), (pd.DataFrame, type(None)))
+    assert isinstance(fairea.compute_trade_off_area(), (pd.DataFrame, type(None)))
