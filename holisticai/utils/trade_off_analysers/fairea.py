@@ -19,10 +19,17 @@ from .utils_fairea import (
     line,
 )
 
+METRICS = {
+    "acc": accuracy_score,
+    "auc": roc_auc_score,
+    "sp": statistical_parity,
+    "aod": average_odds_diff,
+}
+
 
 class Fairea:
     """
-    Fairea class for calculating the trade-off between accuracy and fairness of a classification model.
+    Fairea class for calculating the trade-off between accuracy and fairness of a binary classification model.
 
     Fairea uses a model behaviour mutation method to create a baseline that can be used to compare quantitatively
     the fairness-accuracy trade-off for different bias mitigation algorithms and then evaluate their effectiveness
@@ -71,14 +78,8 @@ class Fairea:
 
         """
         self.verbose = verbose
-        if acc_metric == "acc":
-            self.acc_fn = accuracy_score
-        elif acc_metric == "auc":
-            self.acc_fn = roc_auc_score
-        if fair_metric == "sp":
-            self.fair_fn = statistical_parity
-        elif fair_metric == "aod":
-            self.fair_fn = average_odds_diff
+        self.acc_fn = METRICS[acc_metric]
+        self.fair_fn = METRICS[fair_metric]
         self.fair_metric = fair_metric
         self.methods = dict()
         self.normalized_methods = dict()
@@ -140,11 +141,9 @@ class Fairea:
         )
         self.acc_scaler = MinMaxScaler()
         self.fair_scaler = MinMaxScaler()
-        self.acc_norm = self.acc_scaler.fit_transform(
-            self.baseline_acc.reshape(-1, 1)
-        ).reshape(-1)
+        self.acc_norm = self.acc_scaler.fit_transform(self.baseline_acc).reshape(-1)
         self.fairness_norm = self.fair_scaler.fit_transform(
-            self.baseline_fairness.reshape(-1, 1)
+            self.baseline_fairness
         ).reshape(-1)
 
     def baseline_metrics(self):
@@ -286,7 +285,7 @@ class Fairea:
         fair_base = np.array(
             [np.mean([row[1] for row in results["0"][degree]]) for degree in degrees_]
         )
-        return acc_base, fair_base
+        return acc_base.reshape(-1, 1), fair_base.reshape(-1, 1)
 
     def add_model_outcomes(self, model_name, y_true, y_pred, group_a, group_b):
         """
