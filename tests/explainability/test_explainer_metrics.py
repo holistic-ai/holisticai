@@ -60,8 +60,8 @@ def test_metrics_within_range(strategy):
 
 @pytest.mark.xfail(reason="Expected to raise DivisionByZero or InvalidComparison")
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime"])
-@pytest.mark.parametrize("top_k", [-1, 0, "1"])
-def test_metrics_with_invalid_top_k(strategy, top_k):
+@pytest.mark.parametrize("alpha", [-1, 0, "1"])
+def test_metrics_with_invalid_top_k(strategy, alpha):
     """Checks if calling metrics with invalid top_k raises a Error"""
     X_train, X_test, y_train, y_test, _ = process_dataset()
     model = train_model(X_train, y_train)
@@ -74,7 +74,7 @@ def test_metrics_with_invalid_top_k(strategy, top_k):
         y=y_test,
     )
     try:
-        explainer.metrics(top_k)
+        explainer.metrics(alpha)
     except ZeroDivisionError:
         pytest.xfail("ZeroDivisionError raised")
     except TypeError:
@@ -82,9 +82,9 @@ def test_metrics_with_invalid_top_k(strategy, top_k):
 
 
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime"])
-@pytest.mark.parametrize("top_k", [2, 3, 4])
-def test_metrics_with_valid_top_k(strategy, top_k):
-    """Checks if calling metrics with valid top_k works properly"""
+@pytest.mark.parametrize("alpha", [2, 3, 4])
+def test_metrics_with_valid_alpha(strategy, alpha):
+    """Checks if calling metrics with valid alpha works properly"""
     X_train, X_test, y_train, y_test, _ = process_dataset()
     model = train_model(X_train, y_train)
     explainer = Explainer(
@@ -95,7 +95,7 @@ def test_metrics_with_valid_top_k(strategy, top_k):
         x=X_test,
         y=y_test,
     )
-    metrics_df = explainer.metrics(top_k)
+    metrics_df = explainer.metrics(alpha)
 
     # Assert that the result is not None or empty
     assert metrics_df is not None
@@ -103,8 +103,8 @@ def test_metrics_with_valid_top_k(strategy, top_k):
 
 
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime"])
-@pytest.mark.parametrize("top_k", [2, 3, 4])
-def test_metrics_with_valid_input_data(strategy, top_k):
+@pytest.mark.parametrize("alpha", [2, 3, 4])
+def test_metrics_with_valid_input_data(strategy, alpha):
     """Checks if the explainer module works when input data is a numpy array or a pandas dataframe"""
     X_train, X_test, y_train, y_test, feature_names = process_dataset()
     model = train_model(X_train, y_train)
@@ -116,7 +116,7 @@ def test_metrics_with_valid_input_data(strategy, top_k):
         x=X_test,
         y=y_test,
     )
-    metrics_df = explainer.metrics(top_k)
+    metrics_df = explainer.metrics(alpha)
     assert isinstance(metrics_df, pd.DataFrame)
     assert metrics_df is not None
     assert not metrics_df.empty
@@ -132,7 +132,7 @@ def test_metrics_with_valid_input_data(strategy, top_k):
         x=X_test,
         y=y_test,
     )
-    metrics_df = explainer.metrics(top_k)
+    metrics_df = explainer.metrics(alpha)
     assert isinstance(metrics_df, pd.DataFrame)
     assert metrics_df is not None
     assert not metrics_df.empty

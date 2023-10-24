@@ -20,14 +20,12 @@ dataset = load_adult()
 
 # Dataframe
 df = pd.concat([dataset["data"], dataset["target"]], axis=1)
-# df = df.iloc[:30, :]
 protected_variables = ["sex", "race"]
 output_variable = ["class"]
 
 # Simple preprocessing
 y = df[output_variable].replace({">50K": 1, "<=50K": 0})
-X = pd.get_dummies(df.drop(protected_variables + output_variable, axis=1), dtype=float)
-
+X = pd.get_dummies(df.drop(protected_variables + output_variable, axis=1))
 group = ["sex"]
 group_a = df[group] == "Female"
 group_b = df[group] == "Male"
@@ -55,13 +53,15 @@ y_pred = model.predict(X_test)  # compute predictions
 # import Explainer
 from holisticai.explainability import Explainer
 
+# permutation feature importance
+# lime feature importance
 explainer = Explainer(
     based_on="feature_importance",
-    strategy_type="permutation",
+    strategy_type="lime",
     model_type="binary_classification",
     model=model,
-    x=X_test,
-    y=y_pred,
+    x=X,
+    y=y,
 )
 
-explainer.metrics(alpha=0.7)
+print(explainer.metrics())

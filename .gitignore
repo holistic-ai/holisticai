@@ -9,3 +9,10 @@
 dist/
 
 .python-version
+
+docs/html
+docs/_build
+docs/.generated
+docs/efficacy/.generated
+docs/bias/.generated
+docs/explainability/.generated
