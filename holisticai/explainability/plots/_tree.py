@@ -61,6 +61,6 @@ def check_installed_package(backend):
     allowed_packages = ["pydotplus", "dtreeviz", "sklearn"]
     backend_package = importlib.util.find_spec(backend)
     if (backend and allowed_packages) and (backend_package is None):
-        raise (
-            "Package {backend} must be installed. Please install with: pip install {backend}"
+        raise Exception(
+            f"Package {backend} must be installed. Please install with: pip install {backend}"
         )
