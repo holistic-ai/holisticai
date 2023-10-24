@@ -126,16 +126,15 @@ class Explainer:
     def __getitem__(self, key):
         return self.metric_values.loc[key]["Value"]
 
-    def metrics(self, top_k=None, detailed=False):
+    def metrics(self, alpha=None, detailed=False):
         """
-        top_k: int
+        alpha: int
             Number of features to select
         """
-        params = self.explainer_handler.get_topk(top_k)
-        self.metric_values = self.explainer_handler.metrics(**params, detailed=detailed)
+        self.metric_values = self.explainer_handler.metrics(alpha, detailed=detailed)
         return self.metric_values
 
-    def bar_plot(self, max_display=None, title=None, top_k=None, figsize=(7, 5)):
+    def bar_plot(self, max_display=None, title=None, alpha=None, figsize=(7, 5)):
         """
         Parameters
         ----------
@@ -143,13 +142,12 @@ class Explainer:
             Maximum number of features to display
         title: str
             Title of the plot
-        top_k: int
+        alpha: int
             Number of features to select
         figsize: tuple
             Size of the plot
         """
-        params = self.explainer_handler.get_topk(top_k)
-        feat_imp = params["feature_importance"]
+        feat_imp, _ = self.explainer_handler.get_alpha_feature_importance(alpha)
         bar(
             feat_imp,
             max_display=max_display,
@@ -158,7 +156,7 @@ class Explainer:
             _type=self._strategy_type,
         )
 
-    def lolipop_plot(self, max_display=None, title=None, top_k=None, figsize=(7, 5)):
+    def lolipop_plot(self, max_display=None, title=None, alpha=None, figsize=(7, 5)):
         """
         Parameters
         ----------
@@ -166,13 +164,12 @@ class Explainer:
             Maximum number of features to display
         title: str
             Title of the plot
-        top_k: int
+        alpha: int
             Number of features to select
         figsize: tuple
             Size of the plot
         """
-        params = self.explainer_handler.get_topk(top_k)
-        feat_imp = params["feature_importance"]
+        feat_imp, _ = self.explainer_handler.get_alpha_feature_importance(alpha)
         lolipop(
             feat_imp,
             max_display=max_display,
@@ -195,9 +192,7 @@ class Explainer:
         return self.explainer_handler.tree_visualization(backend, **kargs)
 
     def contrast_visualization(self, show_connections=False):
-        importances = self.explainer_handler.get_topk(top_k=None)
-        cfimp = importances["conditional_feature_importance"]
-        fimp = importances["feature_importance"]
+        fimp, cfimp = self.explainer_handler.get_alpha_feature_importance(alpha=None)
         keys = list(cfimp.keys())
         xticks, matrix = important_constrast_matrix(
             cfimp, fimp, keys, show_connections=show_connections
@@ -210,9 +205,7 @@ class Explainer:
         )
 
     def show_importance_stability(self):
-        importances = self.explainer_handler.get_topk(top_k=None)
-        cfimp = importances["conditional_feature_importance"]
-        fimp = importances["feature_importance"]
+        fimp, cfimp = self.explainer_handler.get_alpha_feature_importance(alpha=None)
         self.explainer_handler.show_importance_stability(fimp, cfimp)
 
     def show_data_stability_boundaries(
@@ -223,20 +216,21 @@ class Explainer:
         )
 
     def feature_importance_table(self, sorted_by="Global", top_n=10):
-        feature_importance = self.explainer_handler.get_topk(None)
+        (
+            feature_importance,
+            cond_feat_imp,
+        ) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
         dfs = []
         df = (
-            feature_importance["feature_importance"][["Variable", "Importance"]]
+            feature_importance[["Variable", "Importance"]]
             .reset_index(drop=True)
             .set_index("Variable")
         )
         df.columns = ["Global Importance"]
         dfs.append(df)
 
-        if "conditional_feature_importance" in feature_importance:
-            for name, cfi in feature_importance[
-                "conditional_feature_importance"
-            ].items():
+        if cond_feat_imp is not None:
+            for name, cfi in cond_feat_imp.items():
                 cdf = (
                     cfi[["Variable", "Importance"]]
                     .reset_index(drop=True)

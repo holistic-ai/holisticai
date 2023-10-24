@@ -16,8 +16,8 @@ from ..utils import (
     BaseFeatureImportance,
     LocalFeatureImportance,
     check_feature_importance,
+    get_alpha_lime,
     get_index_groups,
-    get_top_k_lime,
 )
 
 
@@ -86,45 +86,36 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         self.feature_importance = importance_weights
         self.conditional_feature_importance = conditional_importance_weights
 
-    def get_topk(self, top_k):
-        if top_k is None:
+    def get_alpha_feature_importance(self, alpha):
+        if alpha is None:
             feat_imp = self.feature_importance
             cond_feat_imp = self.conditional_feature_importance
         else:
-            feat_imp = get_top_k_lime(self.feature_importance, top_k)
+            feat_imp = get_alpha_lime(self.feature_importance, alpha)
             cond_feat_imp = {
-                label: get_top_k_lime(value, top_k)
+                label: get_alpha_lime(value, alpha)
                 for label, value in self.conditional_feature_importance.items()
             }
 
-        return {
-            "feature_importance": feat_imp,
-            "conditional_feature_importance": cond_feat_imp,
-        }
+        return feat_imp, cond_feat_imp
 
-    def metrics(
-        self, feature_importance, conditional_feature_importance, detailed=False
-    ):
+    def metrics(self, alpha, detailed=False):
 
         reference_values = {
             "Features Stability Gini": 0,
-            "Features Stability Ratio": 1,
-            "Features Stability Mean": 0,
             "Dataset Stability Gini": 0,
-            "Dataset Stability Ratio": 1,
-            "Dataset Stability Mean": 0,
         }
 
         if not detailed:
             d_spread_stability = dataset_spread_stability(
-                feature_importance, conditional_feature_importance
+                self.feature_importance, self.conditional_feature_importance
             )["result"]
             d_spread_stability = {k: v["Global"] for k, v in d_spread_stability.items()}
             d_spread_stability = pd.DataFrame(d_spread_stability, index=[0])
             d_spread_stability = d_spread_stability.T.rename(columns={0: "Value"})
 
             f_spread_stability = features_spread_stability(
-                feature_importance, conditional_feature_importance
+                self.feature_importance, self.conditional_feature_importance
             )["result"]
             f_spread_stability = {k: v["Global"] for k, v in f_spread_stability.items()}
             f_spread_stability = pd.DataFrame(f_spread_stability, index=[0])
@@ -137,7 +128,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
                 return f"{x['index']}"
 
             d_spread_stability = dataset_spread_stability(
-                feature_importance, conditional_feature_importance
+                self.feature_importance, self.conditional_feature_importance
             )["result"]
             groups = list(d_spread_stability["Dataset Stability Gini"].keys())
             d_spread_stability = pd.DataFrame(d_spread_stability).T.reset_index()
@@ -154,7 +145,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             d_spread_stability = d_spread_stability.rename(columns={"value": "Value"})
 
             f_spread_stability = features_spread_stability(
-                feature_importance, conditional_feature_importance
+                self.feature_importance, self.conditional_feature_importance
             )["result"]
             groups = list(f_spread_stability["Features Stability Gini"].keys())
             f_spread_stability = pd.DataFrame(f_spread_stability).T.reset_index()
@@ -240,14 +231,11 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         if top_n is None:
             top_n = 10
 
-        all_fimp = self.get_topk(None)
-        data_stability = dataset_spread_stability(**all_fimp)
+        fimp, cfimp = self.get_alpha_feature_importance(None)
+        data_stability = dataset_spread_stability(fimp, cfimp)
 
         spread = data_stability["imp_spread"]
-        cfimp = all_fimp["conditional_feature_importance"]
-        fimp = (
-            all_fimp["feature_importance"].groupby("Feature Label")["Importance"].mean()
-        )
+        fimp = fimp.groupby("Feature Label")["Importance"].mean()
 
         fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=figsize)
 
@@ -296,12 +284,12 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         if figsize is None:
             figsize = (15, 5)
 
-        all_fimp = self.get_topk(None)
-        feature_stability = features_spread_stability(**all_fimp)
+        fimp, cfimp = self.get_alpha_feature_importance(alpha=None)
+        fimp = fimp.dropna()
+        cfimp = {k: v.dropna() for k, v in cfimp.items()}
+        feature_stability = features_spread_stability(fimp, cfimp)
 
         spread = feature_stability["imp_spread"]
-        cfimp = all_fimp["conditional_feature_importance"]
-        fimp = all_fimp["feature_importance"]
 
         if n_cols is None:
             n_cols = len(spread)

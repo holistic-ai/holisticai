@@ -68,8 +68,8 @@ def feature_importance_spread_lime(
 
     result = {
         f"{metric_name} Stability Gini": spread_imp_gini,
-        f"{metric_name} Stability Mean": mean_imp_spread,
-        f"{metric_name} Stability Ratio": spread_imp_ratio,
+        # f"{metric_name} Stability Mean": mean_imp_spread,
+        # f"{metric_name} Stability Ratio": spread_imp_ratio,
     }
 
     return {
