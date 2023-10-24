@@ -16,6 +16,12 @@ def get_closer_bounds(point, x_arr, y_arr, bound="lower"):
     bound : string
         The bound to be compared if lower or upper.
 
+    Returns
+    -------
+    x_point : float
+        The closest point in the x axis.
+    y_point : float
+        The closest point in the y axis.
     """
     if point in x_arr:
         return point, y_arr[np.where(x_arr == point)[0][0]]
