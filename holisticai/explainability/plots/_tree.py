@@ -29,7 +29,7 @@ class DecisionTreeVisualizer:
             fi_handler.surrogate,
             out_file=dot_data,
             feature_names=fi_handler.x.columns,
-            **default_params
+            **default_params,
         )
         graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
         img_str = graph.create_png()
