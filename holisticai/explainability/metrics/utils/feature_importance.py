@@ -8,9 +8,9 @@ class GlobalFeatureImportance:
         if last == None:
             last = first + 6
 
-        importances = self.get_topk(top_k=top_k)
-        fimp = importances["feature_importance"]
-        features = list(fimp["Variable"])[first:last]
+        importances = self.get_alpha_feature_importance(alpha=top_k)
+        alpha_feat_imp, alpha_cond_feat_imp = importances
+        features = list(alpha_feat_imp["Variable"])[first:last]
         title = "Partial dependence plot"
         percentiles = (
             (0, 1) if self.model_type == "binary_classification" else (0.05, 0.95)

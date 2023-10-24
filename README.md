@@ -19,6 +19,7 @@ For metrics, you can use the default installation:
 ```bash
 pip install holisticai # basic installation
 pip install holisticai[bias] # bias mitigation support
+pip install holisticai[explainability] # for explainability metrics and plots
 pip install holisticai[all] # install all packages for bias and explainability
 ```
 ## Troubleshooting
@@ -27,6 +28,14 @@ on **macOS** could be necessary some packages before install holisticai library:
 brew install cbc pkg-config
 python -m pip install cylp
 brew install cmake
+```
+
+## Explainability Visualization Tools
+
+Install GraphViz
+```bash
+sudo apt update
+sudo apt-get install graphviz
 ```
 
 ## Contributing

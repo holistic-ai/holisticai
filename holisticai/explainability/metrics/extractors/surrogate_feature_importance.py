@@ -17,7 +17,7 @@ from ..utils import (
     BaseFeatureImportance,
     GlobalFeatureImportance,
     check_feature_importance,
-    get_top_k,
+    get_alpha,
 )
 
 
@@ -93,15 +93,15 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         self.surrogate = surrogate
         self.tree_visualizer = DecisionTreeVisualizer()
 
-    def get_topk(self, top_k):
-        if top_k is None:
+    def get_alpha_feature_importance(self, alpha):
+        if alpha is None:
             feat_imp = self.feature_importance
         else:
-            feat_imp = get_top_k(self.feature_importance, top_k)
+            feat_imp = get_alpha(self.feature_importance, alpha)
 
-        return {"feature_importance": feat_imp}
+        return feat_imp, None
 
-    def metrics(self, feature_importance, detailed):
+    def metrics(self, alpha, detailed):
 
         reference_values = {
             "Fourth Fifths": 0,
@@ -111,14 +111,13 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
             "Surrogate Efficacy Classification": 1,
             "Surrogate Efficacy Regression": 0,
         }
-
         metrics = pd.concat(
             [
-                fourth_fifths(feature_importance),
-                importance_spread_divergence(feature_importance),
-                importance_spread_ratio(feature_importance),
+                fourth_fifths(self.feature_importance),
+                importance_spread_divergence(self.feature_importance),
+                importance_spread_ratio(self.feature_importance),
                 global_explainability_ease_score(
-                    self.model_type, self.model, self.x, self.y, feature_importance
+                    self.model_type, self.model, self.x, self.y, self.feature_importance
                 ),
                 surrogate_efficacy(self.model_type, self.x, self.y, self.surrogate),
             ],
