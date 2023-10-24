@@ -4,7 +4,7 @@ Technical Risks
 ---------------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     efficacy/efficacy
     bias/bias
