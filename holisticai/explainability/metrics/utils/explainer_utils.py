@@ -8,9 +8,21 @@ from holisticai.utils._validation import (
 )
 
 
-def check_feature_importance(x, y, values=None):
+def check_alpha_domain(alpha):
+    if alpha is not None:
+        assert (alpha >= 0) and (
+            alpha <= 1
+        ), f"alpha must be between 0 and 1. Valor found: {alpha}"
+
+
+def check_feature_importance(x, y=None, values=None):
     if not isinstance(x, pd.DataFrame):
         x = _matrix_like_to_dataframe(x)
+
+    x = x.astype(float)
+
+    if (y is None) and (values is None):
+        return x
 
     if not isinstance(y, pd.Series):
         y = _array_like_to_series(y)
@@ -28,7 +40,7 @@ def check_feature_importance(x, y, values=None):
         return x, y, values
 
 
-def alpha_importance_list(feature_importance, alpha=None):
+def alpha_feature_importance(feature_importance, alpha=None):
     """
     Parameters
     ----------
@@ -41,12 +53,12 @@ def alpha_importance_list(feature_importance, alpha=None):
         alpha = 0.8
 
     importance = feature_importance["Importance"]
-    feature_names = feature_importance["Variable"]
 
     feature_weight = importance / sum(importance)
 
+    accum_feature_weight = feature_weight.cumsum()
     # entropy or divergence
-    return feature_names.loc[(feature_weight < alpha).values]
+    return feature_importance.loc[accum_feature_weight < alpha]
 
 
 def alpha_importance_list_lime(
@@ -69,31 +81,43 @@ def alpha_importance_list_lime(
     return feature_importance_names.loc[(feature_weight.cumsum() < alpha).values]
 
 
-def feature_importance_spread(
-    features_importance, conditional_features_importance=None, divergence=False
-):
-    spread_type = "Divergence" if divergence else "Ratio"
+class Spread:
+    def __init__(self, divergence, detailed):
+        self.divergence = divergence
+        self.detailed = detailed
 
-    feat_importance_spread = {
-        f"Importance Spread {spread_type}": [
-            importance_spread(features_importance["Importance"], divergence=divergence)
-        ]
-    }
+    def __call__(self, feat_imp, cond_feat_imp):
+        spread = {
+            self.name: importance_spread(
+                feat_imp["Importance"], divergence=self.divergence
+            )
+        }
 
-    if conditional_features_importance is not None:
+        if self.detailed and (cond_feat_imp is not None):
 
-        feat_importance_spread.update(
-            {
-                f"Conditional Importance Spread {spread_type}[{c}]": [
-                    importance_spread(importance["Importance"], divergence=divergence)
-                ]
-                for c, importance in conditional_features_importance.items()
-            }
-        )
+            cond_spread = {}
+            for c, cfi in cond_feat_imp.items():
+                cond_spread[f"{self.name} {c}"] = importance_spread(
+                    cfi["Importance"], divergence=self.divergence
+                )
 
-    imp_spread = pd.DataFrame(feat_importance_spread)
+            return {**spread, **cond_spread}
 
-    return imp_spread.T.rename(columns={0: "Value"})
+        return spread
+
+
+class SpreadDivergence(Spread):
+    def __init__(self, detailed):
+        super().__init__(divergence=True, detailed=detailed)
+        self.name = "Spread Divergence"
+        self.reference = "-"
+
+
+class SpreadRatio(Spread):
+    def __init__(self, detailed):
+        super().__init__(divergence=False, detailed=detailed)
+        self.name = "Spread Ratio"
+        self.reference = 0
 
 
 def gini_coefficient(x):
@@ -199,7 +223,7 @@ def importance_order_constrast(
 
 
 def partial_dependence_creator(
-    model, grid_resolution, x, feature_ids, target=None, random_state=42
+    model, grid_resolution, x, features, target=None, random_state=42
 ):
     """
     Parameters
@@ -230,7 +254,7 @@ def partial_dependence_creator(
     kargs = {
         "estimator": model,
         "X": x,
-        "features": feature_ids,
+        "features": features,
         "feature_names": feature_names,
         "response_method": response_method,
         "method": method,
@@ -249,8 +273,8 @@ def partial_dependence_creator(
     plt.close()
 
     pd_results = {}
-    for (i, f) in enumerate(feature_ids):
-        pd_results[feature_names[f]] = pd.DataFrame(
+    for (i, f) in enumerate(features):
+        pd_results[f] = pd.DataFrame(
             {
                 "score": g.pd_results[i]["average"][0],
                 "values": g.pd_results[i]["values"][0],

@@ -3,14 +3,14 @@ The :mod:`holisticai.explainability.metrics.global_importance` module includes b
 """
 
 from ._global_metrics import (
-    fourth_fifths,
-    global_explainability_ease_score,
-    global_overlap_score,
-    global_range_overlap_score,
-    global_similarity_score,
-    importance_spread_divergence,
-    importance_spread_ratio,
-    surrogate_efficacy,
+    ExplainabilityEase,
+    FourthFifths,
+    PositionParity,
+    RankAlignment,
+    RegionSimilarity,
+    SpreadDivergence,
+    SpreadRatio,
+    SurrogacyMetric,
 )
 
 # All explainability functions and classes

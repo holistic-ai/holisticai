@@ -25,6 +25,7 @@ def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
         max_features = max_display
 
     if _type == "global":
+        feat_imp = feat_imp.reset_index("Variable")
         df_feat_imp = feat_imp.iloc[0:max_features, :].sort_values(
             by="Importance", ascending=False
         )

@@ -3,15 +3,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from holisticai.explainability.metrics.local_importance._local_metrics import (
-    dataset_spread_stability,
-    features_spread_stability,
-)
-
-from ..local_importance._local_metrics import (
-    dataset_spread_stability,
-    features_spread_stability,
-)
+from ..local_importance._local_metrics import DataStability, FeatureStability
 from ..utils import (
     BaseFeatureImportance,
     LocalFeatureImportance,
@@ -99,91 +91,25 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
         return feat_imp, cond_feat_imp
 
-    def metrics(self, alpha, detailed=False):
+    def metrics(self, alpha=None, detailed=False):
 
-        reference_values = {
-            "Features Stability Gini": 0,
-            "Dataset Stability Gini": 0,
-        }
+        fs = FeatureStability(detailed=detailed)
+        scores = fs(self.feature_importance, self.conditional_feature_importance)
 
-        if not detailed:
-            d_spread_stability = dataset_spread_stability(
-                self.feature_importance, self.conditional_feature_importance
-            )["result"]
-            d_spread_stability = {k: v["Global"] for k, v in d_spread_stability.items()}
-            d_spread_stability = pd.DataFrame(d_spread_stability, index=[0])
-            d_spread_stability = d_spread_stability.T.rename(columns={0: "Value"})
+        metric_scores = []
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Referemce": fs.reference}
+            for metric_name, value in scores.items()
+        ]
 
-            f_spread_stability = features_spread_stability(
-                self.feature_importance, self.conditional_feature_importance
-            )["result"]
-            f_spread_stability = {k: v["Global"] for k, v in f_spread_stability.items()}
-            f_spread_stability = pd.DataFrame(f_spread_stability, index=[0])
-            f_spread_stability = f_spread_stability.T.rename(columns={0: "Value"})
-        else:
+        ds = DataStability(detailed=detailed)
+        scores = ds(self.feature_importance, self.conditional_feature_importance)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Referemce": fs.reference}
+            for metric_name, value in scores.items()
+        ]
 
-            def rename_metric(x):
-                if not (x["variable"] == "Global"):
-                    return f"{x['index']} {x['variable']}"
-                return f"{x['index']}"
-
-            d_spread_stability = dataset_spread_stability(
-                self.feature_importance, self.conditional_feature_importance
-            )["result"]
-            groups = list(d_spread_stability["Dataset Stability Gini"].keys())
-            d_spread_stability = pd.DataFrame(d_spread_stability).T.reset_index()
-            d_spread_stability = pd.melt(
-                d_spread_stability, id_vars=["index"], value_vars=groups
-            ).reset_index()
-            d_spread_stability["Metric"] = d_spread_stability.apply(
-                lambda x: rename_metric(x), axis=1
-            )
-            d_spread_stability.sort_values("index", inplace=True)
-            d_spread_stability = d_spread_stability[["Metric", "value"]].set_index(
-                "Metric"
-            )
-            d_spread_stability = d_spread_stability.rename(columns={"value": "Value"})
-
-            f_spread_stability = features_spread_stability(
-                self.feature_importance, self.conditional_feature_importance
-            )["result"]
-            groups = list(f_spread_stability["Features Stability Gini"].keys())
-            f_spread_stability = pd.DataFrame(f_spread_stability).T.reset_index()
-            f_spread_stability = pd.melt(
-                f_spread_stability, id_vars=["index"], value_vars=groups
-            ).reset_index()
-
-            f_spread_stability["Metric"] = f_spread_stability.apply(
-                lambda x: rename_metric(x), axis=1
-            )
-            f_spread_stability.sort_values("index", inplace=True)
-            f_spread_stability = f_spread_stability[["Metric", "value"]].set_index(
-                "Metric"
-            )
-            f_spread_stability = f_spread_stability.rename(columns={"value": "Value"})
-
-        metrics = pd.concat([d_spread_stability, f_spread_stability], axis=0)
-
-        def remove_label_markers(metric):
-            words = metric.split(" ")
-            if words[-1] == "Global":
-                metric = " ".join([w for w in words[:-1]])
-            else:
-                metric = " ".join([w for w in words if not w.startswith("[")])
-            return metric
-
-        reference_column = pd.DataFrame(
-            [
-                reference_values.get(
-                    metric, reference_values[remove_label_markers(metric)]
-                )
-                for metric in metrics.index
-            ],
-            columns=["Reference"],
-        ).set_index(metrics.index)
-        metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
-
-        return metrics_with_reference
+        return pd.DataFrame(metric_scores).set_index("Metric").sort_index()
 
     def show_importance_stability(
         self, feature_importance, conditional_feature_importance
@@ -192,36 +118,36 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        data_stability = dataset_spread_stability(
-            feature_importance, conditional_feature_importance
+        fs = FeatureStability(detailed=True)
+        ds = DataStability(detailed=True)
+
+        data_stability = ds(
+            feature_importance, conditional_feature_importance, reduce=False
         )
-        feature_stability = features_spread_stability(
-            feature_importance, conditional_feature_importance
+        feature_stability = fs(
+            feature_importance, conditional_feature_importance, reduce=False
         )
 
-        metric_name = "Importance Spread Ratio"
-
-        def format_data(d):
+        def format_data(name, d):
             df = []
-            for g, x in d["imp_spread"].items():
-                if not g == "Global":
-                    a = pd.DataFrame(d["imp_spread"][g].copy())
-                    a["Output"] = g
-                    df.append(a)
+            for g, x in d.items():
+                a = pd.DataFrame(d[g].copy())
+                a["Output"] = g
+                df.append(a)
             df = pd.concat(df, axis=0)
-            df.columns = [metric_name, "Output"]
+            df.columns = [name, "Output"]
             return df
 
         fig, axs = plt.subplots(1, 2, figsize=(15, 5))
 
-        axs[0].set_title("Data Stability")
-        df = format_data(data_stability)
-        sns.boxplot(data=df, x=metric_name, y="Output", ax=axs[0])
+        axs[0].set_title(ds.name)
+        df = format_data("Spread Ratio", data_stability)
+        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axs[0])
         axs[0].grid()
 
-        axs[1].set_title("Feature Stability")
-        df = format_data(feature_stability)
-        sns.boxplot(data=df, x=metric_name, y="Output", ax=axs[1])
+        axs[1].set_title(fs.name)
+        df = format_data("Spread Ratio", feature_stability)
+        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axs[1])
         axs[1].grid()
 
     def show_data_stability_boundaries(self, n_rows, n_cols, top_n=None, figsize=None):
@@ -232,9 +158,9 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             top_n = 10
 
         fimp, cfimp = self.get_alpha_feature_importance(None)
-        data_stability = dataset_spread_stability(fimp, cfimp)
+        ds = DataStability(detailed=True)
+        spread = ds(fimp, cfimp, reduce=False)
 
-        spread = data_stability["imp_spread"]
         fimp = fimp.groupby("Feature Label")["Importance"].mean()
 
         fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=figsize)
@@ -250,36 +176,32 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         i = 0
         min_values = []
         max_values = []
-        for g, s in spread.items():
+        for g, _ in cfimp.items():
+            s = spread[f"{ds.name} {g}"]
             max_index = s.idxmax()
             min_index = s.idxmin()
 
-            if not (g == "Global"):
-                min_values.append(show_importance(cfimp[g], min_index, axs[0, i]))
-                axs[0, i].set_title(f"{g} Min Ratio [{s.loc[min_index]:.3f}]")
+            min_values.append(show_importance(cfimp[g], min_index, axs[0, i]))
+            axs[0, i].set_title(f"{g} Min Ratio [{s.loc[min_index]:.3f}]")
 
-                max_values.append(show_importance(cfimp[g], max_index, axs[1, i]))
-                axs[1, i].set_title(f"{g} Max Ratio [{s.loc[max_index]:.3f}]")
+            max_values.append(show_importance(cfimp[g], max_index, axs[1, i]))
+            axs[1, i].set_title(f"{g} Max Ratio [{s.loc[max_index]:.3f}]")
 
-                i += 1
+            i += 1
 
         i = 0
         xlim0 = max(min_values)
         xlim1 = max(max_values)
         xlim = max([xlim0, xlim1])
-        for g, s in spread.items():
-            if not (g == "Global"):
-                axs[0, i].set_xlim([0, xlim])
-                axs[1, i].set_xlim([0, xlim])
-                axs[0, i].grid(True)
-                axs[1, i].grid(True)
-                i += 1
+        for g, s in cfimp.items():
+            axs[0, i].set_xlim([0, xlim])
+            axs[1, i].set_xlim([0, xlim])
+            axs[0, i].grid(True)
+            axs[1, i].grid(True)
+            i += 1
         fig.tight_layout()
 
     def show_features_stability_boundaries(self, n_rows, n_cols, figsize=None):
-        from holisticai.explainability.metrics.local_importance._local_metrics import (
-            features_spread_stability,
-        )
 
         if figsize is None:
             figsize = (15, 5)
@@ -287,9 +209,9 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         fimp, cfimp = self.get_alpha_feature_importance(alpha=None)
         fimp = fimp.dropna()
         cfimp = {k: v.dropna() for k, v in cfimp.items()}
-        feature_stability = features_spread_stability(fimp, cfimp)
 
-        spread = feature_stability["imp_spread"]
+        fs = FeatureStability(detailed=True)
+        spread = fs(fimp, cfimp, reduce=False)
 
         if n_cols is None:
             n_cols = len(spread)
@@ -297,14 +219,12 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
         fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=figsize)
         max_values = []
-        for i, (g, s) in enumerate(spread.items()):
+        for i, (g, _) in enumerate(cfimp.items()):
+            s = spread[f"{fs.name} {g}"]
             min_index = s.idxmin()
             max_index = s.idxmax()
 
-            if not (g == "Global"):
-                fi = cfimp[g]
-            else:
-                fi = fimp
+            fi = cfimp[g]
 
             importances = fi[fi["Feature Label"] == min_index]["Importance"]
             max_value1 = importances.max()
@@ -322,7 +242,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
         i = 0
         xlim = max(max_values)
-        for g, s in spread.items():
+        for g, _ in cfimp.items():
             axs[0, i].set_xlim([0, xlim])
             axs[1, i].set_xlim([0, xlim])
             axs[0, i].grid(True)
