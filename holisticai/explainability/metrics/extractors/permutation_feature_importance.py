@@ -5,19 +5,15 @@ import seaborn as sns
 from sklearn.inspection import permutation_importance
 
 from ..global_importance import (
+    ExplainabilityEase,
     FourthFifths,
-    PositionParity, 
-    RankAlignment, 
+    PositionParity,
+    RankAlignment,
     RegionSimilarity,
-    SpreadDivergence, 
+    SpreadDivergence,
     SpreadRatio,
-    ExplainabilityEase
 )
-from ..utils import (
-    BaseFeatureImportance,
-    GlobalFeatureImportance,
-    get_index_groups,
-)
+from ..utils import BaseFeatureImportance, GlobalFeatureImportance, get_index_groups
 
 
 def feature_importance(model, x, y):
@@ -90,28 +86,46 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
 
     def metrics(self, alpha, detailed):
 
-        feat_imp, (alpha_feat_imp, alpha_cond_feat_imp) = self.get_alpha_feature_importance(alpha)
-        
-        metrics = [SpreadDivergence(detailed=detailed), 
-                   SpreadRatio(detailed=detailed), 
-                   PositionParity(detailed=detailed), 
-                   RankAlignment(detailed=detailed), 
-                   RegionSimilarity(detailed=detailed)]
-        
-        ff = FourthFifths(detailed=detailed)        
-        expe = ExplainabilityEase(model_type=self.model_type, model=self.model, x=self.x)
-        
-        
+        feat_imp, (
+            alpha_feat_imp,
+            alpha_cond_feat_imp,
+        ) = self.get_alpha_feature_importance(alpha)
+
+        metrics = [
+            SpreadDivergence(detailed=detailed),
+            SpreadRatio(detailed=detailed),
+            PositionParity(detailed=detailed),
+            RankAlignment(detailed=detailed),
+            RegionSimilarity(detailed=detailed),
+        ]
+
+        ff = FourthFifths(detailed=detailed)
+        expe = ExplainabilityEase(
+            model_type=self.model_type, model=self.model, x=self.x
+        )
+
         metric_scores = []
         scores = ff(feat_imp)
-        metric_scores +=[{'Metric':metric_name, 'Value':value, 'Reference': ff.reference} for metric_name,value in scores.items()]
-        
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": ff.reference}
+            for metric_name, value in scores.items()
+        ]
+
         for metric_fn in metrics:
             scores = metric_fn(alpha_feat_imp, alpha_cond_feat_imp)
-            metric_scores +=[{'Metric':metric_name, 'Value':value, 'Reference': metric_fn.reference} 
-                             for metric_name,value in scores.items()]
-                    
+            metric_scores += [
+                {
+                    "Metric": metric_name,
+                    "Value": value,
+                    "Reference": metric_fn.reference,
+                }
+                for metric_name, value in scores.items()
+            ]
+
         scores = expe(alpha_feat_imp)
-        metric_scores +=[{'Metric':metric_name, 'Value':value, 'Reference': expe.reference} for metric_name,value in scores.items()]
-        
-        return pd.DataFrame(metric_scores).set_index('Metric').sort_index()
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": expe.reference}
+            for metric_name, value in scores.items()
+        ]
+
+        return pd.DataFrame(metric_scores).set_index("Metric").sort_index()

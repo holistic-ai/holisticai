@@ -3,7 +3,10 @@ import warnings
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from holisticai.explainability.metrics.utils import check_feature_importance, check_alpha_domain
+from holisticai.explainability.metrics.utils import (
+    check_alpha_domain,
+    check_feature_importance,
+)
 from holisticai.explainability.plots import bar, contrast_matrix, lolipop
 
 from .metrics.extractors.local_feature_importance import (
@@ -73,9 +76,10 @@ class Explainer:
             elif strategy_type == "surrogate":
                 y_pred = model.predict(x)
                 x, y_pred = check_feature_importance(x, y_pred)
-                
+
                 self.explainer_handler = compute_surrogate_feature_importance(
-                    model_type, x, y_pred)
+                    model_type, x, y_pred
+                )
                 self._strategy_type = "global"
 
             elif strategy_type == "local":
@@ -109,7 +113,8 @@ class Explainer:
                 import shap
 
                 from holisticai.explainability.metrics.utils import ShapTabularHandler
-                x = x.apply(pd.to_numeric, errors='coerce')
+
+                x = x.apply(pd.to_numeric, errors="coerce")
                 X100 = shap.utils.sample(x, 100)
                 local_explainer_handler = ShapTabularHandler(model.predict, X100)
                 self.explainer_handler = compute_local_feature_importance(
@@ -136,10 +141,10 @@ class Explainer:
     def metrics(self, alpha=None, detailed=False):
         """
         alpha: float
-            Percentage of the selected top feature importance 
+            Percentage of the selected top feature importance
         """
         check_alpha_domain(alpha)
-            
+
         self.metric_values = self.explainer_handler.metrics(alpha, detailed=detailed)
         return self.metric_values
 
@@ -152,7 +157,7 @@ class Explainer:
         title: str
             Title of the plot
         alpha: float
-            Percentage of the selected top feature importance 
+            Percentage of the selected top feature importance
         figsize: tuple
             Size of the plot
         """
@@ -174,7 +179,7 @@ class Explainer:
         title: str
             Title of the plot
         alpha: float
-            Percentage of the selected top feature importance 
+            Percentage of the selected top feature importance
         figsize: tuple
             Size of the plot
         """
@@ -201,7 +206,9 @@ class Explainer:
         return self.explainer_handler.tree_visualization(backend, **kargs)
 
     def contrast_visualization(self, show_connections=False):
-        _,(fimp, cfimp) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
+        _, (fimp, cfimp) = self.explainer_handler.get_alpha_feature_importance(
+            alpha=None
+        )
         keys = list(cfimp.keys())
         xticks, matrix = important_constrast_matrix(
             cfimp, fimp, keys, show_connections=show_connections
@@ -225,13 +232,16 @@ class Explainer:
         )
 
     def feature_importance_table(self, sorted_by="Global", top_n=10):
-        
-        _ , (feature_importance, cond_feat_imp) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
-        
+
+        _, (
+            feature_importance,
+            cond_feat_imp,
+        ) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
+
         feature_importance = feature_importance.reset_index()
         if cond_feat_imp is not None:
-            cond_feat_imp = {k:v.reset_index() for k,v in cond_feat_imp.items()}
-        
+            cond_feat_imp = {k: v.reset_index() for k, v in cond_feat_imp.items()}
+
         dfs = []
         df = (
             feature_importance[["Variable", "Importance"]]

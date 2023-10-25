@@ -3,12 +3,12 @@ The :mod:`holisticai.explainability.metrics.global_importance` module includes b
 """
 
 from ._global_metrics import (
-    FourthFifths, 
-    ExplainabilityEase, 
-    PositionParity, 
-    RankAlignment, 
-    RegionSimilarity, 
-    SpreadDivergence, 
+    ExplainabilityEase,
+    FourthFifths,
+    PositionParity,
+    RankAlignment,
+    RegionSimilarity,
+    SpreadDivergence,
     SpreadRatio,
     SurrogacyMetric,
 )

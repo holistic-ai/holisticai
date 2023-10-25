@@ -18,23 +18,29 @@ def importance_distribution_variation(importance, mode):
         raise (f"Unknown distribution variation type: {mode}")
 """
 
+
 class FeatureStability:
     def __init__(self, detailed):
         self.name = "Feature Stability"
         self.reference = 0
         self.detailed = detailed
-    
+
     def __call__(self, feature_importance, conditional_feature_importance, reduce=True):
-        
-        def spread_ratio_function(importance): 
+        def spread_ratio_function(importance):
             return importance_spread(importance, divergence=False)
-            
-        imp_spread = {self.name: feature_importance.groupby("Feature Label")["Importance"].apply(spread_ratio_function)}
-        
+
+        imp_spread = {
+            self.name: feature_importance.groupby("Feature Label")["Importance"].apply(
+                spread_ratio_function
+            )
+        }
+
         if self.detailed:
             for c, cfi in conditional_feature_importance.items():
-                imp_spread[f"{self.name} {c}"] = cfi.groupby("Feature Label")["Importance"].apply(spread_ratio_function)
-        
+                imp_spread[f"{self.name} {c}"] = cfi.groupby("Feature Label")[
+                    "Importance"
+                ].apply(spread_ratio_function)
+
         if reduce:
             return {k: gini_coefficient(v) for k, v in imp_spread.items()}
         else:
@@ -46,23 +52,29 @@ class DataStability:
         self.name = "Data Stability"
         self.reference = 0
         self.detailed = detailed
-    
+
     def __call__(self, feature_importance, conditional_feature_importance, reduce=True):
-        
-        def spread_ratio_function(df): 
+        def spread_ratio_function(df):
             importance = df.set_index("Feature Label")["Importance"]
             return importance_spread(importance, divergence=False)
-                    
-        imp_spread = {self.name: feature_importance.groupby("Sample Id").apply(spread_ratio_function)}
-        
+
+        imp_spread = {
+            self.name: feature_importance.groupby("Sample Id").apply(
+                spread_ratio_function
+            )
+        }
+
         if self.detailed:
             for c, ccfi in conditional_feature_importance.items():
-                imp_spread[f"{self.name} {c}"] = ccfi.groupby("Sample Id").apply(spread_ratio_function)
-        
+                imp_spread[f"{self.name} {c}"] = ccfi.groupby("Sample Id").apply(
+                    spread_ratio_function
+                )
+
         if reduce:
             return {k: gini_coefficient(v) for k, v in imp_spread.items()}
         else:
             return imp_spread
+
 
 """
 def feature_importance_spread_lime(

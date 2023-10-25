@@ -99,11 +99,11 @@ class ExplainabilityEase:
         self.x = x
         self.reference = 1
         self.name = "Explainability Ease"
-    
+
     def __call__(self, feat_imp):
-        kargs = {"model":self.model,  "feature_importance":feat_imp, "x":self.x}
-        
+        kargs = {"model": self.model, "feature_importance": feat_imp, "x": self.x}
+
         if self.model_type == "binary_classification":
-            kargs['target'] = list(sorted(set(self.model.classes_) - {0}))[0]
-            
-        return {self.name : compute_partial_dependence(**kargs)}
+            kargs["target"] = list(sorted(set(self.model.classes_) - {0}))[0]
+
+        return {self.name: compute_partial_dependence(**kargs)}

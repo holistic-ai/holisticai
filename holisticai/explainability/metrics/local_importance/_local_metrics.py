@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ._lime_importance_spread import FeatureStability, DataStability
+from ._lime_importance_spread import DataStability, FeatureStability
 
 """
 def dataset_spread_stability(feature_importance, conditional_feature_importance):

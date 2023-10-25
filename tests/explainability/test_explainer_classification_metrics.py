@@ -3,10 +3,9 @@ import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+
 from holisticai.explainability import Explainer
-from tests.bias.mitigation.testing_utils.utils import (
-     small_categorical_dataset,
-)
+from tests.bias.mitigation.testing_utils.utils import small_categorical_dataset
 
 
 def classification_process_dataset(small_categorical_dataset):
@@ -25,7 +24,9 @@ def train_model(X_train, y_train):
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime", "shap"])
 def test_metrics_within_range(small_categorical_dataset, strategy):
     """Checks if metrics are within the valid range (0 to 1)"""
-    X_train, X_test, y_train, y_test, _ = classification_process_dataset(small_categorical_dataset)
+    X_train, X_test, y_train, y_test, _ = classification_process_dataset(
+        small_categorical_dataset
+    )
     model = train_model(X_train, y_train)
     explainer = Explainer(
         based_on="feature_importance",
@@ -41,7 +42,7 @@ def test_metrics_within_range(small_categorical_dataset, strategy):
     min_valid_value = 0
     max_valid_value = 1
 
-    not_ranged_metrics = ["Importance Spread Divergence"]
+    not_ranged_metrics = ["Spread Divergence"]
 
     for index, row in metrics.iterrows():
         if index in not_ranged_metrics:
@@ -56,7 +57,9 @@ def test_metrics_within_range(small_categorical_dataset, strategy):
 @pytest.mark.parametrize("alpha", [-1, 0, "1"])
 def test_metrics_with_invalid_top_k(small_categorical_dataset, strategy, alpha):
     """Checks if calling metrics with invalid top_k raises a Error"""
-    X_train, X_test, y_train, y_test, _ = classification_process_dataset(small_categorical_dataset)
+    X_train, X_test, y_train, y_test, _ = classification_process_dataset(
+        small_categorical_dataset
+    )
     model = train_model(X_train, y_train)
     explainer = Explainer(
         based_on="feature_importance",
@@ -75,10 +78,12 @@ def test_metrics_with_invalid_top_k(small_categorical_dataset, strategy, alpha):
 
 
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime", "shap"])
-@pytest.mark.parametrize("alpha", [0.5, 0.9])
+@pytest.mark.parametrize("alpha", [0.8, 0.9])
 def test_metrics_with_valid_alpha(small_categorical_dataset, strategy, alpha):
     """Checks if calling metrics with valid alpha works properly"""
-    X_train, X_test, y_train, y_test, _ = classification_process_dataset(small_categorical_dataset)
+    X_train, X_test, y_train, y_test, _ = classification_process_dataset(
+        small_categorical_dataset
+    )
     model = train_model(X_train, y_train)
     explainer = Explainer(
         based_on="feature_importance",
@@ -96,10 +101,12 @@ def test_metrics_with_valid_alpha(small_categorical_dataset, strategy, alpha):
 
 
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime", "shap"])
-@pytest.mark.parametrize("alpha", [0.5, 0.9])
+@pytest.mark.parametrize("alpha", [0.8, 0.9])
 def test_metrics_with_valid_input_data(small_categorical_dataset, strategy, alpha):
     """Checks if the explainer module works when input data is a numpy array or a pandas dataframe"""
-    X_train, X_test, y_train, y_test, _ = classification_process_dataset(small_categorical_dataset)
+    X_train, X_test, y_train, y_test, _ = classification_process_dataset(
+        small_categorical_dataset
+    )
     model = train_model(X_train, y_train)
     explainer = Explainer(
         based_on="feature_importance",

@@ -7,19 +7,23 @@ from holisticai.utils._validation import (
     _matrix_like_to_dataframe,
 )
 
+
 def check_alpha_domain(alpha):
     if alpha is not None:
-        assert (alpha>=0) and (alpha<=1), f"alpha must be between 0 and 1. Valor found: {alpha}"
-    
+        assert (alpha >= 0) and (
+            alpha <= 1
+        ), f"alpha must be between 0 and 1. Valor found: {alpha}"
+
+
 def check_feature_importance(x, y=None, values=None):
     if not isinstance(x, pd.DataFrame):
         x = _matrix_like_to_dataframe(x)
-        
+
     x = x.astype(float)
-    
+
     if (y is None) and (values is None):
         return x
-        
+
     if not isinstance(y, pd.Series):
         y = _array_like_to_series(y)
 
@@ -76,38 +80,46 @@ def alpha_importance_list_lime(
     feature_weight = feature_importance / sum(feature_importance)
     return feature_importance_names.loc[(feature_weight.cumsum() < alpha).values]
 
+
 class Spread:
     def __init__(self, divergence, detailed):
         self.divergence = divergence
         self.detailed = detailed
-        
+
     def __call__(self, feat_imp, cond_feat_imp):
-        spread  = {self.name : importance_spread(feat_imp["Importance"], divergence=self.divergence)}
+        spread = {
+            self.name: importance_spread(
+                feat_imp["Importance"], divergence=self.divergence
+            )
+        }
 
         if self.detailed and (cond_feat_imp is not None):
 
             cond_spread = {}
             for c, cfi in cond_feat_imp.items():
-                cond_spread[f"{self.name} {c}"] = importance_spread(cfi["Importance"], divergence=self.divergence)
-            
+                cond_spread[f"{self.name} {c}"] = importance_spread(
+                    cfi["Importance"], divergence=self.divergence
+                )
+
             return {**spread, **cond_spread}
-            
+
         return spread
-        
+
 
 class SpreadDivergence(Spread):
     def __init__(self, detailed):
         super().__init__(divergence=True, detailed=detailed)
         self.name = "Spread Divergence"
         self.reference = "-"
-        
+
+
 class SpreadRatio(Spread):
     def __init__(self, detailed):
         super().__init__(divergence=False, detailed=detailed)
         self.name = "Spread Ratio"
         self.reference = 0
-        
-        
+
+
 def gini_coefficient(x):
     """Compute Gini coefficient of array of values"""
     diffsum = 0

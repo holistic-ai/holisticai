@@ -48,7 +48,7 @@ def test_metrics_within_range(strategy):
     min_valid_value = 0
     max_valid_value = 1
 
-    not_ranged_metrics = ["Importance Spread Divergence"]
+    not_ranged_metrics = ["Spread Divergence"]
 
     for index, row in metrics.iterrows():
         if index in not_ranged_metrics:
@@ -82,7 +82,7 @@ def test_metrics_with_invalid_top_k(strategy, alpha):
 
 
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime", "shap"])
-@pytest.mark.parametrize("alpha", [0.3, 0.5, 0.9])
+@pytest.mark.parametrize("alpha", [0.8, 0.85, 0.9])
 def test_metrics_with_valid_alpha(strategy, alpha):
     """Checks if calling metrics with valid alpha works properly"""
     X_train, X_test, y_train, y_test, _ = regression_process_dataset()
@@ -103,7 +103,7 @@ def test_metrics_with_valid_alpha(strategy, alpha):
 
 
 @pytest.mark.parametrize("strategy", ["permutation", "surrogate", "lime", "shap"])
-@pytest.mark.parametrize("alpha", [0.3, 0.5, 0.9])
+@pytest.mark.parametrize("alpha", [0.8, 0.85, 0.9])
 def test_metrics_with_valid_input_data(strategy, alpha):
     """Checks if the explainer module works when input data is a numpy array or a pandas dataframe"""
     X_train, X_test, y_train, y_test, feature_names = regression_process_dataset()

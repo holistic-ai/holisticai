@@ -37,7 +37,12 @@ def importance_order_constrast(
     conditional_feature_importance_indexes: np.array
         array with conditional feature importance indexes
     """
-    m_order = [f==c for f,c  in zip(feature_importance_indexes, conditional_features_importance_indexes)]
+    m_order = [
+        f == c
+        for f, c in zip(
+            feature_importance_indexes, conditional_features_importance_indexes
+        )
+    ]
     m_order = np.cumsum(m_order) / np.arange(1, len(m_order) + 1)
 
     return m_order.mean()
@@ -48,12 +53,8 @@ def important_similarity(
 ):
     from sklearn.metrics.pairwise import cosine_similarity
 
-    f1 = np.array(feature_importance_indexes_1["Importance"]).reshape(
-        [1, -1]
-    )
-    f2 = np.array(feature_importance_indexes_2["Importance"]).reshape(
-        [1, -1]
-    )
+    f1 = np.array(feature_importance_indexes_1["Importance"]).reshape([1, -1])
+    f2 = np.array(feature_importance_indexes_2["Importance"]).reshape([1, -1])
 
     return cosine_similarity(f1, f2)[0][0]
 
@@ -75,9 +76,7 @@ def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
             if similarity:
                 values[0, 2 * i] = compare_fn(fimp, cfimp[keys[i]])
             else:
-                values[0, 2 * i] = compare_fn(
-                    fimp.index, cfimp[keys[i]].index
-                )
+                values[0, 2 * i] = compare_fn(fimp.index, cfimp[keys[i]].index)
             xticks[2 * i] = keys[i]
         return xticks, values
 
@@ -110,12 +109,13 @@ def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
     values = np.concatenate([order_values, range_values, sim_values], axis=0)
     return xticks, values
 
+
 class ContrastMetric:
     def __init__(self, detailed, contrast_function):
         self.detailed = detailed
         self.contrast_function = contrast_function
 
-    def __call__(self, feat_imp, cond_feat_imp):       
+    def __call__(self, feat_imp, cond_feat_imp):
 
         cond_contrast = {
             f"{self.name} {k}": self.contrast_function(feat_imp, cfi)
@@ -123,27 +123,32 @@ class ContrastMetric:
         }
         contrast = {self.name: np.mean(list(cond_contrast.values()))}
 
-        if self.detailed:                
+        if self.detailed:
             return {**contrast, **cond_contrast}
-        
-        return contrast
-        
 
-        
+        return contrast
+
+
 class PositionParity(ContrastMetric):
     def __init__(self, detailed):
         self.reference = 1
         self.name = "Position Parity"
-        contrast_fn = lambda x,y : importance_order_constrast(list(x.index), list(y.index))
+        contrast_fn = lambda x, y: importance_order_constrast(
+            list(x.index), list(y.index)
+        )
         super().__init__(detailed, contrast_fn)
-        
+
+
 class RankAlignment(ContrastMetric):
     def __init__(self, detailed):
         self.reference = 1
         self.name = "Rank Alignment"
-        contrast_fn = lambda x,y : importance_range_constrast(list(x.index), list(y.index))
+        contrast_fn = lambda x, y: importance_range_constrast(
+            list(x.index), list(y.index)
+        )
         super().__init__(detailed, contrast_fn)
-        
+
+
 class RegionSimilarity(ContrastMetric):
     def __init__(self, detailed):
         self.reference = 1

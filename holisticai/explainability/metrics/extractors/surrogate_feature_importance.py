@@ -7,8 +7,8 @@ import pandas as pd
 from holisticai.explainability.plots import DecisionTreeVisualizer
 
 from ..global_importance import (
-    FourthFifths,
     ExplainabilityEase,
+    FourthFifths,
     SpreadDivergence,
     SpreadRatio,
     SurrogacyMetric,
@@ -16,7 +16,7 @@ from ..global_importance import (
 from ..utils import (
     BaseFeatureImportance,
     GlobalFeatureImportance,
-    check_feature_importance
+    check_feature_importance,
 )
 
 
@@ -92,33 +92,58 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
 
     def metrics(self, alpha, detailed):
 
-        feat_imp, (alpha_feat_imp, alpha_cond_feat_imp) = self.get_alpha_feature_importance(alpha)
-        
+        feat_imp, (
+            alpha_feat_imp,
+            alpha_cond_feat_imp,
+        ) = self.get_alpha_feature_importance(alpha)
+
+        if len(alpha_feat_imp) == 0:
+            print(
+                f"There are no features for alpha={alpha}, please select a higher value."
+            )
+            return None
+
         sd = SpreadDivergence(detailed=detailed)
         sr = SpreadRatio(detailed=detailed)
         ff = FourthFifths(detailed=detailed)
-        expe = ExplainabilityEase(model_type=self.model_type, model=self.surrogate, x=self.x)
+        expe = ExplainabilityEase(
+            model_type=self.model_type, model=self.surrogate, x=self.x
+        )
         sur_eff = SurrogacyMetric(model_type=self.model_type)
-        
-        metric_scores = []
-        
-        score = sd(alpha_feat_imp, alpha_cond_feat_imp)
-        metric_scores += [{'Metric':metric_name, 'Value': value, 'Reference': sd.reference} for metric_name,value in score.items()]
-        
-        score = sr(alpha_feat_imp, alpha_cond_feat_imp)
-        metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': sr.reference} for metric_name,value in score.items()]
-        
-        score = ff(feat_imp)
-        metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': ff.reference} for metric_name,value in score.items()]
-        
-        score = expe(alpha_feat_imp)
-        metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': expe.reference} for metric_name,value in score.items()]
-        
-        score = sur_eff(self.surrogate, self.x, self.y)
-        metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': sur_eff.reference} \
-            for metric_name,value in score.items()]
 
-        return pd.DataFrame(metric_scores).set_index('Metric').sort_index()
+        metric_scores = []
+
+        score = sd(alpha_feat_imp, alpha_cond_feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": sd.reference}
+            for metric_name, value in score.items()
+        ]
+
+        score = sr(alpha_feat_imp, alpha_cond_feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": sr.reference}
+            for metric_name, value in score.items()
+        ]
+
+        score = ff(feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": ff.reference}
+            for metric_name, value in score.items()
+        ]
+
+        score = expe(alpha_feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": expe.reference}
+            for metric_name, value in score.items()
+        ]
+
+        score = sur_eff(self.surrogate, self.x, self.y)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": sur_eff.reference}
+            for metric_name, value in score.items()
+        ]
+
+        return pd.DataFrame(metric_scores).set_index("Metric").sort_index()
 
     def tree_visualization(self, backend="sklearn", **kargs):
         if backend in self.tree_visualizer.visualization_backend:

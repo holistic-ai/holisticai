@@ -3,9 +3,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from ..local_importance._local_metrics import FeatureStability, DataStability
-
-
+from ..local_importance._local_metrics import DataStability, FeatureStability
 from ..utils import (
     BaseFeatureImportance,
     LocalFeatureImportance,
@@ -97,15 +95,21 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
         fs = FeatureStability(detailed=detailed)
         scores = fs(self.feature_importance, self.conditional_feature_importance)
-        
+
         metric_scores = []
-        metric_scores += [{'Metric':metric_name, 'Value':value, 'Referemce': fs.reference} for metric_name,value in scores.items()]
-        
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Referemce": fs.reference}
+            for metric_name, value in scores.items()
+        ]
+
         ds = DataStability(detailed=detailed)
         scores = ds(self.feature_importance, self.conditional_feature_importance)
-        metric_scores += [{'Metric':metric_name, 'Value':value, 'Referemce': fs.reference} for metric_name,value in scores.items()]
-        
-        return pd.DataFrame(metric_scores).set_index('Metric').sort_index()
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Referemce": fs.reference}
+            for metric_name, value in scores.items()
+        ]
+
+        return pd.DataFrame(metric_scores).set_index("Metric").sort_index()
 
     def show_importance_stability(
         self, feature_importance, conditional_feature_importance
@@ -114,11 +118,15 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        fs =  FeatureStability(detailed=True)
+        fs = FeatureStability(detailed=True)
         ds = DataStability(detailed=True)
-        
-        data_stability = ds(feature_importance, conditional_feature_importance, reduce=False)
-        feature_stability = fs(feature_importance, conditional_feature_importance, reduce=False)
+
+        data_stability = ds(
+            feature_importance, conditional_feature_importance, reduce=False
+        )
+        feature_stability = fs(
+            feature_importance, conditional_feature_importance, reduce=False
+        )
 
         def format_data(name, d):
             df = []
@@ -152,7 +160,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         fimp, cfimp = self.get_alpha_feature_importance(None)
         ds = DataStability(detailed=True)
         spread = ds(fimp, cfimp, reduce=False)
-        
+
         fimp = fimp.groupby("Feature Label")["Importance"].mean()
 
         fig, axs = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=figsize)
@@ -201,7 +209,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         fimp, cfimp = self.get_alpha_feature_importance(alpha=None)
         fimp = fimp.dropna()
         cfimp = {k: v.dropna() for k, v in cfimp.items()}
-        
+
         fs = FeatureStability(detailed=True)
         spread = fs(fimp, cfimp, reduce=False)
 
@@ -216,7 +224,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             min_index = s.idxmin()
             max_index = s.idxmax()
 
-            fi = cfimp[g]            
+            fi = cfimp[g]
 
             importances = fi[fi["Feature Label"] == min_index]["Importance"]
             max_value1 = importances.max()
