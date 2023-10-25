@@ -114,4 +114,4 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
         scores = expe(alpha_feat_imp)
         metric_scores +=[{'Metric':metric_name, 'Value':value, 'Reference': expe.reference} for metric_name,value in scores.items()]
         
-        return pd.DataFrame(metric_scores).set_index('Metric')
+        return pd.DataFrame(metric_scores).set_index('Metric').sort_index()

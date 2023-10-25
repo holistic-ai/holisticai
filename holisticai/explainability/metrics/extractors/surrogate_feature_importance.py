@@ -109,7 +109,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': sr.reference} for metric_name,value in score.items()]
         
         score = ff(feat_imp)
-        metric_scores +[{'Metric':metric_name, 'Value': value, 'Reference': ff.reference} for metric_name,value in score.items()]
+        metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': ff.reference} for metric_name,value in score.items()]
         
         score = expe(alpha_feat_imp)
         metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': expe.reference} for metric_name,value in score.items()]
@@ -118,7 +118,7 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         metric_scores +=[{'Metric':metric_name, 'Value': value, 'Reference': sur_eff.reference} \
             for metric_name,value in score.items()]
 
-        return pd.DataFrame(metric_scores).set_index('Metric')
+        return pd.DataFrame(metric_scores).set_index('Metric').sort_index()
 
     def tree_visualization(self, backend="sklearn", **kargs):
         if backend in self.tree_visualizer.visualization_backend:
