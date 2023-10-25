@@ -1,5 +1,5 @@
-Tutorials
-=========
+Bias
+====
 
 .. _measuring bias:
 

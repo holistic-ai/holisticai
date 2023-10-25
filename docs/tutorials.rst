@@ -1,11 +1,11 @@
 .. _technical risks
 
-Technical Risks
----------------
+Tutorials
+---------
 
 .. toctree::
     :maxdepth: 1
 
     efficacy/efficacy
     tutorials/bias/bias
-    explainability/explainability
+    tutorials/explainability/explainability
