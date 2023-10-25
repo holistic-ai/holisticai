@@ -1,3 +1,9 @@
+## 0.7.2 (2023-10-25)
+
+### Fix
+- Fix explainers metric computation
+- Update Tutorials and readthedocs
+
 ## 0.7.1 (2023-10-13)
 
 ### Fix
