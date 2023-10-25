@@ -54,13 +54,13 @@ def compute_partial_dependence(model, feature_importance, x, target=None):
     class_to_index = {c: i for i, c in index_to_class.items()}
     categories = class_to_index.keys()
 
-    feature_importance_indexes = list(feature_importance["Variable"].index)
+    feature_importance = list(feature_importance.index)
 
     partial_dependence = partial_dependence_creator(
         model,
         grid_resolution=grid_resolution,
         x=x,
-        feature_ids=feature_importance_indexes,
+        features=feature_importance,
         target=target,
     )
     data = {
@@ -92,26 +92,18 @@ def compute_partial_dependence(model, feature_importance, x, target=None):
     return score
 
 
-def explainability_ease_score(model_type, model, x, target, feature_importance):
-    if model_type == "binary_classification":
-        target = list(sorted(set(model.classes_) - {0}))[0]
-        result = pd.DataFrame.from_dict(
-            {
-                "Global Explainability Ease Score": compute_partial_dependence(
-                    model, feature_importance, x, target
-                )
-            },
-            orient="index",
-        )
-
-    elif model_type == "regression":
-        result = pd.DataFrame.from_dict(
-            {
-                "Global Explainability Ease Score": compute_partial_dependence(
-                    model, feature_importance, x
-                )
-            },
-            orient="index",
-        )
-
-    return result.rename(columns={0: "Value"})
+class ExplainabilityEase:
+    def __init__(self, model_type, model, x):
+        self.model_type = model_type
+        self.model = model
+        self.x = x
+        self.reference = 1
+        self.name = "Explainability Ease"
+    
+    def __call__(self, feat_imp):
+        kargs = {"model":self.model,  "feature_importance":feat_imp, "x":self.x}
+        
+        if self.model_type == "binary_classification":
+            kargs['target'] = list(sorted(set(self.model.classes_) - {0}))[0]
+            
+        return {self.name : compute_partial_dependence(**kargs)}

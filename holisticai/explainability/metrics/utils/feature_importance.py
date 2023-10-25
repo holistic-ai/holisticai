@@ -1,4 +1,22 @@
+from ..utils import alpha_feature_importance
+
 class GlobalFeatureImportance:
+    def get_alpha_feature_importance(self, alpha):
+        
+        feat_imp = alpha_feat_imp = self.feature_importance.set_index('Variable').sort_values('Importance', ascending=False)
+        
+        if alpha is not None:
+            alpha_feat_imp = alpha_feature_importance(feat_imp, alpha)
+        
+        alpha_cond_feat_imp = None
+        if hasattr(self, 'conditional_feature_importance') and (self.conditional_feature_importance is not None):
+            alpha_cond_feat_imp = {
+                label:value.set_index('Variable').sort_values('Importance', ascending=False).iloc[:len(alpha_feat_imp.index)]
+                for label, value in self.conditional_feature_importance.items()
+            }
+
+        return feat_imp, (alpha_feat_imp, alpha_cond_feat_imp)
+    
     def partial_dependence_plot(self, first=0, last=None, **plot_kargs):
 
         import matplotlib.pyplot as plt
@@ -9,8 +27,8 @@ class GlobalFeatureImportance:
             last = first + 6
 
         importances = self.get_alpha_feature_importance(alpha=top_k)
-        alpha_feat_imp, alpha_cond_feat_imp = importances
-        features = list(alpha_feat_imp["Variable"])[first:last]
+        feat_imp, (alpha_feat_imp, alpha_cond_feat_imp) = importances
+        features = list(alpha_feat_imp.index)[first:last]
         title = "Partial dependence plot"
         percentiles = (
             (0, 1) if self.model_type == "binary_classification" else (0.05, 0.95)

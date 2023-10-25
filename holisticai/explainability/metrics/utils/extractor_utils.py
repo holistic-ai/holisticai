@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ..utils.explainer_utils import alpha_importance_list, alpha_importance_list_lime
+from ..utils.explainer_utils import alpha_importance_list_lime
 
 
 def quantil_classify(q1, q2, q3, labels, x):
@@ -44,15 +44,6 @@ def get_index_groups(model_type, y):
         return index_groups
     else:
         raise NotImplementedError
-
-
-def get_alpha(df_feature_importance, alpha):
-    feat_id = alpha_importance_list(df_feature_importance, alpha=alpha)
-    df_feature_importance = df_feature_importance.loc[
-        df_feature_importance["Variable"].isin(list(feat_id))
-    ]
-    return df_feature_importance
-
 
 def get_alpha_lime(df_feature_importance, alpha):
 

@@ -3,7 +3,7 @@ import warnings
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from holisticai.explainability.metrics.utils import check_feature_importance
+from holisticai.explainability.metrics.utils import check_feature_importance, check_alpha_domain
 from holisticai.explainability.plots import bar, contrast_matrix, lolipop
 
 from .metrics.extractors.local_feature_importance import (
@@ -21,7 +21,7 @@ warnings.filterwarnings("ignore")
 
 
 class Explainer:
-    def __init__(self, based_on, strategy_type, model_type, x, y, **kargs):
+    def __init__(self, based_on, strategy_type, model_type, x, y=None, **kargs):
         """
         The Explainer class is designed to compute various feature importance strategies and explainability metrics based on different types of models.
 
@@ -60,27 +60,33 @@ class Explainer:
         model = kargs.get("model", None)
 
         if based_on == "feature_importance":
-            x, y = check_feature_importance(x, y)
 
             if strategy_type == "permutation":
+                if y is None:
+                    raise Exception("y (true label) must be passed.")
+                x, y = check_feature_importance(x, y)
                 self.explainer_handler = compute_permutation_feature_importance(
                     model_type, model, x, y
                 )
                 self._strategy_type = "global"
 
             elif strategy_type == "surrogate":
+                y_pred = model.predict(x)
+                x, y_pred = check_feature_importance(x, y_pred)
+                
                 self.explainer_handler = compute_surrogate_feature_importance(
-                    model_type, model, x, y
-                )
+                    model_type, x, y_pred)
                 self._strategy_type = "global"
 
             elif strategy_type == "local":
+                x, y = check_feature_importance(x, y)
                 self.explainer_handler = compute_local_feature_importance(
                     model_type, x, y, **kargs
                 )
                 self._strategy_type = "local"
 
             elif strategy_type == "lime":
+                x, y = check_feature_importance(x, y)
                 self.check_installed_package("lime")
 
                 from holisticai.explainability.metrics.utils import LimeTabularHandler
@@ -98,11 +104,12 @@ class Explainer:
                 self._strategy_type = "local"
 
             elif strategy_type == "shap":
+                x, y = check_feature_importance(x, y)
                 self.check_installed_package("shap")
                 import shap
 
                 from holisticai.explainability.metrics.utils import ShapTabularHandler
-
+                x = x.apply(pd.to_numeric, errors='coerce')
                 X100 = shap.utils.sample(x, 100)
                 local_explainer_handler = ShapTabularHandler(model.predict, X100)
                 self.explainer_handler = compute_local_feature_importance(
@@ -128,9 +135,11 @@ class Explainer:
 
     def metrics(self, alpha=None, detailed=False):
         """
-        alpha: int
-            Number of features to select
+        alpha: float
+            Percentage of the selected top feature importance 
         """
+        check_alpha_domain(alpha)
+            
         self.metric_values = self.explainer_handler.metrics(alpha, detailed=detailed)
         return self.metric_values
 
@@ -142,8 +151,8 @@ class Explainer:
             Maximum number of features to display
         title: str
             Title of the plot
-        alpha: int
-            Number of features to select
+        alpha: float
+            Percentage of the selected top feature importance 
         figsize: tuple
             Size of the plot
         """
@@ -164,8 +173,8 @@ class Explainer:
             Maximum number of features to display
         title: str
             Title of the plot
-        alpha: int
-            Number of features to select
+        alpha: float
+            Percentage of the selected top feature importance 
         figsize: tuple
             Size of the plot
         """
@@ -192,7 +201,7 @@ class Explainer:
         return self.explainer_handler.tree_visualization(backend, **kargs)
 
     def contrast_visualization(self, show_connections=False):
-        fimp, cfimp = self.explainer_handler.get_alpha_feature_importance(alpha=None)
+        _,(fimp, cfimp) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
         keys = list(cfimp.keys())
         xticks, matrix = important_constrast_matrix(
             cfimp, fimp, keys, show_connections=show_connections
@@ -216,10 +225,13 @@ class Explainer:
         )
 
     def feature_importance_table(self, sorted_by="Global", top_n=10):
-        (
-            feature_importance,
-            cond_feat_imp,
-        ) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
+        
+        _ , (feature_importance, cond_feat_imp) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
+        
+        feature_importance = feature_importance.reset_index()
+        if cond_feat_imp is not None:
+            cond_feat_imp = {k:v.reset_index() for k,v in cond_feat_imp.items()}
+        
         dfs = []
         df = (
             feature_importance[["Variable", "Importance"]]

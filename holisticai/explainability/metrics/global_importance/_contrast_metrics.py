@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def __importance_range_constrast(
+def importance_range_constrast(
     feature_importance_indexes: np.ndarray,
     conditional_feature_importance_indexes: np.ndarray,
 ):
@@ -25,7 +25,7 @@ def __importance_range_constrast(
     return m_range.mean()
 
 
-def __importance_order_constrast(
+def importance_order_constrast(
     feature_importance_indexes: np.ndarray,
     conditional_features_importance_indexes: np.ndarray,
 ):
@@ -37,23 +37,21 @@ def __importance_order_constrast(
     conditional_feature_importance_indexes: np.array
         array with conditional feature importance indexes
     """
-    m_order = np.array(feature_importance_indexes) == np.array(
-        conditional_features_importance_indexes
-    )
+    m_order = [f==c for f,c  in zip(feature_importance_indexes, conditional_features_importance_indexes)]
     m_order = np.cumsum(m_order) / np.arange(1, len(m_order) + 1)
 
     return m_order.mean()
 
 
-def __important_similarity(
+def important_similarity(
     feature_importance_indexes_1: np.ndarray, feature_importance_indexes_2: np.ndarray
 ):
     from sklearn.metrics.pairwise import cosine_similarity
 
-    f1 = np.array(feature_importance_indexes_1.sort_index()["Importance"]).reshape(
+    f1 = np.array(feature_importance_indexes_1["Importance"]).reshape(
         [1, -1]
     )
-    f2 = np.array(feature_importance_indexes_2.sort_index()["Importance"]).reshape(
+    f2 = np.array(feature_importance_indexes_2["Importance"]).reshape(
         [1, -1]
     )
 
@@ -70,7 +68,7 @@ def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
                 values[0, 2 * i - 1] = compare_fn(cfimp[keys[i - 1]], cfimp[keys[i]])
             else:
                 values[0, 2 * i - 1] = compare_fn(
-                    cfimp[keys[i - 1]]["Variable"], cfimp[keys[i]]["Variable"]
+                    cfimp[keys[i - 1]].index, cfimp[keys[i]].index
                 )
 
         for i in range(len(keys)):
@@ -78,7 +76,7 @@ def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
                 values[0, 2 * i] = compare_fn(fimp, cfimp[keys[i]])
             else:
                 values[0, 2 * i] = compare_fn(
-                    fimp["Variable"], cfimp[keys[i]]["Variable"]
+                    fimp.index, cfimp[keys[i]].index
                 )
             xticks[2 * i] = keys[i]
         return xticks, values
@@ -91,7 +89,7 @@ def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
             if similarity:
                 values[0, i] = compare_fn(fimp, cfimp[keys[i]])
             else:
-                values[0, i] = compare_fn(fimp["Variable"], cfimp[keys[i]]["Variable"])
+                values[0, i] = compare_fn(fimp.index, cfimp[keys[i]].index)
             xticks[i] = keys[i]
         return xticks, values
 
@@ -101,70 +99,53 @@ def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
         compare_importances_fn = nodes_only
 
     xticks, range_values = compare_importances_fn(
-        cfimp, fimp, keys, __importance_range_constrast
+        cfimp, fimp, keys, importance_range_constrast
     )
     _, order_values = compare_importances_fn(
-        cfimp, fimp, keys, __importance_order_constrast
+        cfimp, fimp, keys, importance_order_constrast
     )
     _, sim_values = compare_importances_fn(
-        cfimp, fimp, keys, __important_similarity, similarity=True
+        cfimp, fimp, keys, important_similarity, similarity=True
     )
     values = np.concatenate([order_values, range_values, sim_values], axis=0)
     return xticks, values
 
+class ContrastMetric:
+    def __init__(self, detailed, contrast_function):
+        self.detailed = detailed
+        self.contrast_function = contrast_function
 
-def feature_importance_contrast(
-    feature_importance, conditional_feature_importance, mode=None, detailed=False
-):
+    def __call__(self, feat_imp, cond_feat_imp):       
 
-    feature_importance_indexes = list(feature_importance.index)
-    conditional_feature_importance_indexes = {
-        k: list(v.index) for k, v in conditional_feature_importance.items()
-    }
-
-    if mode == "range":
-        feature_importance_constrast = {
-            f"Global Range Overlap Score {k}": __importance_range_constrast(
-                feature_importance_indexes, v
-            )
-            for k, v in conditional_feature_importance_indexes.items()
+        cond_contrast = {
+            f"{self.name} {k}": self.contrast_function(feat_imp, cfi)
+            for k, cfi in cond_feat_imp.items()
         }
+        contrast = {self.name: np.mean(list(cond_contrast.values()))}
 
-        if not detailed:
-            feature_importance_constrast = {
-                "Global Range Overlap Score": np.mean(
-                    list(feature_importance_constrast.values())
-                )
-            }
+        if self.detailed:                
+            return {**contrast, **cond_contrast}
+        
+        return contrast
+        
 
-    elif mode == "overlap":
-        feature_importance_constrast = {
-            f"Global Overlap Score {k}": __importance_order_constrast(
-                feature_importance_indexes, v
-            )
-            for k, v in conditional_feature_importance_indexes.items()
-        }
-        if not detailed:
-            feature_importance_constrast = {
-                "Global Overlap Score": np.mean(
-                    list(feature_importance_constrast.values())
-                )
-            }
-
-    elif mode == "similarity":
-        feature_importance_constrast = {
-            f"Global Similarity Score {k}": __important_similarity(
-                feature_importance, v
-            )
-            for k, v in conditional_feature_importance.items()
-        }
-        if not detailed:
-            feature_importance_constrast = {
-                "Global Similarity Score": np.mean(
-                    list(feature_importance_constrast.values())
-                )
-            }
-
-    return pd.DataFrame.from_dict(
-        feature_importance_constrast, orient="index", columns=["Value"]
-    )
+        
+class PositionParity(ContrastMetric):
+    def __init__(self, detailed):
+        self.reference = 1
+        self.name = "Position Parity"
+        contrast_fn = lambda x,y : importance_order_constrast(list(x.index), list(y.index))
+        super().__init__(detailed, contrast_fn)
+        
+class RankAlignment(ContrastMetric):
+    def __init__(self, detailed):
+        self.reference = 1
+        self.name = "Rank Alignment"
+        contrast_fn = lambda x,y : importance_range_constrast(list(x.index), list(y.index))
+        super().__init__(detailed, contrast_fn)
+        
+class RegionSimilarity(ContrastMetric):
+    def __init__(self, detailed):
+        self.reference = 1
+        self.name = "Region Similarity"
+        super().__init__(detailed, important_similarity)
