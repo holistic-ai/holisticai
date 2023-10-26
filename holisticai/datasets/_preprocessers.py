@@ -15,13 +15,32 @@ from .utils_law_school_dataset import process_law_school_dataset
 from .utils_student_dataset import process_student_dataset
 
 
-def load_dataset(
-    dataset="adult", preprocessed=True, as_array=False, **kwargs
-):
+def load_dataset(dataset="adult", preprocessed=True, as_array=False, **kwargs):
     """
     Loads and preprocess tutorial datasets. Allows to return the data as numpy arrays or pandas dataframes.
 
+    For 'adult' dataset, the protected attribute is 'sex', the preprocessed array version returns a tuple with four numpy arrays containing the data,
+    output variable, protected group A and protected group B. The preprocessed dataframe version returns a tuple
+    with three pandas dataframes containing the data, protected group A and protected group B, the target column is 'class'.
+
+    For 'crime' dataset, the protected attribute is 'racePctWhite', the preprocessed array version returns a tuple with four numpy arrays containing the data,
+    output variable, protected group A and protected group B. The preprocessed dataframe version returns a tuple
+    with three pandas dataframes containing the data, protected group A and protected group B, the target column is 'ViolentCrimesPerPop'.
+
+    For 'student' dataset, the protected attribute is 'Mjob', the preprocessed array version returns a tuple with three numpy arrays containing the data,
+    output variable and protected attribute. The preprocessed dataframe version returns a tuple
+    with two pandas dataframes containing the data and the protected attribute, the target column is 'target'.
+
+    For 'law_school' dataset, the protected attribute is 'race1', the preprocessed array version returns a tuple with four numpy arrays containing the data,
+    output variable, protected group A and protected group B. The preprocessed dataframe version returns a tuple
+    with three pandas dataframes containing the data, protected group A and protected group B, the target column is 'target'.
+
+    For 'lastfm' dataset, the protected attribute is 'sex', returns a tuple with two elements, the first one is a numpy array containing the pivot matrix and
+    the second one is a numpy array containing the protected attribute.
+
     Obs.: The lastfm dataset preprocessing returns a pivot matrix, which is a numpy array. Therefore, the as_array parameter is ignored for this dataset.
+    Contrary to other datasets, the student dataset preprocessing does not return two vectors for protected groups, but only one vector. This is because
+    this dataset is more suitable for analysis where more than two elements are in the protected group.
 
     Parameters
     ----------
