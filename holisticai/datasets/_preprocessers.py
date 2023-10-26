@@ -15,7 +15,7 @@ from .utils_law_school_dataset import process_law_school_dataset
 from .utils_student_dataset import process_student_dataset
 
 
-def load_preprocessed_dataset(
+def load_dataset(
     dataset="adult", preprocessed=True, as_array=False, **kwargs
 ):
     """

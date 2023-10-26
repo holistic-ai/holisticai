@@ -9,7 +9,7 @@ from ._dataloaders import (
     load_student,
     load_us_crime,
 )
-from ._preprocessers import load_preprocessed_dataset
+from ._preprocessers import load_dataset
 
 __all__ = [
     "load_adult",
@@ -17,5 +17,5 @@ __all__ = [
     "load_law_school",
     "load_last_fm",
     "load_us_crime",
-    "load_preprocessed_dataset",
+    "load_dataset",
 ]
