@@ -9,7 +9,7 @@ from .dataset_processing_utils import (
 )
 
 
-def preprocess_adult_dataset(df, protected_attribute, output_variable, drop_columns):
+def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_columns):
     """
     Pre-processes the adult dataset by converting the output variable to a binary variable, dropping unnecessary columns, converting categorical columns to one-hot encoded columns and converting the output variable to a binary variable
 
@@ -33,7 +33,6 @@ def preprocess_adult_dataset(df, protected_attribute, output_variable, drop_colu
     group_b : pandas.DataFrame
         The dataframe containing the protected group B
     """
-    df = df.dropna()
     group_a = get_protected_values(df, protected_attribute, "Female")
     group_b = get_protected_values(df, protected_attribute, "Male")
     unique_values = df[output_variable].unique()
@@ -44,7 +43,7 @@ def preprocess_adult_dataset(df, protected_attribute, output_variable, drop_colu
     return post_process_dataframe(df, group_a, group_b)
 
 
-def process_adult_dataset(as_array=False, preprocessed=False, **kwargs):
+def process_adult_dataset(as_array=False):
     """
     Processes the adult dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
 
@@ -58,15 +57,13 @@ def process_adult_dataset(as_array=False, preprocessed=False, **kwargs):
     tuple
         When as_array is True, returns a tuple with four numpy arrays containing the data, output variable, protected group A and protected group B. When as_array is False, returns a tuple with three pandas dataframes containing the data, protected group A and protected group B
     """
-    if not preprocessed:
-        return load_adult(**kwargs)
     data = load_adult()
     protected_attribute = "sex"
     output_variable = "class"
     drop_columns = ["education", "race", "sex", "class"]
     df = pd.concat([data["data"], data["target"]], axis=1)
     df = remove_nans(df)
-    df, group_a, group_b = preprocess_adult_dataset(
+    df, group_a, group_b = __preprocess_adult_dataset(
         df, protected_attribute, output_variable, drop_columns
     )
     if as_array:

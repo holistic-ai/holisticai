@@ -6,7 +6,7 @@ from .dataset_processing_utils import (
 )
 
 
-def preprocess_law_school_dataset(
+def __preprocess_law_school_dataset(
     df, protected_attribute, output_variable, drop_columns
 ):
     """
@@ -42,7 +42,7 @@ def preprocess_law_school_dataset(
     return post_process_dataframe(df, group_a, group_b)
 
 
-def process_law_school_dataset(as_array=False, preprocessed=False, **kwargs):
+def process_law_school_dataset(as_array=False):
     """
     Processes the law school dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
     For convenience, the output variable is renamed to 'target'.
@@ -57,14 +57,12 @@ def process_law_school_dataset(as_array=False, preprocessed=False, **kwargs):
     tuple
         When as_array is True, returns a tuple with four numpy arrays containing the data, output variable, protected group A and protected group B. When as_array is False, returns a tuple with three pandas dataframes containing the data, protected group A and protected group B
     """
-    if not preprocessed:
-        return load_law_school(**kwargs)
     protected_attribute = "race1"
     output_variable = "bar"
     drop_columns = ["ugpagt3", "race1", "gender", "bar"]
     bunch = load_law_school()
     df = bunch["frame"]
-    df, group_a, group_b = preprocess_law_school_dataset(
+    df, group_a, group_b = __preprocess_law_school_dataset(
         df, protected_attribute, output_variable, drop_columns
     )
     if as_array:

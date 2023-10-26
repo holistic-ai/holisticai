@@ -4,7 +4,7 @@ from ._dataloaders import load_us_crime
 from .dataset_processing_utils import post_process_dataset, remove_nans
 
 
-def preprocess_us_crime_dataset(df, protected_attribute, threshold=0.5):
+def __preprocess_us_crime_dataset(df, protected_attribute, threshold=0.5):
     """
     Pre-processes the US crime dataset by converting the output variable to a binary variable, dropping unnecessary columns, converting categorical columns to one-hot encoded columns and converting the output variable to a binary variable
 
@@ -35,7 +35,7 @@ def preprocess_us_crime_dataset(df, protected_attribute, threshold=0.5):
     return df, group_a, group_b
 
 
-def process_crime_dataset(as_array=False, preprocessed=False, **kwargs):
+def process_crime_dataset(as_array=False):
     """
     Processes the US crime dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
 
@@ -49,14 +49,13 @@ def process_crime_dataset(as_array=False, preprocessed=False, **kwargs):
     tuple
         When as_array is True, returns a tuple with four numpy arrays containing the data, output variable, protected group A and protected group B. When as_array is False, returns a tuple with three pandas dataframes containing the data, protected group A and protected group B
     """
-    if not preprocessed:
-        return load_us_crime(**kwargs)
+
     data = load_us_crime()
     protected_attribute = "racePctWhite"
     output_variable = "ViolentCrimesPerPop"
     df = pd.concat([data["data"], data["target"]], axis=1)
     df = remove_nans(df)
-    df, group_a, group_b = preprocess_us_crime_dataset(
+    df, group_a, group_b = __preprocess_us_crime_dataset(
         df, protected_attribute=protected_attribute
     )
     if as_array:

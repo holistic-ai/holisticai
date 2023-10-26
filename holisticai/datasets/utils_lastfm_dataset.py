@@ -4,7 +4,7 @@ from ._dataloaders import load_last_fm
 from .dataset_processing_utils import post_process_recommender
 
 
-def preprocess_lastfm_dataset(df, protected_attribute, user_column, item_column):
+def __preprocess_lastfm_dataset(df, protected_attribute, user_column, item_column):
     """
     Performs the pre-processing step of the data.
 
@@ -42,7 +42,7 @@ def preprocess_lastfm_dataset(df, protected_attribute, user_column, item_column)
     return df_pivot, p_attr
 
 
-def process_lastfm_dataset(preprocessed=False, **kwargs):
+def process_lastfm_dataset():
     """
     Processes the lastfm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -58,14 +58,12 @@ def process_lastfm_dataset(preprocessed=False, **kwargs):
     p_attr : np.ndarray
         The protected attribute
     """
-    if not preprocessed:
-        return load_last_fm(**kwargs)
     bunch = load_last_fm()
     df = bunch["frame"]
     protected_attribute = "sex"
     user_column = "user"
     item_column = "artist"
-    df_pivot, p_attr = preprocess_lastfm_dataset(
+    df_pivot, p_attr = __preprocess_lastfm_dataset(
         df,
         protected_attribute=protected_attribute,
         user_column=user_column,
