@@ -42,7 +42,7 @@ def preprocess_lastfm_dataset(df, protected_attribute, user_column, item_column)
     return df_pivot, p_attr
 
 
-def process_lastfm_dataset():
+def process_lastfm_dataset(preprocessed=False, **kwargs):
     """
     Processes the lastfm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -58,6 +58,8 @@ def process_lastfm_dataset():
     p_attr : np.ndarray
         The protected attribute
     """
+    if not preprocessed:
+        return load_last_fm(**kwargs)
     bunch = load_last_fm()
     df = bunch["frame"]
     protected_attribute = "sex"

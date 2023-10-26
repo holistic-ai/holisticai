@@ -35,7 +35,7 @@ def preprocess_us_crime_dataset(df, protected_attribute, threshold=0.5):
     return df, group_a, group_b
 
 
-def process_crime_dataset(as_array=False):
+def process_crime_dataset(as_array=False, preprocessed=False, **kwargs):
     """
     Processes the US crime dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
 
@@ -49,6 +49,8 @@ def process_crime_dataset(as_array=False):
     tuple
         When as_array is True, returns a tuple with four numpy arrays containing the data, output variable, protected group A and protected group B. When as_array is False, returns a tuple with three pandas dataframes containing the data, protected group A and protected group B
     """
+    if not preprocessed:
+        return load_us_crime(**kwargs)
     data = load_us_crime()
     protected_attribute = "racePctWhite"
     output_variable = "ViolentCrimesPerPop"

@@ -42,7 +42,7 @@ def preprocess_student_dataset(df, protected_attribute, output_variable, drop_co
     return df, p_attr
 
 
-def process_student_dataset(as_array=False):
+def process_student_dataset(as_array=False, preprocessed=False, **kwargs):
     """
     Processes the student dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
 
@@ -56,6 +56,8 @@ def process_student_dataset(as_array=False):
     tuple
         When as_array is True, returns a tuple with three numpy arrays containing the data, output variable and protected attribute. When as_array is False, returns a tuple with two pandas dataframes containing the data and the protected attribute
     """
+    if not preprocessed:
+        return load_student(**kwargs)
     protected_attribute = "Mjob"
     output_variable = "G3"
     drop_columns = ["G1", "G2", "G3", "Mjob", "age", "Fjob"]
