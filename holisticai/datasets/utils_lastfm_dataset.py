@@ -42,7 +42,7 @@ def __preprocess_lastfm_dataset(df, protected_attribute, user_column, item_colum
     return df_pivot, p_attr
 
 
-def process_lastfm_dataset():
+def process_lastfm_dataset(as_array=False):
     """
     Processes the lastfm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -69,5 +69,7 @@ def process_lastfm_dataset():
         user_column=user_column,
         item_column=item_column,
     )
-    data_matrix = post_process_recommender(df_pivot)
-    return data_matrix, p_attr
+    if as_array:
+        data_matrix = post_process_recommender(df_pivot)
+        return data_matrix, p_attr
+    return df_pivot, p_attr

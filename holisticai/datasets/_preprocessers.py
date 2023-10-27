@@ -35,11 +35,10 @@ def load_dataset(dataset="adult", preprocessed=True, as_array=False, **kwargs):
     output variable, protected group A and protected group B. The preprocessed dataframe version returns a tuple
     with three pandas dataframes containing the data, protected group A and protected group B, the target column is 'target'.
 
-    For 'lastfm' dataset, the protected attribute is 'sex', returns a tuple with two elements, the first one is a numpy array containing the pivot matrix and
+    For 'lastfm' dataset, the protected attribute is 'sex', returns a tuple with two elements, the first one is a numpy array or pandas dataframe containing the pivot matrix and
     the second one is a numpy array containing the protected attribute.
 
-    Obs.: The lastfm dataset preprocessing returns a pivot matrix, which is a numpy array. Therefore, the as_array parameter is ignored for this dataset.
-    Contrary to other datasets, the student dataset preprocessing does not return two vectors for protected groups, but only one vector. This is because
+    Obs.: Contrary to other datasets, the student dataset preprocessing does not return two vectors for protected groups, but only one vector. This is because
     this dataset is more suitable for analysis where more than two elements are in the protected group.
 
     Parameters
@@ -75,6 +74,6 @@ def load_dataset(dataset="adult", preprocessed=True, as_array=False, **kwargs):
     elif dataset == "lastfm":
         if not preprocessed:
             return load_last_fm(**kwargs)
-        return process_lastfm_dataset()
+        return process_lastfm_dataset(as_array)
     else:
         raise ValueError(f"Unknown dataset: {dataset}")
