@@ -7,17 +7,16 @@ import pandas as pd
 from holisticai.explainability.plots import DecisionTreeVisualizer
 
 from ..global_importance import (
-    fourth_fifths,
-    global_explainability_ease_score,
-    importance_spread_divergence,
-    importance_spread_ratio,
-    surrogate_efficacy,
+    ExplainabilityEase,
+    FourthFifths,
+    SpreadDivergence,
+    SpreadRatio,
+    SurrogacyMetric,
 )
 from ..utils import (
     BaseFeatureImportance,
     GlobalFeatureImportance,
     check_feature_importance,
-    get_top_k,
 )
 
 
@@ -49,7 +48,7 @@ def create_surrogate_model(model_type, x, y):
         )
 
 
-def compute_surrogate_feature_importance(model_type, model, x, y):
+def compute_surrogate_feature_importance(model_type, x, y_pred):
     """
     Compute surrogate feature importance for a given model type, model and input features.
 
@@ -61,7 +60,6 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     Returns:
         holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
     """
-    y_pred = model.predict(x)
     surrogate = create_surrogate_model(model_type, x, y_pred)
     feature_names = x.columns
     forest = surrogate
@@ -80,71 +78,72 @@ def compute_surrogate_feature_importance(model_type, model, x, y):
     df_feat_imp["Importance"] /= df_feat_imp["Importance"].sum()
     df_feat_imp = df_feat_imp.sort_values("Importance", ascending=False).copy()
 
-    return SurrogateFeatureImportance(model_type, model, x, y, df_feat_imp, surrogate)
+    return SurrogateFeatureImportance(model_type, x, y_pred, df_feat_imp, surrogate)
 
 
 class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance):
-    def __init__(self, model_type, model, x, y, importance_weights, surrogate):
+    def __init__(self, model_type, x, y_pred, importance_weights, surrogate):
         self.model_type = model_type
-        self.model = model
+        self.y = y_pred
         self.x = x
-        self.y = y
         self.feature_importance = importance_weights
-        self.surrogate = surrogate
+        self.surrogate = self.model = surrogate
         self.tree_visualizer = DecisionTreeVisualizer()
 
-    def get_topk(self, top_k):
-        if top_k is None:
-            feat_imp = self.feature_importance
-        else:
-            feat_imp = get_top_k(self.feature_importance, top_k)
+    def metrics(self, alpha, detailed):
 
-        return {"feature_importance": feat_imp}
+        feat_imp, (
+            alpha_feat_imp,
+            alpha_cond_feat_imp,
+        ) = self.get_alpha_feature_importance(alpha)
 
-    def metrics(self, feature_importance, detailed):
+        if len(alpha_feat_imp) == 0:
+            print(
+                f"There are no features for alpha={alpha}, please select a higher value."
+            )
+            return None
 
-        reference_values = {
-            "Fourth Fifths": 0,
-            "Importance Spread Divergence": "-",
-            "Importance Spread Ratio": 0,
-            "Global Explainability Ease Score": 1,
-            "Surrogate Efficacy Classification": 1,
-            "Surrogate Efficacy Regression": 0,
-        }
-
-        metrics = pd.concat(
-            [
-                fourth_fifths(feature_importance),
-                importance_spread_divergence(feature_importance),
-                importance_spread_ratio(feature_importance),
-                global_explainability_ease_score(
-                    self.model_type, self.model, self.x, self.y, feature_importance
-                ),
-                surrogate_efficacy(self.model_type, self.x, self.y, self.surrogate),
-            ],
-            axis=0,
+        sd = SpreadDivergence(detailed=detailed)
+        sr = SpreadRatio(detailed=detailed)
+        ff = FourthFifths(detailed=detailed)
+        expe = ExplainabilityEase(
+            model_type=self.model_type, model=self.surrogate, x=self.x
         )
+        sur_eff = SurrogacyMetric(model_type=self.model_type)
 
-        def remove_label_markers(metric):
-            words = metric.split(" ")
-            if words[-1] == "Global":
-                metric = " ".join([w for w in words[:-1]])
-            else:
-                metric = " ".join([w for w in words if not w.startswith("[")])
-            return metric
+        metric_scores = []
 
-        reference_column = pd.DataFrame(
-            [
-                reference_values.get(
-                    metric, reference_values[remove_label_markers(metric)]
-                )
-                for metric in metrics.index
-            ],
-            columns=["Reference"],
-        ).set_index(metrics.index)
-        metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
+        score = sd(alpha_feat_imp, alpha_cond_feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": sd.reference}
+            for metric_name, value in score.items()
+        ]
 
-        return metrics_with_reference
+        score = sr(alpha_feat_imp, alpha_cond_feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": sr.reference}
+            for metric_name, value in score.items()
+        ]
+
+        score = ff(feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": ff.reference}
+            for metric_name, value in score.items()
+        ]
+
+        score = expe(alpha_feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": expe.reference}
+            for metric_name, value in score.items()
+        ]
+
+        score = sur_eff(self.surrogate, self.x, self.y)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": sur_eff.reference}
+            for metric_name, value in score.items()
+        ]
+
+        return pd.DataFrame(metric_scores).set_index("Metric").sort_index()
 
     def tree_visualization(self, backend="sklearn", **kargs):
         if backend in self.tree_visualizer.visualization_backend:

@@ -1,40 +1,37 @@
-import numpy as np
-import pandas as pd
-
 from holisticai.efficacy.metrics import (
     classification_efficacy_metrics,
     regression_efficacy_metrics,
 )
 
 
-def compute_surrogate_efficacy_metrics(model_type, x, y, surrogate):
-    """
-    Compute surrogate efficacy metrics for a given model type, model, input features and predicted output.
+class SurrogacyMetric:
+    def __init__(self, model_type):
+        if model_type == "binary_classification":
+            from sklearn.metrics import accuracy_score
 
-    Args:
-        model_type (str): The type of the model, either 'binary_classification' or 'regression'.
-        x (pandas.DataFrame): The input features.
-        surrogate (sklearn estimator): The surrogate model.
+            self.efficacy_metric = accuracy_score
+            self.reference = 1
+        else:
+            from holisticai.efficacy.metrics import smape
 
-    Returns:
-        pandas.DataFrame: The surrogate efficacy metrics.
-    """
+            self.efficacy_metric = smape
+            self.reference = 0
 
-    prediction = surrogate.predict(x)
+        self.name = "Surrogacy Efficacy"
 
-    if model_type == "binary_classification":
-        metric = {
-            "Surrogate Efficacy Classification": classification_efficacy_metrics(
-                prediction, y
-            ).loc["Accuracy"]
-        }
+    def __call__(self, surrogate, x, y):
+        """
+        Compute surrogate efficacy metrics for a given model type, model, input features and predicted output.
 
-    elif model_type == "regression":
-        metric = {
-            "Surrogate Efficacy Regression": regression_efficacy_metrics(
-                prediction, y
-            ).loc["SMAPE"]
-        }
+        Args:
+            model_type (str): The type of the model, either 'binary_classification' or 'regression'.
+            x (pandas.DataFrame): The input features.
+            surrogate (sklearn estimator): The surrogate model.
 
-    metric = pd.DataFrame(metric)
-    return metric.rename(columns={0: "Value"}).T[["Value"]]
+        Returns:
+            pandas.DataFrame: The surrogate efficacy metrics.
+        """
+
+        prediction = surrogate.predict(x)
+
+        return {self.name: self.efficacy_metric(y, prediction)}

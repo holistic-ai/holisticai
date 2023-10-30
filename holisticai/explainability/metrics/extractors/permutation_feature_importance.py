@@ -5,20 +5,15 @@ import seaborn as sns
 from sklearn.inspection import permutation_importance
 
 from ..global_importance import (
-    fourth_fifths,
-    global_explainability_ease_score,
-    global_overlap_score,
-    global_range_overlap_score,
-    global_similarity_score,
-    importance_spread_divergence,
-    importance_spread_ratio,
+    ExplainabilityEase,
+    FourthFifths,
+    PositionParity,
+    RankAlignment,
+    RegionSimilarity,
+    SpreadDivergence,
+    SpreadRatio,
 )
-from ..utils import (
-    BaseFeatureImportance,
-    GlobalFeatureImportance,
-    get_index_groups,
-    get_top_k,
-)
+from ..utils import BaseFeatureImportance, GlobalFeatureImportance, get_index_groups
 
 
 def feature_importance(model, x, y):
@@ -89,72 +84,48 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
         self.conditional_feature_importance = conditional_importance_weights
         self.index_groups = index_groups
 
-    def get_topk(self, top_k):
-        if top_k is None:
-            feat_imp = self.feature_importance
-            cond_feat_imp = self.conditional_feature_importance
-        else:
-            feat_imp = get_top_k(self.feature_importance, top_k)
-            cond_feat_imp = {
-                label: get_top_k(value, top_k)
-                for label, value in self.conditional_feature_importance.items()
-            }
+    def metrics(self, alpha, detailed):
 
-        return {
-            "feature_importance": feat_imp,
-            "conditional_feature_importance": cond_feat_imp,
-        }
+        feat_imp, (
+            alpha_feat_imp,
+            alpha_cond_feat_imp,
+        ) = self.get_alpha_feature_importance(alpha)
 
-    def metrics(self, feature_importance, conditional_feature_importance, detailed):
+        metrics = [
+            SpreadDivergence(detailed=detailed),
+            SpreadRatio(detailed=detailed),
+            PositionParity(detailed=detailed),
+            RankAlignment(detailed=detailed),
+            RegionSimilarity(detailed=detailed),
+        ]
 
-        reference_values = {
-            "Fourth Fifths": 0,
-            "Importance Spread Divergence": "-",
-            "Importance Spread Ratio": 0,
-            "Global Overlap Score": 1,
-            "Global Range Overlap Score": 1,
-            "Global Similarity Score": 1,
-            "Global Explainability Ease Score": 1,
-        }
-
-        metrics = pd.concat(
-            [
-                fourth_fifths(feature_importance),
-                importance_spread_divergence(feature_importance),
-                importance_spread_ratio(feature_importance),
-                global_overlap_score(
-                    feature_importance, conditional_feature_importance, detailed
-                ),
-                global_range_overlap_score(
-                    feature_importance, conditional_feature_importance, detailed
-                ),
-                global_similarity_score(
-                    feature_importance, conditional_feature_importance, detailed
-                ),
-                global_explainability_ease_score(
-                    self.model_type, self.model, self.x, self.y, feature_importance
-                ),
-            ],
-            axis=0,
+        ff = FourthFifths(detailed=detailed)
+        expe = ExplainabilityEase(
+            model_type=self.model_type, model=self.model, x=self.x
         )
 
-        def remove_label_markers(metric):
-            words = metric.split(" ")
-            if words[-1] == "Global":
-                metric = " ".join([w for w in words[:-1]])
-            else:
-                metric = " ".join([w for w in words if not w.startswith("[")])
-            return metric
+        metric_scores = []
+        scores = ff(feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": ff.reference}
+            for metric_name, value in scores.items()
+        ]
 
-        reference_column = pd.DataFrame(
-            [
-                reference_values.get(
-                    metric, reference_values[remove_label_markers(metric)]
-                )
-                for metric in metrics.index
-            ],
-            columns=["Reference"],
-        ).set_index(metrics.index)
-        metrics_with_reference = pd.concat([metrics, reference_column], axis=1)
+        for metric_fn in metrics:
+            scores = metric_fn(alpha_feat_imp, alpha_cond_feat_imp)
+            metric_scores += [
+                {
+                    "Metric": metric_name,
+                    "Value": value,
+                    "Reference": metric_fn.reference,
+                }
+                for metric_name, value in scores.items()
+            ]
 
-        return metrics_with_reference
+        scores = expe(alpha_feat_imp)
+        metric_scores += [
+            {"Metric": metric_name, "Value": value, "Reference": expe.reference}
+            for metric_name, value in scores.items()
+        ]
+
+        return pd.DataFrame(metric_scores).set_index("Metric").sort_index()

@@ -1,0 +1,1 @@
+from .fairea import Fairea

@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 
-from ._lime_importance_spread import feature_importance_spread_lime
+from ._lime_importance_spread import DataStability, FeatureStability
 
-
+"""
 def dataset_spread_stability(feature_importance, conditional_feature_importance):
     dfis = feature_importance_spread_lime(
         feature_importance, conditional_feature_importance, lime_importance="dataset"
@@ -16,3 +16,4 @@ def features_spread_stability(feature_importance, conditional_feature_importance
         feature_importance, conditional_feature_importance, lime_importance="features"
     )
     return fdis
+"""

@@ -29,7 +29,7 @@ class DecisionTreeVisualizer:
             fi_handler.surrogate,
             out_file=dot_data,
             feature_names=fi_handler.x.columns,
-            **default_params
+            **default_params,
         )
         graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
         img_str = graph.create_png()
@@ -61,6 +61,6 @@ def check_installed_package(backend):
     allowed_packages = ["pydotplus", "dtreeviz", "sklearn"]
     backend_package = importlib.util.find_spec(backend)
     if (backend and allowed_packages) and (backend_package is None):
-        raise (
-            "Package {backend} must be installed. Please install with: pip install {backend}"
+        raise Exception(
+            f"Package {backend} must be installed. Please install with: pip install {backend}"
         )

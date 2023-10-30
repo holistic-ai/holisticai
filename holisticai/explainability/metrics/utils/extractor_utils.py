@@ -1,25 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from ..utils.explainer_utils import four_fifths_list
-
-
-def four_fifths_list_lime(feature_importance, feature_importance_names, cutoff=None):
-    """
-    Parameters
-    ----------
-    feature_importance: np.array
-        array with raw feature importance
-    feature_importance_names: list
-        list with names
-    cutoff: float
-        threshold for feature importance
-    """
-    if cutoff is None:
-        cutoff = 0.80
-
-    feature_weight = feature_importance / sum(feature_importance)
-    return feature_importance_names.loc[(feature_weight.cumsum() < cutoff).values]
+from ..utils.explainer_utils import alpha_importance_list_lime
 
 
 def quantil_classify(q1, q2, q3, labels, x):
@@ -64,15 +46,7 @@ def get_index_groups(model_type, y):
         raise NotImplementedError
 
 
-def get_top_k(df_feature_importance, top_k):
-    feat_id = four_fifths_list(df_feature_importance, cutoff=top_k)
-    df_feature_importance = df_feature_importance.loc[
-        df_feature_importance["Variable"].isin(list(feat_id))
-    ]
-    return df_feature_importance
-
-
-def get_top_k_lime(df_feature_importance, top_k):
+def get_alpha_lime(df_feature_importance, alpha):
 
     mean_importance = (
         df_feature_importance.groupby("Feature Label")["Importance"]
@@ -81,7 +55,7 @@ def get_top_k_lime(df_feature_importance, top_k):
     )
     feat_imp = mean_importance["Importance"]
     feat_names = mean_importance["Feature Label"]
-    feat_id = four_fifths_list_lime(feat_imp, feat_names, cutoff=top_k)
+    feat_id = alpha_importance_list_lime(feat_imp, feat_names, alpha=alpha)
 
     df_feature_importance = df_feature_importance.loc[
         df_feature_importance["Feature Label"].isin(list(feat_id))
