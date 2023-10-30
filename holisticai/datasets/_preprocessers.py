@@ -3,6 +3,7 @@ import pandas as pd
 
 from ._dataloaders import (
     load_adult,
+    load_heart,
     load_last_fm,
     load_law_school,
     load_student,
@@ -10,6 +11,7 @@ from ._dataloaders import (
 )
 from .utils_adult_dataset import process_adult_dataset
 from .utils_crime_dataset import process_crime_dataset
+from .utils_heart_dataset import process_heart_dataset
 from .utils_lastfm_dataset import process_lastfm_dataset
 from .utils_law_school_dataset import process_law_school_dataset
 from .utils_student_dataset import process_student_dataset
@@ -75,5 +77,9 @@ def load_dataset(dataset="adult", preprocessed=True, as_array=False, **kwargs):
         if not preprocessed:
             return load_last_fm(**kwargs)
         return process_lastfm_dataset(as_array)
+    elif dataset == "heart":
+        if not preprocessed:
+            return load_heart(**kwargs)
+        return process_heart_dataset(as_array)
     else:
         raise ValueError(f"Unknown dataset: {dataset}")

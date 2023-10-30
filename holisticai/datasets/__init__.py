@@ -4,6 +4,7 @@ The :mod:`holisticai.datasets` module includes dataloaders for quick experimenta
 
 from ._dataloaders import (
     load_adult,
+    load_heart,
     load_last_fm,
     load_law_school,
     load_student,
@@ -17,5 +18,6 @@ __all__ = [
     "load_law_school",
     "load_last_fm",
     "load_us_crime",
+    "load_heart",
     "load_dataset",
 ]
