@@ -46,15 +46,8 @@ def compute_similarity(df, num_chunks):
 
 
 def compute_partial_dependence(model, feature_importance, x, target=None):
-    num_chunks = 3
-    threshold = 0
-    grid_resolution = 50
-    index_to_class = {0: "Hard", 1: "Medium", 2: "Easy"}
-    class_to_score = {"Hard": 0, "Medium": 0.5, "Easy": 1}
-    class_to_index = {c: i for i, c in index_to_class.items()}
-    categories = class_to_index.keys()
-
     feature_importance = list(feature_importance.index)
+    grid_resolution = 50
 
     partial_dependence = partial_dependence_creator(
         model,
@@ -63,6 +56,18 @@ def compute_partial_dependence(model, feature_importance, x, target=None):
         features=feature_importance,
         target=target,
     )
+
+    return partial_dependence
+
+def compute_explainability_ease_score(partial_dependence):
+    num_chunks = 3
+    threshold = 0
+    index_to_class = {0: "Hard", 1: "Medium", 2: "Easy"}
+    class_to_score = {"Hard": 0, "Medium": 0.5, "Easy": 1}
+    class_to_index = {c: i for i, c in index_to_class.items()}
+    categories = class_to_index.keys()
+
+    
     data = {
         feat: compute_similarity(df, num_chunks)
         for feat, df in partial_dependence.items()
@@ -100,10 +105,11 @@ class ExplainabilityEase:
         self.reference = 1
         self.name = "Explainability Ease"
 
-    def __call__(self, feat_imp):
-        kargs = {"model": self.model, "feature_importance": feat_imp, "x": self.x}
-
+        self.kargs = {"model": self.model, "x": self.x}
         if self.model_type == "binary_classification":
-            kargs["target"] = list(sorted(set(self.model.classes_) - {0}))[0]
+            self.kargs["target"] = list(sorted(set(self.model.classes_) - {0}))[0]
 
-        return {self.name: compute_partial_dependence(**kargs)}
+    def __call__(self, feat_imp):
+        self.kargs["feature_importance"] = feat_imp
+        partial_dependence = compute_partial_dependence(**self.kargs)
+        return {self.name: compute_explainability_ease_score(partial_dependence)}

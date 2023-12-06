@@ -51,6 +51,8 @@ def alpha_feature_importance(feature_importance, alpha=None):
     """
     if alpha is None:
         alpha = 0.8
+    
+    feature_importance = feature_importance.sort_values("Importance", ascending=False)
 
     importance = feature_importance["Importance"]
 
