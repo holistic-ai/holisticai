@@ -59,6 +59,7 @@ def compute_partial_dependence(model, feature_importance, x, target=None):
 
     return partial_dependence
 
+
 def compute_explainability_ease_score(partial_dependence):
     num_chunks = 3
     threshold = 0
@@ -67,7 +68,6 @@ def compute_explainability_ease_score(partial_dependence):
     class_to_index = {c: i for i, c in index_to_class.items()}
     categories = class_to_index.keys()
 
-    
     data = {
         feat: compute_similarity(df, num_chunks)
         for feat, df in partial_dependence.items()
