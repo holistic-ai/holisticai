@@ -7,7 +7,7 @@ from ._global_metrics import (
     FourthFifths,
     PositionParity,
     RankAlignment,
-    RegionSimilarity,
+    ImportantSimilarity,
     SpreadDivergence,
     SpreadRatio,
     SurrogacyMetric,

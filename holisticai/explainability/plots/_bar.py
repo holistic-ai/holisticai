@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 from holisticai.utils import get_colors
 
 
-def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
+def bar(feat_imp, top_k_sep, max_display=None, title=None, figsize=(7, 5), _type="global", ax=None):
     """
     Parameters
     ----------
@@ -30,11 +29,11 @@ def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
             by="Importance", ascending=False
         )
         importance = df_feat_imp["Importance"]
-        df_feat_imp["Variable"] = df_feat_imp["Variable"].str[:20]
+        df_feat_imp["Variable"] = df_feat_imp["Variable"].str[:max_display]
         names = df_feat_imp["Variable"]
 
     else:
-        feat_imp["Feature Label"] = feat_imp["Feature Label"].str[:20]
+        feat_imp["Feature Label"] = feat_imp["Feature Label"].str[:max_display]
         df_feat_imp = (
             feat_imp.groupby("Feature Label")["Importance"]
             .mean()
@@ -50,12 +49,14 @@ def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
     hai_palette = sns.color_palette(colors)
 
     sns.set(style="whitegrid")
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        _, ax = plt.subplots(figsize=figsize)
     sns.barplot(
         y=names,
         x=importance,
         palette=hai_palette,
         ax=ax,
     )
+    ax.axhline(y=top_k_sep-0.5, color='red', linewidth=2)
     ax.set_title(title)
     plt.tight_layout()

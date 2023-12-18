@@ -38,6 +38,8 @@ def compute_similarity(df, num_chunks):
             sim = np.matmul(dc[i], dc[i - 1]) / (
                 np.linalg.norm(dc[i]) * np.linalg.norm(dc[i - 1])
             )
+            if np.isnan(sim):
+                sim = 1
         else:
             sim = 1
         sims.append(sim)
@@ -94,7 +96,7 @@ def compute_explainability_ease_score(partial_dependence):
 
     # metric = {'score':score, 'easy':easy, 'medium':medium, 'hard':hard}
 
-    return score
+    return score,score_data
 
 
 class ExplainabilityEase:
@@ -109,7 +111,10 @@ class ExplainabilityEase:
         if self.model_type == "binary_classification":
             self.kargs["target"] = list(sorted(set(self.model.classes_) - {0}))[0]
 
-    def __call__(self, feat_imp):
+    def __call__(self, feat_imp, return_score_data=False):
         self.kargs["feature_importance"] = feat_imp
         partial_dependence = compute_partial_dependence(**self.kargs)
-        return {self.name: compute_explainability_ease_score(partial_dependence)}
+        score,score_data = compute_explainability_ease_score(partial_dependence)
+        if return_score_data:
+            return {self.name: score}, score_data.set_index('feature')
+        return {self.name: score}

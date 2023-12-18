@@ -2,40 +2,50 @@ from ..utils import alpha_feature_importance
 
 
 class GlobalFeatureImportance:
-    def get_alpha_feature_importance(self, alpha):
+    def get_alpha_feature_importance(self, alpha=0.8):
 
         feat_imp = alpha_feat_imp = self.feature_importance.set_index(
             "Variable"
         ).sort_values("Importance", ascending=False)
-
+        
         if alpha is not None:
             alpha_feat_imp = alpha_feature_importance(feat_imp, alpha)
 
         alpha_cond_feat_imp = None
+        cond_feat_imp = None
         if hasattr(self, "conditional_feature_importance") and (
             self.conditional_feature_importance is not None
         ):
+            cond_feat_imp = {
+                label: value.set_index("Variable").sort_values("Importance", ascending=False)
+                for label, value in self.conditional_feature_importance.items()
+            }
+            
             alpha_cond_feat_imp = {
-                label: value.set_index("Variable")
-                .sort_values("Importance", ascending=False)
-                .iloc[: len(alpha_feat_imp.index)]
+                label: alpha_feature_importance(value, alpha)
                 for label, value in self.conditional_feature_importance.items()
             }
 
-        return feat_imp, (alpha_feat_imp, alpha_cond_feat_imp)
+        return (feat_imp, cond_feat_imp), (alpha_feat_imp, alpha_cond_feat_imp)
 
     def partial_dependence_plot(self, first=0, last=None, **plot_kargs):
 
         import matplotlib.pyplot as plt
         from sklearn.inspection import PartialDependenceDisplay
 
-        top_k = None
         if last == None:
             last = first + 6
-
-        importances = self.get_alpha_feature_importance(alpha=top_k)
-        feat_imp, (alpha_feat_imp, alpha_cond_feat_imp) = importances
+        
+        importances = self.get_alpha_feature_importance()
+        (feat_imp,_), (alpha_feat_imp, alpha_cond_feat_imp) = importances
+        
+        from ..global_importance import ExplainabilityEase
+        expe = ExplainabilityEase(
+            model_type=self.model_type, model=self.model, x=self.x
+        )
+        _,score_data = expe(alpha_feat_imp, return_score_data=True)    
         features = list(alpha_feat_imp.index)[first:last]
+        level = [score_data.loc[f]["scores"] for f in features]
         title = "Partial dependence plot"
         percentiles = (
             (0, 1) if self.model_type == "binary_classification" else (0.05, 0.95)
@@ -44,7 +54,7 @@ class GlobalFeatureImportance:
         common_params = {
             "subsample": 50,
             "n_jobs": 2,
-            "grid_resolution": 20,
+            "grid_resolution": 50,
             "random_state": 0,
             "kind": "average",
             "percentiles": percentiles,
@@ -61,7 +71,11 @@ class GlobalFeatureImportance:
             features,
             **common_params,
         )
-        pdp.figure_.suptitle(title)
+        
+        for lv,ax in zip(level,pdp.axes_[0]):
+            ax.legend([lv])
+                
+        return pdp #.figure_.suptitle(title)
 
 
 class LocalFeatureImportance:

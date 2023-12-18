@@ -91,28 +91,30 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
         return feat_imp, cond_feat_imp
 
-    def metrics(self, alpha=None, detailed=False):
+    def metrics(self, alpha=None, detailed=False, metric_names = None):
+        if metric_names is None:
+            metric_names = ["Feature Stability", "Data Stability"]
 
         fs = FeatureStability(detailed=detailed)
         scores = fs(self.feature_importance, self.conditional_feature_importance)
 
         metric_scores = []
         metric_scores += [
-            {"Metric": metric_name, "Value": value, "Referemce": fs.reference}
+            {"Metric": metric_name, "Value": value, "Reference": fs.reference}
             for metric_name, value in scores.items()
         ]
 
         ds = DataStability(detailed=detailed)
         scores = ds(self.feature_importance, self.conditional_feature_importance)
         metric_scores += [
-            {"Metric": metric_name, "Value": value, "Referemce": fs.reference}
+            {"Metric": metric_name, "Value": value, "Reference": fs.reference}
             for metric_name, value in scores.items()
         ]
 
         return pd.DataFrame(metric_scores).set_index("Metric").sort_index()
 
     def show_importance_stability(
-        self, feature_importance, conditional_feature_importance
+        self, feature_importance, conditional_feature_importance, axes=None
     ):
 
         import matplotlib.pyplot as plt
@@ -137,18 +139,19 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             df = pd.concat(df, axis=0)
             df.columns = [name, "Output"]
             return df
+        
+        if axes is None:
+            fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 
-        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-
-        axs[0].set_title(ds.name)
+        axes[0].set_title(ds.name)
         df = format_data("Spread Ratio", data_stability)
-        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axs[0])
-        axs[0].grid()
+        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axes[0])
+        axes[0].grid()
 
-        axs[1].set_title(fs.name)
+        axes[1].set_title(fs.name)
         df = format_data("Spread Ratio", feature_stability)
-        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axs[1])
-        axs[1].grid()
+        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axes[1])
+        axes[1].grid()
 
     def show_data_stability_boundaries(self, n_rows, n_cols, top_n=None, figsize=None):
         if figsize is None:

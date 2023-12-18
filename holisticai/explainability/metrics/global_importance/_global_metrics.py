@@ -5,7 +5,7 @@ from ..utils.explainer_utils import (
     SpreadRatio,
     alpha_feature_importance,
 )
-from ._contrast_metrics import PositionParity, RankAlignment, RegionSimilarity
+from ._contrast_metrics import PositionParity, RankAlignment, ImportantSimilarity
 from ._explainability_level import ExplainabilityEase
 from ._surrogate_efficacy_metrics import SurrogacyMetric
 

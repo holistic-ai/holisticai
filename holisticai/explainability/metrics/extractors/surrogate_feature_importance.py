@@ -90,12 +90,17 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         self.surrogate = self.model = surrogate
         self.tree_visualizer = DecisionTreeVisualizer()
 
-    def metrics(self, alpha, detailed):
+    def metrics(self, alpha, detailed, metric_names=None):
+        if metric_names is None:
+            metric_names = [
+                "Explainability Ease",
+                "Fourth Fifths", 
+                "Spread Divergence", 
+                "Spread Ratio", 
+                "Surrogacy Efficacy"
+                ]
 
-        feat_imp, (
-            alpha_feat_imp,
-            alpha_cond_feat_imp,
-        ) = self.get_alpha_feature_importance(alpha)
+        (feat_imp,_), (alpha_feat_imp,_) = self.get_alpha_feature_importance(alpha)
 
         if len(alpha_feat_imp) == 0:
             print(
@@ -113,13 +118,13 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
 
         metric_scores = []
 
-        score = sd(alpha_feat_imp, alpha_cond_feat_imp)
+        score = sd(alpha_feat_imp)
         metric_scores += [
             {"Metric": metric_name, "Value": value, "Reference": sd.reference}
             for metric_name, value in score.items()
         ]
 
-        score = sr(alpha_feat_imp, alpha_cond_feat_imp)
+        score = sr(alpha_feat_imp)
         metric_scores += [
             {"Metric": metric_name, "Value": value, "Reference": sr.reference}
             for metric_name, value in score.items()

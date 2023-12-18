@@ -69,7 +69,7 @@ class Explainer:
                     raise Exception("y (true label) must be passed.")
                 x, y = check_feature_importance(x, y)
                 self.explainer_handler = compute_permutation_feature_importance(
-                    model_type, model, x, y
+                    model_type, x, y, **kargs
                 )
                 self._strategy_type = "global"
 
@@ -94,13 +94,14 @@ class Explainer:
                 self.check_installed_package("lime")
 
                 from holisticai.explainability.metrics.utils import LimeTabularHandler
-
+                modeltype2mode = {'binary_classification':'classification', 'regression':"regression"}
+                modeltype2scorer = {'binary_classification': lambda x: model.predict_proba(x), 'regression': lambda x: model.predict(x)}
                 local_explainer_handler = LimeTabularHandler(
-                    model.predict,
+                    modeltype2scorer[model_type],
                     x.values,
                     feature_names=x.columns.tolist(),
                     discretize_continuous=True,
-                    mode="regression",
+                    mode=modeltype2mode[model_type],
                 )
                 self.explainer_handler = compute_local_feature_importance(
                     model_type, x, y, local_explainer_handler=local_explainer_handler
@@ -138,17 +139,17 @@ class Explainer:
     def __getitem__(self, key):
         return self.metric_values.loc[key]["Value"]
 
-    def metrics(self, alpha=None, detailed=False):
+    def metrics(self, alpha=None, detailed=False, metric_names=None):
         """
         alpha: float
             Percentage of the selected top feature importance
         """
         check_alpha_domain(alpha)
 
-        self.metric_values = self.explainer_handler.metrics(alpha, detailed=detailed)
+        self.metric_values = self.explainer_handler.metrics(alpha, detailed=detailed, metric_names=metric_names)
         return self.metric_values
 
-    def bar_plot(self, max_display=None, title=None, alpha=None, figsize=(7, 5)):
+    def bar_plot(self, max_display=None, title=None, alpha=None, figsize=(7, 5), ax=None):
         """
         Parameters
         ----------
@@ -161,14 +162,17 @@ class Explainer:
         figsize: tuple
             Size of the plot
         """
-        feat_imp, _ = self.explainer_handler.get_alpha_feature_importance(alpha)
-        bar(
-            feat_imp,
+        (feat_imp,_),(alpha_feat_imp_,_)= self.explainer_handler.get_alpha_feature_importance(alpha)
+        top_k_sep = len(alpha_feat_imp_)
+        bar(feat_imp=feat_imp,
+            top_k_sep=top_k_sep,
             max_display=max_display,
             title=title,
             figsize=figsize,
             _type=self._strategy_type,
+            ax=ax
         )
+        return feat_imp
 
     def lolipop_plot(self, max_display=None, title=None, alpha=None, figsize=(7, 5)):
         """
@@ -205,24 +209,25 @@ class Explainer:
 
         return self.explainer_handler.tree_visualization(backend, **kargs)
 
-    def contrast_visualization(self, show_connections=False):
-        _, (fimp, cfimp) = self.explainer_handler.get_alpha_feature_importance(
+    def contrast_visualization(self, show_connections=False, ax=None):
+        (fimp,cfimp), (afimp, acfimp) = self.explainer_handler.get_alpha_feature_importance(
             alpha=None
         )
+        
         keys = list(cfimp.keys())
         xticks, matrix = important_constrast_matrix(
-            cfimp, fimp, keys, show_connections=show_connections
+            acfimp, afimp, cfimp, fimp, keys, show_connections=show_connections
         )
-        contrast_matrix(xticks, matrix)
-
+        contrast_matrix(xticks, matrix, ax=ax)
+    
     def partial_dependence_plot(self, first=0, last=None, **plot_kargs):
-        self.explainer_handler.partial_dependence_plot(
+        return self.explainer_handler.partial_dependence_plot(
             first=first, last=last, **plot_kargs
         )
 
-    def show_importance_stability(self):
+    def show_importance_stability(self, axes=None):
         fimp, cfimp = self.explainer_handler.get_alpha_feature_importance(alpha=None)
-        self.explainer_handler.show_importance_stability(fimp, cfimp)
+        self.explainer_handler.show_importance_stability(fimp, cfimp, axes=axes)
 
     def show_data_stability_boundaries(
         self, n_rows=2, n_cols=4, top_n=None, figsize=None
