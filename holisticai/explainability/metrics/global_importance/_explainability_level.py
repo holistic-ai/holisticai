@@ -96,7 +96,7 @@ def compute_explainability_ease_score(partial_dependence):
 
     # metric = {'score':score, 'easy':easy, 'medium':medium, 'hard':hard}
 
-    return score,score_data
+    return score, score_data
 
 
 class ExplainabilityEase:
@@ -114,7 +114,7 @@ class ExplainabilityEase:
     def __call__(self, feat_imp, return_score_data=False):
         self.kargs["feature_importance"] = feat_imp
         partial_dependence = compute_partial_dependence(**self.kargs)
-        score,score_data = compute_explainability_ease_score(partial_dependence)
+        score, score_data = compute_explainability_ease_score(partial_dependence)
         if return_score_data:
-            return {self.name: score}, score_data.set_index('feature')
+            return {self.name: score}, score_data.set_index("feature")
         return {self.name: score}

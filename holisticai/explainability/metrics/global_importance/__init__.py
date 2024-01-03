@@ -5,9 +5,9 @@ The :mod:`holisticai.explainability.metrics.global_importance` module includes b
 from ._global_metrics import (
     ExplainabilityEase,
     FourthFifths,
+    ImportantSimilarity,
     PositionParity,
     RankAlignment,
-    ImportantSimilarity,
     SpreadDivergence,
     SpreadRatio,
     SurrogacyMetric,

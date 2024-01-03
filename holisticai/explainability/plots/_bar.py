@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from holisticai.utils import get_colors
 
 
-def bar(feat_imp, top_k_sep, max_display=None, title=None, figsize=(7, 5), _type="global", ax=None):
+def bar(
+    feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global", ax=None
+):
     """
     Parameters
     ----------
@@ -24,6 +27,7 @@ def bar(feat_imp, top_k_sep, max_display=None, title=None, figsize=(7, 5), _type
         max_features = max_display
 
     if _type == "global":
+        feat_imp, _ = feat_imp
         feat_imp = feat_imp.reset_index("Variable")
         df_feat_imp = feat_imp.iloc[0:max_features, :].sort_values(
             by="Importance", ascending=False
@@ -57,6 +61,5 @@ def bar(feat_imp, top_k_sep, max_display=None, title=None, figsize=(7, 5), _type
         palette=hai_palette,
         ax=ax,
     )
-    ax.axhline(y=top_k_sep-0.5, color='red', linewidth=2)
     ax.set_title(title)
     plt.tight_layout()

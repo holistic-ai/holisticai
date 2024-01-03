@@ -94,13 +94,13 @@ class SurrogateFeatureImportance(BaseFeatureImportance, GlobalFeatureImportance)
         if metric_names is None:
             metric_names = [
                 "Explainability Ease",
-                "Fourth Fifths", 
-                "Spread Divergence", 
-                "Spread Ratio", 
-                "Surrogacy Efficacy"
-                ]
+                "Fourth Fifths",
+                "Spread Divergence",
+                "Spread Ratio",
+                "Surrogacy Efficacy",
+            ]
 
-        (feat_imp,_), (alpha_feat_imp,_) = self.get_alpha_feature_importance(alpha)
+        (feat_imp, _), (alpha_feat_imp, _) = self.get_alpha_feature_importance(alpha)
 
         if len(alpha_feat_imp) == 0:
             print(

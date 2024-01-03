@@ -15,10 +15,16 @@ def importance_range_constrast(
         array with conditional feature importance indexes
     """
     feature_importance_indexes = list(feature_importance_indexes)
-    conditional_features_importance_indexes = list(conditional_features_importance_indexes)
-    min_len = min(len(feature_importance_indexes), len(conditional_features_importance_indexes))
+    conditional_features_importance_indexes = list(
+        conditional_features_importance_indexes
+    )
+    min_len = min(
+        len(feature_importance_indexes), len(conditional_features_importance_indexes)
+    )
     feature_importance_indexes = feature_importance_indexes[:min_len]
-    conditional_features_importance_indexes = conditional_features_importance_indexes[:min_len]
+    conditional_features_importance_indexes = conditional_features_importance_indexes[
+        :min_len
+    ]
     m_range = []
     for top_k in range(1, len(feature_importance_indexes) + 1):
         ggg = set(feature_importance_indexes[:top_k])
@@ -43,10 +49,16 @@ def importance_order_constrast(
         array with conditional feature importance indexes
     """
     feature_importance_indexes = list(feature_importance_indexes)
-    conditional_features_importance_indexes = list(conditional_features_importance_indexes)
-    min_len = min(len(feature_importance_indexes), len(conditional_features_importance_indexes))
+    conditional_features_importance_indexes = list(
+        conditional_features_importance_indexes
+    )
+    min_len = min(
+        len(feature_importance_indexes), len(conditional_features_importance_indexes)
+    )
     feature_importance_indexes = feature_importance_indexes[:min_len]
-    conditional_features_importance_indexes = conditional_features_importance_indexes[:min_len]
+    conditional_features_importance_indexes = conditional_features_importance_indexes[
+        :min_len
+    ]
     m_order = [
         f == c
         for f, c in zip(
@@ -69,7 +81,9 @@ def important_similarity(
     return cosine_similarity(f1, f2)[0][0]
 
 
-def important_constrast_matrix(acfimp, afimp, cfimp, fimp, keys, show_connections=False):
+def important_constrast_matrix(
+    acfimp, afimp, cfimp, fimp, keys, show_connections=False
+):
     def nodes_and_edges(cfimp, fimp, keys, compare_fn, similarity=False):
         total_values = 2 * len(keys) - 1
         values = np.zeros(shape=(1, total_values))

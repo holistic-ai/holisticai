@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+from holisticai.utils import get_colors
+
 from ..local_importance._local_metrics import DataStability, FeatureStability
 from ..utils import (
     BaseFeatureImportance,
@@ -91,7 +93,7 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
 
         return feat_imp, cond_feat_imp
 
-    def metrics(self, alpha=None, detailed=False, metric_names = None):
+    def metrics(self, alpha=None, detailed=False, metric_names=None):
         if metric_names is None:
             metric_names = ["Feature Stability", "Data Stability"]
 
@@ -120,6 +122,9 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
         import matplotlib.pyplot as plt
         import seaborn as sns
 
+        colors = get_colors(10)
+        hai_palette = sns.color_palette(colors)
+
         fs = FeatureStability(detailed=True)
         ds = DataStability(detailed=True)
 
@@ -139,28 +144,36 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             df = pd.concat(df, axis=0)
             df.columns = [name, "Output"]
             return df
-        
+
         if axes is None:
             fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 
         axes[0].set_title(ds.name)
         df = format_data("Spread Ratio", data_stability)
-        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axes[0])
+        sns.boxplot(
+            data=df, x="Spread Ratio", y="Output", ax=axes[0], palette=hai_palette
+        )
         axes[0].grid()
 
         axes[1].set_title(fs.name)
         df = format_data("Spread Ratio", feature_stability)
-        sns.boxplot(data=df, x="Spread Ratio", y="Output", ax=axes[1])
+        sns.boxplot(
+            data=df, x="Spread Ratio", y="Output", ax=axes[1], palette=hai_palette
+        )
         axes[1].grid()
 
-    def show_data_stability_boundaries(self, n_rows, n_cols, top_n=None, figsize=None):
+        plt.tight_layout()
+
+    def show_data_stability_boundaries(
+        self, n_rows, n_cols, top_n=None, figsize=None, alpha=0.8
+    ):
         if figsize is None:
             figsize = (15, 5)
 
         if top_n is None:
             top_n = 10
 
-        fimp, cfimp = self.get_alpha_feature_importance(None)
+        fimp, cfimp = self.get_alpha_feature_importance(alpha=alpha)
         ds = DataStability(detailed=True)
         spread = ds(fimp, cfimp, reduce=False)
 
@@ -204,12 +217,14 @@ class TabularLocalFeatureImportance(BaseFeatureImportance, LocalFeatureImportanc
             i += 1
         fig.tight_layout()
 
-    def show_features_stability_boundaries(self, n_rows, n_cols, figsize=None):
+    def show_features_stability_boundaries(
+        self, n_rows, n_cols, figsize=None, alpha=0.8
+    ):
 
         if figsize is None:
             figsize = (15, 5)
 
-        fimp, cfimp = self.get_alpha_feature_importance(alpha=None)
+        fimp, cfimp = self.get_alpha_feature_importance(alpha=alpha)
         fimp = fimp.dropna()
         cfimp = {k: v.dropna() for k, v in cfimp.items()}
 
