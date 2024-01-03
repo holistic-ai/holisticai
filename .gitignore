@@ -10,9 +10,16 @@ dist/
 
 .python-version
 
+*.tex
+*.png
+*.pdf
+
 docs/html
 docs/_build
 docs/.generated
 docs/efficacy/.generated
 docs/bias/.generated
 docs/explainability/.generated
+
+mlruns/
+mlartifacts/

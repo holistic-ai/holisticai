@@ -1,44 +1,104 @@
 from tqdm import tqdm
+
 import os
-import matplotlib.pyplot as plt
-from holisticai.datasets import load_adult
-from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
-from holisticai.explainability import Explainer
+import matplotlib.pyplot as plt
+
+
+from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_diabetes
 from sklearn.preprocessing import StandardScaler
 
-def load_processed_diabetes(seed):
-    dataset = load_diabetes() # load dataset
-    
-    X = dataset.data # features
-    y = dataset.target # target 
-    y = StandardScaler().fit_transform(y.reshape([-1, 1])).reshape([-1])
-    feature_names = dataset.feature_names # feature names
+from holisticai.explainability import Explainer
+from holisticai.datasets import load_adult
 
-    X = pd.DataFrame(X, columns=feature_names) # convert to dataframe
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed) # train test split
+
+def load_processed_diabetes(seed):
+    """
+    Load the diabetes dataset and return the train test split
+
+    Parameters
+    ----------
+    seed : int
+        random seed for reproducibility
+        
+    Returns
+    -------
+    X_train : pd.DataFrame
+        training data
+    X_test : pd.DataFrame
+        test data
+    y_train : pd.DataFrame
+        training labels
+    y_test : pd.DataFrame
+        test labels
+    """
+    dataset = load_diabetes()
+    
+    X = dataset.data 
+    y = dataset.target 
+    y = StandardScaler().fit_transform(y.reshape([-1, 1])).reshape([-1])
+    feature_names = dataset.feature_names
+
+    X = pd.DataFrame(X, columns=feature_names)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
+    
     return X_train, X_test, y_train, y_test
     
     
-    
 def load_processed_adult(seed):
-    # Dataset
+    """
+    Load the adult dataset and return the train test split
+
+    Parameters
+    ----------
+    seed : int
+        random seed for reproducibility
+
+    Returns
+    -------
+    X_train : pd.DataFrame
+        training data
+    X_test : pd.DataFrame
+        test data
+    y_train : pd.DataFrame
+        training labels
+    y_test : pd.DataFrame
+        test labels
+    """
     dataset = load_adult()
 
-    # Dataframe
     df = pd.concat([dataset["data"], dataset["target"]], axis=1)
     protected_variables = ["sex", "race"]
     output_variable = ["class"]
 
-    # Simple preprocessing
     y = df[output_variable].replace({">50K": 1, "<=50K": 0})
     X = pd.get_dummies(df.drop(protected_variables + output_variable, axis=1), dtype=float)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed) # train test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
+
     return X_train, X_test, y_train, y_test
 
 def train_classifier_model(X_train, X_test, y_train, y_test):
+    """
+    Train a classifier model on the given data
+
+    Parameters
+    ----------
+    X_train : pd.DataFrame
+        training data
+    X_test : pd.DataFrame
+        test data
+    y_train : pd.DataFrame
+        training labels
+    y_test : pd.DataFrame
+        test labels
+
+    Returns
+    -------
+    outputs : list
+        list of dictionaries containing the predictions, efficacy metrics and the model
+    """
     from sklearn.linear_model import LogisticRegression
     from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
     from tqdm import tqdm
@@ -51,18 +111,36 @@ def train_classifier_model(X_train, X_test, y_train, y_test):
         
         model = Pipeline(steps=[
             ('scaler', StandardScaler()), 
-            ('model', model_type())]) # instantiate model
-        model.fit(X_train, y_train) # fit model
+            ('model', model_type())])
+        model.fit(X_train, y_train)
 
-        y_pred = model.predict(X_test) # compute predictions
+        y_pred = model.predict(X_test)
 
-        # compute efficacy metrics
-        res = classification_efficacy_metrics(y_test, y_pred)
-        outputs.append({'y_pred': y_pred, 'X_test':X_test, 'res': res, 'model': model})
-        
+        metrics = classification_efficacy_metrics(y_test, y_pred)
+        outputs.append({'y_pred': y_pred, 'X_test':X_test, 'res': metrics, 'model': model})
+    
     return outputs
 
 def  train_regression_model(X_train, X_test, y_train, y_test):
+    """
+    Train a regressor model on the given data
+
+    Parameters
+    ----------
+    X_train : pd.DataFrame
+        training data
+    X_test : pd.DataFrame
+        test data
+    y_train : pd.DataFrame
+        training labels
+    y_test : pd.DataFrame
+        test labels
+
+    Returns
+    -------
+    outputs : list
+        list of dictionaries containing the predictions, efficacy metrics and the model
+    """
     from sklearn.linear_model import LinearRegression
     from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
     from tqdm import tqdm
@@ -75,18 +153,32 @@ def  train_regression_model(X_train, X_test, y_train, y_test):
         
         model = Pipeline(steps=[
             ('scaler', StandardScaler()), 
-            ('model', model_type())]) # instantiate model
-        model.fit(X_train, y_train) # fit model
+            ('model', model_type())])
+        model.fit(X_train, y_train)
 
-        y_pred = model.predict(X_test) # compute predictions
-
-        # compute efficacy metrics
-        res = regression_efficacy_metrics(y_test, y_pred)
-        outputs.append({'y_pred': y_pred, 'X_test':X_test, 'res': res, 'model': model})
+        y_pred = model.predict(X_test)
+        metrics = regression_efficacy_metrics(y_test, y_pred)
+        outputs.append({'y_pred': y_pred, 'X_test':X_test, 'res': metrics, 'model': model})
         
     return outputs
 
 def save_detailed_metrics(metric_names, explainers, output_path):
+    """
+    Save the detailed metrics for the explainers
+
+    Parameters
+    ----------
+    metric_names : list
+        list of metric names
+    explainers : list
+        list of explainers
+    output_path : str
+        output path
+
+    Returns
+    -------
+    None
+    """
     xai_metrics = [p.metrics(metric_names=metric_names, detailed=True) for p in explainers]
     names = ['LR','RF','GB']
     
@@ -102,9 +194,23 @@ def save_detailed_metrics(metric_names, explainers, output_path):
         f.write(metric_latex)
         
 def run_permutation_explainability(model_type, outputs):
-    output_path=f'{model_type}_plots_permutation'
+    """
+    Run permutation explainability on the given data
+
+    Parameters
+    ----------
+    model_type : str
+        model type - regression or binary_classification
+    outputs : list
+        list of dictionaries containing the predictions, efficacy metrics and the model
+
+    Returns
+    -------
+    None
+    """
+    output_path=f'tutorials/explainability/paper_metrics/{model_type}_plots_permutation'
     os.makedirs(output_path, exist_ok=True)
-    # permutation feature importance
+
     permutation_fi_params = {
             'max_samples' : 5000,
             'n_repeats' : 20,
@@ -122,7 +228,8 @@ def run_permutation_explainability(model_type, outputs):
                             **permutation_fi_params)
         permutation_explainers.append(permutation_explainer)
     
-    metric_names = ["Explainability Ease","Fourth Fifths", "Position Parity", "Rank Alignment", "Region Similarity", "Spread Divergence", "Spread Ratio"]
+    metric_names = ["Explainability Ease","Fourth Fifths", "Position Parity", "Rank Alignment", "Region Similarity", 
+                    "Spread Divergence", "Spread Ratio"]
     save_detailed_metrics(metric_names, permutation_explainers, output_path)
     
     xai_metrics = [p.metrics(metric_names=metric_names, detailed=False) for p in permutation_explainers]
@@ -163,17 +270,31 @@ def run_permutation_explainability(model_type, outputs):
         sr_score = xai_res.loc['Spread Ratio'][n]
         ax.set_title(f"{n} (Fourth Fifths : {ff_score:.3f} | Spread Ratio: {sr_score:.3f})")
         
-    fig.savefig(os.path.join(output_path,f'Fourth Fifths.png'), dpi=300)
+    fig.savefig(os.path.join(output_path,f'fourth_fifths.png'), dpi=300)
     
     fig,axs = plt.subplots(1,3, figsize=(10,3))
     for i,(n,ax) in enumerate(zip(names,axs)):
         permutation_explainers[i].contrast_visualization(show_connections=False, ax=ax)
         ax.set_title(n)
-    fig.savefig(os.path.join(output_path,f'Contrast.png'), dpi=300)
+    fig.savefig(os.path.join(output_path,f'contrast.png'), dpi=300)
     
 
 def run_surrogate_explainability(model_type, outputs):
-    output_path=f'{model_type}_plots_surrogacy'
+    """
+    Run surrogate explainability on the given data
+
+    Parameters
+    ----------
+    model_type : str
+        model type - regression or binary_classification
+    outputs : list
+        list of dictionaries containing the predictions, efficacy metrics and the model
+
+    Returns
+    -------
+    None
+    """
+    output_path=f'tutorials/explainability/paper_metrics/{model_type}_plots_surrogacy'
     os.makedirs(output_path, exist_ok=True)
     surrogate_explainers = []
     for output in tqdm(outputs):
@@ -225,14 +346,28 @@ def run_surrogate_explainability(model_type, outputs):
         sr_score = xai_res.loc['Spread Ratio'][n]
         ax.set_title(f"{n} (Fourth Fifth : {ff_score:.3f} | Spread Ratio : {sr_score:.3f})")   
         
-    fig.savefig(os.path.join(output_path,f'Fourth Fifths.png'), dpi=300)
+    fig.savefig(os.path.join(output_path,f'fourth_fifths.png'), dpi=300)
     
     for i,n in enumerate(names):
         vis = surrogate_explainers[i].tree_visualization('pydotplus')
-        vis.save(os.path.join(output_path,f'Tree_{n}.png'))
+        vis.save(os.path.join(output_path,f'tree_{n}.png'))
         
 def run_lime_explainability(model_type, outputs):
-    output_path=f'{model_type}_plots_lime'
+    """
+    Run LIME explainability on the given data
+
+    Parameters
+    ----------
+    model_type : str
+        model type - regression or binary_classification
+    outputs : list
+        list of dictionaries containing the predictions, efficacy metrics and the model
+
+    Returns
+    -------
+    None
+    """
+    output_path=f'tutorials/explainability/paper_metrics/{model_type}_plots_lime'
     os.makedirs(output_path, exist_ok=True)
     
     lime_explainers = []
@@ -299,10 +434,24 @@ def run_lime_explainability(model_type, outputs):
     for i in range(len(axes)):
         axes[i][0].set_xlim([min(xmin0),max(xmax0)])
         axes[i][1].set_xlim([min(xmin1),max(xmax1)])
-    fig.savefig(os.path.join(output_path,'Stability.png'), dpi=300)
+    fig.savefig(os.path.join(output_path,'stability.png'), dpi=300)
     
 def run_shap_explainability(model_type, outputs):
-    output_path=f'{model_type}_plots_shap'
+    """
+    Run SHAP explainability on the given data
+
+    Parameters
+    ----------
+    model_type : str
+        model type - regression or binary_classification
+    outputs : list
+        list of dictionaries containing the predictions, efficacy metrics and the model
+
+    Returns
+    -------
+    None
+    """
+    output_path=f'tutorials/explainability/paper_metrics/{model_type}_plots_shap'
     os.makedirs(output_path, exist_ok=True)
     
     lime_explainers = []
@@ -369,5 +518,5 @@ def run_shap_explainability(model_type, outputs):
     for i in range(len(axes)):
         axes[i][0].set_xlim([min(xmin0),max(xmax0)])
         axes[i][1].set_xlim([min(xmin1),max(xmax1)])
-    fig.savefig(os.path.join(output_path,'Stability.png'), dpi=300)
+    fig.savefig(os.path.join(output_path,'stability.png'), dpi=300)
     
