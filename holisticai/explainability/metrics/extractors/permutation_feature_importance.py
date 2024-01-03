@@ -97,6 +97,7 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
                 "Explainability Ease",
                 "Fourth Fifths",
                 "Position Parity",
+                "Important Similarity",
                 "Rank Alignment",
                 "Region Similarity",
                 "Spread Divergence",
@@ -156,7 +157,7 @@ class PermutationFeatureImportance(BaseFeatureImportance, GlobalFeatureImportanc
             imp_sim = ImportantSimilarity(detailed=detailed)
             scores = imp_sim(feat_imp, cond_feat_imp)
             metric_scores += [
-                {"Metric": metric_name, "Value": value, "Reference": expe.reference}
+                {"Metric": metric_name, "Value": value, "Reference": imp_sim.reference}
                 for metric_name, value in scores.items()
             ]
 
