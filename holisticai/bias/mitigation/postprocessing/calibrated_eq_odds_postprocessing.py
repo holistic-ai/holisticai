@@ -21,6 +21,7 @@ class CalibratedEqualizedOdds(BMPost):
         self,
         cost_constraint: Optional[str] = "fnr",
         alpha: Optional[float] = None,
+        seed: Optional[int] = 42,
     ):
         """
         Create a Calibrated Equalized Odds Post-processing instance.
@@ -42,6 +43,7 @@ class CalibratedEqualizedOdds(BMPost):
         """
         self.cost_constraint = cost_constraint
         self.alpha = alpha
+        self.random_state = np.random.RandomState(seed)
 
     def _build_cost(self, y_true, y_score, base_rate, sample_weight):
         if self.cost_constraint == "fpr":
@@ -72,7 +74,7 @@ class CalibratedEqualizedOdds(BMPost):
         return base_rate, cost, trivial_cost
 
     def _mitigate_bias_score(self, y_score, group, mix_rate, base_rate):
-        indexes = np.random.random(sum(group)) <= mix_rate
+        indexes = self.random_state.random(sum(group)) <= mix_rate
         new_y_score = y_score[group == 1].copy()
         new_y_score[indexes] = base_rate
         return new_y_score
