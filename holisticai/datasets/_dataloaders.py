@@ -361,3 +361,70 @@ def load_us_crime(data_home=None, return_X_y=False, as_frame=True):
     )
 
     return bunch
+
+
+def load_heart(data_home=None, return_X_y=False, as_frame=True):
+    """
+    Load heart Dataset.
+
+    Description
+    ----------
+    We use the sklearn.datasets fetch_openml function to
+    fetch data from the openml api. Information about
+    the heart dataset can be obtained by printing
+    load_us_crime()['DESCR'] or in its original repository
+    https://archive.ics.uci.edu/dataset/519/heart+failure+clinical+records.
+
+    Parameters
+    ----------
+    data_home : str
+        The directory to which the data is downloaded. If None, we download
+        to the holisticai_data folder in user home directory.
+    return_X_y : bool, default=False
+        If True, returns ``(data, target)`` instead of a Bunch object.
+        See below for more information about the `data` and `target` object.
+    as_frame : bool, default=False
+        If True, the data is a pandas DataFrame including columns with
+        appropriate dtypes (numeric). The target is
+        a pandas DataFrame or Series depending on the number of target columns.
+        If `return_X_y` is True, then (`data`, `target`) will be pandas
+        DataFrames or Series as described below.
+
+    Returns
+    -------
+    data : :class:`~sklearn.utils.Bunch`
+        Dictionary-like object, with the following attributes.
+        data : {ndarray, dataframe} of shape (1994, 127)
+            The flattened data matrix. If `as_frame=True`, `data` will be
+            a pandas DataFrame.
+        target: {ndarray, Series} of shape (1994,)
+            The classification target. If `as_frame=True`, `target` will be
+            a pandas Series.
+        frame: DataFrame of shape (1994, 128)
+            Only present when `as_frame=True`. DataFrame with `data` and
+            `target`.
+        feature_names: list
+            The names of the dataset columns.
+        target_names: list
+            The names of target classes.
+        DESCR: str
+            The full description of the dataset.
+        (data, target) : tuple if ``return_X_y`` is True
+            A tuple of two ndarrays by default. The first contains a 2D ndarray of
+            shape (num_rows, num_columns) with each row representing one sample and
+            each column representing the features. The second ndarray of shape (1994)
+            contains the target samples.  If `as_frame=True`, both arrays are pandas
+            objects, i.e. `X` a dataframe and `y` a series.
+    """
+    if data_home is None:
+        data_home = get_data_home()
+
+    bunch = fetch_openml(
+        name="heart-failure",
+        version=1,
+        data_home=data_home,
+        return_X_y=return_X_y,
+        as_frame=as_frame,
+    )
+
+    return bunch
