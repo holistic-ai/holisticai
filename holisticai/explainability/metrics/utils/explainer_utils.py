@@ -52,7 +52,9 @@ def alpha_feature_importance(feature_importance, alpha=None):
     if alpha is None:
         alpha = 0.8
 
-    importance = feature_importance["Importance"]
+    feature_importance = feature_importance.sort_values("Importance", ascending=False)
+
+    importance = feature_importance["Importance"].abs()
 
     feature_weight = importance / sum(importance)
 
@@ -86,7 +88,7 @@ class Spread:
         self.divergence = divergence
         self.detailed = detailed
 
-    def __call__(self, feat_imp, cond_feat_imp):
+    def __call__(self, feat_imp, cond_feat_imp=None):
         spread = {
             self.name: importance_spread(
                 feat_imp["Importance"], divergence=self.divergence

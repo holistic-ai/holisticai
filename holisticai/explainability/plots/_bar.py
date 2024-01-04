@@ -4,7 +4,9 @@ import seaborn as sns
 from holisticai.utils import get_colors
 
 
-def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
+def bar(
+    feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global", ax=None
+):
     """
     Parameters
     ----------
@@ -25,16 +27,17 @@ def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
         max_features = max_display
 
     if _type == "global":
+        feat_imp, _ = feat_imp
         feat_imp = feat_imp.reset_index("Variable")
         df_feat_imp = feat_imp.iloc[0:max_features, :].sort_values(
             by="Importance", ascending=False
         )
         importance = df_feat_imp["Importance"]
-        df_feat_imp["Variable"] = df_feat_imp["Variable"].str[:20]
+        df_feat_imp["Variable"] = df_feat_imp["Variable"].str[:max_display]
         names = df_feat_imp["Variable"]
 
     else:
-        feat_imp["Feature Label"] = feat_imp["Feature Label"].str[:20]
+        feat_imp["Feature Label"] = feat_imp["Feature Label"].str[:max_display]
         df_feat_imp = (
             feat_imp.groupby("Feature Label")["Importance"]
             .mean()
@@ -50,7 +53,8 @@ def bar(feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global"):
     hai_palette = sns.color_palette(colors)
 
     sns.set(style="whitegrid")
-    fig, ax = plt.subplots(figsize=figsize)
+    if ax is None:
+        _, ax = plt.subplots(figsize=figsize)
     sns.barplot(
         y=names,
         x=importance,

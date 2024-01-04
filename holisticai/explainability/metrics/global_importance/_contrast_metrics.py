@@ -4,7 +4,7 @@ import pandas as pd
 
 def importance_range_constrast(
     feature_importance_indexes: np.ndarray,
-    conditional_feature_importance_indexes: np.ndarray,
+    conditional_features_importance_indexes: np.ndarray,
 ):
     """
     Parameters
@@ -14,10 +14,21 @@ def importance_range_constrast(
     conditional_feature_importance_indexes: np.array
         array with conditional feature importance indexes
     """
+    feature_importance_indexes = list(feature_importance_indexes)
+    conditional_features_importance_indexes = list(
+        conditional_features_importance_indexes
+    )
+    min_len = min(
+        len(feature_importance_indexes), len(conditional_features_importance_indexes)
+    )
+    feature_importance_indexes = feature_importance_indexes[:min_len]
+    conditional_features_importance_indexes = conditional_features_importance_indexes[
+        :min_len
+    ]
     m_range = []
     for top_k in range(1, len(feature_importance_indexes) + 1):
         ggg = set(feature_importance_indexes[:top_k])
-        vvv = set(conditional_feature_importance_indexes[:top_k])
+        vvv = set(conditional_features_importance_indexes[:top_k])
         u = len(set(ggg).intersection(vvv)) / top_k
         m_range.append(u)
     m_range = np.array(m_range)
@@ -37,6 +48,17 @@ def importance_order_constrast(
     conditional_feature_importance_indexes: np.array
         array with conditional feature importance indexes
     """
+    feature_importance_indexes = list(feature_importance_indexes)
+    conditional_features_importance_indexes = list(
+        conditional_features_importance_indexes
+    )
+    min_len = min(
+        len(feature_importance_indexes), len(conditional_features_importance_indexes)
+    )
+    feature_importance_indexes = feature_importance_indexes[:min_len]
+    conditional_features_importance_indexes = conditional_features_importance_indexes[
+        :min_len
+    ]
     m_order = [
         f == c
         for f, c in zip(
@@ -59,7 +81,9 @@ def important_similarity(
     return cosine_similarity(f1, f2)[0][0]
 
 
-def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
+def important_constrast_matrix(
+    acfimp, afimp, cfimp, fimp, keys, show_connections=False
+):
     def nodes_and_edges(cfimp, fimp, keys, compare_fn, similarity=False):
         total_values = 2 * len(keys) - 1
         values = np.zeros(shape=(1, total_values))
@@ -98,10 +122,10 @@ def important_constrast_matrix(cfimp, fimp, keys, show_connections=False):
         compare_importances_fn = nodes_only
 
     xticks, range_values = compare_importances_fn(
-        cfimp, fimp, keys, importance_range_constrast
+        cfimp, afimp, keys, importance_range_constrast
     )
     _, order_values = compare_importances_fn(
-        cfimp, fimp, keys, importance_order_constrast
+        cfimp, afimp, keys, importance_order_constrast
     )
     _, sim_values = compare_importances_fn(
         cfimp, fimp, keys, important_similarity, similarity=True
@@ -133,9 +157,7 @@ class PositionParity(ContrastMetric):
     def __init__(self, detailed):
         self.reference = 1
         self.name = "Position Parity"
-        contrast_fn = lambda x, y: importance_order_constrast(
-            list(x.index), list(y.index)
-        )
+        contrast_fn = lambda x, y: importance_order_constrast(x.index, y.index)
         super().__init__(detailed, contrast_fn)
 
 
@@ -143,14 +165,12 @@ class RankAlignment(ContrastMetric):
     def __init__(self, detailed):
         self.reference = 1
         self.name = "Rank Alignment"
-        contrast_fn = lambda x, y: importance_range_constrast(
-            list(x.index), list(y.index)
-        )
+        contrast_fn = lambda x, y: importance_range_constrast(x.index, y.index)
         super().__init__(detailed, contrast_fn)
 
 
-class RegionSimilarity(ContrastMetric):
+class ImportantSimilarity(ContrastMetric):
     def __init__(self, detailed):
         self.reference = 1
-        self.name = "Region Similarity"
+        self.name = "Important Similarity"
         super().__init__(detailed, important_similarity)

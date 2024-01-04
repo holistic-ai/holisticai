@@ -69,7 +69,7 @@ class Explainer:
                     raise Exception("y (true label) must be passed.")
                 x, y = check_feature_importance(x, y)
                 self.explainer_handler = compute_permutation_feature_importance(
-                    model_type, model, x, y
+                    model_type, x, y, **kargs
                 )
                 self._strategy_type = "global"
 
@@ -95,12 +95,20 @@ class Explainer:
 
                 from holisticai.explainability.metrics.utils import LimeTabularHandler
 
+                modeltype2mode = {
+                    "binary_classification": "classification",
+                    "regression": "regression",
+                }
+                modeltype2scorer = {
+                    "binary_classification": lambda x: model.predict_proba(x),
+                    "regression": lambda x: model.predict(x),
+                }
                 local_explainer_handler = LimeTabularHandler(
-                    model.predict,
+                    modeltype2scorer[model_type],
                     x.values,
                     feature_names=x.columns.tolist(),
                     discretize_continuous=True,
-                    mode="regression",
+                    mode=modeltype2mode[model_type],
                 )
                 self.explainer_handler = compute_local_feature_importance(
                     model_type, x, y, local_explainer_handler=local_explainer_handler
@@ -138,17 +146,21 @@ class Explainer:
     def __getitem__(self, key):
         return self.metric_values.loc[key]["Value"]
 
-    def metrics(self, alpha=None, detailed=False):
+    def metrics(self, alpha=None, detailed=False, metric_names=None):
         """
         alpha: float
             Percentage of the selected top feature importance
         """
         check_alpha_domain(alpha)
 
-        self.metric_values = self.explainer_handler.metrics(alpha, detailed=detailed)
+        self.metric_values = self.explainer_handler.metrics(
+            alpha, detailed=detailed, metric_names=metric_names
+        )
         return self.metric_values
 
-    def bar_plot(self, max_display=None, title=None, alpha=None, figsize=(7, 5)):
+    def bar_plot(
+        self, max_display=None, title=None, alpha=None, figsize=(7, 5), ax=None
+    ):
         """
         Parameters
         ----------
@@ -162,12 +174,14 @@ class Explainer:
             Size of the plot
         """
         feat_imp, _ = self.explainer_handler.get_alpha_feature_importance(alpha)
+
         bar(
-            feat_imp,
+            feat_imp=feat_imp,
             max_display=max_display,
             title=title,
             figsize=figsize,
             _type=self._strategy_type,
+            ax=ax,
         )
 
     def lolipop_plot(self, max_display=None, title=None, alpha=None, figsize=(7, 5)):
@@ -205,38 +219,40 @@ class Explainer:
 
         return self.explainer_handler.tree_visualization(backend, **kargs)
 
-    def contrast_visualization(self, show_connections=False):
-        _, (fimp, cfimp) = self.explainer_handler.get_alpha_feature_importance(
-            alpha=None
-        )
+    def contrast_visualization(self, show_connections=False, ax=None, alpha=0.8):
+        (fimp, cfimp), (
+            afimp,
+            acfimp,
+        ) = self.explainer_handler.get_alpha_feature_importance(alpha=alpha)
+
         keys = list(cfimp.keys())
         xticks, matrix = important_constrast_matrix(
-            cfimp, fimp, keys, show_connections=show_connections
+            acfimp, afimp, cfimp, fimp, keys, show_connections=show_connections
         )
-        contrast_matrix(xticks, matrix)
+        contrast_matrix(xticks, matrix, ax=ax)
 
-    def partial_dependence_plot(self, first=0, last=None, **plot_kargs):
-        self.explainer_handler.partial_dependence_plot(
-            first=first, last=last, **plot_kargs
+    def partial_dependence_plot(self, first=0, last=None, alpha=0.8, **plot_kargs):
+        return self.explainer_handler.partial_dependence_plot(
+            first=first, last=last, alpha=alpha, **plot_kargs
         )
 
-    def show_importance_stability(self):
-        fimp, cfimp = self.explainer_handler.get_alpha_feature_importance(alpha=None)
-        self.explainer_handler.show_importance_stability(fimp, cfimp)
+    def show_importance_stability(self, axes=None, alpha=0.8):
+        fimp, cfimp = self.explainer_handler.get_alpha_feature_importance(alpha=alpha)
+        self.explainer_handler.show_importance_stability(fimp, cfimp, axes=axes)
 
     def show_data_stability_boundaries(
-        self, n_rows=2, n_cols=4, top_n=None, figsize=None
+        self, n_rows=2, n_cols=4, top_n=None, figsize=None, alpha=0.8
     ):
         self.explainer_handler.show_data_stability_boundaries(
-            n_rows, n_cols, top_n=top_n, figsize=figsize
+            n_rows, n_cols, top_n=top_n, figsize=figsize, alpha=alpha
         )
 
-    def feature_importance_table(self, sorted_by="Global", top_n=10):
+    def feature_importance_table(self, sorted_by="Global", top_n=10, alpha=0.8):
 
         _, (
             feature_importance,
             cond_feat_imp,
-        ) = self.explainer_handler.get_alpha_feature_importance(alpha=None)
+        ) = self.explainer_handler.get_alpha_feature_importance(alpha=alpha)
 
         feature_importance = feature_importance.reset_index()
         if cond_feat_imp is not None:
@@ -267,13 +283,13 @@ class Explainer:
         subset = [col for col in dfs.columns if "Importance" in col]
         vmax = dfs[subset].max().max()
         dfs = dfs.iloc[:top_n].style.bar(
-            subset=subset, color="lightgreen", vmin=0.0, vmax=vmax
+            subset=subset, color="darkgreen", vmin=0.0, vmax=vmax
         )
         return dfs
 
     def show_features_stability_boundaries(
-        self, n_cols=None, n_rows=None, figsize=None
+        self, n_cols=None, n_rows=None, figsize=None, alpha=0.8
     ):
         self.explainer_handler.show_features_stability_boundaries(
-            n_cols=n_cols, n_rows=n_rows, figsize=figsize
+            n_cols=n_cols, n_rows=n_rows, figsize=figsize, alpha=alpha
         )
