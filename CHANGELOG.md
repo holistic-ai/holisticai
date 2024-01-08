@@ -1,3 +1,10 @@
+## 0.7.3 (2024-01-08)
+
+### Fix
+- Add random state in calibrated equalized odds
+- Update Explainability Metrics and Plots
+- Refactoring Bias Datasets, Metrics and Mitigation Tutorials
+
 ## 0.7.2 (2023-10-25)
 
 ### Fix
