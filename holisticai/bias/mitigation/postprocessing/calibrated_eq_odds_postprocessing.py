@@ -40,7 +40,7 @@ class CalibratedEqualizedOdds(BMPost):
         alpha : float
             Used only with cost contraint  "weighted".
             Value between 0 and 1 used to combine fnr and fpr cost constraint.
-            
+
         seed: int
             A seed value for random number generators. This ensures reproducibility of results.
         """

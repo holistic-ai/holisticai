@@ -94,4 +94,3 @@ Here are some tutorials where different systems are fitting using the mitigators
 
     - Postprocessing
         - `Mitigating Bias using MCMF Clustering <mitigating_bias_tutorials/clustering/postprocessing/mcmf_clustering.ipynb>`_
-
