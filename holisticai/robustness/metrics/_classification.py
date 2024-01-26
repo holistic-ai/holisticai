@@ -270,7 +270,7 @@ def clever(
 
         classifier = ScikitlearnClassifier(classifier)
 
-    pred_class = classifier.predict(np.array([x]))[0]
+    y_pred = classifier.predict(np.array([x]))[0]
     pred_class = np.argmax(y_pred, axis=1)[0]
     if target is None:
         # Get a list of untargeted classes
