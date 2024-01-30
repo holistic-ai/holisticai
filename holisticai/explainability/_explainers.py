@@ -174,9 +174,10 @@ class Explainer:
             Size of the plot
         """
         feat_imp, _ = self.explainer_handler.get_alpha_feature_importance(alpha)
-
+        top_k_sep = len(feat_imp)
         bar(
             feat_imp=feat_imp,
+            top_k_sep=top_k_sep,
             max_display=max_display,
             title=title,
             figsize=figsize,
