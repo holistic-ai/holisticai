@@ -1,9 +1,9 @@
-#AI privacy toolkit
-#Abigail Goldsteen, Ola Saadi, Ron Shmelkin, Shlomit Shachor, Natalia Razinkov, "AI privacy toolkit", SoftwareX, Volume 22, 2023, 101352, ISSN 2352-7110
+# AI privacy toolkit
+# Abigail Goldsteen, Ola Saadi, Ron Shmelkin, Shlomit Shachor, Natalia Razinkov, "AI privacy toolkit", SoftwareX, Volume 22, 2023, 101352, ISSN 2352-7110
 
-#Retrieved from https://www.softxjournal.com/article/S2352-7110(23)00048-1/fulltext
+# Retrieved from https://www.softxjournal.com/article/S2352-7110(23)00048-1/fulltext
 
-#GitHub Repository: https://github.com/IBM/ai-privacy-toolkit
+# GitHub Repository: https://github.com/IBM/ai-privacy-toolkit
 
 from collections import Counter
 from typing import Optional, Union
