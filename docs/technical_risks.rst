@@ -9,3 +9,4 @@ Technical Risks
     efficacy/efficacy
     bias/bias
     explainability/explainability
+    privacy/privacy
