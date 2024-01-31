@@ -5,7 +5,13 @@ from holisticai.utils import get_colors
 
 
 def bar(
-    feat_imp, max_display=None, title=None, figsize=(7, 5), _type="global", ax=None
+    feat_imp,
+    top_k_sep,
+    max_display=6,
+    title=None,
+    figsize=(7, 5),
+    _type="global",
+    ax=None,
 ):
     """
     Parameters
@@ -61,5 +67,6 @@ def bar(
         palette=hai_palette,
         ax=ax,
     )
+    ax.axhline(y=top_k_sep - 0.5, color="red", linewidth=2)
     ax.set_title(title)
     plt.tight_layout()

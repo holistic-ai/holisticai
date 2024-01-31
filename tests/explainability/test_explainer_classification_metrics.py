@@ -4,19 +4,23 @@ import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
+from holisticai.datasets import load_dataset
 from holisticai.explainability import Explainer
 from tests.bias.mitigation.testing_utils.utils import small_categorical_dataset
 
 
 def classification_process_dataset(small_categorical_dataset):
-    train_data, test_data = small_categorical_dataset
-    X_train, y_train, _, _ = train_data
-    X_test, y_test, _, _ = test_data
+    df, _, _ = load_dataset(dataset="adult", preprocessed=True, as_array=False)
+    X = df.iloc[:500, :-1]
+    y = df.iloc[:500, -1]
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
     return X_train, X_test, y_train, y_test, None
 
 
 def train_model(X_train, y_train):
-    model = LogisticRegression()
+    model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
     return model
 
