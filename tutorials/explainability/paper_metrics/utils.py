@@ -3,18 +3,18 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from tqdm import tqdm
+from ucimlrepo import fetch_ucirepo
 
 from holisticai.datasets import load_adult
 from holisticai.explainability import Explainer
 
 
-def load_processed_diabetes(seed):
+def load_processed_parkinson(seed):
     """
-    Load the diabetes dataset and return the train test split
+    Load the parkinson dataset and return the train test split
 
     Parameters
     ----------
@@ -32,12 +32,14 @@ def load_processed_diabetes(seed):
     y_test : pd.DataFrame
         test labels
     """
-    dataset = load_diabetes()
+    parkinsons_telemonitoring = fetch_ucirepo(id=189)
 
-    X = dataset.data
-    y = dataset.target
+    data = parkinsons_telemonitoring.data.features
+    target = parkinsons_telemonitoring.data.targets
+    X = np.array(data.iloc[:1000, :])
+    y = np.array(target.iloc[:1000, 1:])
     y = StandardScaler().fit_transform(y.reshape([-1, 1])).reshape([-1])
-    feature_names = dataset.feature_names
+    feature_names = data.columns
 
     X = pd.DataFrame(X, columns=feature_names)
     X_train, X_test, y_train, y_test = train_test_split(
@@ -162,8 +164,12 @@ def train_regression_model(X_train, X_test, y_train, y_test):
     for model_type in tqdm(
         [LinearRegression, RandomForestRegressor, GradientBoostingRegressor]
     ):
+        if model_type == GradientBoostingRegressor:
+            estimator = model_type(n_estimators=50)
+        else:
+            estimator = model_type()
 
-        model = Pipeline(steps=[("scaler", StandardScaler()), ("model", model_type())])
+        model = Pipeline(steps=[("scaler", StandardScaler()), ("model", estimator)])
         model.fit(X_train, y_train)
 
         y_pred = model.predict(X_test)
@@ -232,7 +238,7 @@ def run_permutation_explainability(model_type, outputs):
     os.makedirs(output_path, exist_ok=True)
 
     permutation_fi_params = {
-        "max_samples": 5000,
+        "max_samples": 1000,
         "n_repeats": 20,
         "random_state": np.random.randint(0, 1000),
     }
@@ -294,15 +300,19 @@ def run_permutation_explainability(model_type, outputs):
         f.write(metric_latex)
 
     for p, n in zip(permutation_explainers, names):
-        fig, ax = plt.subplots(1, 1, figsize=(10, 3))
+        if n == "RF":
+            fig, ax = plt.subplots(1, 1, figsize=(10, 3))
+        else:
+            fig, ax = plt.subplots(1, 1, figsize=(5, 5))
         pdp = p.partial_dependence_plot(last=3, ax=ax, kind="both", n_cols=3)
         score = xai_res.loc["Explainability Ease"][n]
         pdp.figure_.suptitle(f"{n} (Explainability Ease : {score:.3f})")
+        plt.tight_layout()
         fig.savefig(os.path.join(output_path, f"{n}.png"), dpi=300)
 
     fig, axs = plt.subplots(1, 3, figsize=(15, 6))
     for ax, p, n in zip(axs, permutation_explainers, names):
-        feat_imp = p.bar_plot(alpha=0.8, max_display=30, ax=ax)
+        feat_imp = p.bar_plot(alpha=0.8, max_display=6, ax=ax)
         ff_score = xai_res.loc["Fourth Fifths"][n]
         sr_score = xai_res.loc["Spread Ratio"][n]
         ax.set_title(
