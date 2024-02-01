@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def k_anonymity(df, qi):
@@ -9,7 +9,7 @@ def k_anonymity(df, qi):
     -----------
     Computes k-Anonymity metric. K-anonymity is a property of a dataset that indicates the re-identifiability of its records. A dataset is
     k-anonymous if quasi-identifiers for each person in the dataset are identical to at least k – 1 other people also in the dataset.
-    
+
     Parameters
     ----------
 
@@ -54,5 +54,12 @@ def l_diversity(df, qi, sa):
     dict[str, list]: Computed metric per sensitive attribute.
     """
     df_grouped = df.groupby(qi, as_index=False)
-    return {s: sorted([len(row['unique']) for _, row in df_grouped[s].agg(['unique']).dropna().iterrows()]) for s in sa}
-
+    return {
+        s: sorted(
+            [
+                len(row["unique"])
+                for _, row in df_grouped[s].agg(["unique"]).dropna().iterrows()
+            ]
+        )
+        for s in sa
+    }
