@@ -1,6 +1,7 @@
+import numpy as np
 import pandas as pd
 
-from ._dataloaders import load_adult
+from ._dataloaders import load_diabetes
 from .dataset_processing_utils import (
     get_protected_values,
     post_process_dataframe,
@@ -9,9 +10,11 @@ from .dataset_processing_utils import (
 )
 
 
-def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_columns):
+def __preprocess_diabetes_dataset(
+    df, protected_attribute, output_variable, drop_columns
+):
     """
-    Pre-processes the adult dataset by converting the output variable to a binary variable, dropping unnecessary columns, converting categorical columns to one-hot encoded columns and converting the output variable to a binary variable
+    Pre-processes the diabetes dataset by converting the output variable to a binary variable, dropping unnecessary columns, converting categorical columns to one-hot encoded columns and converting the output variable to a binary variable
 
     Parameters
     ----------
@@ -33,8 +36,8 @@ def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_co
     group_b : pandas.DataFrame
         The dataframe containing the protected group B
     """
-    group_a = get_protected_values(df, protected_attribute, "Male")
-    group_b = get_protected_values(df, protected_attribute, "Female")
+    group_a = get_protected_values(df, protected_attribute, "white")
+    group_b = get_protected_values(df, protected_attribute, "non-white")
     unique_values = df[output_variable].unique()
     output = df[output_variable].map({unique_values[0]: 0, unique_values[1]: 1})
     df = df.drop(drop_columns, axis=1)
@@ -43,7 +46,7 @@ def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_co
     return post_process_dataframe(df, group_a, group_b)
 
 
-def process_adult_dataset(as_array=False):
+def process_diabetes_dataset(as_array=False):
     """
     Processes the adult dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
 
@@ -57,13 +60,29 @@ def process_adult_dataset(as_array=False):
     tuple
         When as_array is True, returns a tuple with four numpy arrays containing the data, output variable, protected group A and protected group B. When as_array is False, returns a tuple with three pandas dataframes containing the data, protected group A and protected group B
     """
-    data = load_adult()
-    protected_attribute = "sex"
-    output_variable = "class"
-    drop_columns = ["education", "race", "sex", "class"]
+    data = load_diabetes()
+    protected_attribute = "race"
+    output_variable = "target"
+    drop_columns = [
+        "race",
+        "sex",
+        "age",
+        "weight",
+        "payer_code",
+        "diag_1",
+        "diag_2",
+        "diag_3",
+        "encounter_id",
+        "patient_nbr",
+        "medical_specialty",
+        "target",
+    ]
     df = pd.concat([data["data"], data["target"]], axis=1)
+    df.rename(columns={"readmitted": output_variable, "gender": "sex"}, inplace=True)
+    df["race"] = np.where(df["race"] == "Caucasian", "white", "non-white")
+    df[output_variable] = np.where(df[output_variable] == "NO", 0, 1)
     df = remove_nans(df)
-    df, group_a, group_b = __preprocess_adult_dataset(
+    df, group_a, group_b = __preprocess_diabetes_dataset(
         df, protected_attribute, output_variable, drop_columns
     )
     if as_array:
