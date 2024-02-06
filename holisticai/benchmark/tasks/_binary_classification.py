@@ -2,8 +2,6 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-import inspect
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -14,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 from tabulate import tabulate
 from tqdm import tqdm
 
-from holisticai.benchmark.datasets import load_benchmark
+from holisticai.benchmark.utils import load_benchmark
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.datasets import load_dataset
 from holisticai.pipeline import Pipeline
@@ -23,13 +21,12 @@ from holisticai.utils._plotting import get_colors
 DATASETS = [
     "adult",
     "law_school",
-    #   'german_credit',
-    #   'census_kdd',
-    #   'bank_marketing',
-    #   'credit_card',
-    #  'compas_reci',
-    #   'diabetes',
-    #    'family_expenditure',
+    "german_credit",
+    "census_kdd",
+    "bank_marketing",
+    "credit_card",
+    "compas_recidivism",
+    "diabetes",
 ]
 
 MODELS = [LogisticRegression(), RandomForestClassifier(), GradientBoostingClassifier()]
@@ -42,8 +39,8 @@ class BinaryClassificationBenchmark:
     def __str__(self):
         return "BinaryClassificationBenchmark"
 
-    def run_benchmark(self, mitigator=None, type=None, params=None):
-        self.mitigator_name = mitigator.__name__
+    def run_benchmark(self, mitigator=None, type=None):
+        self.mitigator_name = mitigator.__class__.__name__
 
         if mitigator is None:
             raise ValueError("Please provide a mitigator to run the benchmark")
@@ -91,42 +88,12 @@ class BinaryClassificationBenchmark:
                     )
 
                 elif type == "inprocessing":
-                    custom_params = params if params is not None else {}
-                    internal_params = {
-                        "features_dim": X.shape[1],
-                        "batch_size": 32,
-                        "hidden_size": 64,
-                        "adversary_loss_weight": 0.1,
-                        "verbose": 1,
-                        "use_debias": True,
-                        "seed": 42,
-                        "constraints": "DemographicParity",
-                        "loss": "Square",
-                        "min_val": -0.1,
-                        "max_val": 1.3,
-                        "grid_size": 20,
-                        "constraint": "StatisticalRate",
-                        "maxiter": 100,
-                        "fit_intercept": True,
-                        "print_interval": 1,
-                        "estimator": model,
-                    }
-                    cparams = {
-                        k: v
-                        for k, v in custom_params.items()
-                        if k in inspect.signature(mitigator).parameters
-                    }
-                    iparams = {
-                        k: v
-                        for k, v in internal_params.items()
-                        if k in inspect.signature(mitigator).parameters
-                    }
                     pipeline = Pipeline(
                         steps=[
                             ("scalar", StandardScaler()),
                             (
                                 "bm_inprocessing",
-                                mitigator(**cparams, **iparams).transform_estimator(),
+                                mitigator.transform_estimator(feature_dim=X.shape[1]),
                             ),
                         ]
                     )
@@ -154,6 +121,7 @@ class BinaryClassificationBenchmark:
                     "bm__group_a": group_a_test,
                     "bm__group_b": group_b_test,
                 }
+
                 y_pred = pipeline.predict(X_test, **predict_params)
                 metrics = classification_bias_metrics(
                     group_a_test, group_b_test, y_pred, y_test, metric_type="both"
@@ -179,6 +147,16 @@ class BinaryClassificationBenchmark:
             .sort_values(by=["Dataset", "Statistical Parity"], ascending=False)
             .reset_index(drop=True)
         )
+        ranking = abs(
+            self.results_benchmark.pivot_table(
+                index="Mitigator",
+                columns="Dataset",
+                values="Statistical Parity",
+                aggfunc="mean",
+            )
+        )
+        ranking.insert(0, "Mean", ranking.mean(axis=1))
+        self.results_ranking = ranking.sort_values(by="Mean", ascending=True)
 
     def highlight_line(self, s):
         return [
@@ -186,19 +164,30 @@ class BinaryClassificationBenchmark:
             for v in s
         ]
 
-    def evaluate_table(self, highlight=True, tab=False, benchmark=True):
-        benchmark_table = self.results
-        if benchmark:
-            benchmark_table = self.results_benchmark
-
+    def evaluate_table(self, ranking=True, highlight=True, tab=False):
+        benchmark_table = self.results if not ranking else self.results_ranking
+        print(
+            "Benchmark Table: the values are |frac{1}{M}\sum_{i}^{M}(StatiticalParity_{i}))| by dataset, \n where M is the number of models trained in benchmark."
+        )
         if highlight:
-            return benchmark_table.style.apply(self.highlight_line, axis=0)
+
+            def highlight_mitigator_name(val):
+                return [
+                    "background: mediumslateblue"
+                    if val.name == self.mitigator_name
+                    else ""
+                    for _ in val
+                ]
+
+            return benchmark_table.style.apply(highlight_mitigator_name, axis=1)
+
         elif tab:
-            return print(
+            print(
                 tabulate(
                     benchmark_table, headers=benchmark_table.columns, tablefmt="pretty"
                 )
             )
+
         else:
             return benchmark_table
 
@@ -211,11 +200,8 @@ class BinaryClassificationBenchmark:
         colors = get_colors(len(data["Model"].unique()))
         hai_palette = sns.color_palette(colors)
 
-        fig, axes = plt.subplots(
-            len(data["Dataset"].unique()), 1, figsize=(15, 10), sharex=False
-        )
-
         for i in range(len(data["Dataset"].unique())):
+            fig = plt.figure(figsize=(15, 5))
             level_1 = data["Dataset"].unique()[i]
             temp = data[(data["Dataset"] == level_1)]
             sns.barplot(
@@ -224,28 +210,22 @@ class BinaryClassificationBenchmark:
                 hue="Model",
                 palette=hai_palette,
                 data=temp,
-                ax=axes[i],
             )
-            axes[i].axhline(0, color="red", linewidth=2, linestyle="--")
-            axes[i].grid()
-            axes[i].set_xlabel("")
-            axes[i].set_xticklabels(
-                axes[i].get_xticklabels(), rotation=45, horizontalalignment="right"
-            )
-            axes[i].set_title(f"Dataset: {level_1}")
-            axes[i].legend(loc="upper right", bbox_to_anchor=(1.3, 1))
-
-        plt.tight_layout()
-        plt.show()
+            plt.axhline(0, color="red", linewidth=2, linestyle="--")
+            plt.grid()
+            plt.xlabel("")
+            plt.xticks(rotation=45)
+            plt.title(f"Dataset: {level_1}")
+            plt.legend(loc="upper right", bbox_to_anchor=(1.3, 1))
+            plt.tight_layout()
+            plt.show()
 
     def benchmark(self, type=None):
         if type is None:
             raise ValueError(
                 "Please provide a type: preprocessing, inprocessing or postprocessing"
             )
-        return load_benchmark(task="binary_classification", type=type).reset_index(
-            drop=True
-        )
+        return load_benchmark(task="binary_classification", type=type, ranking=True)
 
     def submit(self):
         name = self.mitigator_name

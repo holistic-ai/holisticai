@@ -26,11 +26,11 @@ MITIGATORS_PREPROCESSING = [
 ]
 
 MITIGATORS_INPROCESSING = [
-    AdversarialDebiasing,
-    ExponentiatedGradientReduction,
-    GridSearchReduction,
-    MetaFairClassifier,
-    PrejudiceRemover,
+    AdversarialDebiasing(),
+    ExponentiatedGradientReduction(),
+    GridSearchReduction(),
+    MetaFairClassifier(),
+    PrejudiceRemover(),
 ]
 
 MITIGATORS_POSTPROCESSING = [
@@ -54,7 +54,7 @@ def __hai_bench__():
         dataframe = pd.DataFrame()
         for mitigator in MITIGATORS[type]:
             task.run_benchmark(mitigator=mitigator, type=type)
-            data = task.evaluate_table(benchmark=False, highlight=False)
+            data = task.evaluate_table(ranking=False, highlight=False, tab=False)
             dataframe = (
                 pd.concat([dataframe, data], axis=0)
                 .sort_values(by=["Dataset", "Statistical Parity"], ascending=False)
@@ -62,7 +62,7 @@ def __hai_bench__():
             )
 
         dataframe.to_parquet(
-            f"holisticai/benchmark/datasets/{type}_binary_classification_benchmark.parquet"
+            f"holisticai/benchmark/baselines/{type}_binary_classification_benchmark.parquet"
         )
 
 

@@ -1,10 +1,8 @@
-from holisticai.benchmark.utils import (
-    BinaryClassificationBenchmark,
-    ClusteringBenchmark,
-    MultiClassificationBenchmark,
-    RecommenderSystemBenchmark,
-    RegressionBenchmark,
-)
+from ._binary_classification import BinaryClassificationBenchmark
+from ._clustering import ClusteringBenchmark
+from ._multiclass import MultiClassificationBenchmark
+from ._recommender import RecommenderSystemBenchmark
+from ._regression import RegressionBenchmark
 
 TASKS = {
     "binary_classification": BinaryClassificationBenchmark(),

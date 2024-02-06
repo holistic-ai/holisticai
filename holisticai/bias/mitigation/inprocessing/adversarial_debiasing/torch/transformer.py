@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from holisticai.utils.transformers.bias import BMInprocessing as BMImp
+from holisticai.utils.transformers.bias import BMInprocessing as BMInp
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 from .dataset import ADDataset
@@ -12,7 +12,7 @@ from .models import ADModel, ClassifierModel
 from .trainer import TrainArgs, Trainer
 
 
-class AdversarialDebiasing(BMImp):
+class AdversarialDebiasing(BMInp):
     """
     Adversarial debiasing learns a classifier to maximize prediction accuracy and simultaneously reduce an
     adversary's ability to determine the protected attribute from the predictions. This approach leads to a fair classifier as the
@@ -25,6 +25,8 @@ class AdversarialDebiasing(BMImp):
         Biases with Adversarial Learning," AAAI/ACM Conference on Artificial
         Intelligence, Ethics, and Society, 2018.
     """
+
+    DEFAULT_ESTIMATOR_CLASS = ClassifierModel
 
     def __init__(
         self,
@@ -109,11 +111,13 @@ class AdversarialDebiasing(BMImp):
         self.print_interval = print_interval
         self.device = device
         self.seed = seed
-
         self.sens_groups = SensitiveGroups()
 
-    def transform_estimator(self, estimator=None):
+    def transform_estimator(self, estimator=None, **kargs):
         if estimator is None:
+            if self.features_dim is None:
+                self.features_dim = kargs["feature_dim"]
+
             self.estimator = ClassifierModel(
                 self.features_dim, self.hidden_size, self.keep_prob
             )

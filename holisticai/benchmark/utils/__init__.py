@@ -1,13 +1,3 @@
-from ._binary_classification import BinaryClassificationBenchmark
-from ._clustering import ClusteringBenchmark
-from ._multiclass import MultiClassificationBenchmark
-from ._recommender import RecommenderSystemBenchmark
-from ._regression import RegressionBenchmark
+from ._dataloader import load_benchmark
 
-__all__ = [
-    "BinaryClassificationBenchmark",
-    "MultiClassificationBenchmark",
-    "RegressionBenchmark",
-    "ClusteringBenchmark",
-    "RecommenderSystemBenchmark",
-]
+__all__ = ["load_benchmark"]
