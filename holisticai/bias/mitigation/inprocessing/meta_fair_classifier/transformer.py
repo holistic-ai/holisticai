@@ -62,7 +62,7 @@ class MetaFairClassifier(BMImp):
         )
         self.seed = seed
 
-    def transform_estimator(self):
+    def transform_estimator(self, estimator=None):
         return self
 
     def fit(

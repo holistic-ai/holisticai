@@ -116,10 +116,11 @@ class AdversarialDebiasing(BMInp):
     def transform_estimator(self, estimator=None, **kargs):
         if estimator is None:
             if self.features_dim is None:
-                self.features_dim = kargs["feature_dim"]
-
+                features_dim = kargs["feature_dim"]
+            else:
+                features_dim = self.features_dim
             self.estimator = ClassifierModel(
-                self.features_dim, self.hidden_size, self.keep_prob
+                features_dim, self.hidden_size, self.keep_prob
             )
         else:
             self.estimator = estimator

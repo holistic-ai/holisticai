@@ -1,8 +1,8 @@
-# HAIBENCH: An Empirical Benchmark Framework for Bias Mitigation Methods in Machine Learning Systems
+# BMBench: an Empirical Bias Mitigation Benchmark for Multitask Machine Learning Predictions
 
 ## Overview
 
-HAIBENCH is an empirical benchmark framework designed to evaluate the effectiveness of bias mitigation methods in machine learning systems. It provides a systematic and standardized way to measure and compare the performance of different bias mitigation techniques.
+BMBench is an empirical benchmark framework designed to evaluate the effectiveness of bias mitigation methods in machine learning systems. It provides a systematic and standardized way to measure and compare the performance of different bias mitigation techniques.
 
 ## Evaluation Metrics
 

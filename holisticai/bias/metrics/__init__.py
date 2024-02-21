@@ -6,6 +6,7 @@ The :mod:`holisticai.bias.metrics` module includes classification, regression, m
 from ._classification import (
     abroca,
     accuracy_diff,
+    accuracy_fairness_score,
     average_odds_diff,
     classification_bias_metrics,
     coefficient_of_variation,
@@ -94,6 +95,7 @@ __all__ = [
     "four_fifths",
     "cohen_d",
     "accuracy_diff",
+    "accuracy_fairness_score",
     "false_negative_rate_diff",
     "true_negative_rate_diff",
     "abroca",

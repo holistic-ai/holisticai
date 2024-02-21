@@ -1,19 +1,23 @@
 import warnings
-
 warnings.filterwarnings("ignore")
 
-import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+
+import matplotlib.pyplot as plt
 import seaborn as sns
+
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
 from tabulate import tabulate
 from tqdm import tqdm
+import webbrowser
 
 from holisticai.benchmark.utils import load_benchmark
-from holisticai.bias.metrics import classification_bias_metrics
+from holisticai.bias.metrics import classification_bias_metrics, accuracy_fairness_score
 from holisticai.datasets import load_dataset
 from holisticai.pipeline import Pipeline
 from holisticai.utils._plotting import get_colors
@@ -40,6 +44,7 @@ class BinaryClassificationBenchmark:
         return "BinaryClassificationBenchmark"
 
     def run_benchmark(self, mitigator=None, type=None):
+        self.mitigator = mitigator
         self.mitigator_name = mitigator.__class__.__name__
 
         if mitigator is None:
@@ -58,11 +63,13 @@ class BinaryClassificationBenchmark:
 
         for data_name in tqdm(DATASETS):
             for model in MODELS:
+                np.random.seed(10)
                 df, group_a, group_b = load_dataset(
                     dataset=data_name, preprocessed=True, as_array=False
                 )
                 X = df.iloc[:, :-1].values
-                y = df.iloc[:, -1].values
+                y = df.iloc[:, -1].values.astype(int)
+                feat_dim = X.shape[1]
                 (
                     X_train,
                     X_test,
@@ -82,18 +89,22 @@ class BinaryClassificationBenchmark:
                     pipeline = Pipeline(
                         steps=[
                             ("scalar", StandardScaler()),
-                            ("bm_preprocessing", mitigator),
+                            ("bm_preprocessing", self.mitigator),
                             ("model", model),
                         ]
                     )
 
                 elif type == "inprocessing":
+                    kargs = {
+                        'feature_dim': feat_dim
+                    }
                     pipeline = Pipeline(
                         steps=[
                             ("scalar", StandardScaler()),
                             (
                                 "bm_inprocessing",
-                                mitigator.transform_estimator(feature_dim=X.shape[1]),
+                                # kargs for AdversarialDebiasing
+                                self.mitigator.transform_estimator(estimator=model),
                             ),
                         ]
                     )
@@ -103,37 +114,39 @@ class BinaryClassificationBenchmark:
                         steps=[
                             ("scalar", StandardScaler()),
                             ("model", model),
-                            ("bm_postprocessing", mitigator),
+                            ("bm_postprocessing", self.mitigator),
                         ]
                     )
 
-                X_train, y_train, group_a_train, group_b_train = train_data
-                X_test, y_test, group_a_test, group_b_test = test_data
+                X_train_t, y_train_t, group_a_train, group_b_train = train_data
+                X_test_t, y_test_t, group_a_test, group_b_test = test_data
 
                 fit_params = {
                     "bm__group_a": group_a_train,
                     "bm__group_b": group_b_train,
                 }
 
-                pipeline.fit(X_train, y_train, **fit_params)
+                pipeline.fit(X_train_t, y_train_t, **fit_params)
 
                 predict_params = {
                     "bm__group_a": group_a_test,
                     "bm__group_b": group_b_test,
                 }
 
-                y_pred = pipeline.predict(X_test, **predict_params)
+                y_pred = pipeline.predict(X_test_t, **predict_params)
+                afs = accuracy_fairness_score(group_a_test, group_b_test, y_pred, y_test_t)
                 metrics = classification_bias_metrics(
-                    group_a_test, group_b_test, y_pred, y_test, metric_type="both"
+                    group_a_test, group_b_test, y_pred, y_test_t, metric_type="both"
                 )
                 metrics_result = (
                     metrics.copy()
                     .drop(columns="Reference")
-                    .rename(columns={"Value": f"{mitigator.__class__.__name__}"})
+                    .rename(columns={"Value": f"{self.mitigator_name}"})
                     .T
                 )
                 metrics_result.insert(0, "Dataset", data_name)
                 metrics_result.insert(1, "Model", model.__class__.__name__)
+                metrics_result.insert(2, "AFS", afs)
                 metrics_result = metrics_result.reset_index(drop=False).rename(
                     columns={"index": "Mitigator"}
                 )
@@ -144,19 +157,19 @@ class BinaryClassificationBenchmark:
         self.results = results_dataframe.reset_index(drop=True)
         self.results_benchmark = (
             pd.concat([self.results, bench_dataframe], axis=0)
-            .sort_values(by=["Dataset", "Statistical Parity"], ascending=False)
+            .sort_values(by=["Dataset", "AFS"], ascending=False)
             .reset_index(drop=True)
         )
         ranking = abs(
             self.results_benchmark.pivot_table(
                 index="Mitigator",
                 columns="Dataset",
-                values="Statistical Parity",
+                values="AFS",
                 aggfunc="mean",
             )
         )
-        ranking.insert(0, "Mean", ranking.mean(axis=1))
-        self.results_ranking = ranking.sort_values(by="Mean", ascending=True)
+        ranking.insert(0, "Average AFS", ranking.mean(axis=1))
+        self.results_ranking = ranking.sort_values(by="Average AFS", ascending=False)
 
     def highlight_line(self, s):
         return [
@@ -166,9 +179,6 @@ class BinaryClassificationBenchmark:
 
     def evaluate_table(self, ranking=True, highlight=True, tab=False):
         benchmark_table = self.results if not ranking else self.results_ranking
-        print(
-            "Benchmark Table: the values are |frac{1}{M}\sum_{i}^{M}(StatiticalParity_{i}))| by dataset, \n where M is the number of models trained in benchmark."
-        )
         if highlight:
 
             def highlight_mitigator_name(val):
@@ -191,7 +201,7 @@ class BinaryClassificationBenchmark:
         else:
             return benchmark_table
 
-    def evaluate_plot(self, metric="Statistical Parity", benchmark=True):
+    def evaluate_plot(self, metric="AFS", benchmark=True):
 
         data = self.results_benchmark
         if benchmark is not True:
@@ -220,16 +230,14 @@ class BinaryClassificationBenchmark:
             plt.tight_layout()
             plt.show()
 
-    def benchmark(self, type=None):
+    def benchmark(self, type=None, ranking=True):
         if type is None:
             raise ValueError(
                 "Please provide a type: preprocessing, inprocessing or postprocessing"
             )
-        return load_benchmark(task="binary_classification", type=type, ranking=True)
+        return load_benchmark(task="binary_classification", type=type, ranking=ranking)
 
     def submit(self):
-        name = self.mitigator_name
-        print(f"{name} benchmark submitted")
-        print(f"{name} benchmark submitted")
-
-        print("https://holistic-ai.com/benchmark/binary_classification")
+        link = "https://forms.office.com/r/Vd6FT4eNL2"
+        print("Opening the link in your browser:")  
+        webbrowser.open(link, new=2)

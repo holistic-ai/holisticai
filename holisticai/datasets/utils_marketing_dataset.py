@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from ._dataloaders import load_bank_marketing
 from .dataset_processing_utils import (
@@ -36,7 +37,7 @@ def __preprocess_marketing_dataset(
         The dataframe containing the protected group B
     """
     group_a = get_protected_values(df, protected_attribute, "married")
-    group_b = get_protected_values(df, protected_attribute, "single")
+    group_b = get_protected_values(df, protected_attribute, "non-married")
     unique_values = df[output_variable].unique()
     output = df[output_variable].map({unique_values[0]: 0, unique_values[1]: 1})
     df = df.drop(drop_columns, axis=1)
@@ -83,6 +84,7 @@ def process_marketing_dataset(as_array=False):
         "poutcome",
     ]
     df.columns = feature_names + [output_variable]
+    df["marital"] = np.where(df["marital"] == 'married', "married", "non-married")
     df = remove_nans(df)
     df, group_a, group_b = __preprocess_marketing_dataset(
         df, protected_attribute, output_variable, drop_columns

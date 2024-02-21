@@ -93,6 +93,31 @@ def statistical_parity(group_a, group_b, y_pred):
 
     return sr_a - sr_b
 
+def accuracy_fairness_score(group_a, group_b, y_pred, y_test):
+    """
+    Calculates a new metric combining statistical parity and accuracy.
+    A higher AAPS value indicates better fairness and accuracy.
+
+    Parameters
+    ----------
+    group_a : array-like
+        Group membership vector (binary)
+    group_b : array-like
+        Group membership vector (binary)
+    y_pred : array-like
+        Predictions vector (binary)
+    Returns
+    -------
+    float
+        Acurracy-Fairness score
+    """
+    inv_sp = 1 - np.abs(statistical_parity(group_a, group_b, y_pred))
+    acc = accuracy_score(y_test, y_pred)
+
+    afs = (inv_sp + acc)/2
+
+    return afs
+
 
 def success_rate(group_a, group_b, y_pred):
     """

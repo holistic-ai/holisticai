@@ -28,11 +28,11 @@ def load_benchmark(task=None, type=None, ranking=False):
             data.pivot_table(
                 index="Mitigator",
                 columns="Dataset",
-                values="Statistical Parity",
+                values="AFS",
                 aggfunc="mean",
             )
         )
-        rank.insert(0, "Mean", rank.mean(axis=1))
-        return rank.sort_values(by="Mean", ascending=True)
+        rank.insert(0, "Average AFS", rank.mean(axis=1))
+        return rank.sort_values(by="Average AFS", ascending=False)
     else:
         return pd.read_parquet(filepath)
