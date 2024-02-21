@@ -1,23 +1,22 @@
 import warnings
+
 warnings.filterwarnings("ignore")
 
-import numpy as np
-import pandas as pd
+import webbrowser
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-
 from tabulate import tabulate
 from tqdm import tqdm
-import webbrowser
 
 from holisticai.benchmark.utils import load_benchmark
-from holisticai.bias.metrics import classification_bias_metrics, accuracy_fairness_score
+from holisticai.bias.metrics import accuracy_fairness_score, classification_bias_metrics
 from holisticai.datasets import load_dataset
 from holisticai.pipeline import Pipeline
 from holisticai.utils._plotting import get_colors
@@ -95,9 +94,7 @@ class BinaryClassificationBenchmark:
                     )
 
                 elif type == "inprocessing":
-                    kargs = {
-                        'feature_dim': feat_dim
-                    }
+                    kargs = {"feature_dim": feat_dim}
                     pipeline = Pipeline(
                         steps=[
                             ("scalar", StandardScaler()),
@@ -134,7 +131,9 @@ class BinaryClassificationBenchmark:
                 }
 
                 y_pred = pipeline.predict(X_test_t, **predict_params)
-                afs = accuracy_fairness_score(group_a_test, group_b_test, y_pred, y_test_t)
+                afs = accuracy_fairness_score(
+                    group_a_test, group_b_test, y_pred, y_test_t
+                )
                 metrics = classification_bias_metrics(
                     group_a_test, group_b_test, y_pred, y_test_t, metric_type="both"
                 )
@@ -239,5 +238,5 @@ class BinaryClassificationBenchmark:
 
     def submit(self):
         link = "https://forms.office.com/r/Vd6FT4eNL2"
-        print("Opening the link in your browser:")  
+        print("Opening the link in your browser:")
         webbrowser.open(link, new=2)

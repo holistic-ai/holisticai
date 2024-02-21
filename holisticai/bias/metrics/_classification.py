@@ -93,6 +93,7 @@ def statistical_parity(group_a, group_b, y_pred):
 
     return sr_a - sr_b
 
+
 def accuracy_fairness_score(group_a, group_b, y_pred, y_test):
     """
     Calculates a new metric combining statistical parity and accuracy.
@@ -114,7 +115,7 @@ def accuracy_fairness_score(group_a, group_b, y_pred, y_test):
     inv_sp = 1 - np.abs(statistical_parity(group_a, group_b, y_pred))
     acc = accuracy_score(y_test, y_pred)
 
-    afs = (inv_sp + acc)/2
+    afs = (inv_sp + acc) / 2
 
     return afs
 

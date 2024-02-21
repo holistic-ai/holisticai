@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from ._dataloaders import load_bank_marketing
 from .dataset_processing_utils import (
@@ -84,7 +84,7 @@ def process_marketing_dataset(as_array=False):
         "poutcome",
     ]
     df.columns = feature_names + [output_variable]
-    df["marital"] = np.where(df["marital"] == 'married', "married", "non-married")
+    df["marital"] = np.where(df["marital"] == "married", "married", "non-married")
     df = remove_nans(df)
     df, group_a, group_b = __preprocess_marketing_dataset(
         df, protected_attribute, output_variable, drop_columns

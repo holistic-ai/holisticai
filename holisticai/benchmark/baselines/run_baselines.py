@@ -1,9 +1,9 @@
+import os
+
 import pandas as pd
-import os 
 
 from holisticai.benchmark.tasks import get_task
-from holisticai.bias.mitigation import (
-    #AdversarialDebiasing,
+from holisticai.bias.mitigation import (  # AdversarialDebiasing,
     CalibratedEqualizedOdds,
     CorrelationRemover,
     DisparateImpactRemover,
@@ -27,8 +27,8 @@ MITIGATORS_PREPROCESSING = [
 ]
 
 MITIGATORS_INPROCESSING = [
-    #AdversarialDebiasing(),
-    #ExponentiatedGradientReduction(verbose=1),
+    # AdversarialDebiasing(),
+    # ExponentiatedGradientReduction(verbose=1),
     GridSearchReduction(),
     MetaFairClassifier(),
     PrejudiceRemover(),
@@ -51,7 +51,7 @@ MITIGATORS = {
 
 def __hai_bench__():
     task = get_task("binary_classification")
-    for type in ["postprocessing"]:#, "preprocessing"]:#["inprocessing", "preprocessing", "postprocessing"]:
+    for type in ["inprocessing", "preprocessing", "postprocessing"]:
         dataframe = pd.DataFrame()
         for mitigator in MITIGATORS[type]:
             task.run_benchmark(mitigator=mitigator, type=type)
