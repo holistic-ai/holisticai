@@ -12,6 +12,7 @@ from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
 from tabulate import tabulate
 from tqdm import tqdm
 
@@ -20,16 +21,17 @@ from holisticai.bias.metrics import accuracy_fairness_score, classification_bias
 from holisticai.datasets import load_dataset
 from holisticai.pipeline import Pipeline
 from holisticai.utils._plotting import get_colors
+from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 
 DATASETS = [
     "adult",
-    "law_school",
-    "german_credit",
-    "census_kdd",
-    "bank_marketing",
-    "credit_card",
-    "compas_recidivism",
-    "diabetes",
+#    "law_school",
+#    "german_credit",
+#    "census_kdd",
+#    "bank_marketing",
+#    "credit_card",
+#    "compas_recidivism",
+#    "diabetes",
 ]
 
 MODELS = [LogisticRegression(), RandomForestClassifier(), GradientBoostingClassifier()]
@@ -43,6 +45,7 @@ class BinaryClassificationBenchmark:
         return "BinaryClassificationBenchmark"
 
     def run_benchmark(self, mitigator=None, type=None):
+
         self.mitigator = mitigator
         self.mitigator_name = mitigator.__class__.__name__
 
@@ -131,6 +134,7 @@ class BinaryClassificationBenchmark:
                 }
 
                 y_pred = pipeline.predict(X_test_t, **predict_params)
+                acc = accuracy_score(y_test_t, y_pred)
                 afs = accuracy_fairness_score(
                     group_a_test, group_b_test, y_pred, y_test_t
                 )
@@ -146,6 +150,7 @@ class BinaryClassificationBenchmark:
                 metrics_result.insert(0, "Dataset", data_name)
                 metrics_result.insert(1, "Model", model.__class__.__name__)
                 metrics_result.insert(2, "AFS", afs)
+                metrics_result.insert(3, "Accuracy", acc)
                 metrics_result = metrics_result.reset_index(drop=False).rename(
                     columns={"index": "Mitigator"}
                 )
@@ -238,5 +243,5 @@ class BinaryClassificationBenchmark:
 
     def submit(self):
         link = "https://forms.office.com/r/Vd6FT4eNL2"
-        print("Opening the link in your browser:")
+        print("Opening the link in your browser: https://forms.office.com/r/Vd6FT4eNL2")
         webbrowser.open(link, new=2)

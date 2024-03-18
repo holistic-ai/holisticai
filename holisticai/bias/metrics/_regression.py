@@ -192,7 +192,6 @@ def statistical_parity_regression(group_a, group_b, y_pred, q=0.5):
 
     return np.squeeze(stat_parity)[()]
 
-
 def no_disparate_impact_level(group_a, group_b, y_pred):
     """
     No disparate impact level.
@@ -793,6 +792,38 @@ def rmse_ratio(group_a, group_b, y_pred, y_true, q=0):
 
     return np.squeeze(rmse_ratio)[()]
 
+def rmse_fairness_score(group_a, group_b, y_pred, y_true):
+    """
+    RMSE fairness score.
+
+    Description
+    -----------
+    This function computes the fairness score based on RMSE and statistical parity.
+
+    Interpretation
+    --------------
+    A value of 1 is desired.
+
+    Parameters
+    ----------
+    group_a : array-like
+        Group membership vector (binary)
+    group_b : array-like
+        Group membership vector (binary)
+    y_pred : array-like
+        Predictions vector (regression)
+    y_true : numpy array
+        Target vector (regression)
+
+    Returns
+    -------
+    float
+        RMSE fairness score
+
+    """
+    rmse_score = rmse_ratio(group_a, group_b, y_pred, y_true)
+    stat_parity = statistical_parity_regression(group_a, group_b, y_pred)
+    return (rmse_score + (1-abs(stat_parity)))
 
 def mae_ratio(group_a, group_b, y_pred, y_true, q=0):
     """

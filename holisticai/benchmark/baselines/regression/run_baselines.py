@@ -3,43 +3,28 @@ import os
 import pandas as pd
 
 from holisticai.benchmark.tasks import get_task
-from holisticai.bias.mitigation import (  # AdversarialDebiasing,
-    CalibratedEqualizedOdds,
-    CorrelationRemover,
-    DisparateImpactRemover,
-    EqualizedOdds,
+from holisticai.bias.mitigation import (  
     ExponentiatedGradientReduction,
     GridSearchReduction,
-    LearningFairRepresentation,
-    LPDebiaserBinary,
-    MetaFairClassifier,
-    MLDebiaser,
-    PrejudiceRemover,
-    RejectOptionClassification,
-    Reweighing,
+    PluginEstimationAndCalibration,
+    WassersteinBarycenter,
+    CorrelationRemover,
+    DisparateImpactRemover,
 )
 
 MITIGATORS_PREPROCESSING = [
     CorrelationRemover(),
-    DisparateImpactRemover(),
-    LearningFairRepresentation(verbose=0),
-    Reweighing(),
+    DisparateImpactRemover(repair_level=0.0),
 ]
 
 MITIGATORS_INPROCESSING = [
-    # AdversarialDebiasing(),
-    # ExponentiatedGradientReduction(verbose=1),
-    GridSearchReduction(),
-    MetaFairClassifier(),
-    PrejudiceRemover(),
+    ExponentiatedGradientReduction(constraints="BoundedGroupLoss", loss='Square', min_val=-0.1, max_val=1.3, upper_bound=0.001,),
+    GridSearchReduction(constraints="BoundedGroupLoss", loss='Square', min_val=-0.1, max_val=1.3, grid_size=20),
 ]
 
 MITIGATORS_POSTPROCESSING = [
-    CalibratedEqualizedOdds(cost_constraint="fnr"),
-    EqualizedOdds(solver="highs", seed=42),
-    LPDebiaserBinary(),
-    MLDebiaser(),
-    RejectOptionClassification(metric_name="Statistical parity difference"),
+    PluginEstimationAndCalibration(),
+    WassersteinBarycenter(),
 ]
 
 MITIGATORS = {
@@ -50,7 +35,7 @@ MITIGATORS = {
 
 
 def __hai_bench__():
-    task = get_task("binary_classification")
+    task = get_task("regression")
     for type in ["inprocessing", "preprocessing", "postprocessing"]:
         dataframe = pd.DataFrame()
         for mitigator in MITIGATORS[type]:
@@ -58,12 +43,12 @@ def __hai_bench__():
             data = task.evaluate_table(ranking=False, highlight=False, tab=False)
             dataframe = (
                 pd.concat([dataframe, data], axis=0)
-                .sort_values(by=["Dataset", "AFS"], ascending=False)
+                .sort_values(by=["Dataset", "RFS"], ascending=False)
                 .reset_index(drop=True)
             )
         benchmarkdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         dataframe.to_parquet(
-            f"{benchmarkdir}/baselines/{type}_binary_classification_benchmark.parquet"
+            f"{benchmarkdir}/regression/{type}_benchmark.parquet"
         )
 
 
