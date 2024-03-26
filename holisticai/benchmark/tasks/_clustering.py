@@ -18,7 +18,11 @@ from holisticai.benchmark.utils import load_benchmark
 from holisticai.bias.metrics import clustering_bias_metrics
 from holisticai.datasets import load_dataset
 from holisticai.pipeline import Pipeline
+from sklearn.base import BaseEstimator, clone
 from holisticai.utils._plotting import get_colors
+from holisticai.utils.transformers.bias import BMInprocessing as BMImp
+from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
+from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 
 DATASETS = [
    "heart",
@@ -36,11 +40,80 @@ class ClusteringBenchmark:
     def __str__(self):
         return "ClusteringBenchmark"
 
-    def run_benchmark(self, mitigator=None, type=None, extra_pred_params=None, extra_fit_params=None):
-        self.mitigator = mitigator
-        self.mitigator_name = mitigator.__class__.__name__
+    def run_benchmark(self, custom_mitigator=None, type=None, extra_pred_params=None, extra_fit_params=None):
+        if type == "preprocessing":
+            class BenchmarkConfig(BaseEstimator, BMPre):
 
-        if mitigator is None:
+                def __init__(self, mitigator=None):
+                    self.mitigator = mitigator
+
+                def fit(self, X, group_a, group_b):
+                    params = self._load_data(X=X, group_a=group_a, group_b=group_b)
+                    X = params["X"]
+                    group_a = params["group_a"]
+                    group_b = params["group_b"]
+
+                    self.model_ = self.mitigator.fit(X, group_a, group_b)
+                    return self
+
+                def transform(self, X, group_a, group_b):
+                    return self.model_.transform(X, group_a, group_b)
+
+        elif type == "inprocessing":
+            class BenchmarkConfig(BaseEstimator, BMImp):
+
+                def __init__(self, mitigator=None):
+                    self.mitigator = mitigator
+
+                def transform_estimator(self, estimator=None):
+                    if estimator is not None:
+                        self.estimator = estimator
+                    else:
+                        self.estimator = clone(self.estimator)
+                    return self
+
+                def fit(self, X, y_true, group_a, group_b):
+                    self.estimator_ = clone(self.estimator)
+
+                    model = self.mitigator.fit(X, y_true, group_a, group_b, self.estimator_)
+                    self.model_ = model
+
+                    return self
+
+                def predict(self, X):
+                    return self.model_.predict(X)
+
+                def predict_proba(self, X):
+                    return self.model_.predict_proba(X)
+        
+        elif type == "postprocessing":
+            class BenchmarkConfig(BaseEstimator, BMPost):
+
+                def __init__(self, mitigator=None):
+                    self.mitigator = mitigator
+
+                def fit(self, y_pred, group_a, group_b):
+                    params = self._load_data(y_pred=y_pred, group_a=group_a, group_b=group_b)
+                    group_a = params["group_a"] == 1
+                    group_b = params["group_b"] == 1
+                    y_pred = params["y_pred"]
+
+                    self.model_ = self.mitigator.fit(y_pred, group_a, group_b)
+                    return self
+
+                def transform(self, y_pred, group_a, group_b):
+                    params = self._load_data(y_pred=y_pred, group_a=group_a, group_b=group_b)
+                    group_a = params["group_a"] == 1
+                    group_b = params["group_b"] == 1
+                    y_pred = params["y_pred"]
+
+                    result = self.model_.transform(y_pred, group_a, group_b)
+                    return result
+            
+        self.mitigator = BenchmarkConfig(mitigator=custom_mitigator)
+        self.mitigator_name = custom_mitigator.__class__.__name__
+
+        if custom_mitigator is None:
             raise ValueError("Please provide a mitigator to run the benchmark")
         if type is None:
             raise ValueError(

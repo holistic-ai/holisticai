@@ -1,5 +1,6 @@
 import os
-
+import sys
+sys.path.append('./././')
 import pandas as pd
 
 from holisticai.benchmark.tasks import get_task
@@ -29,7 +30,7 @@ MITIGATORS_PREPROCESSING = [
 MITIGATORS_INPROCESSING = [
     # AdversarialDebiasing(),
     # ExponentiatedGradientReduction(verbose=1),
-    GridSearchReduction(),
+    GridSearchReduction(constraints="DemographicParity", loss='Square', min_val=-0.1, max_val=1.3, grid_size=20),
     MetaFairClassifier(),
     PrejudiceRemover(),
 ]
@@ -54,7 +55,7 @@ def __hai_bench__():
     for type in ["inprocessing", "preprocessing", "postprocessing"]:
         dataframe = pd.DataFrame()
         for mitigator in MITIGATORS[type]:
-            task.run_benchmark(mitigator=mitigator, type=type)
+            task.run_benchmark(custom_mitigator=mitigator, type=type, _implemented=True)
             data = task.evaluate_table(ranking=False, highlight=False, tab=False)
             dataframe = (
                 pd.concat([dataframe, data], axis=0)
