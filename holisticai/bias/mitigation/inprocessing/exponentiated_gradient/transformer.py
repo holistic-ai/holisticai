@@ -106,13 +106,12 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         self.verbose = verbose
         self.estimator = estimator
 
-    def transform_estimator(self, estimator):
+    def transform_estimator(self, estimator=None):
+        if estimator is not None:
+            self.estimator = estimator
+        else:
+            self.estimator = clone(self.estimator)
 
-        """
-        This method is deprecated but retained for backwards-compatibility. You should pass the estimator object directly in the constructor.
-        """
-
-        self.estimator = estimator
         return self
 
     def fit(

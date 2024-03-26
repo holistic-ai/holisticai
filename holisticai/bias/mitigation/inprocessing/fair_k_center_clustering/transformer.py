@@ -112,10 +112,10 @@ class FairKCenterClustering(BaseEstimator, BMImp):
         self.cost = cost
 
         self.centroids = X[self.centers]
-        self.all_centroids = X[self.all_centers]
+        self.cluster_centers_ = X[self.all_centers]
 
         self.labels_ = self.all_centers[
-            pairwise_distances_argmin(X, Y=self.all_centroids, metric="l1")
+            pairwise_distances_argmin(X, Y=self.cluster_centers_, metric="l1")
         ]
         self.center_groups_ = p_attr[self.all_centers]
 
@@ -124,4 +124,4 @@ class FairKCenterClustering(BaseEstimator, BMImp):
         return np.concatenate([self.centers, self.initially_given], axis=0)
 
     def predict(self, X):
-        return pairwise_distances(self.all_centroids, X, metric="l1").argmin(axis=0)
+        return pairwise_distances(self.cluster_centers_, X, metric="l1").argmin(axis=0)

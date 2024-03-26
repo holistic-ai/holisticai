@@ -50,6 +50,7 @@ class GridSearchReduction(BaseEstimator, BMImp):
         grid_size: Optional[int] = 10,
         grid_limit: Optional[float] = 2.0,
         verbose: Optional[int] = 0.0,
+        estimator=None,
     ):
         """
         Init Grid Search Reduction Transformer
@@ -99,9 +100,13 @@ class GridSearchReduction(BaseEstimator, BMImp):
         self.grid_size = grid_size
         self.grid_limit = grid_limit
         self.verbose = verbose
-
-    def transform_estimator(self, estimator):
         self.estimator = estimator
+
+    def transform_estimator(self, estimator=None):
+        if estimator is not None:
+            self.estimator = estimator
+        else:
+            self.estimator = clone(self.estimator)
         return self
 
     def fit(

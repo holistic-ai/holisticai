@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ._dataloaders import load_adult
+from ._dataloaders import load_census_kdd
 from .dataset_processing_utils import (
     get_protected_values,
     post_process_dataframe,
@@ -9,9 +9,11 @@ from .dataset_processing_utils import (
 )
 
 
-def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_columns):
+def __preprocess_censuskdd_dataset(
+    df, protected_attribute, output_variable, drop_columns
+):
     """
-    Pre-processes the adult dataset by converting the output variable to a binary variable, dropping unnecessary columns, converting categorical columns to one-hot encoded columns and converting the output variable to a binary variable
+    Pre-processes the german dataset by converting the output variable to a binary variable, dropping unnecessary columns, converting categorical columns to one-hot encoded columns and converting the output variable to a binary variable
 
     Parameters
     ----------
@@ -38,14 +40,18 @@ def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_co
     unique_values = df[output_variable].unique()
     output = df[output_variable].map({unique_values[0]: 0, unique_values[1]: 1})
     df = df.drop(drop_columns, axis=1)
-    df = pd.get_dummies(df, columns=df.columns[df.dtypes == "category"])
+    df = pd.get_dummies(
+        df,
+        columns=df.columns[(df.dtypes == "category") | (df.dtypes == "object")],
+        dtype=float,
+    )
     df[output_variable] = output
     return post_process_dataframe(df, group_a, group_b)
 
 
-def process_adult_dataset(as_array=False):
+def process_censuskdd_dataset(as_array=False):
     """
-    Processes the adult dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
+    Processes the german dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
 
     Parameters
     ----------
@@ -57,13 +63,17 @@ def process_adult_dataset(as_array=False):
     tuple
         When as_array is True, returns a tuple with four numpy arrays containing the data, output variable, protected group A and protected group B. When as_array is False, returns a tuple with three pandas dataframes containing the data, protected group A and protected group B
     """
-    data = load_adult()
+    data = load_census_kdd()
+    data["data"] = data["data"].applymap(
+        lambda x: x.strip() if isinstance(x, str) else x
+    )
     protected_attribute = "sex"
-    output_variable = "class"
-    drop_columns = ["education", "race", "sex", "class"]
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    output_variable = "target"
+    drop_columns = ["age", "education", "race", "hisp_origin", "sex", "target"]
+    df = pd.concat([data["data"], data["target"].astype("category")], axis=1)
+    df.rename(columns={"income_50k": "target"}, inplace=True)
     df = remove_nans(df)
-    df, group_a, group_b = __preprocess_adult_dataset(
+    df, group_a, group_b = __preprocess_censuskdd_dataset(
         df, protected_attribute, output_variable, drop_columns
     )
     if as_array:

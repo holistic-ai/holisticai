@@ -3,6 +3,12 @@ import pandas as pd
 
 from ._dataloaders import (
     load_adult,
+    load_bank_marketing,
+    load_census_kdd,
+    load_compas_recidivism,
+    load_credit_card,
+    load_diabetes,
+    load_german_credit,
     load_heart,
     load_last_fm,
     load_law_school,
@@ -10,10 +16,16 @@ from ._dataloaders import (
     load_us_crime,
 )
 from .utils_adult_dataset import process_adult_dataset
+from .utils_censuskdd_dataset import process_censuskdd_dataset
+from .utils_compas_dataset import process_compas_dataset
+from .utils_credit_dataset import process_credit_dataset
 from .utils_crime_dataset import process_crime_dataset
+from .utils_diabetes_dataset import process_diabetes_dataset
+from .utils_german_dataset import process_german_dataset
 from .utils_heart_dataset import process_heart_dataset
 from .utils_lastfm_dataset import process_lastfm_dataset
 from .utils_law_school_dataset import process_law_school_dataset
+from .utils_marketing_dataset import process_marketing_dataset
 from .utils_student_dataset import process_student_dataset
 
 
@@ -39,6 +51,9 @@ def load_dataset(dataset="adult", preprocessed=True, as_array=False, **kwargs):
 
     For 'lastfm' dataset, the protected attribute is 'sex', returns a tuple with two elements, the first one is a numpy array or pandas dataframe containing the pivot matrix and
     the second one is a numpy array containing the protected attribute.
+
+    For 'german' dataset, the protected attribute are 'age' and 'sex' and the preprocessed array version returns a tuple with three numpy arrays containing the data
+    and output variable, protected group A and protected group B.
 
     Obs.: Contrary to other datasets, the student dataset preprocessing does not return two vectors for protected groups, but only one vector. This is because
     this dataset is more suitable for analysis where more than two elements are in the protected group.
@@ -81,5 +96,29 @@ def load_dataset(dataset="adult", preprocessed=True, as_array=False, **kwargs):
         if not preprocessed:
             return load_heart(**kwargs)
         return process_heart_dataset(as_array)
+    elif dataset == "german_credit":
+        if not preprocessed:
+            return load_german_credit(**kwargs)
+        return process_german_dataset(as_array)
+    elif dataset == "bank_marketing":
+        if not preprocessed:
+            return load_bank_marketing(**kwargs)
+        return process_marketing_dataset(as_array)
+    elif dataset == "compas_recidivism":
+        if not preprocessed:
+            return load_compas_recidivism(**kwargs)
+        return process_compas_dataset(as_array)
+    elif dataset == "census_kdd":
+        if not preprocessed:
+            return load_census_kdd(**kwargs)
+        return process_censuskdd_dataset(as_array)
+    elif dataset == "credit_card":
+        if not preprocessed:
+            return load_credit_card(**kwargs)
+        return process_credit_dataset(as_array)
+    elif dataset == "diabetes":
+        if not preprocessed:
+            return load_diabetes(**kwargs)
+        return process_diabetes_dataset(as_array)
     else:
         raise ValueError(f"Unknown dataset: {dataset}")

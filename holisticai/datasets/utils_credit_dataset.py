@@ -1,6 +1,7 @@
+import numpy as np
 import pandas as pd
 
-from ._dataloaders import load_adult
+from ._dataloaders import load_credit_card
 from .dataset_processing_utils import (
     get_protected_values,
     post_process_dataframe,
@@ -33,8 +34,8 @@ def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_co
     group_b : pandas.DataFrame
         The dataframe containing the protected group B
     """
-    group_a = get_protected_values(df, protected_attribute, "Male")
-    group_b = get_protected_values(df, protected_attribute, "Female")
+    group_a = get_protected_values(df, protected_attribute, "Female")
+    group_b = get_protected_values(df, protected_attribute, "Male")
     unique_values = df[output_variable].unique()
     output = df[output_variable].map({unique_values[0]: 0, unique_values[1]: 1})
     df = df.drop(drop_columns, axis=1)
@@ -43,7 +44,7 @@ def __preprocess_adult_dataset(df, protected_attribute, output_variable, drop_co
     return post_process_dataframe(df, group_a, group_b)
 
 
-def process_adult_dataset(as_array=False):
+def process_credit_dataset(as_array=False):
     """
     Processes the adult dataset with some fixed parameters and returns the data and protected groups. If as_array is True, returns the data as numpy arrays. If as_array is False, returns the data as pandas dataframes
 
@@ -57,11 +58,38 @@ def process_adult_dataset(as_array=False):
     tuple
         When as_array is True, returns a tuple with four numpy arrays containing the data, output variable, protected group A and protected group B. When as_array is False, returns a tuple with three pandas dataframes containing the data, protected group A and protected group B
     """
-    data = load_adult()
+    data = load_credit_card()
     protected_attribute = "sex"
-    output_variable = "class"
-    drop_columns = ["education", "race", "sex", "class"]
+    output_variable = "target"
+    drop_columns = ["sex", "target"]
     df = pd.concat([data["data"], data["target"]], axis=1)
+    feature_names = [
+        "limit_bal",
+        "sex",
+        "education",
+        "marriage",
+        "age",
+        "pay_0",
+        "pay_2",
+        "pay_3",
+        "pay_4",
+        "pay_5",
+        "pay_6",
+        "bill_amt1",
+        "bill_amt2",
+        "bill_amt3",
+        "bill_amt4",
+        "bill_amt5",
+        "bill_amt6",
+        "pay_amt1",
+        "pay_amt2",
+        "pay_amt3",
+        "pay_amt4",
+        "pay_amt5",
+        "pay_amt6",
+    ]
+    df.columns = feature_names + [output_variable]
+    df["sex"] = np.where(df["sex"] == 1, "Male", "Female")
     df = remove_nans(df)
     df, group_a, group_b = __preprocess_adult_dataset(
         df, protected_attribute, output_variable, drop_columns
