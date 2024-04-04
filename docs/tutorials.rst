@@ -9,3 +9,4 @@ Tutorials
     efficacy/efficacy
     tutorials/bias/bias
     tutorials/explainability/explainability
+    tutorials/privacy/privacy
