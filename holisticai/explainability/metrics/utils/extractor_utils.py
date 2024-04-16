@@ -24,7 +24,7 @@ def get_index_groups(model_type, y):
     y: np.array
         target array
     """
-    if model_type == "binary_classification":
+    if model_type in ("binary_classification", "multiclass_classification"):
         index_groups = {
             f"[label={int(value)}]": list(y[y == value].index) for value in y.unique()
         }
@@ -47,7 +47,6 @@ def get_index_groups(model_type, y):
 
 
 def get_alpha_lime(df_feature_importance, alpha):
-
     mean_importance = (
         df_feature_importance.groupby("Feature Label")["Importance"]
         .mean()
