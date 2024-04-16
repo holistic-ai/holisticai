@@ -1,9 +1,9 @@
 from __future__ import annotations
-import numpy as np
 
 from typing import Iterable
-from numpy.typing import ArrayLike
 
+import numpy as np
+from numpy.typing import ArrayLike
 
 from holisticai.explainability.metrics.global_importance._contrast_metrics import (
     importance_order_constrast,

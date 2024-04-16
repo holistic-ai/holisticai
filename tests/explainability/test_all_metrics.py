@@ -1,18 +1,13 @@
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.inspection import permutation_importance
 from sklearn.datasets import load_diabetes
+from sklearn.inspection import permutation_importance
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.model_selection import train_test_split
 
 from holisticai.datasets import load_dataset
-
 from holisticai.explainability.metrics.core.all_metrics import position_parity
-
-from holisticai.explainability.metrics.utils import (
-    get_index_groups,
-)
+from holisticai.explainability.metrics.utils import get_index_groups
 
 
 def get_feat_importance_ind(x, y, model, samples_len):

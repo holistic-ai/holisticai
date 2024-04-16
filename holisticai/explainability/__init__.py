@@ -6,5 +6,4 @@ holisticai.explainability is a python module meant to help in auditing the expla
 
 from ._explainers import Explainer
 
-
 __all__ = ["Explainer"]
