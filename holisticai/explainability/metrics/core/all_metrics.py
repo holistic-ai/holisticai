@@ -21,6 +21,11 @@ def position_parity(
         array with feature importance indexes
     conditional_feature_importance_indexes: list[Iterable]
         array with conditional feature importance indexes
+
+    Returns
+    -------
+    float
+        position parity value
     """
     return np.mean(
         [
