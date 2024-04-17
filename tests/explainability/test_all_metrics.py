@@ -7,14 +7,14 @@ from sklearn.model_selection import train_test_split
 
 from holisticai.datasets import load_dataset
 from holisticai.explainability.metrics.core.all_metrics import (
+    explainability_ease,
     position_parity,
     rank_alignment,
-    explainability_ease,
 )
-from holisticai.explainability.metrics.utils import get_index_groups
 from holisticai.explainability.metrics.global_importance._explainability_level import (
     compute_partial_dependence,
 )
+from holisticai.explainability.metrics.utils import get_index_groups
 
 
 def convert_float_to_categorical(target, nb_classes, numeric_classes=True):
