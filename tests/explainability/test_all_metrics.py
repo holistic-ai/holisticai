@@ -7,8 +7,12 @@ from sklearn.model_selection import train_test_split
 
 from holisticai.datasets import load_dataset
 from holisticai.explainability.metrics.core.all_metrics import (
+    explainability_ease,
     position_parity,
     rank_alignment,
+)
+from holisticai.explainability.metrics.global_importance._explainability_level import (
+    compute_partial_dependence,
 )
 from holisticai.explainability.metrics.utils import get_index_groups
 
@@ -197,3 +201,45 @@ def test_multiclass_classification_rank_alignment():
         for _, index in index_groups.items()
     ]
     assert rank_alignment(feat_importance, conditional_feature_importance) is not None
+
+
+def test_binary_classification_explainability_ease():
+    X_train, X_test, y_train, _, _ = binary_classification_process_dataset()
+    model = train_model_classification(X_train, y_train)
+    pred = model.predict(X_test)
+    feat_importance = get_feat_importance(
+        x=X_test, y=pred, model=model, samples_len=len(X_test)
+    )
+    partial_dependence = compute_partial_dependence(
+        model=model, feature_importance=feat_importance, x=X_test, target=1
+    )
+    assert explainability_ease(partial_dependence_list=[partial_dependence]) is not None
+
+
+def test_regression_explainability_ease():
+    X_train, X_test, y_train, _, _ = regression_process_dataset()
+    model = train_model_regression(X_train, y_train)
+    pred = model.predict(X_test)
+    feat_importance = get_feat_importance(
+        x=X_test, y=pred, model=model, samples_len=len(X_test)
+    )
+    partial_dependence = compute_partial_dependence(
+        model=model, feature_importance=feat_importance, x=X_test, target=None
+    )
+    assert explainability_ease(partial_dependence_list=[partial_dependence]) is not None
+
+
+def test_multiclass_classification_explainability_ease():
+    X_train, X_test, y_train, _ = multiclass_classification_process_dataset()
+    model = train_model_classification(X_train, y_train)
+    pred = model.predict(X_test)
+    feat_importance = get_feat_importance(
+        x=X_test, y=pred, model=model, samples_len=len(X_test)
+    )
+    partial_dependence = [
+        compute_partial_dependence(
+            model=model, feature_importance=feat_importance, x=X_test, target=i
+        )
+        for i in np.unique(pred)
+    ]
+    assert explainability_ease(partial_dependence_list=partial_dependence) is not None
