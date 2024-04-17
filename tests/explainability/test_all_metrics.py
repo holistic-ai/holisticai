@@ -160,7 +160,6 @@ def test_binary_classification_rank_alignment():
         )
         for _, index in index_groups.items()
     ]
-    print(rank_alignment(feat_importance, conditional_feature_importance))
     assert rank_alignment(feat_importance, conditional_feature_importance) is not None
 
 
@@ -179,7 +178,6 @@ def test_regression_rank_alignment():
         )
         for _, index in index_groups.items()
     ]
-    print(rank_alignment(feat_importance, conditional_feature_importance))
     assert rank_alignment(feat_importance, conditional_feature_importance) is not None
 
 
@@ -198,5 +196,4 @@ def test_multiclass_classification_rank_alignment():
         )
         for _, index in index_groups.items()
     ]
-    print(rank_alignment(feat_importance, conditional_feature_importance))
     assert rank_alignment(feat_importance, conditional_feature_importance) is not None
