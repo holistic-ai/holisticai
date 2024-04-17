@@ -6,8 +6,25 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split
 
 from holisticai.datasets import load_dataset
-from holisticai.explainability.metrics.core.all_metrics import position_parity
+from holisticai.explainability.metrics.core.all_metrics import (
+    position_parity,
+)
 from holisticai.explainability.metrics.utils import get_index_groups
+
+
+def convert_float_to_categorical(target, nb_classes, numeric_classes=True):
+    eps = np.finfo(float).eps
+    if numeric_classes:
+        labels = list(range(nb_classes))
+    else:
+        labels = [f"Q{c}-Q{c+1}" for c in range(nb_classes)]
+    labels_values = np.linspace(0, 1, nb_classes + 1)
+    v = np.array(target.quantile(labels_values)).squeeze()
+    v[0], v[-1] = v[0] - eps, v[-1] + eps
+    y = target.copy()
+    for i, c in enumerate(labels):
+        y[(target.values >= v[i]) & (target.values < v[i + 1])] = c
+    return y.astype(np.int32)
 
 
 def get_feat_importance_ind(x, y, model, samples_len):
@@ -24,7 +41,7 @@ def get_feat_importance_ind(x, y, model, samples_len):
     return df_feat_imp.sort_values("Importance", ascending=False).copy().index
 
 
-def classification_process_dataset():
+def binary_classification_process_dataset():
     df, _, _ = load_dataset(dataset="adult", preprocessed=True, as_array=False)
     X = df.iloc[:500, :-1]
     y = df.iloc[:500, -1]
@@ -60,8 +77,22 @@ def train_model_regression(X_train, y_train):
     return model
 
 
+def multiclass_classification_process_dataset():
+    seed = np.random.seed(42)
+    df, group_a, group_b = load_dataset(
+        dataset="crime", preprocessed=True, as_array=False
+    )
+    nb_classes = 5
+    X = df.iloc[:, :-1]
+    y = convert_float_to_categorical(df.iloc[:, -1], nb_classes=nb_classes)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=seed
+    )  # train test split
+    return X_train, X_test, y_train, y_test
+
+
 def test_binary_classification_position_parity():
-    X_train, X_test, y_train, y_test, _ = classification_process_dataset()
+    X_train, X_test, y_train, y_test, _ = binary_classification_process_dataset()
     model = train_model_classification(X_train, y_train)
     pred = model.predict(X_test)
     feat_importance = get_feat_importance_ind(
@@ -87,6 +118,24 @@ def test_regression_position_parity():
     )
     y = pd.Series(pred, index=X_test.index)
     index_groups = get_index_groups(model_type="regression", y=y)
+    conditional_features_importance = [
+        get_feat_importance_ind(
+            x=X_test.loc[index], y=y.loc[index], model=model, samples_len=len(index)
+        )
+        for _, index in index_groups.items()
+    ]
+    assert position_parity(feat_importance, conditional_features_importance) is not None
+
+
+def test_multiclass_classification_position_parity():
+    X_train, X_test, y_train, y_test = multiclass_classification_process_dataset()
+    model = train_model_classification(X_train, y_train)
+    pred = model.predict(X_test)
+    feat_importance = get_feat_importance_ind(
+        x=X_test, y=pred, model=model, samples_len=len(X_test)
+    )
+    y = pd.Series(pred, index=X_test.index)
+    index_groups = get_index_groups(model_type="multiclass_classification", y=y)
     conditional_features_importance = [
         get_feat_importance_ind(
             x=X_test.loc[index], y=y.loc[index], model=model, samples_len=len(index)
