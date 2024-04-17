@@ -5,6 +5,7 @@ import pandas as pd
 
 from holisticai.explainability.metrics.global_importance._contrast_metrics import (
     importance_order_constrast,
+    importance_range_constrast,
 )
 
 
