@@ -33,4 +33,3 @@ def position_parity(
             )
             for i in conditional_feature_importance
         ]
-    )

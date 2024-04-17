@@ -78,6 +78,7 @@ def train_model_regression(X_train, y_train):
 def multiclass_classification_process_dataset():
     seed = np.random.seed(42)
     df, _, _ = load_dataset(dataset="crime", preprocessed=True, as_array=False)
+
     nb_classes = 5
     X = df.iloc[:, :-1]
     y = convert_float_to_categorical(df.iloc[:, -1], nb_classes=nb_classes)
