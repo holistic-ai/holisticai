@@ -6,7 +6,10 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split
 
 from holisticai.datasets import load_dataset
-from holisticai.explainability.metrics.core.all_metrics import position_parity
+from holisticai.explainability.metrics.core.all_metrics import (
+    position_parity,
+    rank_alignment,
+)
 from holisticai.explainability.metrics.utils import get_index_groups
 
 
@@ -140,3 +143,57 @@ def test_multiclass_classification_position_parity():
         for _, index in index_groups.items()
     ]
     assert position_parity(feat_importance, conditional_feature_importance) is not None
+
+
+def test_binary_classification_rank_alignment():
+    X_train, X_test, y_train, _, _ = binary_classification_process_dataset()
+    model = train_model_classification(X_train, y_train)
+    pred = model.predict(X_test)
+    feat_importance = get_feat_importance(
+        x=X_test, y=pred, model=model, samples_len=len(X_test)
+    )
+    y = pd.Series(pred, index=X_test.index)
+    index_groups = get_index_groups(model_type="binary_classification", y=y)
+    conditional_feature_importance = [
+        get_feat_importance(
+            x=X_test.loc[index], y=y.loc[index], model=model, samples_len=len(index)
+        )
+        for _, index in index_groups.items()
+    ]
+    assert rank_alignment(feat_importance, conditional_feature_importance) is not None
+
+
+def test_regression_rank_alignment():
+    X_train, X_test, y_train, _, _ = regression_process_dataset()
+    model = train_model_regression(X_train, y_train)
+    pred = model.predict(X_test)
+    feat_importance = get_feat_importance(
+        x=X_test, y=pred, model=model, samples_len=len(X_test)
+    )
+    y = pd.Series(pred, index=X_test.index)
+    index_groups = get_index_groups(model_type="regression", y=y)
+    conditional_feature_importance = [
+        get_feat_importance(
+            x=X_test.loc[index], y=y.loc[index], model=model, samples_len=len(index)
+        )
+        for _, index in index_groups.items()
+    ]
+    assert rank_alignment(feat_importance, conditional_feature_importance) is not None
+
+
+def test_multiclass_classification_rank_alignment():
+    X_train, X_test, y_train, _ = multiclass_classification_process_dataset()
+    model = train_model_classification(X_train, y_train)
+    pred = model.predict(X_test)
+    feat_importance = get_feat_importance(
+        x=X_test, y=pred, model=model, samples_len=len(X_test)
+    )
+    y = pd.Series(pred, index=X_test.index)
+    index_groups = get_index_groups(model_type="multiclass_classification", y=y)
+    conditional_feature_importance = [
+        get_feat_importance(
+            x=X_test.loc[index], y=y.loc[index], model=model, samples_len=len(index)
+        )
+        for _, index in index_groups.items()
+    ]
+    assert rank_alignment(feat_importance, conditional_feature_importance) is not None
