@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import train_test_split
 
 from holisticai.datasets import load_dataset
-from holisticai.explainability.metrics.core.all_metrics import (
+from holisticai.explainability.metrics.core import (
     explainability_ease,
     position_parity,
     rank_alignment,
