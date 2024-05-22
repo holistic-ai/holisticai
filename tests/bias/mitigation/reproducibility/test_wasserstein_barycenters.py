@@ -6,8 +6,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.bias.metrics import regression_bias_metrics
-from holisticai.bias.mitigation import WassersteinBarycenter
+from holisticai.metrics.bias import regression_bias_metrics
+from holisticai.mitigation.bias import WassersteinBarycenter
 from holisticai.pipeline import Pipeline
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,

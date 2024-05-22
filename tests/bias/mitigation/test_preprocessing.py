@@ -12,7 +12,7 @@ from tests.bias.mitigation.testing_utils.utils import (
 
 
 def build_rew_pipeline():
-    from holisticai.bias.mitigation import Reweighing
+    from holisticai.mitigation.bias import Reweighing
 
     np.random.seed(100)
 

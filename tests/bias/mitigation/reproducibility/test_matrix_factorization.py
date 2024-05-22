@@ -20,13 +20,13 @@ def test_running_matrix_factorization_strategies(small_recommender_dataset):
     mf.fit(data_matrix)
     assert mf.pred.shape == (numUsers, numItems)
 
-    from holisticai.bias.mitigation import PopularityPropensityMF
+    from holisticai.mitigation.bias import PopularityPropensityMF
 
     mf = PopularityPropensityMF(K=K, beta=0.02, steps=3, verbose=1)
     mf.fit(data_matrix)
     assert mf.pred.shape == (numUsers, numItems)
 
-    from holisticai.bias.mitigation import DebiasingLearningMF
+    from holisticai.mitigation.bias import DebiasingLearningMF
 
     mf = DebiasingLearningMF(
         K=K,

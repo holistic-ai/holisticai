@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from holisticai.bias.mitigation import FairRec
+from holisticai.mitigation.bias import FairRec
 from tests.bias.mitigation.testing_utils.utils import small_recommender_dataset
 
 np.random.seed(42)

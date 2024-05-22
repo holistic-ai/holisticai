@@ -3,7 +3,7 @@ import numpy as np
 from numpy.testing import assert_approx_equal, assert_array_almost_equal
 
 # Multiclass
-from holisticai.bias.metrics import (
+from holisticai.metrics.bias import (
     accuracy_matrix,
     confusion_tensor,
     frequency_matrix,

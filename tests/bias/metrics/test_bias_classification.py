@@ -4,7 +4,7 @@ import pandas as pd
 from numpy.testing import assert_approx_equal
 
 # Classification
-from holisticai.bias.metrics import (
+from holisticai.metrics.bias import (
     abroca,
     accuracy_diff,
     average_odds_diff,

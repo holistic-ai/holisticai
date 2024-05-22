@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.bias.mitigation import CorrelationRemover
+from holisticai.mitigation.bias import CorrelationRemover
 from holisticai.pipeline import Pipeline
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,
@@ -17,7 +17,7 @@ seed = 42
 def running_without_pipeline(small_regression_dataset):
     from sklearn.linear_model import LinearRegression
 
-    from holisticai.bias.metrics import regression_bias_metrics
+    from holisticai.metrics.bias import regression_bias_metrics
 
     train_data, test_data = small_regression_dataset
     X, y, group_a, group_b = train_data
@@ -56,7 +56,7 @@ def running_without_pipeline(small_regression_dataset):
 def running_with_pipeline(small_regression_dataset):
     from sklearn.linear_model import LinearRegression
 
-    from holisticai.bias.metrics import regression_bias_metrics
+    from holisticai.metrics.bias import regression_bias_metrics
 
     train_data, test_data = small_regression_dataset
     model = LinearRegression()

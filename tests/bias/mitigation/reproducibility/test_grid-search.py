@@ -6,8 +6,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics
-from holisticai.bias.mitigation import GridSearchReduction
+from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics
+from holisticai.mitigation.bias import GridSearchReduction
 from holisticai.pipeline import Pipeline
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,

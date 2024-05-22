@@ -207,7 +207,7 @@ def evaluate_pipeline(pipeline, small_categorical_dataset, metric_names, thresho
     object
         The fitted pipeline
     """
-    from holisticai.bias import metrics
+    from holisticai.metrics import bias as metrics
 
     train_data, _ = small_categorical_dataset
     X, y, group_a, group_b = train_data

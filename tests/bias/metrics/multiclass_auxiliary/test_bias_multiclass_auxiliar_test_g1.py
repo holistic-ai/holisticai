@@ -7,7 +7,7 @@ from utils import (
     unconventional_numeric_config,
 )
 
-from holisticai.bias.metrics import frequency_matrix, multiclass_statistical_parity
+from holisticai.metrics.bias import frequency_matrix, multiclass_statistical_parity
 
 #######################
 # 1 entrada + p_attr

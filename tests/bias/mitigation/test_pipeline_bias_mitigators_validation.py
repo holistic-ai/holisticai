@@ -7,7 +7,7 @@ from holisticai.utils.transformers.bias import BIAS_TAGS
 
 
 def test_incorrect_pipeline_mitigators_tags():
-    from holisticai.bias.mitigation import EqualizedOdds, Reweighing
+    from holisticai.mitigation.bias import EqualizedOdds, Reweighing
 
     def incorrect_post_processing_pipeline_tag_definition():
         return Pipeline(

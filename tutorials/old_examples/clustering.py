@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.bias.mitigation import FairKmedianClustering
+from holisticai.mitigation.bias import FairKmedianClustering
 from tutorials.utils.datasets import preprocessed_dataset
 
 train_data, test_data = preprocessed_dataset("adult")

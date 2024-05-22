@@ -6,7 +6,7 @@ sys.path.append(os.getcwd())
 import pytest
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.bias.metrics import classification_bias_metrics
+from holisticai.metrics.bias import classification_bias_metrics
 from holisticai.pipeline import Pipeline
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,
@@ -18,7 +18,7 @@ seed = 42
 
 def running_without_pipeline(small_categorical_dataset):
 
-    from holisticai.bias.mitigation import AdversarialDebiasing
+    from holisticai.mitigation.bias import AdversarialDebiasing
 
     train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data
@@ -50,7 +50,7 @@ def running_without_pipeline(small_categorical_dataset):
 
 
 def running_with_pipeline(small_categorical_dataset):
-    from holisticai.bias.mitigation import AdversarialDebiasing
+    from holisticai.mitigation.bias import AdversarialDebiasing
 
     train_data, test_data = small_categorical_dataset
     X, y, group_a, group_b = train_data

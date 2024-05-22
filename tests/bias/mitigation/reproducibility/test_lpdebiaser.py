@@ -9,8 +9,8 @@ import warnings
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.bias.metrics import classification_bias_metrics, multiclass_bias_metrics
-from holisticai.bias.mitigation import LPDebiaserBinary, LPDebiaserMulticlass
+from holisticai.metrics.bias import classification_bias_metrics, multiclass_bias_metrics
+from holisticai.mitigation.bias import LPDebiaserBinary, LPDebiaserMulticlass
 from holisticai.pipeline import Pipeline
 from holisticai.utils.transformers.bias import SensitiveGroups
 from tests.bias.mitigation.testing_utils.utils import (

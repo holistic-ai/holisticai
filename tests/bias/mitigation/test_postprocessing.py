@@ -22,7 +22,7 @@ def check_postprocessing_prediction(model, small_categorical_dataset):
 
 
 def build_ceop_pipeline(cost_constraint):
-    from holisticai.bias.mitigation import CalibratedEqualizedOdds
+    from holisticai.mitigation.bias import CalibratedEqualizedOdds
 
     np.random.seed(100)
 
@@ -40,7 +40,7 @@ def build_ceop_pipeline(cost_constraint):
 
 
 def build_eop_pipeline():
-    from holisticai.bias.mitigation import EqualizedOdds
+    from holisticai.mitigation.bias import EqualizedOdds
 
     np.random.seed(100)
 
@@ -55,7 +55,7 @@ def build_eop_pipeline():
 
 
 def build_roc_pipeline(metric_name):
-    from holisticai.bias.mitigation import RejectOptionClassification
+    from holisticai.mitigation.bias import RejectOptionClassification
 
     np.random.seed(100)
 

@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 import pandas as pd
 
-from holisticai.bias.mitigation import FairScoreClassifier
+from holisticai.mitigation.bias import FairScoreClassifier
 from tests.bias.mitigation.testing_utils.utils import small_multiclass_dataset
 
 
