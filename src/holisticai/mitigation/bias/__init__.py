@@ -1,5 +1,5 @@
 """
-The :mod:`holisticai.bias.mitigation` module includes preprocessing, inprocessing and postprocessing bias mitigation algorithms.
+The :mod:`holisticai.mitigation.bias` module includes preprocessing, inprocessing and postprocessing bias mitigation algorithms.
 """
 
 # inprocessing algorithm classes

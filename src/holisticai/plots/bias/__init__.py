@@ -1,5 +1,5 @@
 """
-The :mod:`holisticai.bias.plots` module includes bias plotters.
+The :mod:`holisticai.plots.bias` module includes bias plotters.
 """
 # Classification Plots
 # Exploratory plots
