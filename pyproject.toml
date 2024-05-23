@@ -82,7 +82,14 @@ dependencies = [
   "myst_parser",
   "nbsphinx",
   "sphinx_copybutton",
+<<<<<<< HEAD
   #"holisticai[all]",
+=======
+  "sphinx_design",
+  "sphinx_togglebutton",
+  "sphinxcontrib.youtube",
+  "holisticai[all]",
+>>>>>>> f460e981628f108ab8ac26bd32657b66ed24e02d
 ]
 
 [tool.hatch.envs.docs.scripts]

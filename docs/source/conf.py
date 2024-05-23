@@ -13,21 +13,21 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import os
-import shutil
-import sys
 
 
+<<<<<<< HEAD
 sys.path.insert(0, os.path.abspath(".."))
 work_dir = '/'.join(os.getcwd().split("/")[:-2])
 src_path = os.path.join(work_dir,'src')
 print(src_path)
 
 sys.path.insert(0, src_path)
+=======
+>>>>>>> f460e981628f108ab8ac26bd32657b66ed24e02d
 # -- Project information -----------------------------------------------------
 
 project = "holisticai"
-copyright = "2022, Holistic AI"
+copyright = "2024, Holistic AI"
 author = "Holistic AI"
 
 
@@ -44,6 +44,9 @@ extensions = [
     "sphinx.ext.napoleon",
     "nbsphinx",
     "sphinx_copybutton",
+    "sphinx_design",
+    "sphinx_togglebutton",
+    "sphinxcontrib.youtube",
 ]
 
 # autodoc options
@@ -66,23 +69,43 @@ exclude_patterns = [
     ".ipynb_checkpoints",
 ]
 
-html_logo = "holistic_ai.png"
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+
+html_logo = "hai_logo.svg"
+html_favicon = "../holistic_ai.png"
+
 html_theme = "pydata_sphinx_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
 # Theme options
-# html_theme_options = {'logo_only': True,'display_version': True}
+html_theme_options = {
+    "logo": {"image_dark": "https://assets-global.website-files.com/6305e5d42c283515c3e71b8c/63d771efd50a073bd66193f0_Holistic-AI-Logo-Horizontal-Dark.svg"},
+    "github_url": "https://github.com/holistic-ai/holisticai",
+    "twitter_url": "https://twitter.com/holistic_ai",
+    "show_version_warning_banner": True,
+    "announcement": "Visit our website and <a href='https://www.holisticai.com/demo'>schedule a demo</a> with our experts to find out how Holistic AI can help you shield against AI risks.",
+    "icon_links": [
+        {
+            "name": "Community",
+            "url": "https://join.slack.com/t/holisticaicommunity/shared_invite/zt-2jamouyrn-BrMfeoBZIHT8HbLzB3P9QQ",  # required
+            "icon": "fa-brands fa-slack",
+            "type": "fontawesome",
+        }
+   ]
+}
 
+import os
+import shutil
+import sys
 
-
+sys.path.insert(0, os.path.abspath(".."))
 
 # make copy of notebooks in docs folder, as they must be here for sphinx to
 # pick them up properly.

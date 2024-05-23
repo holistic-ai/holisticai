@@ -21,6 +21,8 @@ docs/source/.generated
 docs/efficacy/.generated
 docs/source/bias/.generated
 docs/source/metrics/.generated
+**/.generated/
+.generated/
 docs/source/explainability/.generated
 
 mlruns/
