@@ -1,3 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
+body{
+  font-family:"Space Grotesk";
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family:"Space Grotesk";
+}
+
+.btn-primary {
+  background-color: #5b42e4;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.btn-primary:visited {
+  color: white;
+}
+
 .wy-side-nav-search {
-  background-color:#2980b9a1;
+  background-color:#5b42e4;
+}
+
+div.admonition.admonition-youtube {
+  border-color: #5b42e4; /* YouTube red */
+}
+div.admonition.admonition-youtube > .admonition-title {
+  background-color: #5b42e4;
+  color: white;
+}
+div.admonition.admonition-youtube > .admonition-title:after {
+  color: #5b42e4;
+  content: "\f26c"; /* fa-solid fa-tv */
+}
+
+.intro-card {
+  padding: 10px 10px 20px 10px;
+}
+
+.intro-card .sd-card-img-top {
+  margin: 10px;
+  height: 52px;
+  background: none !important;
 }
