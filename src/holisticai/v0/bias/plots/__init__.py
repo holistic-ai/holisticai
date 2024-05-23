@@ -1,6 +1,7 @@
 """
-The :mod:`holisticai.bias.plots` module includes bias plotters.
+The :mod:`holisticai.plots.bias` module includes bias plotters.
 """
+
 # Classification Plots
 from ._bias_classification_plots import abroca_plot
 

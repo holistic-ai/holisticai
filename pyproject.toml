@@ -85,13 +85,14 @@ dependencies = [
   "sphinx_design",
   "sphinx_togglebutton",
   "sphinxcontrib.youtube",
-  "holisticai[all]",
 ]
 
 [tool.hatch.envs.docs.scripts]
 foo = ["which sphinx-build"]
 foo2 = ["which python"]
-build = ["sphinx-build -M html docs/source docs/build -W --keep-going"]
+build = [
+  "PYTHONPATH=./src sphinx-build -M html docs/source docs/build -W --keep-going",
+]
 
 [tool.hatch.envs.testing]
 dependencies = [

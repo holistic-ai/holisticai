@@ -3,7 +3,10 @@ The :mod:`holisticai.metrics.bias` module includes classification, regression, m
 """
 
 # Classification
-from ._classification import (
+# Clustering
+# Multiclass
+# Recommender
+from holisticai.metrics.bias._classification import (
     abroca,
     accuracy_diff,
     average_odds_diff,
@@ -24,9 +27,7 @@ from ._classification import (
     z_test_diff,
     z_test_ratio,
 )
-
-# Clustering
-from ._clustering import (
+from holisticai.metrics.bias._clustering import (
     cluster_balance,
     cluster_dist_entropy,
     cluster_dist_kl,
@@ -36,9 +37,7 @@ from ._clustering import (
     silhouette_diff,
     social_fairness_ratio,
 )
-
-# Multiclass
-from ._multiclass import (
+from holisticai.metrics.bias._multiclass import (
     accuracy_matrix,
     confusion_matrix,
     confusion_tensor,
@@ -51,9 +50,7 @@ from ._multiclass import (
     precision_matrix,
     recall_matrix,
 )
-
-# Recommender
-from ._recommender import (
+from holisticai.metrics.bias._recommender import (
     aggregate_diversity,
     avg_f1_ratio,
     avg_precision_ratio,
@@ -70,7 +67,7 @@ from ._recommender import (
 )
 
 # Regression
-from ._regression import (
+from holisticai.metrics.bias._regression import (
     avg_score_diff,
     avg_score_ratio,
     correlation_diff,

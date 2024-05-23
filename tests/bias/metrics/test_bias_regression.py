@@ -23,20 +23,15 @@ from holisticai.metrics.bias import (
 
 # Formatting
 from holisticai.utils import extract_columns
+from tests.bias.utils import load_bias_regression_data
 
-# Dataset
-df_r = pd.read_csv("tests/data/small_test_regression.csv")
+                        # Dataset
+df_r = load_bias_regression_data()
 
 # Format data into numpy
 group_a, group_b, y_pred_r, y_true_r = extract_columns(
     df_r, cols=["group_a", "group_b", "y_pred", "y_true"]
 )
-
-# Dummy Test
-def test_dummy():
-    """dummy test"""
-    pass
-
 
 def test_success_rate_regression():
     y_pred = [20, 30, 12, 45]

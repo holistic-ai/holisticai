@@ -15,11 +15,9 @@ from holisticai.metrics.bias import classification_bias_metrics
 from holisticai.mitigation.bias import Reweighing
 from holisticai.pipeline import Pipeline
 from holisticai.utils import extract_columns
-from tests.bias.mitigation.testing_utils.utils import (
-    check_results,
-    small_categorical_dataset,
-)
-
+from tests.bias.mitigation.testing_utils.utils import check_results
+from tests.bias.utils import load_bias_classification_data
+from tests.bias.mitigation.testing_utils.utils import small_categorical_dataset
 warnings.filterwarnings("ignore")
 
 
@@ -88,7 +86,7 @@ def test_reproducibility_with_and_without_pipeline(small_categorical_dataset):
 
 
 def test_reweighing():
-    df_c = pd.read_csv("tests/data/small_test_classification.csv")
+    df_c = load_bias_classification_data()
     group_a, group_b, y_pred_c, y_true_c = extract_columns(
         df_c, cols=["group_a", "group_b", "y_pred", "y_true"]
     )

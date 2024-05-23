@@ -2,7 +2,7 @@
 The :mod:`holisticai.datasets` module includes dataloaders for quick experimentation
 """
 
-from ._dataloaders import (
+from holisticai.datasets._dataloaders import (
     load_adult,
     load_heart,
     load_last_fm,
@@ -10,7 +10,7 @@ from ._dataloaders import (
     load_student,
     load_us_crime,
 )
-from ._preprocessers import load_dataset
+from holisticai.datasets._dataset import load_dataset
 
 __all__ = [
     "load_adult",

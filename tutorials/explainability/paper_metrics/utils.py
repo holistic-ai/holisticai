@@ -112,7 +112,7 @@ def train_classifier_model(X_train, X_test, y_train, y_test):
     from sklearn.preprocessing import StandardScaler
     from tqdm import tqdm
 
-    from holisticai.efficacy.metrics import classification_efficacy_metrics
+    from holisticai.metrics.efficacy import classification_efficacy_metrics
 
     outputs = []
     for model_type in tqdm(
@@ -158,7 +158,7 @@ def train_regression_model(X_train, X_test, y_train, y_test):
     from sklearn.preprocessing import StandardScaler
     from tqdm import tqdm
 
-    from holisticai.efficacy.metrics import regression_efficacy_metrics
+    from holisticai.metrics.efficacy import regression_efficacy_metrics
 
     outputs = []
     for model_type in tqdm(

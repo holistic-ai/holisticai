@@ -34,13 +34,6 @@ X = np.array(
 )
 centroids = np.array([[-2, 1], [1, 2], [0, -2]])
 
-
-# Dummy Test
-def test_dummy():
-    """test dummy"""
-    pass
-
-
 def test_cluster_balance():
     """test cluster_balance"""
     a = cluster_balance(group_a, group_b, y_pred_cl)

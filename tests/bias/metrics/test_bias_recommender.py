@@ -21,9 +21,10 @@ from holisticai.metrics.bias import (
 
 # Formatting
 from holisticai.utils import extract_columns
+from tests.bias.utils import load_bias_recommender_data
 
 # Dataset
-df_rec = pd.read_csv("tests/data/small_test_recommender.csv")
+df_rec = load_bias_recommender_data()
 
 # Format data into numpy
 group_a, group_b = extract_columns(df_rec, cols=["group_a", "group_b"])
@@ -31,12 +32,6 @@ mat_pred = df_rec[["item_1", "item_2", "item_3", "item_4"]].to_numpy()
 mat_true = df_rec[
     ["item_1_true", "item_2_true", "item_3_true", "item_4_true"]
 ].to_numpy()
-
-
-# Dummy Test
-def test_dummy():
-    """test dummy"""
-    pass
 
 
 def test_aggregate_diversity():

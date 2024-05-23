@@ -1,4 +1,4 @@
-from holisticai.efficacy.metrics import (
+from holisticai.metrics.efficacy import (
     classification_efficacy_metrics,
     regression_efficacy_metrics,
 )
@@ -12,7 +12,7 @@ class SurrogacyMetric:
             self.efficacy_metric = accuracy_score
             self.reference = 1
         else:
-            from holisticai.efficacy.metrics import smape
+            from holisticai.metrics.efficacy import smape
 
             self.efficacy_metric = smape
             self.reference = 0

@@ -14,6 +14,13 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sys,os
+sys.path.insert(0, os.path.abspath(".."))
+work_dir = '/'.join(os.getcwd().split("/")[:-2])
+src_path = os.path.join(work_dir,'src')
+print(src_path)
+
+sys.path.insert(0, src_path)
 
 # -- Project information -----------------------------------------------------
 
@@ -67,7 +74,7 @@ exclude_patterns = [
 #
 
 html_logo = "hai_logo.svg"
-html_favicon = "../holistic_ai.png"
+html_favicon = "holistic_ai.png"
 
 html_theme = "pydata_sphinx_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
