@@ -3,7 +3,7 @@ The :mod:`holisticai.utils` module includes utils helper tools
 """
 
 # formatting
-from ._formatting import (
+from holisticai.utils._formatting import (
     extract_columns,
     extract_group_vectors,
     mat_to_binary,
@@ -12,7 +12,7 @@ from ._formatting import (
 )
 
 # plotting
-from ._plotting import get_colors
+from holisticai.utils._plotting import get_colors
 
 __all__ = [
     "extract_columns",

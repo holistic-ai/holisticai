@@ -18,11 +18,12 @@ import shutil
 import sys
 
 
-#w#ork_dir = '/'.join(os.getcwd().split("/")[:-2])
-#src_path = os.path.join(work_dir,'src')
-#print(src_path)
 sys.path.insert(0, os.path.abspath(".."))
+work_dir = '/'.join(os.getcwd().split("/")[:-2])
+src_path = os.path.join(work_dir,'src')
+print(src_path)
 
+sys.path.insert(0, src_path)
 # -- Project information -----------------------------------------------------
 
 project = "holisticai"

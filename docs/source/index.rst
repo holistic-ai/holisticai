@@ -7,7 +7,8 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
     :maxdepth: 1
     :caption: Documentation
     
-    technical_risks
+    metrics
+    mitigation
     datasets
     pipeline
     tutorials

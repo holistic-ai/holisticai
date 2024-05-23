@@ -82,13 +82,15 @@ dependencies = [
   "myst_parser",
   "nbsphinx",
   "sphinx_copybutton",
-  "holisticai[all]",
+  #"holisticai[all]",
 ]
 
 [tool.hatch.envs.docs.scripts]
 foo = ["which sphinx-build"]
 foo2 = ["which python"]
-build = ["sphinx-build -M html docs/source docs/build -W --keep-going"]
+build = [
+  "PYTHONPATH=./src sphinx-build -M html docs/source docs/build -W --keep-going",
+]
 
 [tool.hatch.envs.testing]
 dependencies = [

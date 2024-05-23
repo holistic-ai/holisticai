@@ -32,12 +32,6 @@ y_pred = np.array([0, 1, 1, 0, 1, 1, 0, 1, 1, 0])
 y_true = np.array([0, 1, 1, 0, 1, 0, 1, 1, 1, 1])
 
 
-# Dummy Test
-def test_dummy():
-    """test dummy"""
-    pass
-
-
 def test_confusion_tensor():
     """test confusion_tensor"""
     a = confusion_tensor(p, y_pred_mc, y_true_mc, as_tensor=True)
