@@ -82,6 +82,9 @@ dependencies = [
   "myst_parser",
   "nbsphinx",
   "sphinx_copybutton",
+  "sphinx_design",
+  "sphinx_togglebutton",
+  "sphinxcontrib.youtube",
   "holisticai[all]",
 ]
 

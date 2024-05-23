@@ -1,0 +1,25 @@
+Holistic Documentation
+======================
+
+Install dependencies:
+---------------------
+
+Create a conda environment
+
+```bash
+conda create -n "holisticai-docs" python=3.8
+conda activate holisticai-docs
+```
+
+Python dependecies:
+  $ pip install -r docs/requirements.txt
+
+Pandoc:
+  - Linux:   $ sudo apt install pandoc
+  - Windows: C:\> winget install pandoc
+  - MacOs:   $ brew install pandoc
+
+Build html: 
+-----------
+
+  $ sphinx-build -M html docs/source/ docs/build/
