@@ -21,8 +21,6 @@ from ...utils._validation import (
 def _group_success_rate(g, y):
     """
     Group success rate.
-
-    Description
     -----------
     This function computes the success rate for a given subgroup.
 
@@ -46,8 +44,6 @@ def _group_success_rate(g, y):
 def statistical_parity(group_a, group_b, y_pred):
     """
     Statistical parity.
-
-    Description
     -----------
     This function computes the statistical parity (difference of success rates)
     between group_a and group_b.
@@ -70,10 +66,14 @@ def statistical_parity(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Statistical Parity : :math:`sr_a - sr_b`
+        Statistical Parity
+
+    Notes
+    -----
+    :math:`sr_a - sr_b`
 
     Examples
-    -------
+    --------
     >>> import numpy as np
     >>> from holisticai.metrics.bias import statistical_parity
     >>> group_a = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
@@ -94,7 +94,10 @@ def statistical_parity(group_a, group_b, y_pred):
 
 def success_rate(group_a, group_b, y_pred):
     """
+    Success Rate
+    -----------
     Calculates the raw success rates for each group.
+
     Parameters
     ----------
     group_a : array-like
@@ -103,6 +106,7 @@ def success_rate(group_a, group_b, y_pred):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (binary)
+
     Returns
     -------
     dict
@@ -116,8 +120,6 @@ def success_rate(group_a, group_b, y_pred):
 def disparate_impact(group_a, group_b, y_pred):
     """
     Disparate Impact.
-
-    Description
     -----------
     This function computes the disparate impact (ratio of success rates)
     between group_a and group_b class.
@@ -140,7 +142,11 @@ def disparate_impact(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Disparate Impact : :math:`sr_a/sr_b`
+        Disparate Impact
+
+    Notes
+    -----
+    :math:`sr_a/sr_b`
 
     References
     ----------
@@ -170,9 +176,7 @@ def disparate_impact(group_a, group_b, y_pred):
 
 def four_fifths(group_a, group_b, y_pred):
     """
-    Four Fifths.
-
-    Description
+    Four Fifths
     -----------
     This function computes the four fifths rule (ratio of success rates)
     between group_a and group_b. We return the minimum of the ratio
@@ -219,9 +223,7 @@ def four_fifths(group_a, group_b, y_pred):
 
 def cohen_d(group_a, group_b, y_pred):
     r"""
-    Cohen D.
-
-    Description
+    Cohen D
     -----------
     This function computes the Cohen D statistic (normalised statistical parity)
     between group_a and group_b.
@@ -245,7 +247,11 @@ def cohen_d(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Cohen D : :math:`\frac{sr_a-sr_b}{\texttt{std_pool}}`
+        Cohen D :
+
+    Notes
+    -----
+    :math:`\frac{sr_a-sr_b}{\texttt{std_pool}}`
 
     Examples
     --------
@@ -280,9 +286,7 @@ def cohen_d(group_a, group_b, y_pred):
 
 def z_test_diff(group_a, group_b, y_pred):
     r"""
-    Z Test (Difference).
-
-    Description
+    Z Test (Difference)
     -----------
     This function computes the Z-test statistic for the difference
     in success rates. Also known as 2-SD Statistic.
@@ -343,9 +347,7 @@ def z_test_diff(group_a, group_b, y_pred):
 
 def z_test_ratio(group_a, group_b, y_pred):
     r"""
-    Z Test (Ratio).
-
-    Description
+    Z Test (Ratio)
     -----------
     This function computes the Z-test statistic for the ratio
     in success rates. Also known as 2-SD Statistic.
@@ -405,9 +407,7 @@ def z_test_ratio(group_a, group_b, y_pred):
 
 def _correlation_diff(group_a, group_b, y_pred, y_true):
     """
-    Correlation difference.
-
-    Description
+    Correlation difference
     -----------
     This function computes the difference in correlation between predicted
     and true labels for group_a and group_b.
@@ -432,7 +432,11 @@ def _correlation_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        Correlation Difference : :math:`CV_a - CV_b`
+        Correlation Difference
+
+    Notes
+    -----
+    :math:`CV_a - CV_b`
 
     Examples
     --------
@@ -457,9 +461,7 @@ def _correlation_diff(group_a, group_b, y_pred, y_true):
 
 def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
     """
-    Equality of opportunity difference.
-
-    Description
+    Equality of opportunity difference
     -----------
     This function computes the difference in true positive
     rates for group_a and group_b.
@@ -484,7 +486,11 @@ def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        Equal opportunity difference : :math:`tpr_a - tpr_b`
+        Equal opportunity difference
+
+    Notes
+    -----
+    :math:`tpr_a - tpr_b`
 
     Examples
     --------
@@ -509,9 +515,7 @@ def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
 
 def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
     """
-    False positive rate difference.
-
-    Description
+    False positive rate difference
     ----------
     This function computes the difference in false positive
     rates between group_a and group_b.
@@ -536,7 +540,11 @@ def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        FPR_diff : :math:`fpr_a - fpr_b`
+        FPR_diff
+
+    Notes
+    -----
+    :math:`fpr_a - fpr_b`
 
     Examples
     --------
@@ -561,9 +569,7 @@ def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
 
 def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
     """
-    False negative Rate difference.
-
-    Description
+    False negative Rate difference
     ----------
     This function computes the difference in false negative
     rates for group_a and group_b.
@@ -588,7 +594,11 @@ def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        False Negative Rate difference : :math:`fnr_a - fnr_b`
+        False Negative Rate difference
+
+    Notes
+    -----
+    :math:`fnr_a - fnr_b`
 
     Examples
     -------
@@ -613,9 +623,7 @@ def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
 
 def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
     """
-    True negative Rate difference.
-
-    Description
+    True negative Rate difference
     ----------
     This function computes the difference in true negative
     rates for group_a and group_b.
@@ -640,7 +648,11 @@ def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        True Negative Rate difference : :math:`tnr_a - tnr_b`
+        True Negative Rate difference
+
+    Notes
+    -----
+    :math:`tnr_a - tnr_b`
 
     Examples
     -------
@@ -665,9 +677,7 @@ def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
 
 def average_odds_diff(group_a, group_b, y_pred, y_true):
     """
-    Average Odds Difference.
-
-    Description
+    Average Odds Difference
     -----------
     This function computes the difference in average odds
     between group_a and group_b.
@@ -693,7 +703,11 @@ def average_odds_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        AOD : :math:`0.5 * (fpr_a-fpr_b + tpr_a-tpr_b)`
+        AOD score
+
+    Notes
+    -----
+    :math:`0.5 * (fpr_a-fpr_b + tpr_a-tpr_b)`
 
     Examples
     -------
@@ -720,9 +734,7 @@ def average_odds_diff(group_a, group_b, y_pred, y_true):
 
 def accuracy_diff(group_a, group_b, y_score, y_true):
     """
-    Accuracy Difference.
-
-    Description
+    Accuracy Difference
     ----------
     This function computes the difference in accuracy
     of predictions for group_a and group_b
@@ -777,9 +789,7 @@ def accuracy_diff(group_a, group_b, y_score, y_true):
 
 def abroca(group_a, group_b, y_score, y_true):
     """
-    ABROCA (area between roc curves).
-
-    Description
+    ABROCA (area between roc curves)
     -----------
     This function computes the area between the roc curve
     of group_a and the roc curve of group_b
@@ -836,9 +846,7 @@ def classification_bias_metrics(
     group_a=None, group_b=None, y_pred=None, y_true=None, y_score=None, X=None, metric_type="group", **kargs
 ):
     """
-    Classification bias metrics batch computation.
-
-    Description
+    Classification bias metrics batch computation
     -----------
     This function computes all the relevant classification bias metrics,
     and displays them as a pandas dataframe. It also includes a fair reference
@@ -852,20 +860,21 @@ def classification_bias_metrics(
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (binary)
-    y_true (optional) : numpy array
+    y_true : array-like, optional
         Target vector (binary)
-    y_score (optional) : array-like
+    y_score : array-like, optional
         Probability estimates (regression)
-    metric_type (optional) : 'group', 'individual', 'equal_outcome' , 'equal_opportunity'
-        Specifies which metrics we compute
+    X : array-like, optional
+        Feature matrix
+    metric_type : str, optional
+        Specifies which metrics we compute 'group', 'individual', 'equal_outcome' , 'equal_opportunity'
+    **kargs : dict
+        Additional keyword arguments for individual metrics
 
     Returns
     -------
     pandas DataFrame
         Metrics | Values | Reference
-
-    Examples
-    --------
     """
 
     individual_metrics_format_1 = {
@@ -975,15 +984,31 @@ def classification_bias_metrics(
 ### Inidivudal Metrics
 
 
-def benefit_function(y_pred, y_true) -> np.ndarray:
+def benefit_function(y_pred, y_true):
+    """
+    Benefit function
+    -----------
+    This function computes the benefit function
+    used in the generalized entropy index.
+
+    Parameters
+    ----------
+    y_true : array-like
+        True target values
+    y_pred : array-like
+        Predicted target values
+
+    Returns
+    -------
+    np.ndarray
+        Benefit function
+    """
     return y_pred - y_true + 1
 
 
 def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """
     The Theil index
-
-    Description
     -----------
     The Theil index is a measure of inequality that is commonly used in economics. It is used to measure the inequality of a distribution,
     such as the distribution of income or wealth. The Theil index is a special case of general entropy indices that allows to observe inequalities
@@ -1020,8 +1045,6 @@ def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int = 2) -> float:
     """
     Generalized entropy index
-
-    Description
     -----------
     Generalized entropy index is a measure of inequality that is proposed as a unified individual and group fairness measure [1].
     It is used to measure the extent of inequality in the distribution of a variable. The measure is based on the idea that
@@ -1038,8 +1061,8 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
         The true target values.
     y_pred : array-like of shape (n_samples,)
         The predicted target values.
-    alpha : int, default=2
-        Parameter that regulates the weight given to distances between values at different parts of the distribution.
+    alpha : int, optional, default=2
+        Parameter that regulates the weight given to distances between values at different parts of the distribution. Default=2.
 
     Returns
     -------
@@ -1048,7 +1071,10 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
 
     References
     ----------
-    [1] Speicher, T., Heidari, H., Grgic-Hlaca, N., Gummadi, K. P., & Weller, A. (2018, April). A Unified Approach to Quantifying Algorithmic Unfairness: Measuring Individual & Group Unfairness via Inequality Indices. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (pp. 2239-2248).
+    .. [1] Speicher, T., Heidari, H., Grgic-Hlaca, N., Gummadi, K. P., & Weller, A. (2018, April). A Unified Approach
+        to Quantifying Algorithmic Unfairness: Measuring Individual & Group Unfairness via Inequality Indices. In
+        Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining 
+        (pp. 2239-2248).
 
     Examples
     --------
@@ -1080,18 +1106,25 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
 
 def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """
+    Coefficient of variation
+    -----------
     Calculates the coefficient of variation, which is a special case that calculates two times the square root of the generalized entropy index with alpha=2.
 
     Interpretation
     --------------
     A high value implies high inequality while a value of 0 indicates perfect equality.
 
-    Args:
-        y_true (np.ndarray): True labels.
-        y_pred (np.ndarray): Predicted labels.
+    Parameters
+    ----------
+    y_true : array-like
+        True target values.
+    y_pred : array-like
+        Predicted target values.
 
-    Returns:
-        float: The coefficient of variation.
+    Returns
+    --------
+    float
+        The coefficient of variation.
     """
     y_pred = _array_like_to_numpy(y_pred)
     y_true = _array_like_to_numpy(y_true)
@@ -1101,15 +1134,23 @@ def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 
 def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -> float:
     """
+    Consistency score
+    -----------
     Compares a model's classification prediction of a given data item X to its k-nearest neighbors.
 
-    Args:
-        X (np.ndarray): The input features.
-        y (np.ndarray): The true labels.
-        n_neighbors (int, optional): Number of neighbors for the knn computation. Defaults to 5.
+    Parameters
+    ----------
+    X : array-like
+        The input features.
+    y_pred : array-like
+        The predicted labels.
+    n_neighbors : int, optional
+        Number of neighbors for the knn computation. Default is 5.
 
-    Returns:
-        float: The consistency score.
+    Returns
+    -------
+    float
+        The consistency score.
     """
     X = _matrix_like_to_numpy(X)
     y_pred = _array_like_to_numpy(y_pred)

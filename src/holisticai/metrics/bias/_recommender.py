@@ -22,9 +22,7 @@ from ...utils._validation import _recommender_checks
 
 def aggregate_diversity(mat_pred, top=None, thresh=0.5, normalize=False):
     r"""
-    Aggregate Diversity.
-
-    Description
+    Aggregate Diversity
     ----------
     Given a matrix of scores, this function computes the recommended items for
     each user, selecting either the highest-scored items or those above an input
@@ -41,18 +39,22 @@ def aggregate_diversity(mat_pred, top=None, thresh=0.5, normalize=False):
     mat_pred : matrix-like
         Matrix with shape (num_users, num_items). A recommender
         score (binary or soft pred) for each user,item interaction.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items recommended to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        Aggregate Diversity : :math:`\frac{|Items\; shown|}{|Items|}`
+        Aggregate Diversity
+
+    Notes
+    -----
+    :math:`\frac{|Items\; shown|}{|Items|}`
 
     References
     ----------
@@ -106,9 +108,7 @@ def aggregate_diversity(mat_pred, top=None, thresh=0.5, normalize=False):
 
 def gini_index(mat_pred, top=None, thresh=0.5, normalize=False):
     """
-    GINI index.
-
-    Description
+    GINI index
     ----------
     Measures the inequality across the frequency distribution
     of the recommended items.
@@ -124,12 +124,12 @@ def gini_index(mat_pred, top=None, thresh=0.5, normalize=False):
     mat_pred : matrix-like
         Matrix with shape (num_users, num_items). A recommender
         score (binary or soft pred) for each user,item interaction.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
@@ -196,9 +196,7 @@ def gini_index(mat_pred, top=None, thresh=0.5, normalize=False):
 
 def exposure_entropy(mat_pred, top=None, thresh=0.5, normalize=False):
     r"""
-    Exposure Entropy.
-
-    Description
+    Exposure Entropy
     ----------
     This function measures the entropy of the item exposure distribution.
 
@@ -213,18 +211,22 @@ def exposure_entropy(mat_pred, top=None, thresh=0.5, normalize=False):
     mat_pred : matrix-like
         Matrix with shape (num_users, num_items). A recommender
         score (binary or soft pred) for each user,item interaction.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        Exposure Entropy : :math:`-\sum_{k}{ p_k} \ln(p_k)`
+        Exposure Entropy
+
+    Notes
+    -----
+    :math:`-\sum_{k}{ p_k} \ln(p_k)`
 
     Examples
     --------
@@ -269,9 +271,7 @@ def exposure_entropy(mat_pred, top=None, thresh=0.5, normalize=False):
 
 def avg_recommendation_popularity(mat_pred, top=None, thresh=0.5, normalize=False):
     """
-    Average Recommendation Popularity.
-
-    Description
+    Average Recommendation Popularity
     ----------
     This function computes the average recommendation popularity
     of items over users. We define the recommendation popularity
@@ -287,12 +287,12 @@ def avg_recommendation_popularity(mat_pred, top=None, thresh=0.5, normalize=Fals
     mat_pred : matrix-like
         Matrix with shape (num_users, num_items). A recommender
         score (binary or soft pred) for each user,item interaction.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
@@ -348,9 +348,7 @@ def avg_recommendation_popularity(mat_pred, top=None, thresh=0.5, normalize=Fals
 
 def mad_score(group_a, group_b, mat_pred, normalize=False):
     r"""
-    Mean Absolute Deviation.
-
-    Description
+    Mean Absolute Deviation
     ----------
     Difference in average score for group_a and group_b.
 
@@ -370,13 +368,17 @@ def mad_score(group_a, group_b, mat_pred, normalize=False):
     mat_pred : matrix-like
         Matrix with shape (num_users, num_items). A recommender
         score (binary or soft pred) for each user,item interaction.
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        MAD Score : :math:`\texttt{avg_group_a - avg_group_b}`
+        MAD Score
+
+    Notes
+    -----
+    :math:`\texttt{avg_group_a - avg_group_b}`
 
     References
     ----------
@@ -437,9 +439,7 @@ def mad_score(group_a, group_b, mat_pred, normalize=False):
 
 def exposure_l1(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=False):
     """
-    Exposure Total Variation.
-
-    Description
+    Exposure Total Variation
     ----------
     This function computes the total variation norm between the group_a
     exposure distribution to the group_b exposure distribution.
@@ -532,9 +532,7 @@ def exposure_l1(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=Fals
 
 def exposure_kl(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=False):
     """
-    Exposure KL Divergence.
-
-    Description
+    Exposure KL Divergence
     ----------
     This function computes the KL divergence from the group_a
     exposure distribution to the group_b exposure distribution.
@@ -554,18 +552,18 @@ def exposure_kl(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=Fals
     mat_pred : matrix-like
         Matrix with shape (num_users, num_items). A recommender
         score (binary or soft pred) for each user,item interaction.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        `KL(exp_min,exp_maj)`
+        Exposure KL Divergence
 
     References
     ----------
@@ -633,8 +631,6 @@ def exposure_kl(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=Fals
 def _recommender_metric_ratio(metric, group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     """
     Metric ratio for recommender systems
-
-    Description
     ----------
     This function computes the ratio of a given metric on minority and majority group.
 
@@ -652,12 +648,12 @@ def _recommender_metric_ratio(metric, group_a, group_b, mat_pred, mat_true, top=
     mat_true : matrix-like
         Matrix with shape (num_users, num_items). A target score
         (binary or soft pred) for each user,item pair.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
@@ -704,8 +700,6 @@ def _recommender_metric_ratio(metric, group_a, group_b, mat_pred, mat_true, top=
 def avg_precision_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     r"""
     Average precision ratio
-
-    Description
     ----------
     This function computes the ratio of average precision (over users)
     on minority and majority group.
@@ -727,18 +721,22 @@ def avg_precision_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0
     mat_true : matrix-like
         Matrix with shape (num_users, num_items). A target score
         (binary or soft pred) for each user,item pair.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        Ratio of average precisions : :math:`\frac{\texttt{AVg_precision_min}}{\texttt{AVg_precision_maj}}`
+        Ratio of average precisions
+
+    Notes
+    -----
+    :math:`\frac{\texttt{AVg_precision_min}}{\texttt{AVg_precision_maj}}`
 
     References
     ----------
@@ -783,8 +781,6 @@ def avg_precision_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0
 def avg_recall_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     r"""
     Average recall ratio
-
-    Description
     ----------
     This function computes the ratio of average recall (over users)
     on minority and majority group.
@@ -801,18 +797,22 @@ def avg_recall_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5,
     mat_true : matrix-like
         Matrix with shape (num_users, num_items). A target score
         (binary or soft pred) for each user,item pair.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        Ratio of average recalls : :math:`\frac{\texttt{AVg_recall_min}}{\texttt{AVg_recall_maj}}`
+        Ratio of average recalls
+
+    Notes
+    -----
+    :math:`\frac{\texttt{AVg_recall_min}}{\texttt{AVg_recall_maj}}`
 
     References
     ----------
@@ -857,8 +857,6 @@ def avg_recall_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5,
 def avg_f1_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     r"""
     Average f1 ratio
-
-    Description
     ----------
     This function computes the ratio of average f1 (over users)
     on minority and majority group.
@@ -880,18 +878,22 @@ def avg_f1_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, nor
     mat_true : matrix-like
         Matrix with shape (num_users, num_items). A target score
         (binary or soft pred) for each user,item pair.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        Ratio of average f1 : :math:`\frac{\texttt{AVg_f1_min}}{\texttt{AVg_f1_maj}}`
+        Ratio of average f1
+
+    Notes
+    -----
+    :math:`\frac{\texttt{AVg_f1_min}}{\texttt{AVg_f1_maj}}`
 
     References
     ----------
@@ -936,9 +938,7 @@ def avg_f1_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, nor
 
 def recommender_rmse_ratio(group_a, group_b, mat_pred, mat_true, normalize=False):
     """
-    Recommender RMSE ratio.
-
-    Description
+    Recommender RMSE ratio
     ----------
     This function computes the ratio of rmse between
     predictions and scores for group_a and group_b.
@@ -960,13 +960,17 @@ def recommender_rmse_ratio(group_a, group_b, mat_pred, mat_true, normalize=False
     mat_true : matrix-like
         Matrix with shape (num_users, num_items). A target score
         (binary or soft pred) for each user,item pair.
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        Recommender RMSE ratio : :math:`\frac{\texttt{AVg_rmse_min}}{\texttt{AVg_rmse_maj}}`
+        Recommender RMSE ratio
+
+    Notes
+    -----
+    :math:`\frac{\texttt{AVg_rmse_min}}{\texttt{AVg_rmse_maj}}`
 
     Examples
     --------
@@ -1011,9 +1015,7 @@ def recommender_rmse_ratio(group_a, group_b, mat_pred, mat_true, normalize=False
 
 def recommender_mae_ratio(group_a, group_b, mat_pred, mat_true, normalize=False):
     """
-    Recommender MAE ratio.
-
-    Description
+    Recommender MAE ratio
     ----------
     This function computes the ratio of mae between
     predictions and scores for group_a and group_b.
@@ -1035,13 +1037,17 @@ def recommender_mae_ratio(group_a, group_b, mat_pred, mat_true, normalize=False)
     mat_true : matrix-like
         Matrix with shape (num_users, num_items). A target score
         (binary or soft pred) for each user,item pair.
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
 
     Returns
     -------
     float
-        Recommender MAE ratio : :math:`\frac{\texttt{AVg_mae_min}}{\texttt{AVg_mae_maj}}`
+        Recommender MAE ratio
+
+    Notes
+    -----
+    :math:`\frac{\texttt{AVg_mae_min}}{\texttt{AVg_mae_maj}}`
 
     Examples
     --------
@@ -1095,9 +1101,7 @@ def recommender_bias_metrics(
     metric_type="equal_outcome",
 ):
     """
-    Recommender bias metrics batch computation.
-
-    Description
+    Recommender bias metrics batch computation
     ----------
     This function computes all the relevant recommender bias metrics,
     and displays them as a pandas dataframe.
@@ -1114,15 +1118,15 @@ def recommender_bias_metrics(
     mat_true : matrix-like
         Matrix with shape (num_users, num_items). A target score
         (binary or soft pred) for each user,item pair.
-    top (optional) : int
+    top : int, optional
         If not None, the number of items that are shown to each user.
-    thresh (optional) : float
+    thresh : float, optional
         Threshold indicating value at which
         a given item is shown to user (if top is None).
-    normalize (optional) : bool
+    normalize : bool, optional
         If True, normalises the data matrix to [0,1] range.
-    metric_type : 'all', 'item_based', 'equal_outcome' or 'equal_opportunity'
-        Specifies which metrics we compute
+    metric_type : str, optional
+        Specifies which metrics we compute: 'all', 'item_based', 'equal_outcome' or 'equal_opportunity'
 
     Returns
     -------

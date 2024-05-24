@@ -15,7 +15,10 @@ def _calc_success_rate(group_membership: np.array, threshold=float):
 
 def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
     """
+    Success rate (Regression version)
+    -------------------------------
     Calculates the raw success rates for each group.
+
     Parameters
     ----------
     group_a : array-like
@@ -24,8 +27,9 @@ def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (numerical)
-    threshold: float, str
-        The number above which the result is considered a success. Also accepts 'median' and 'mean'.
+    threshold: float, str, optional
+        The number above which the result is considered a success. Ranged between 0 and 1.
+        Also accepts 'median' and 'mean'.
     Returns
     -------
     dict
@@ -50,9 +54,7 @@ def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
 
 def disparate_impact_regression(group_a, group_b, y_pred, q=0.8):
     r"""
-    Disparate Impact quantile (Regression version).
-
-    Description
+    Disparate Impact quantile (Regression version)
     -----------
     This function computes the ratio of success rates between group_a and
     group_b, where sucess means predicted score exceeds a given quantile (default = 0.8).
@@ -74,13 +76,17 @@ def disparate_impact_regression(group_a, group_b, y_pred, q=0.8):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (regression)
-    q (optional) : float or array, default=0.8
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.8
 
     Returns
     -------
     float
-        Disparate Impact (top %) : :math:`\frac{sr_a}{sr_b}`
+        Disparate Impact (top %)
+
+    Notes
+    -----
+    :math:`\frac{sr_a}{sr_b}`
 
     Examples
     --------
@@ -119,9 +125,7 @@ def disparate_impact_regression(group_a, group_b, y_pred, q=0.8):
 
 def statistical_parity_regression(group_a, group_b, y_pred, q=0.5):
     """
-    Statistical Parity quantile (Regression version).
-
-    Description
+    Statistical Parity quantile (Regression version)
     -----------
     This function computes the difference of success rates between group_a and
     group_b, where sucess means that the predicted score exceeds a given quantile.
@@ -142,8 +146,8 @@ def statistical_parity_regression(group_a, group_b, y_pred, q=0.5):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (regression)
-    q (optional) : float or array, default=0.5
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.5
 
     Returns
     -------
@@ -187,9 +191,7 @@ def statistical_parity_regression(group_a, group_b, y_pred, q=0.5):
 
 def no_disparate_impact_level(group_a, group_b, y_pred):
     """
-    No disparate impact level.
-
-    Description
+    No disparate impact level
     -----------
     This function computes the maximum score such that thresholding at that score
     does not allow adverse impact.
@@ -242,10 +244,7 @@ def no_disparate_impact_level(group_a, group_b, y_pred):
 
 def avg_score_diff(group_a, group_b, y_pred, q=0):
     """
-
-    Average Score Difference.
-
-    Description
+    Average Score Difference
     -----------
     This function computes the difference in average scores between
     group_a and group_b.
@@ -268,13 +267,17 @@ def avg_score_diff(group_a, group_b, y_pred, q=0):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (regression)
-    q (optional) : float or array
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.
 
     Returns
     -------
     float
-        Average Score Spread : :math:`\texttt{AVgroup_a - AVgroup_b}`
+        Average Score Spread
+
+    Notes
+    -----
+    :math:`\texttt{AVgroup_a - AVgroup_b}`
 
     Examples
     -------
@@ -310,10 +313,7 @@ def avg_score_diff(group_a, group_b, y_pred, q=0):
 
 def avg_score_ratio(group_a, group_b, y_pred, q=0):
     """
-
-    Average Score Ratio.
-
-    Description
+    Average Score Ratio
     -----------
     This function computes the ratio in average scores between
     group_a and group_b.
@@ -336,13 +336,17 @@ def avg_score_ratio(group_a, group_b, y_pred, q=0):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (regression)
-    q (optional) : float or array
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.
 
     Returns
     -------
     float
-        Average Score Ratio : :math:`\texttt{AVgroup_a / AVgroup_b}`
+        Average Score Ratio
+
+    Notes
+    -----
+    :math:`\texttt{AVgroup_a / AVgroup_b}`
 
     Examples
     -------
@@ -378,10 +382,7 @@ def avg_score_ratio(group_a, group_b, y_pred, q=0):
 
 def zscore_diff(group_a, group_b, y_pred, q=0):
     """
-
-    ZScore Difference.
-
-    Description
+    ZScore Difference
     -----------
     This function computes the spread in Zscores between
     group_a and group_b. The Zscore is a normalised
@@ -404,13 +405,17 @@ def zscore_diff(group_a, group_b, y_pred, q=0):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (regression)
-    q (optional) : float or array
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.
 
     Returns
     -------
     float
-        ZScore Difference : :math:`\frac{\texttt{AVgroup_a} - \texttt{AVgroup_b}}{\texttt{STD_pool}}`
+        ZScore Difference
+
+    Notes
+    -----
+    :math:`\frac{\texttt{AVgroup_a} - \texttt{AVgroup_b}}{\texttt{STD_pool}}`
 
     Examples
     --------
@@ -457,9 +462,7 @@ def zscore_diff(group_a, group_b, y_pred, q=0):
 
 def statistical_parity_auc(group_a, group_b, y_pred):
     """
-    Statistical parity (AUC).
-
-    Description
+    Statistical parity (AUC)
     -----------
     This function computes the area under the statistical parity
     versus threshold curve.
@@ -510,9 +513,7 @@ def statistical_parity_auc(group_a, group_b, y_pred):
 
 def _weighed_statistical_parity_auc(group_a, group_b, y_pred):
     """
-    Weighed Statistical parity (AUC).
-
-    Description
+    Weighed Statistical parity (AUC)
     -----------
     This function computes the area under the statistical
     parity versus threshold curve, weighed by the 2t distribution.
@@ -564,9 +565,7 @@ def _weighed_statistical_parity_auc(group_a, group_b, y_pred):
 
 def max_statistical_parity(group_a, group_b, y_pred):
     """
-    Max absolute statistical parity.
-
-    Description
+    Max absolute statistical parity
     -----------
     This function computes the maximum over all thresholds of
     the absolute statistical parity between group_a and group_b.
@@ -617,9 +616,7 @@ def max_statistical_parity(group_a, group_b, y_pred):
 
 def correlation_diff(group_a, group_b, y_pred, y_true, q=0):
     """
-    Correlation difference.
-
-    Description
+    Correlation difference
     -----------
     This function computes the difference in correlation between predictions
     and targets for group_a and group_b.
@@ -643,13 +640,17 @@ def correlation_diff(group_a, group_b, y_pred, y_true, q=0):
         Predictions vector (regression)
     y_true : numpy array
         Target vector (regression)
-    q (optional) : float or array
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.
 
     Returns
     -------
     float
-        correlation difference : :math:`CV_a - CV_b`
+        correlation difference
+
+    Notes
+    -----
+    :math:`CV_a - CV_b`
 
     Examples
     --------
@@ -690,9 +691,7 @@ def correlation_diff(group_a, group_b, y_pred, y_true, q=0):
 
 def rmse_ratio(group_a, group_b, y_pred, y_true, q=0):
     """
-    RMSE ratio.
-
-    Description
+    RMSE ratio
     -----------
     This function computes the ratio of the RMSE for group_a and group_b.
 
@@ -714,13 +713,17 @@ def rmse_ratio(group_a, group_b, y_pred, y_true, q=0):
         Predictions vector (regression)
     y_true : numpy array
         Target vector (regression)
-    q (optional) : float or array
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.
 
     Returns
     -------
     float
-        RMSE ratio : :math:`\frac{RMSE_a}{RMSE_b}`
+        RMSE ratio
+
+    Notes
+    -----
+    :math:`\frac{RMSE_a}{RMSE_b}`
 
     Examples
     --------
@@ -764,8 +767,6 @@ def rmse_ratio(group_a, group_b, y_pred, y_true, q=0):
 def mae_ratio(group_a, group_b, y_pred, y_true, q=0):
     """
     MAE ratio
-
-    Description
     -----------
     This function computes the ratio of the MAE for group_a and group_b.
 
@@ -787,13 +788,17 @@ def mae_ratio(group_a, group_b, y_pred, y_true, q=0):
         Predictions vector (regression)
     y_true : numpy array
         Target vector (regression)
-    q (optional) : float or array
-        quantile of predictions considered
+    q : float, array-like, optional
+        quantile of predictions considered, default=0.
 
     Returns
     -------
     float
-        MAE ratio : :math:`\frac{MAE_a}{MAE_b}`
+        MAE ratio
+
+    Notes
+    -----
+    :math:`\frac{MAE_a}{MAE_b}`
 
     Examples
     --------
@@ -837,8 +842,6 @@ def mae_ratio(group_a, group_b, y_pred, y_true, q=0):
 def regression_bias_metrics(group_a, group_b, y_pred, y_true=None, metric_type="group"):
     """
     Regression bias metrics batch computation
-
-    Description
     -----------
     This function computes all the relevant regression bias metrics,
     and displays them as a pandas dataframe.
@@ -851,11 +854,10 @@ def regression_bias_metrics(group_a, group_b, y_pred, y_true=None, metric_type="
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (regression)
-    y_true (optional) : numpy array
+    y_true : numpy array, optional
         Target vector (regression)
-    metric_type : 'both', 'equal_outcome' or 'equal_opportunity'
-        Specifies which metrics we compute
-
+    metric_type : str, optional
+        Specifies which metrics we compute : individual, group, equal_outcome, equal_opportunity, both
     Returns
     -------
     pandas DataFrame
@@ -983,18 +985,19 @@ def regression_bias_metrics(group_a, group_b, y_pred, y_true=None, metric_type="
 def jain_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """
     The Jain index (Fairness index)
-
-    Description
     -----------
-    The Jain index is an index proposed for resources allocation that measures the "equality" of user allocation [1]. For our purposes,
-    from the point of view of fairness, it measures the equality of the error distributed in the model outcomes. Empirically, we
-    could say that a model with a Jain index of 1 is a model that distributes the error equally among all the samples.
+    The Jain index is an index proposed for resources allocation that measures the "equality" of user allocation [1].
+    For our purposes, from the point of view of fairness, it measures the equality of the error distributed in the model
+    outcomes. Empirically, we could say that a model with a Jain index of 1 is a model that distributes the error 
+    equally among all the samples.
 
-    Please, use this metric with caution, as it is not a metric that has been proposed for fairness in machine learning models, but for resources allocation.
+    Please, use this metric with caution, as it is not a metric that has been proposed for fairness in machine learning
+    models, but for resources allocation.
 
     Interpretation
     --------------
-    From the point of view of fairness, it measures the equality of the error distributed among the samples. A fairer model will have a Jain index closer to 1.
+    From the point of view of fairness, it measures the equality of the error distributed among the samples. A fairer
+    model will have a Jain index closer to 1.
 
     Parameters
     ----------
@@ -1010,7 +1013,8 @@ def jain_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 
     References
     ----------
-    [1] Jain, R. (1984). A Quantitative Measure of Fairness and Discrimination for Resource Allocation in Shared Computer Systems. Eastern Research Laboratory, Digital Equipment Corporation.
+    .. [1] Jain, R. (1984). A Quantitative Measure of Fairness and Discrimination for Resource Allocation in Shared
+    Computer Systems. Eastern Research Laboratory, Digital Equipment Corporation.
 
     Examples
     -------

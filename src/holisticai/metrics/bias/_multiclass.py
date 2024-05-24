@@ -8,9 +8,7 @@ from ...utils._validation import _multiclass_checks
 
 def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
     """
-    Confusion Matrix.
-
-    Description
+    Confusion Matrix
     ----------
     This function computes the confusion matrix. The i,jth
     entry is the number of elements with predicted class i
@@ -22,10 +20,10 @@ def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
         Prediction vector (categorical)
     y_true : array-like
         Target vector (categorical)
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
-    normalize (optional) : None, 'pred' or 'class'
-        According to which of pred or class we normalize
+    normalize : str, optional
+        According to which of pred or class we normalize: None, 'pred' or 'class'
 
     Returns
     -------
@@ -80,11 +78,9 @@ def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
     return pd.DataFrame(confmat, columns=classes).set_index(np.array(classes))
 
 
-def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tensor=False):
+def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tensor=False):  # noqa: FBT002
     """
-    Confusion Tensor.
-
-    Description
+    Confusion Tensor
     ----------
     This function computes the confusion tensor. The k,i,jth
     entry is the number of instances of group k with predicted
@@ -98,12 +94,12 @@ def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tenso
         Prediction vector (categorical)
     y_true : array-like
         Target vector (categorical)
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
-    as_tensor (optional) : bool, default False
-        Whether we return a tensor or DataFrame
+    as_tensor : bool, optional
+        Whether we return a tensor or DataFrame, default False
 
     Returns
     -------
@@ -181,9 +177,7 @@ def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tenso
 
 def frequency_matrix(p_attr, y_pred, groups=None, classes=None, normalize="group"):
     """
-    Frequency Matrix.
-
-    Description
+    Frequency Matrix
     ----------
     This function computes the frequency matrix. For each
     group, class pair we compute the count of that group
@@ -196,12 +190,12 @@ def frequency_matrix(p_attr, y_pred, groups=None, classes=None, normalize="group
         Multiclass protected attribute vector.
     y_pred : array-like
         Prediction vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
-    normalize (optional): None, 'group' or 'class'
-        According to which of group or class we normalize
+    normalize: str, optional
+        According to which of group or class we normalize: None, 'group' or 'class'
 
     Returns
     -------
@@ -262,9 +256,7 @@ def frequency_matrix(p_attr, y_pred, groups=None, classes=None, normalize="group
 
 def accuracy_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
     """
-    Multiclass Accuracy Matrix.
-
-    Description
+    Multiclass Accuracy Matrix
     ----------
     Given a protected attribute and multiclass classification task,
     for each group and class this function computes the accuracy of
@@ -278,9 +270,9 @@ def accuracy_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
         Prediction vector (categorical).
     y_true : array-like
         Target vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
 
     Returns
@@ -330,9 +322,7 @@ def accuracy_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
 
 def precision_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
     """
-    Multiclass Precision Matrix.
-
-    Description
+    Multiclass Precision Matrix
     ----------
     Given a protected attribute and multiclass classification task,
     for each group and class this function computes the precision of
@@ -346,9 +336,9 @@ def precision_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
         Prediction vector (categorical).
     y_true : array-like
         Target vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
 
     Returns
@@ -398,9 +388,7 @@ def precision_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
 
 def recall_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
     """
-    Multiclass Recall Matrix.
-
-    Description
+    Multiclass Recall Matrix
     ----------
     Given a protected attribute and multiclass classification task,
     for each group and class this function computes the recall of
@@ -414,9 +402,9 @@ def recall_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
         Prediction vector (categorical).
     y_true : array-like
         Target vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
 
     Returns
@@ -466,9 +454,7 @@ def recall_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
 
 def multiclass_equality_of_opp(p_attr, y_pred, y_true, groups=None, classes=None, aggregation_fun="mean"):
     """
-    Multiclass Equality of Opportunity.
-
-    Description
+    Multiclass Equality of Opportunity
     ----------
     This metric is a multiclass generalisation of Equality of
     Opportunity. For each group, compute the matrix of error
@@ -490,10 +476,12 @@ def multiclass_equality_of_opp(p_attr, y_pred, y_true, groups=None, classes=None
         Prediction vector (categorical).
     y_true : array-like
         Target vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
+    aggregation_fun : str, optional
+        The function to aggregate across groups ('mean' or 'max')
 
     Returns
     -------
@@ -548,9 +536,7 @@ def multiclass_equality_of_opp(p_attr, y_pred, y_true, groups=None, classes=None
 
 def multiclass_average_odds(p_attr, y_pred, y_true, groups=None, classes=None, aggregation_fun="mean"):
     """
-    Multiclass Average Odds.
-
-    Description
+    Multiclass Average Odds
     ----------
     This metric is a multiclass generalisation of Average
     Odds. For each group, compute the matrix of error
@@ -573,14 +559,16 @@ def multiclass_average_odds(p_attr, y_pred, y_true, groups=None, classes=None, a
         Prediction vector (categorical).
     y_true : array-like
         Target vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
+    aggregation_fun : str, optional
+        The function to aggregate across groups ('mean' or 'max')
 
     Returns
     -------
-    scalar
+    float
         Multiclass Average Odds
 
     Examples
@@ -631,9 +619,7 @@ def multiclass_average_odds(p_attr, y_pred, y_true, groups=None, classes=None, a
 
 def multiclass_true_rates(p_attr, y_pred, y_true, groups=None, classes=None, aggregation_fun="mean"):
     """
-    Multiclass True Rates.
-
-    Description
+    Multiclass True Rates
     ----------
     This metric is a multiclass generalisation of TPR
     Difference. For each group, compute the matrix of error
@@ -655,10 +641,12 @@ def multiclass_true_rates(p_attr, y_pred, y_true, groups=None, classes=None, agg
         Prediction vector (categorical).
     y_true : array-like
         Target vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
+    aggregation_fun : str, optional
+        The function to aggregate across groups ('mean' or 'max')
 
     Returns
     -------
@@ -712,9 +700,7 @@ def multiclass_true_rates(p_attr, y_pred, y_true, groups=None, classes=None, agg
 
 def multiclass_statistical_parity(p_attr, y_pred, groups=None, classes=None, aggregation_fun="mean"):
     """
-    Multiclass statistical parity.
-
-    Description
+    Multiclass statistical parity
     ----------
     This function computes statistical parity for a classification task
     with multiple classes and a protected attribute with multiple groups.
@@ -734,11 +720,11 @@ def multiclass_statistical_parity(p_attr, y_pred, groups=None, classes=None, agg
         Multiclass protected attribute vector.
     y_pred : array-like
         Prediction vector (categorical).
-    groups (optional) : list
+    groups : list, optional
         Unique groups from p_attr in order
-    classes (optional) : list
+    classes : list, optional
         The unique output classes in order
-    aggregation_fun (optional) : str
+    aggregation_fun : str, optional
         The function to aggregate across groups ('mean' or 'max')
 
     Returns
@@ -791,25 +777,25 @@ def multiclass_statistical_parity(p_attr, y_pred, groups=None, classes=None, agg
 
 def multiclass_bias_metrics(p_attr, y_pred, y_true, groups=None, classes=None, metric_type="equal_outcome"):
     """
-    Multiclass bias metrics batch computation.
-
-    Description
+    Multiclass bias metrics batch computation
     ----------
     This function computes all the relevant multiclass bias metrics,
     and displays them as a pandas dataframe.
 
     Parameters
     ----------
-    g_min : numpy array
-        Minority class vector
-    g_maj : numpy array
-        Majority class vector
+    p_attr : array-like
+        Multiclass protected attribute vector
     y_pred : array-like
         Regression predictions vector
-    y_true (optional) : numpy array
+    y_true : numpy array
         Regression target vector
-    metric_type : 'both', 'equal_outcome' or 'equal_opportunity'
-        Specifies which metrics we compute
+    groups : list, optional
+        Unique groups from p_attr in order
+    classes : list, optional
+        The unique output classes in order
+    metric_type : str, optional
+        Specifies which metrics we compute: 'both', 'equal_outcome' or 'equal_opportunity'
 
     Returns
     -------

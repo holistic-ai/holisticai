@@ -17,9 +17,7 @@ from ...utils._validation import _clustering_checks
 
 def cluster_balance(group_a, group_b, y_pred):
     """
-    Cluster Balance.
-
-    Description
+    Cluster Balance
     -----------
     Given a clustering and protected attribute. The cluster balance is
     the minimum over all groups and clusters of the ratio of the representation
@@ -92,9 +90,7 @@ def cluster_balance(group_a, group_b, y_pred):
 
 def min_cluster_ratio(group_a, group_b, y_pred):
     """
-    Minimum Cluster Ratio.
-
-    Description
+    Minimum Cluster Ratio
     -----------
     Given a clustering and protected attributes. The min cluster ratio is
     the minimum over all clusters of the ratio of number of group_a members
@@ -150,9 +146,7 @@ def min_cluster_ratio(group_a, group_b, y_pred):
 
 def _avg_cluster_ratio(group_a, group_b, y_pred):
     """
-    Average Cluster Ratio.
-
-    Description
+    Average Cluster Ratio
     -----------
     Given a clustering and protected attributes. The average cluster ratio is
     the average over all clusters of the ratio of group_a members to group_b
@@ -213,17 +207,15 @@ def _avg_cluster_ratio(group_a, group_b, y_pred):
 
 def _cluster_dist(y_pred_g, clusters):
     """
-    Group distribution over clusters.
-
-    Description
+    Group distribution over clusters
     -----------
     This function computes the distribution of the group across clusters.
 
     Parameters
     ----------
-    y_pred_g :
+    y_pred_g : array-like
         Cluster predictions (categorical)
-    clusters :
+    clusters : array-like
         Cluster ground truth (categorical)
 
     Returns
@@ -240,9 +232,7 @@ def _cluster_dist(y_pred_g, clusters):
 
 def cluster_dist_l1(group_a, group_b, y_pred):
     """
-    Cluster Distribution Total Variation.
-
-    Description
+    Cluster Distribution Total Variation
     -----------
     This function computes the distribution of group_a and group_b across clusters.
     It then outputs the total variation distance between these distributions.
@@ -298,9 +288,7 @@ def cluster_dist_l1(group_a, group_b, y_pred):
 
 def cluster_dist_kl(group_a, group_b, y_pred):
     """
-    Cluster Distribution KL.
-
-    Description
+    Cluster Distribution KL
     -----------
     This function computes the distribution of group_a and group_b
     membership across the clusters. It then returns the KL distance
@@ -324,7 +312,11 @@ def cluster_dist_kl(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Cluster Distribution KL : :math:`KL(P_a,P_b)`
+        Cluster Distribution KL
+
+    Notes
+    -----
+    :math:`KL(P_a,P_b)`
 
     Examples
     -------
@@ -356,9 +348,7 @@ def cluster_dist_kl(group_a, group_b, y_pred):
 
 def cluster_dist_entropy(group, y_pred):
     """
-    Minority Cluster Distribution Entropy.
-
-    Description
+    Minority Cluster Distribution Entropy
     -----------
     The entropy of the distribution of the group
     over the clusters.
@@ -379,7 +369,11 @@ def cluster_dist_entropy(group, y_pred):
     Returns
     -------
     float
-        Group Presence Entropy : :math:`Entropy(P_{group})`
+        Group Presence Entropy
+
+    Notes
+    -----
+    :math:`Entropy(P_{group})`
 
     Examples
     -------
@@ -409,9 +403,7 @@ def cluster_dist_entropy(group, y_pred):
 
 def _ami_diff(group_a, group_b, y_pred, y_true):
     """
-    Adjusted Mutual information Difference.
-
-    Description
+    Adjusted Mutual information Difference
     -----------
     We compute the difference of the adjusted mutual information
     on group_a and group_b.
@@ -467,9 +459,7 @@ def _ami_diff(group_a, group_b, y_pred, y_true):
 
 def social_fairness_ratio(group_a, group_b, data, centroids):
     """
-    Social Fairness Ratio.
-
-    Description
+    Social Fairness Ratio
     -----------
     Given a centroid based clustering, this function compute the average
     distance to the nearest centroid for both groups. The metric is the
@@ -550,9 +540,7 @@ def social_fairness_ratio(group_a, group_b, data, centroids):
 
 def silhouette_diff(group_a, group_b, data, y_pred):
     r"""
-    Silhouette Difference.
-
-    Description
+    Silhouette Difference
     -----------
     We compute the difference of the mean silhouette score for both
     groups.
@@ -568,15 +556,19 @@ def silhouette_diff(group_a, group_b, data, y_pred):
         Group membership vector (binary)
     group_b : array-like
         Group membership vector (binary)
-    y_pred : array-like
-        Cluster predictions (categorical)
     data : matrix-like
         Data matrix of shape (num_inst, dim)
+    y_pred : array-like
+        Cluster predictions (categorical)
 
     Returns
     -------
     float
-        Silhouette difference : :math:`\texttt{mean_silhouette_a - mean_silhouette_b}`
+        Silhouette difference
+
+    Notes
+    -----
+    :math:`\texttt{mean_silhouette_a - mean_silhouette_b}`
 
     Examples
     -------
@@ -624,9 +616,7 @@ def clustering_bias_metrics(
     metric_type="equal_outcome",
 ):
     """
-    Clustering bias metrics batch computation.
-
-    Description
+    Clustering bias metrics batch computation
     -----------
     This function computes all the relevant clustering bias metrics,
     and displays them as a pandas dataframe.
@@ -639,12 +629,12 @@ def clustering_bias_metrics(
         Group membership vector (binary)
     y_pred : array-like
         Cluster predictions (categorical)
-    data (optional) : matrix-like
+    data : matrix-like, optional
         Data matrix of shape (num_inst, dim)
-    centroids (optional) : matrix-like
+    centroids : matrix-like, optional
         Centroids (centers)
-    metric_type : 'both', 'equal_outcome' or 'equal_opportunity'
-        Specifies which metrics we compute
+    metric_type : str, optional
+        Specifies which metrics we compute: 'both', 'equal_outcome' or 'equal_opportunity'
 
     Returns
     -------
