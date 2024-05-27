@@ -6,8 +6,8 @@ import seaborn as sns
 from holisticai.metrics.bias import confusion_matrix
 
 # utils
-from ...utils import get_colors
-from ...utils._validation import (
+from holisticai.utils import get_colors
+from holisticai.utils._validation import (
     _check_columns,
     _check_numerical_dataframe,
     _regression_checks,
@@ -42,34 +42,35 @@ def group_pie_plot(y_feat, ax=None, size=None, title=None):
         labels = value_counts.index.tolist()
 
     else:
-        raise TypeError("input is not a numpy array or pandas series")
+        msg = "input is not a numpy array or pandas series"
+        raise TypeError(msg)
 
     # calculations
-    n_b = np.sum(value_counts / np.sum(value_counts) > 0.02)
+    threshold = 0.02
+    n_b = np.sum(value_counts / np.sum(value_counts) > threshold)
     n_nb = len(value_counts) - n_b
     if n_nb > 0 and n_b > 0:
-        labels = list(labels[:n_b]) + ["Others"]
-        value_counts = list(value_counts[:n_b]) + [np.sum(value_counts[n_b:])]
+        labels = [*list(labels[:n_b]), "Others"]
+        value_counts = [*list(value_counts[:n_b]), np.sum(value_counts[n_b:])]
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Group proportions")
 
     # chart
     colors = get_colors(len(value_counts), extended_colors=True)
     hai_palette = sns.color_palette(colors)
     ax.pie(value_counts, labels=labels, colors=hai_palette, autopct="%.0f%%")
-
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Group proportions")
     # return
     return ax
 
 
-def _group_confusion_matrices(group_a, group_b, y_pred, y_true, size=None, title=None):
+def group_confusion_matrices(group_a, group_b, y_pred, y_true, size=None, title=None):
     """Group confusion matrices comparison.
 
     Plots three heatmaps showing confusion matrices for
@@ -116,14 +117,14 @@ def _group_confusion_matrices(group_a, group_b, y_pred, y_true, size=None, title
     conf_mat_combi = conf_mat_combi / conf_mat_combi.sum(axis=0)[np.newaxis, :]
 
     # Setup
-    sns.set()
+    sns.set_theme()
     colors = get_colors(100, extended_colors=True)
     hai_palette = sns.color_palette(colors)
     fig, ax = plt.subplots(1, 3, figsize=size)
     if title is not None:
-        fig.suptitle(title)
+        ax.set_title(title)
     else:
-        fig.suptitle("Confusion matrices")
+        ax.set_title("Confusion matrices")
 
     # charting
     sns.heatmap(
@@ -187,13 +188,9 @@ def distribution_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     matplotlib ax
     """
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("KDE distribution plot")
 
     # charting
     colors = get_colors(len(np.unique(p_attr)), extended_colors=True)
@@ -202,7 +199,11 @@ def distribution_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
         x=y_feat, hue=p_attr, fill=True, palette=hai_palette, common_norm=False, ax=ax
     )
 
-    # return
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Distribution Plot")
+
     return ax
 
 
@@ -229,13 +230,9 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     matplotlib ax
     """
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Histogram Plot")
 
     colors = get_colors(len(np.unique(p_attr)))
     hai_palette = sns.color_palette(colors)
@@ -260,7 +257,11 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     _, labels = plt.xticks()
     plt.setp(labels, rotation=45)
 
-    # return
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Histogram Plot")
+
     return ax
 
 
@@ -297,13 +298,10 @@ def correlation_matrix_plot(
     df = _check_numerical_dataframe(df)
     _check_columns(df, target_feature)
 
-    sns.set(font_scale=1.25)
+    sns.set_theme(font_scale=1.25)
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Correlation matrix")
+
     corrmat = df.corr()
     cols = corrmat.nlargest(n_features, target_feature)[target_feature].index
     cm = np.corrcoef(df[cols].values.T)
@@ -319,4 +317,9 @@ def correlation_matrix_plot(
         cmap=cmap,
     )
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Correlation matrix")
     return ax

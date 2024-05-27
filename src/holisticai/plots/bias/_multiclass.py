@@ -8,7 +8,7 @@ from holisticai.metrics.bias import frequency_matrix
 from holisticai.utils import get_colors
 
 # utils
-from holisticai.utils._validation import _check_binary, _multiclass_checks
+from holisticai.utils._validation import _multiclass_checks
 from matplotlib import pyplot as plt
 
 
@@ -52,12 +52,13 @@ def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
     n_classes = len(name_classes)
 
     # charting
-    sns.set()
+    sns.set_theme()
 
     colors = get_colors(sr_list.shape[0])
     hai_palette = sns.color_palette(colors)
 
-    if n_classes > 2:
+    num_classes_threshold = 2
+    if n_classes > num_classes_threshold:
         for i in range(n_classes):
             fig, ax = plt.subplots()
             fig.suptitle("Class " + str(name_classes[i]))
@@ -78,10 +79,6 @@ def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
 
         if ax is None:
             fig, ax = plt.subplots(figsize=size)
-            if title is not None:
-                fig.suptitle(title)
-            else:
-                fig.suptitle("Frequency Plot (Class {})".format(name_classes[1]))
 
         sns.barplot(
             x=sr_list.index.to_list(),
@@ -93,6 +90,10 @@ def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
         ax.set_ylabel("Frequency")
         _, labels = plt.xticks()
         plt.setp(labels, rotation=45)
+        if title is not None:
+            ax.set_title(title)
+        else:
+            ax.set_title(f"Frequency Plot (Class {name_classes[1]})")
 
         return ax
 
@@ -139,8 +140,6 @@ def statistical_parity_plot(
         classes=None,
     )
 
-    _check_binary(y_pred, name="y_pred")
-
     group_dict = dict(zip(groups, range(len(groups))))
     # get success rates.
     sr_list = frequency_matrix(p_attr, y_pred * 1, groups=groups, normalize="group")[
@@ -158,13 +157,9 @@ def statistical_parity_plot(
         sp_list = sr_list_sorted - np.max(sr_list)
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Statistical Parity plot")
 
     # charting
     colors = get_colors(len(groups))
@@ -180,6 +175,10 @@ def statistical_parity_plot(
     _, labels = plt.xticks()
     plt.setp(labels, rotation=45)
     ax.legend()
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Statistical Parity plot")
 
     return ax
 
@@ -226,8 +225,6 @@ def disparate_impact_plot(
         classes=None,
     )
 
-    _check_binary(y_pred, name="y_pred")
-
     group_dict = dict(zip(groups, range(len(groups))))
     # get success rates
     sr_list = frequency_matrix(p_attr, 1 * y_pred, groups)[pos_label].to_numpy()
@@ -243,13 +240,9 @@ def disparate_impact_plot(
         di_list = sr_list_sorted / sr_list_sorted[0]
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Disparate Impact plot")
 
     # charting
     colors = get_colors(len(groups))
@@ -266,6 +259,10 @@ def disparate_impact_plot(
     plt.setp(labels, rotation=45)
     # legend
     ax.legend()
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Disparate Impact plot")
 
     # return
     return ax
@@ -333,13 +330,9 @@ def frequency_matrix_plot(
     )
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Frequency matrix plot")
 
     # charting
     if normalize is None:
@@ -348,6 +341,10 @@ def frequency_matrix_plot(
         sns.heatmap(sr_mat, annot=True, fmt=".2%", cmap=hai_palette, ax=ax)
     ax.set_xlabel("Class")
     ax.set_ylabel("Group")
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Frequency matrix plot")
 
     # return
     return ax
@@ -409,13 +406,9 @@ def accuracy_bar_plot(p_attr, y_pred, y_true, ax=None, size=None, title=None):
     groups.append("Total")
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Accuracy Bar Plot")
 
     # charting
     colors = get_colors(len(groups))
@@ -423,5 +416,9 @@ def accuracy_bar_plot(p_attr, y_pred, y_true, ax=None, size=None, title=None):
     ax.set_xlabel("Group")
     ax.set_ylabel("Accuracy")
     sns.barplot(x=groups, y=acc_list, palette=hai_palette, ax=ax)
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Accuracy Bar Plot")
 
     return ax

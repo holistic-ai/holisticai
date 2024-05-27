@@ -18,37 +18,39 @@ if TYPE_CHECKING:
 def load_adult_dataset():
     data = load_adult()
     protected_attribute = "sex"
-    output_variable = "class"
+    output_name = "class"
     drop_columns = ["education", "race", "sex"]
     df = pd.concat([data["data"], data["target"]], axis=1)
     df = df.dropna().reset_index(drop=True)
     group_a = get_protected_values(df, protected_attribute, "Female")
     group_b = get_protected_values(df, protected_attribute, "Male")
     df = df.drop(drop_columns, axis=1)
-    y = df.pop(output_variable).map({"<=50K": 0, ">50K": 1})
+    y = df.pop(output_name).map({"<=50K": 0, ">50K": 1})
     df = pd.get_dummies(df, columns=df.columns[df.dtypes == "category"])
     bool_columns = df.columns[df.dtypes == "bool"]
     df[bool_columns] = df[bool_columns].astype(int)
     x = df
-    return Dataset(x=x, y=y, group_a=group_a, group_b=group_b)
+    data = pd.concat([x, y], axis=1)
+    return Dataset(data=data, x=x, y=y, group_a=group_a, group_b=group_b)
 
 
 def load_law_school_dataset():
     bunch = load_law_school()
     protected_attribute = "race1"
-    output_variable = "bar"
+    output_name = "bar"
     drop_columns = ["ugpagt3", "race1", "gender", "bar"]
     df = bunch["frame"]
     df = df.dropna()
     group_a = get_protected_values(df, protected_attribute, "white")
     group_b = get_protected_values(df, protected_attribute, "non-white")
-    y = df[output_variable]  # binary label vector
+    y = df[output_name]  # binary label vector
     y = y.map({"FALSE": 0, "TRUE": 1})
     x = df.drop(drop_columns, axis=1)
-    return Dataset(x=x, y=y, group_a=group_a, group_b=group_b)
+    data = pd.concat([x, y], axis=1)
+    return Dataset(data=data, x=x, y=y, group_a=group_a, group_b=group_b, output_name=output_name)
 
 def load_student_multiclass_dataset():
-    output_column = "G3"
+    output_name = "G3"
     protected_attributes = ['sex', 'address', 'Mjob', 'Fjob']
     drop_columns = ["G1", "G2", "G3", 'sex', 'address', 'Mjob', 'Fjob']
     bunch = load_student()
@@ -56,10 +58,12 @@ def load_student_multiclass_dataset():
 
     # we don't want to encode protected attributes
     df = df.dropna()
-    y = df[output_column].to_numpy()
+    y = df[output_name].to_numpy()
     buckets = np.array([8, 11, 14])
     y_cat = pd.Series((y.reshape(-1, 1) > buckets.reshape(1, -1)).sum(axis=1))
     p_attr = df[protected_attributes]
+    group_a = get_protected_values(df, 'sex', "F")
+    group_b = get_protected_values(df, 'sex', "M")
 
     for col in df.select_dtypes(include=["object"]):
         df[col] = pd.factorize(df[col])[0]
@@ -72,10 +76,11 @@ def load_student_multiclass_dataset():
     x = df.astype(float)
     y = df["target"]
     x = df.drop(columns="target")
-    return Dataset(x=x, y=y, p_attr=p_attr)
+    data = pd.concat([x, y], axis=1)
+    return Dataset(data=data, x=x, y=y, p_attr=p_attr, group_a=group_a, group_b=group_b, output_name=output_name)
 
 def load_student_dataset():
-    outputs = ["G1", "G2", "G3"]
+    output_name = ["G1", "G2", "G3"]
     protected_attributes = ['sex', 'address', 'Mjob', 'Fjob']
     drop_columns = ["G1", "G2", "G3", 'sex', 'address', 'Mjob', 'Fjob']
     bunch = load_student()
@@ -83,8 +88,10 @@ def load_student_dataset():
 
     # we don't want to encode protected attributes
     df = df.dropna()
-    y = df[outputs]
+    y = df[output_name]
     p_attr = df[protected_attributes]
+    group_a = get_protected_values(df, 'sex', "F")
+    group_b = get_protected_values(df, 'sex', "M")
 
     for col in df.select_dtypes(include=["object"]):
         df[col] = pd.factorize(df[col])[0]
@@ -94,7 +101,8 @@ def load_student_dataset():
     p_attr = p_attr.reset_index(drop=True)
     x = df.astype(float)
     y = y.reset_index(drop=True)
-    return Dataset(x=x, y=y, p_attr=p_attr)
+    data = pd.concat([x, y], axis=1)
+    return Dataset(data=data, x=x, y=y, p_attr=p_attr, group_a=group_a, group_b=group_b, output_name=output_name)
 
 
 def process_lastfm_dataset():
@@ -133,7 +141,7 @@ def process_lastfm_dataset():
         aggfunc="mean",
     )
     df_pivot = df_pivot.fillna(0)
-    return Dataset(data_pivot=df_pivot, p_attr=pd.Series(p_attr))
+    return Dataset(data=df, data_pivot=df_pivot, p_attr=pd.Series(p_attr))
 
 
 def load_dataset(dataset_name):
@@ -183,7 +191,8 @@ class Dataset(dict):
         self.features = list(self.data.keys())
         self.num_rows = len(next(iter(self.data.values())))
 
-    def __init__(self, **kargs):
+    def __init__(self, output_name=None, **kargs):
+        self.output_name = output_name
         self.data = kargs
         for name,value in kargs.items():
             if type(value) in [pd.DataFrame, pd.Series]:
@@ -214,11 +223,15 @@ class Dataset(dict):
     def __repr__(self):
         return f"Dataset({{\n" f"        features: {self.features},\n" f"        num_rows: {self.num_rows}\n" f"    }})"
 
+    def __output_name__(self):
+        return self.output_name
+
     def repr_info(self):
         return (
             f"<ul>"
             f"<li><span style='font-weight: normal;'>features: {self.features}</span></li>"
             f"<li><span style='font-weight: normal;'>num_rows: {self.num_rows}</span></li>"
+            f"<li><span style='font-weight: normal;'>output_name: {self.output_name}</span></li>"
             f"</ul>"
         )
 

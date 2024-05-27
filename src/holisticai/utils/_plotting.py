@@ -2,7 +2,7 @@
 import numpy as np
 
 
-def get_colors(n_lines, extended_colors=False, reverse=False):
+def get_colors(n_lines, extended_colors=False, reverse=False):  # noqa: FBT002
     """
     Get colors for Holistic AI pallette
 

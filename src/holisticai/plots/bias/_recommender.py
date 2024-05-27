@@ -1,16 +1,15 @@
 # Base Imports
 import numpy as np
-import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
 
 # utils
-from ...utils import get_colors, mat_to_binary, normalize_tensor
-from ...utils._validation import _recommender_checks
+from holisticai.utils import get_colors, mat_to_binary, normalize_tensor
+from holisticai.utils._validation import _recommender_checks
+from matplotlib import pyplot as plt
 
 
 def long_tail_plot(
-    mat_pred, top=None, thresh=0.5, normalize=False, ax=None, size=None, title=None
+    mat_pred, top=None, thresh=0.5, normalize=False, ax=None, size=None, title=None  # noqa: FBT002
 ):
     """
     Long Tail Plot.
@@ -66,13 +65,9 @@ def long_tail_plot(
     item_counts_sorted = sorted(item_counts, reverse=True)
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Long Tail Plot")
 
     # chart
     ax.set_xlabel("Items (sorted by popularity)")
@@ -84,6 +79,10 @@ def long_tail_plot(
         linewidth=2,
         color=hai_color[0],
     )
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Long Tail Plot")
 
     return ax
 
@@ -94,7 +93,7 @@ def exposure_diff_plot(
     mat_pred,
     top=None,
     thresh=0.5,
-    normalize=False,
+    normalize=False,  # noqa: FBT002
     ax=None,
     size=None,
     title=None,
@@ -172,13 +171,9 @@ def exposure_diff_plot(
     item_dist_diff_sorted = list(item_dist_diff_sorted)
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Exposure Difference Plot")
 
     # chart
     ax.set_xlabel("Items (sorted by exposure difference)")
@@ -190,6 +185,10 @@ def exposure_diff_plot(
         linewidth=2,
         color=hai_color[0],
     )
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Exposure Difference Plot")
 
     return ax
 
@@ -200,7 +199,7 @@ def exposure_ratio_plot(
     mat_pred,
     top=None,
     thresh=0.5,
-    normalize=False,
+    normalize=False,  # noqa: FBT002
     ax=None,
     size=None,
     title=None,
@@ -278,13 +277,9 @@ def exposure_ratio_plot(
     item_dist_rat_sorted = list(item_dist_rat_sorted)
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Exposure Ratio Plot")
 
     # chart
     ax.set_xlabel("Items (sorted by exposure ratio)")
@@ -296,5 +291,9 @@ def exposure_ratio_plot(
         linewidth=2,
         color=hai_color[0],
     )
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Exposure Ratio Plot")
 
     return ax

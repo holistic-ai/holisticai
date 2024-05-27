@@ -7,7 +7,6 @@ This gallery contains a collection of examples that demonstrate the usage of ``h
 .. toctree::
     :maxdepth: 2
 
-    tutorials/bias/bias
-    tutorials/explainability/explainability
-    community/community
-    videos/videos
+    tutorials/bias/index
+    cookbook/index
+    videos/index

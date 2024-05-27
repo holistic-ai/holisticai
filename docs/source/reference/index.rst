@@ -7,28 +7,51 @@ API reference
 This page gives an overview of all public ``holisticai`` objects, functions and
 methods. All classes and functions exposed in ``holisticai.*`` namespace are public.
 
-The following subpackages are public.
+Following is the list of modules in ``holisticai``:
 
-- ``holisticai.bias``: Functions and classes for bias measure and mitigation.
-- ``holisticai.explainability``: Plotting public API.
-- ``holisticai.privacy``: Functions and classes for privacy measure and mitigation.
-- ``holisticai.robustness``: Functions and classes for robustness measure and mitigation.
-- ``holisticai.efficacy``: Functions and classes for efficacy measure and mitigation.
-- ``holisticai.datasets``: Functions and classes for datasets.
-- ``holisticai.pipeline``: Functions and classes for pipeline.
+.. grid:: 3 3 3 3
+    :gutter: 4
+    :padding: 2 2 0 0
+    :class-container: sd-text-center
 
+    .. grid-item-card:: Metrics
+        :link: metrics/index.html
+        :shadow: md
+
+        Implement metrics for bias, explainability, efficacy, security, and robustness.
+
+    .. grid-item-card:: Mitigation
+        :link: mitigation/index.html
+        :shadow: md
+
+        Implement bias mitigation strategies.
+    
+    .. grid-item-card:: Plots
+        :link: plots/index.html
+        :shadow: md
+
+        Implement plots and visualizations for bias, explainability, efficacy, security, and robustness.
+
+    .. grid-item-card:: Pipeline
+        :link: pipeline.html
+        :shadow: md
+
+        Easy framework to build and deploy machine learning pipelines.
+
+    .. grid-item-card:: Datasets
+        :link: datasets.html
+        :shadow: md
+
+        Datasets for experiments and testing.
 
 .. If you update this toctree, also update the manual toctree in the
 .. main index.rst.template
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
 
-   bias
-   bias_mitigation
-   bias_metrics
-   bias_plots
-   explainability
-   efficacy
-   datasets
+   metrics/index
+   mitigation/index
+   plots/index
    pipeline
+   datasets
