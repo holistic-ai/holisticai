@@ -4,12 +4,8 @@ import warnings
 import numpy as np
 import pandas as pd
 
-# Efficacy metrics
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
-from sklearn.neighbors import NearestNeighbors
-
 # utils
-from ...utils._validation import (
+from holisticai.utils._validation import (
     _array_like_to_numpy,
     _check_binary,
     _classification_checks,
@@ -17,12 +13,14 @@ from ...utils._validation import (
     _regression_checks,
 )
 
+# Efficacy metrics
+from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
+from sklearn.neighbors import NearestNeighbors
+
 
 def _group_success_rate(g, y):
     """
     Group success rate.
-
-    Description
     -----------
     This function computes the success rate for a given subgroup.
 
@@ -39,23 +37,20 @@ def _group_success_rate(g, y):
         group success rate
 
     """
-    success_rate = y[g == 1].sum() / g.sum()  # success rate group_a
-    return success_rate
+    return y[g == 1].sum() / g.sum()  # success rate group_a
 
 
 def statistical_parity(group_a, group_b, y_pred):
     """
     Statistical parity.
-
-    Description
     -----------
-    This function computes the statistical parity (difference of success rates)
+    This function computes the statistical parity (difference of success rates)\
     between group_a and group_b.
 
     Interpretation
     --------------
-    A value of 0 is desired. Negative values are unfair towards group_a.
-    Positive values are unfair towards group_b. The range (-0.1,0.1)
+    A value of 0 is desired. Negative values are unfair towards group_a.\
+    Positive values are unfair towards group_b. The range (-0.1,0.1)\
     is considered acceptable.
 
     Parameters
@@ -70,10 +65,14 @@ def statistical_parity(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Statistical Parity : :math:`sr_a - sr_b`
+        Statistical Parity
+
+    Notes
+    -----
+    :math:`sr_a - sr_b`
 
     Examples
-    -------
+    --------
     >>> import numpy as np
     >>> from holisticai.metrics.bias import statistical_parity
     >>> group_a = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
@@ -94,7 +93,10 @@ def statistical_parity(group_a, group_b, y_pred):
 
 def success_rate(group_a, group_b, y_pred):
     """
+    Success Rate
+    -----------
     Calculates the raw success rates for each group.
+
     Parameters
     ----------
     group_a : array-like
@@ -103,6 +105,7 @@ def success_rate(group_a, group_b, y_pred):
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (binary)
+
     Returns
     -------
     dict
@@ -116,16 +119,14 @@ def success_rate(group_a, group_b, y_pred):
 def disparate_impact(group_a, group_b, y_pred):
     """
     Disparate Impact.
-
-    Description
     -----------
-    This function computes the disparate impact (ratio of success rates)
+    This function computes the disparate impact (ratio of success rates)\
     between group_a and group_b class.
 
     Interpretation
     --------------
-    A value of 1 is desired. Values below 1 are unfair towards group_a.
-    Values above 1 are unfair towards group_b. The range (0.8,1.2)
+    A value of 1 is desired. Values below 1 are unfair towards group_a.\
+    Values above 1 are unfair towards group_b. The range (0.8,1.2)\
     is considered acceptable.
 
     Parameters
@@ -140,7 +141,11 @@ def disparate_impact(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Disparate Impact : :math:`sr_a/sr_b`
+        Disparate Impact
+
+    Notes
+    -----
+    :math:`sr_a/sr_b`
 
     References
     ----------
@@ -170,18 +175,14 @@ def disparate_impact(group_a, group_b, y_pred):
 
 def four_fifths(group_a, group_b, y_pred):
     """
-    Four Fifths.
-
-    Description
+    Four Fifths
     -----------
-    This function computes the four fifths rule (ratio of success rates)
-    between group_a and group_b. We return the minimum of the ratio
-    taken both ways.
+    This function computes the four fifths rule (ratio of success rates)\
+    between group_a and group_b. We return the minimum of the ratio taken both ways.
 
     Interpretation
     --------------
-    A value of 1 is desired. Values below 1 are unfair. The range (0.8,1)
-    is considered acceptable.
+    A value of 1 is desired. Values below 1 are unfair. The range (0.8,1) is considered acceptable.
 
     Parameters
     ----------
@@ -218,20 +219,17 @@ def four_fifths(group_a, group_b, y_pred):
 
 
 def cohen_d(group_a, group_b, y_pred):
-    r"""
-    Cohen D.
-
-    Description
+    """
+    Cohen D
     -----------
-    This function computes the Cohen D statistic (normalised statistical parity)
+    This function computes the Cohen D statistic (normalised statistical parity)\
     between group_a and group_b.
 
     Interpretation
     --------------
     A value of 0 is desired. Negative values are unfair towards group_a.
-    Positive values are unfair towards group_b. Reference values:
-    0.2 is considered a small effect size, 0.5 is considered medium,
-    0.8 is considered large.
+    Positive values are unfair towards group_b. Reference values: 0.2 is\
+    considered a small effect size, 0.5 is considered medium, 0.8 is considered large.
 
     Parameters
     ----------
@@ -245,7 +243,11 @@ def cohen_d(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Cohen D : :math:`\frac{sr_a-sr_b}{\texttt{std_pool}}`
+        Cohen D :
+
+    Notes
+    -----
+    :math:`\frac{sr_a-sr_b}{\texttt{std_pool}}`
 
     Examples
     --------
@@ -279,19 +281,17 @@ def cohen_d(group_a, group_b, y_pred):
 
 
 def z_test_diff(group_a, group_b, y_pred):
-    r"""
-    Z Test (Difference).
-
-    Description
+    """
+    Z Test (Difference)
     -----------
-    This function computes the Z-test statistic for the difference
+    This function computes the Z-test statistic for the difference\
     in success rates. Also known as 2-SD Statistic.
 
     Interpretation
     --------------
-    A value of 0 is desired. This test considers the data unfair
-    if the computed value is greater than 2 or smaller than -2,
-    indicating a statistically significant difference in success rates.
+    A value of 0 is desired. This test considers the data unfair if\
+    the computed value is greater than 2 or smaller than -2, indicating\
+    a statistically significant difference in success rates.
 
     Parameters
     ----------
@@ -342,19 +342,17 @@ def z_test_diff(group_a, group_b, y_pred):
 
 
 def z_test_ratio(group_a, group_b, y_pred):
-    r"""
-    Z Test (Ratio).
-
-    Description
+    """
+    Z Test (Ratio)
     -----------
-    This function computes the Z-test statistic for the ratio
+    This function computes the Z-test statistic for the ratio\
     in success rates. Also known as 2-SD Statistic.
 
     Interpretation
     --------------
-    A value of 0 is desired. This test considers the data unfair
-    if the computed value is greater than 2 or smaller than -2,
-    indicating a statistically significant ratio in success rates.
+    A value of 0 is desired. This test considers the data unfair if\
+    the computed value is greater than 2 or smaller than -2, indicating\
+    a statistically significant ratio in success rates.
 
     Parameters
     ----------
@@ -405,18 +403,15 @@ def z_test_ratio(group_a, group_b, y_pred):
 
 def _correlation_diff(group_a, group_b, y_pred, y_true):
     """
-    Correlation difference.
-
-    Description
+    Correlation difference
     -----------
-    This function computes the difference in correlation between predicted
+    This function computes the difference in correlation between predicted\
     and true labels for group_a and group_b.
 
     Interpretation
     --------------
-    A value of 0 is desired. This metric ranges between -2 and 2,
-    with negative values indicating bias against group_a, and
-    positive values indicating bias against group_b.
+    A value of 0 is desired. This metric ranges between -2 and 2, with\
+    negative values indicating bias against group_a, and positive values indicating bias against group_b.
 
     Parameters
     ----------
@@ -432,7 +427,11 @@ def _correlation_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        Correlation Difference : :math:`CV_a - CV_b`
+        Correlation Difference
+
+    Notes
+    -----
+    :math:`CV_a - CV_b`
 
     Examples
     --------
@@ -457,17 +456,15 @@ def _correlation_diff(group_a, group_b, y_pred, y_true):
 
 def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
     """
-    Equality of opportunity difference.
-
-    Description
+    Equality of opportunity difference
     -----------
-    This function computes the difference in true positive
+    This function computes the difference in true positive\
     rates for group_a and group_b.
 
     Interpretation
     --------------
-    A value of 0 is desired. This metric ranges between -1 and 1,
-    with negative values indicating bias against group_a, and
+    A value of 0 is desired. This metric ranges between -1 and 1,\
+    with negative values indicating bias against group_a, and\
     positive values indicating bias against group_b.
 
     Parameters
@@ -484,7 +481,11 @@ def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        Equal opportunity difference : :math:`tpr_a - tpr_b`
+        Equal opportunity difference
+
+    Notes
+    -----
+    :math:`tpr_a - tpr_b`
 
     Examples
     --------
@@ -509,17 +510,15 @@ def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
 
 def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
     """
-    False positive rate difference.
-
-    Description
+    False positive rate difference
     ----------
-    This function computes the difference in false positive
+    This function computes the difference in false positive\
     rates between group_a and group_b.
 
     Interpretation
     --------------
-    A value of 0 is desired. This metric ranges between -1 and 1,
-    with negative values indicating bias against group_a, and
+    A value of 0 is desired. This metric ranges between -1 and 1,\
+    with negative values indicating bias against group_a, and\
     positive values indicating bias against group_b.
 
     Parameters
@@ -536,7 +535,11 @@ def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        FPR_diff : :math:`fpr_a - fpr_b`
+        FPR_diff
+
+    Notes
+    -----
+    :math:`fpr_a - fpr_b`
 
     Examples
     --------
@@ -561,17 +564,15 @@ def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
 
 def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
     """
-    False negative Rate difference.
-
-    Description
+    False negative Rate difference
     ----------
-    This function computes the difference in false negative
+    This function computes the difference in false negative\
     rates for group_a and group_b.
 
     Interpretation
     ----------
-    A value of 0 is desired. This metric ranges between -1 and 1,
-    with negative values indicating bias against group_b, and
+    A value of 0 is desired. This metric ranges between -1 and 1,\
+    with negative values indicating bias against group_b, and\
     positive values indicating bias against group_a.
 
     Parameters
@@ -588,7 +589,11 @@ def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        False Negative Rate difference : :math:`fnr_a - fnr_b`
+        False Negative Rate difference
+
+    Notes
+    -----
+    :math:`fnr_a - fnr_b`
 
     Examples
     -------
@@ -613,17 +618,15 @@ def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
 
 def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
     """
-    True negative Rate difference.
-
-    Description
+    True negative Rate difference
     ----------
-    This function computes the difference in true negative
+    This function computes the difference in true negative\
     rates for group_a and group_b.
 
     Interpretation
     ----------
-    A value of 0 is desired. This metric ranges between -1 and 1,
-    with negative values indicating bias against group_a, and
+    A value of 0 is desired. This metric ranges between -1 and 1,\
+    with negative values indicating bias against group_a, and\
     positive values indicating bias against group_b.
 
     Parameters
@@ -640,7 +643,11 @@ def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        True Negative Rate difference : :math:`tnr_a - tnr_b`
+        True Negative Rate difference
+
+    Notes
+    -----
+    :math:`tnr_a - tnr_b`
 
     Examples
     -------
@@ -665,18 +672,16 @@ def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
 
 def average_odds_diff(group_a, group_b, y_pred, y_true):
     """
-    Average Odds Difference.
-
-    Description
+    Average Odds Difference
     -----------
-    This function computes the difference in average odds
+    This function computes the difference in average odds\
     between group_a and group_b.
 
     Interpretation
     --------------
-    A value of 0 is desired. This metric ranges between -1 and 1,
-    with negative values indicating bias against group_a,
-    and positive values indicating bias against group_b.
+    A value of 0 is desired. This metric ranges between -1 and 1,\
+    with negative values indicating bias against group_a,\
+    and positive values indicating bias against group_b.\
     The range (-0.1,0.1) is considered acceptable.
 
     Parameters
@@ -693,7 +698,11 @@ def average_odds_diff(group_a, group_b, y_pred, y_true):
     Returns
     -------
     float
-        AOD : :math:`0.5 * (fpr_a-fpr_b + tpr_a-tpr_b)`
+        AOD score
+
+    Notes
+    -----
+    :math:`0.5 * (fpr_a-fpr_b + tpr_a-tpr_b)`
 
     Examples
     -------
@@ -710,27 +719,23 @@ def average_odds_diff(group_a, group_b, y_pred, y_true):
     group_a, group_b, y_pred, y_true = _classification_checks(group_a, group_b, y_pred, y_true)
 
     # Compute AOD
-    aod = 0.5 * (
+    return 0.5 * (
         equal_opportunity_diff(group_a, group_b, y_pred, y_true)
         + false_positive_rate_diff(group_a, group_b, y_pred, y_true)
     )
 
-    return aod
-
 
 def accuracy_diff(group_a, group_b, y_score, y_true):
     """
-    Accuracy Difference.
-
-    Description
+    Accuracy Difference
     ----------
-    This function computes the difference in accuracy
+    This function computes the difference in accuracy\
     of predictions for group_a and group_b
 
     Interpretation
     --------------
-    A value of 0 is desired. This metric ranges between -1 and 1,
-    with negative values indicating bias against group_a,
+    A value of 0 is desired. This metric ranges between -1 and 1,\
+    with negative values indicating bias against group_a,\
     and positive values indicating bias against group_b.
 
     Parameters
@@ -771,23 +776,20 @@ def accuracy_diff(group_a, group_b, y_score, y_true):
     y_score_b = y_score[group_b == 1]
 
     # compute abroca
-    val = accuracy_score(y_true_a, y_score_a) - accuracy_score(y_true_b, y_score_b)
-    return val
+    return accuracy_score(y_true_a, y_score_a) - accuracy_score(y_true_b, y_score_b)
 
 
 def abroca(group_a, group_b, y_score, y_true):
     """
-    ABROCA (area between roc curves).
-
-    Description
+    ABROCA (area between roc curves)
     -----------
-    This function computes the area between the roc curve
+    This function computes the area between the roc curve\
     of group_a and the roc curve of group_b
 
     Interpretation
     --------------
-    A value of 0 is desired. This metric ranges between -1 and 1,
-    with negative values indicating bias against group_a,
+    A value of 0 is desired. This metric ranges between -1 and 1,\
+    with negative values indicating bias against group_a,\
     and positive values indicating bias against group_b.
 
     Parameters
@@ -828,20 +830,17 @@ def abroca(group_a, group_b, y_score, y_true):
     y_score_b = y_score[group_b == 1]
 
     # compute abroca
-    val = roc_auc_score(y_true_a, y_score_a) - roc_auc_score(y_true_b, y_score_b)
-    return val
+    return roc_auc_score(y_true_a, y_score_a) - roc_auc_score(y_true_b, y_score_b)
 
 
 def classification_bias_metrics(
-    group_a=None, group_b=None, y_pred=None, y_true=None, y_score=None, X=None, metric_type="group", **kargs
+    group_a=None, group_b=None, y_pred=None, y_true=None, y_score=None, X=None, metric_type="group", **kargs  # noqa: N803
 ):
     """
-    Classification bias metrics batch computation.
-
-    Description
+    Classification bias metrics batch computation
     -----------
-    This function computes all the relevant classification bias metrics,
-    and displays them as a pandas dataframe. It also includes a fair reference
+    This function computes all the relevant classification bias metrics,\
+    and displays them as a pandas dataframe. It also includes a fair reference\
     value for comparison.
 
     Parameters
@@ -852,20 +851,21 @@ def classification_bias_metrics(
         Group membership vector (binary)
     y_pred : array-like
         Predictions vector (binary)
-    y_true (optional) : numpy array
+    y_true : array-like, optional
         Target vector (binary)
-    y_score (optional) : array-like
+    y_score : array-like, optional
         Probability estimates (regression)
-    metric_type (optional) : 'group', 'individual', 'equal_outcome' , 'equal_opportunity'
-        Specifies which metrics we compute
+    X : array-like, optional
+        Feature matrix
+    metric_type : str, optional
+        Specifies which metrics we compute 'group', 'individual', 'equal_outcome' , 'equal_opportunity'
+    **kargs : dict
+        Additional keyword arguments for individual metrics
 
     Returns
     -------
     pandas DataFrame
         Metrics | Values | Reference
-
-    Examples
-    --------
     """
 
     individual_metrics_format_1 = {
@@ -914,7 +914,7 @@ def classification_bias_metrics(
         "Coefficient of Variation": 0,
     }
 
-    has_group_parameters = all([(p is not None) for p in [group_a, group_b, y_pred]])
+    has_group_parameters = all((p is not None) for p in [group_a, group_b, y_pred])
 
     if has_group_parameters:
         out_metrics = [[pf, fn(group_a, group_b, y_pred), ref_vals[pf]] for pf, fn in equal_outcome_metrics.items()]
@@ -952,7 +952,7 @@ def classification_bias_metrics(
     if metric_type in ["group", "both"]:
         if metric_type == "both":
             # TODO: remove both for next version
-            warnings.warn(
+            warnings.warn(  # noqa: B028
                 "`both` option will be depreciated in the next versions, use group",
                 DeprecationWarning,
             )
@@ -960,34 +960,52 @@ def classification_bias_metrics(
         metrics = out_metrics + opp_metrics
         return pd.DataFrame(metrics, columns=["Metric", "Value", "Reference"]).set_index("Metric")
 
-    elif metric_type == "equal_outcome":
+    if metric_type == "equal_outcome":
         return pd.DataFrame(out_metrics, columns=["Metric", "Value", "Reference"]).set_index("Metric")
 
-    elif metric_type == "equal_opportunity":
+    if metric_type == "equal_opportunity":
         return pd.DataFrame(opp_metrics, columns=["Metric", "Value", "Reference"]).set_index("Metric")
 
-    elif metric_type == "individual":
+    if metric_type == "individual":
         return pd.DataFrame(indv_metrics, columns=["Metric", "Value", "Reference"]).set_index("Metric")
-    else:
-        raise ValueError("metric_type is not one of : group, individual, equal_outcome, equal_opportunity")
+
+    msg = "metric_type is not one of : group, individual, equal_outcome, equal_opportunity"
+    raise ValueError(msg)
 
 
 ### Inidivudal Metrics
 
 
-def benefit_function(y_pred, y_true) -> np.ndarray:
+def benefit_function(y_pred, y_true):
+    """
+    Benefit function
+    -----------
+    This function computes the benefit function\
+    used in the generalized entropy index.
+
+    Parameters
+    ----------
+    y_true : array-like
+        True target values
+    y_pred : array-like
+        Predicted target values
+
+    Returns
+    -------
+    np.ndarray
+        Benefit function
+    """
     return y_pred - y_true + 1
 
 
 def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """
     The Theil index
-
-    Description
     -----------
-    The Theil index is a measure of inequality that is commonly used in economics. It is used to measure the inequality of a distribution,
-    such as the distribution of income or wealth. The Theil index is a special case of general entropy indices that allows to observe inequalities
-    at group level and individual level.
+    The Theil index is a measure of inequality that is commonly used in economics.\
+    It is used to measure the inequality of a distribution, such as the distribution\
+    of income or wealth. The Theil index is a special case of general entropy indices\
+    that allows to observe inequalities at group level and individual level.
 
     Interpretation
     --------------
@@ -1020,13 +1038,12 @@ def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int = 2) -> float:
     """
     Generalized entropy index
-
-    Description
     -----------
-    Generalized entropy index is a measure of inequality that is proposed as a unified individual and group fairness measure [1].
-    It is used to measure the extent of inequality in the distribution of a variable. The measure is based on the idea that
-    inequality can be measured by the extent to which the distribution of a variable deviates from a hypothetical distribution
-    in which everyone has an equal share.
+    Generalized entropy index is a measure of inequality that is proposed as a unified\
+    individual and group fairness measure [1]. It is used to measure the extent of inequality\
+    in the distribution of a variable. The measure is based on the idea that inequality can\
+    be measured by the extent to which the distribution of a variable deviates from a hypothetical\
+    distribution in which everyone has an equal share.
 
     Interpretation
     --------------
@@ -1038,8 +1055,9 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
         The true target values.
     y_pred : array-like of shape (n_samples,)
         The predicted target values.
-    alpha : int, default=2
-        Parameter that regulates the weight given to distances between values at different parts of the distribution.
+    alpha : int, optional, default=2
+        Parameter that regulates the weight given to distances between values at different parts\
+        of the distribution. Default=2.
 
     Returns
     -------
@@ -1048,7 +1066,10 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
 
     References
     ----------
-    [1] Speicher, T., Heidari, H., Grgic-Hlaca, N., Gummadi, K. P., & Weller, A. (2018, April). A Unified Approach to Quantifying Algorithmic Unfairness: Measuring Individual & Group Unfairness via Inequality Indices. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (pp. 2239-2248).
+    .. [1] Speicher, T., Heidari, H., Grgic-Hlaca, N., Gummadi, K. P., & Weller, A. (2018, April).\
+        A Unified Approach to Quantifying Algorithmic Unfairness: Measuring Individual & Group Unfairness\
+        via Inequality Indices. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge\
+        Discovery & Data Mining (pp. 2239-2248).
 
     Examples
     --------
@@ -1071,27 +1092,34 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
         # rewrite equation to allow 0 b values
         return np.mean(np.log(bu**b) / u)
 
-    elif alpha == 0:
+    if alpha == 0:
         return -np.mean(np.log(bu) / u)
 
-    else:
-        return (1 / (alpha * (alpha - 1))) * np.mean(bu**alpha - 1)
+    return (1 / (alpha * (alpha - 1))) * np.mean(bu**alpha - 1)
 
 
 def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     """
-    Calculates the coefficient of variation, which is a special case that calculates two times the square root of the generalized entropy index with alpha=2.
+    Coefficient of variation
+    -----------
+    Calculates the coefficient of variation, which is a special case that calculates two times the square\
+    root of the generalized entropy index with alpha=2.
 
     Interpretation
     --------------
     A high value implies high inequality while a value of 0 indicates perfect equality.
 
-    Args:
-        y_true (np.ndarray): True labels.
-        y_pred (np.ndarray): Predicted labels.
+    Parameters
+    ----------
+    y_true : array-like
+        True target values.
+    y_pred : array-like
+        Predicted target values.
 
-    Returns:
-        float: The coefficient of variation.
+    Returns
+    --------
+    float
+        The coefficient of variation.
     """
     y_pred = _array_like_to_numpy(y_pred)
     y_true = _array_like_to_numpy(y_true)
@@ -1099,19 +1127,27 @@ def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     return 2 * np.sqrt(generalized_entropy_index(y_pred, y_true, alpha=2))
 
 
-def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -> float:
+def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -> float:  # noqa: N803
     """
+    Consistency score
+    -----------
     Compares a model's classification prediction of a given data item X to its k-nearest neighbors.
 
-    Args:
-        X (np.ndarray): The input features.
-        y (np.ndarray): The true labels.
-        n_neighbors (int, optional): Number of neighbors for the knn computation. Defaults to 5.
+    Parameters
+    ----------
+    X : array-like
+        The input features.
+    y_pred : array-like
+        The predicted labels.
+    n_neighbors : int, optional
+        Number of neighbors for the knn computation. Default is 5.
 
-    Returns:
-        float: The consistency score.
+    Returns
+    -------
+    float
+        The consistency score.
     """
-    X = _matrix_like_to_numpy(X)
+    X = _matrix_like_to_numpy(X)  # noqa: N806
     y_pred = _array_like_to_numpy(y_pred)
     _check_binary(y_pred)
 
@@ -1120,6 +1156,4 @@ def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -
     _, indices = nbrs.kneighbors(X)
 
     # compute consistency score
-    consistency = 1 - np.mean([np.abs(yi - np.mean(y_pred[ids])) for yi, ids in zip(y_pred, indices)])
-
-    return consistency
+    return 1 - np.mean([np.abs(yi - np.mean(y_pred[ids])) for yi, ids in zip(y_pred, indices)])

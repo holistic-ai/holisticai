@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from holisticai.utils._recommender_tools import entropy
+from holisticai.utils._validation import _clustering_checks
 
 # sklearn imports
 from sklearn.metrics import (
@@ -8,27 +10,19 @@ from sklearn.metrics import (
     silhouette_samples,
 )
 
-# scipy imports
-from ...utils._recommender_tools import entropy
-
-# utils
-from ...utils._validation import _clustering_checks
-
 
 def cluster_balance(group_a, group_b, y_pred):
     """
-    Cluster Balance.
-
-    Description
+    Cluster Balance
     -----------
-    Given a clustering and protected attribute. The cluster balance is
-    the minimum over all groups and clusters of the ratio of the representation
+    Given a clustering and protected attribute. The cluster balance is\
+    the minimum over all groups and clusters of the ratio of the representation\
     of members of that group in that cluster to the representation overall.
 
     Interpretation
     --------------
-    A value of 1 is desired. That is when all clusters have the exact same
-    representation as the data. Lower values imply the existence of clusters
+    A value of 1 is desired. That is when all clusters have the exact same\
+    representation as the data. Lower values imply the existence of clusters\
     where either group_a or group_b is underrepresented.
 
     Parameters
@@ -92,18 +86,16 @@ def cluster_balance(group_a, group_b, y_pred):
 
 def min_cluster_ratio(group_a, group_b, y_pred):
     """
-    Minimum Cluster Ratio.
-
-    Description
+    Minimum Cluster Ratio
     -----------
-    Given a clustering and protected attributes. The min cluster ratio is
-    the minimum over all clusters of the ratio of number of group_a members
+    Given a clustering and protected attributes. The min cluster ratio is\
+    the minimum over all clusters of the ratio of number of group_a members\
     to the number of group_b members.
 
     Interpretation
     --------------
-    A value of 1 is desired. That is when all clusters are perfectly
-    balanced. Low values imply the existence of clusters where
+    A value of 1 is desired. That is when all clusters are perfectly\
+    balanced. Low values imply the existence of clusters where\
     group_a has fewer members than group_b.
 
     Parameters
@@ -150,18 +142,16 @@ def min_cluster_ratio(group_a, group_b, y_pred):
 
 def _avg_cluster_ratio(group_a, group_b, y_pred):
     """
-    Average Cluster Ratio.
-
-    Description
+    Average Cluster Ratio
     -----------
-    Given a clustering and protected attributes. The average cluster ratio is
-    the average over all clusters of the ratio of group_a members to group_b
+    Given a clustering and protected attributes. The average cluster ratio is\
+    the average over all clusters of the ratio of group_a members to group_b\
     members in that cluster.
 
     Interpretation
     --------------
-    A value of 1 is desired. Low values imply the predominance of clusters where
-    group_a is underrepresented. High values imply the predominance of clusters where
+    A value of 1 is desired. Low values imply the predominance of clusters where\
+    group_a is underrepresented. High values imply the predominance of clusters where\
     group_b is underrepresented.
 
     Parameters
@@ -213,17 +203,15 @@ def _avg_cluster_ratio(group_a, group_b, y_pred):
 
 def _cluster_dist(y_pred_g, clusters):
     """
-    Group distribution over clusters.
-
-    Description
+    Group distribution over clusters
     -----------
     This function computes the distribution of the group across clusters.
 
     Parameters
     ----------
-    y_pred_g :
+    y_pred_g : array-like
         Cluster predictions (categorical)
-    clusters :
+    clusters : array-like
         Cluster ground truth (categorical)
 
     Returns
@@ -233,25 +221,21 @@ def _cluster_dist(y_pred_g, clusters):
     """
     bin_mat = y_pred_g.reshape(-1, 1) == clusters.reshape(1, -1)
     dist = bin_mat.sum(axis=0)
-    dist = dist / dist.sum()
-
-    return dist
+    return dist / dist.sum()
 
 
 def cluster_dist_l1(group_a, group_b, y_pred):
     """
-    Cluster Distribution Total Variation.
-
-    Description
+    Cluster Distribution Total Variation
     -----------
-    This function computes the distribution of group_a and group_b across clusters.
+    This function computes the distribution of group_a and group_b across clusters.\
     It then outputs the total variation distance between these distributions.
 
     Interpretation
     --------------
-    A value of 0 is desired. That indicates that both groups are distributed
-    similarly amongst the clusters. The metric ranges between 0 and 1,
-    with higher values indicating the groups are distributed in very
+    A value of 0 is desired. That indicates that both groups are distributed\
+    similarly amongst the clusters. The metric ranges between 0 and 1,\
+    with higher values indicating the groups are distributed in very\
     different ways.
 
     Parameters
@@ -298,18 +282,16 @@ def cluster_dist_l1(group_a, group_b, y_pred):
 
 def cluster_dist_kl(group_a, group_b, y_pred):
     """
-    Cluster Distribution KL.
-
-    Description
+    Cluster Distribution KL
     -----------
-    This function computes the distribution of group_a and group_b
-    membership across the clusters. It then returns the KL distance
+    This function computes the distribution of group_a and group_b\
+    membership across the clusters. It then returns the KL distance\
     from the distribution of group_a to the distribution of group_b.
 
     Interpretation
     --------------
-    A value of 0 is desired. That indicates that both groups are distributed
-    similarly amongst the clusters. Higher values indicate the distributions
+    A value of 0 is desired. That indicates that both groups are distributed\
+    similarly amongst the clusters. Higher values indicate the distributions\
     of both groups amongst the clusters differ more.
 
     Parameters
@@ -324,7 +306,11 @@ def cluster_dist_kl(group_a, group_b, y_pred):
     Returns
     -------
     float
-        Cluster Distribution KL : :math:`KL(P_a,P_b)`
+        Cluster Distribution KL
+
+    Notes
+    -----
+    :math:`KL(P_a,P_b)`
 
     Examples
     -------
@@ -356,17 +342,15 @@ def cluster_dist_kl(group_a, group_b, y_pred):
 
 def cluster_dist_entropy(group, y_pred):
     """
-    Minority Cluster Distribution Entropy.
-
-    Description
+    Minority Cluster Distribution Entropy
     -----------
     The entropy of the distribution of the group
     over the clusters.
 
     Interpretation
     --------------
-    Lower values indicate most members of the group are allocated to
-    the same cluaster. Hence we encourage higher values of
+    Lower values indicate most members of the group are allocated to\
+    the same cluaster. Hence we encourage higher values of\
     the entropy, which indicate more homogeneity.
 
     Parameters
@@ -379,7 +363,11 @@ def cluster_dist_entropy(group, y_pred):
     Returns
     -------
     float
-        Group Presence Entropy : :math:`Entropy(P_{group})`
+        Group Presence Entropy
+
+    Notes
+    -----
+    :math:`Entropy(P_{group})`
 
     Examples
     -------
@@ -409,16 +397,14 @@ def cluster_dist_entropy(group, y_pred):
 
 def _ami_diff(group_a, group_b, y_pred, y_true):
     """
-    Adjusted Mutual information Difference.
-
-    Description
+    Adjusted Mutual information Difference
     -----------
-    We compute the difference of the adjusted mutual information
+    We compute the difference of the adjusted mutual information\
     on group_a and group_b.
 
     Interpretation
     --------------
-    The MI difference ranges from -1 to 1, with lower values indicating bias
+    The MI difference ranges from -1 to 1, with lower values indicating bias\
     towards group_a and larger values indicating bias against group_b.
 
     Parameters
@@ -467,19 +453,17 @@ def _ami_diff(group_a, group_b, y_pred, y_true):
 
 def social_fairness_ratio(group_a, group_b, data, centroids):
     """
-    Social Fairness Ratio.
-
-    Description
+    Social Fairness Ratio
     -----------
-    Given a centroid based clustering, this function compute the average
-    distance to the nearest centroid for both groups. The metric is the
+    Given a centroid based clustering, this function compute the average\
+    distance to the nearest centroid for both groups. The metric is the\
     ratio of the resulting distance for group_a to group_b.
 
     Interpretation
     --------------
-    A value of 1 is desired. Lower values indicate the group_a
-    is on average closer to the respective centroids. Higher
-    values indicate that group_a is on average further from the
+    A value of 1 is desired. Lower values indicate the group_a\
+    is on average closer to the respective centroids. Higher\
+    values indicate that group_a is on average further from the\
     respective centroids.
 
     Parameters
@@ -549,17 +533,15 @@ def social_fairness_ratio(group_a, group_b, data, centroids):
 
 
 def silhouette_diff(group_a, group_b, data, y_pred):
-    r"""
-    Silhouette Difference.
-
-    Description
+    """
+    Silhouette Difference
     -----------
-    We compute the difference of the mean silhouette score for both
+    We compute the difference of the mean silhouette score for both\
     groups.
 
     Interpretation
     --------------
-    The silhouette difference ranges from -1 to 1, with lower values indicating bias
+    The silhouette difference ranges from -1 to 1, with lower values indicating bias\
     towards group_a and larger values indicating bias against group_b.
 
     Parameters
@@ -568,15 +550,19 @@ def silhouette_diff(group_a, group_b, data, y_pred):
         Group membership vector (binary)
     group_b : array-like
         Group membership vector (binary)
-    y_pred : array-like
-        Cluster predictions (categorical)
     data : matrix-like
         Data matrix of shape (num_inst, dim)
+    y_pred : array-like
+        Cluster predictions (categorical)
 
     Returns
     -------
     float
-        Silhouette difference : :math:`\texttt{mean_silhouette_a - mean_silhouette_b}`
+        Silhouette difference
+
+    Notes
+    -----
+    :math:`\texttt{mean_silhouette_a - mean_silhouette_b}`
 
     Examples
     -------
@@ -624,11 +610,9 @@ def clustering_bias_metrics(
     metric_type="equal_outcome",
 ):
     """
-    Clustering bias metrics batch computation.
-
-    Description
+    Clustering bias metrics batch computation
     -----------
-    This function computes all the relevant clustering bias metrics,
+    This function computes all the relevant clustering bias metrics,\
     and displays them as a pandas dataframe.
 
     Parameters
@@ -639,12 +623,12 @@ def clustering_bias_metrics(
         Group membership vector (binary)
     y_pred : array-like
         Cluster predictions (categorical)
-    data (optional) : matrix-like
+    data : matrix-like, optional
         Data matrix of shape (num_inst, dim)
-    centroids (optional) : matrix-like
+    centroids : matrix-like, optional
         Centroids (centers)
-    metric_type : 'both', 'equal_outcome' or 'equal_opportunity'
-        Specifies which metrics we compute
+    metric_type : str, optional
+        Specifies which metrics we compute: 'both', 'equal_outcome' or 'equal_opportunity'
 
     Returns
     -------
@@ -687,11 +671,11 @@ def clustering_bias_metrics(
         metrics = out_metrics + opp_metrics
         return pd.DataFrame(metrics, columns=["Metric", "Value", "Reference"]).set_index("Metric")
 
-    elif metric_type == "equal_outcome":
+    if metric_type == "equal_outcome":
         return pd.DataFrame(out_metrics, columns=["Metric", "Value", "Reference"]).set_index("Metric")
 
-    elif metric_type == "equal_opportunity":
+    if metric_type == "equal_opportunity":
         return pd.DataFrame(opp_metrics, columns=["Metric", "Value", "Reference"]).set_index("Metric")
 
-    else:
-        raise ValueError("metric_type is not one of : both, equal_outcome, equal_opportunity")
+    msg = "metric_type is not one of : both, equal_outcome, equal_opportunity"
+    raise ValueError(msg)
