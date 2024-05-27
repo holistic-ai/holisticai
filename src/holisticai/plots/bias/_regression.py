@@ -1,16 +1,14 @@
 # Base Imports
 import numpy as np
-import pandas as pd
 import seaborn as sns
+
+# utils
+from holisticai.utils import get_colors
+from holisticai.utils._validation import _multiclass_checks, _regression_checks
 from matplotlib import pyplot as plt
 
 # sklearn imports
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-
-# utils
-from holisticai.utils import get_colors
-
-from ...utils._validation import _multiclass_checks, _regression_checks
 
 
 def success_rate_curve(group_a, group_b, y_pred, ax=None, size=None, title=None):
@@ -54,13 +52,9 @@ def success_rate_curve(group_a, group_b, y_pred, ax=None, size=None, title=None)
     pass_b = y_binary[group_b == 1].sum(axis=0) / group_b.sum()
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Sucess rate A vs B curve")
 
     # charting
     colors = get_colors(1)
@@ -69,6 +63,10 @@ def success_rate_curve(group_a, group_b, y_pred, ax=None, size=None, title=None)
     ax.set_xlabel("Group B Success Rate %")
     ax.set_ylabel("Group A Success Rate %")
     ax.legend()
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Sucess rate A vs B curve")
 
     return ax
 
@@ -119,14 +117,10 @@ def statistical_parity_curve(
     pass_b = y_binary[group_b == 1].sum(axis=0) / group_b.sum()
 
     # setup
-    sns.set()
+    sns.set_theme()
     colors = get_colors(1)
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Statistical Parity Curve")
 
     # charting
     if x_axis == "score":
@@ -164,7 +158,12 @@ def statistical_parity_curve(
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : quantile, score")
+        msg = "x_axis is not one of : quantile, score"
+        raise ValueError(msg)
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Statistical Parity Curve")
 
     return ax
 
@@ -214,14 +213,10 @@ def disparate_impact_curve(
     pass_b = y_binary[group_b == 1].sum(axis=0) / group_b.sum()
 
     # setup
-    sns.set()
+    sns.set_theme()
     colors = get_colors(1)
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Disparate Impact Curve")
 
     # charting
     if x_axis == "score":
@@ -257,7 +252,13 @@ def disparate_impact_curve(
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : score, quantile")
+        msg = "x_axis is not one of : score, quantile"
+        raise ValueError(msg)
+
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Disparate Impact Curve")
 
     return ax
 
@@ -313,13 +314,9 @@ def success_rate_curves(
 
     # setup
     colors = get_colors(len(groups) + 1, extended_colors=True)
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Success Rate Curves")
 
     # charting
     if x_axis == "score":
@@ -355,7 +352,13 @@ def success_rate_curves(
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : score, quantile")
+        msg = "x_axis is not one of : score, quantile"
+        raise ValueError(msg)
+
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Success Rate Curves")
 
     return ax
 
@@ -419,13 +422,9 @@ def rmse_bar_plot(p_attr, y_pred, y_true, ax=None, size=None, title=None):
     rmse_list_sorted, groups_sorted = list(rmse_list_sorted), list(groups_sorted)
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("RMSE bar plot")
 
     # charting
     colors = get_colors(len(groups))
@@ -435,6 +434,11 @@ def rmse_bar_plot(p_attr, y_pred, y_true, ax=None, size=None, title=None):
     sns.barplot(x=groups_sorted, y=rmse_list_sorted, palette=hai_palette)
     _, labels = plt.xticks()
     plt.setp(labels, rotation=45)
+
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("RMSE bar plot")
 
     return ax
 
@@ -498,13 +502,9 @@ def mae_bar_plot(p_attr, y_pred, y_true, ax=None, size=None, title=None):
     mae_list_sorted, groups_sorted = list(mae_list_sorted), list(groups_sorted)
 
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("MAE bar plot")
 
     # charting
     colors = get_colors(len(groups))
@@ -514,5 +514,9 @@ def mae_bar_plot(p_attr, y_pred, y_true, ax=None, size=None, title=None):
     sns.barplot(x=groups_sorted, y=mae_list_sorted, palette=hai_palette)
     _, labels = plt.xticks()
     plt.setp(labels, rotation=45)
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("MAE bar plot")
 
     return ax

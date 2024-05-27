@@ -1,15 +1,11 @@
-
 =============
 Getting Started
 =============
 
-You can install the library with `pip` using the following command:
-
-.. code-block::
-
-  pip install holisticai
+This section will guide you through the installation of the `holisticai` open-source library and the first steps to get you started.
 
 .. toctree::
    :maxdepth: 2
 
-   install/install
+   install
+   quickstart

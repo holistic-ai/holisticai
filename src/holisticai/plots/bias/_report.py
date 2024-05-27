@@ -94,10 +94,8 @@ def bias_metrics_report(
     if len(metric_names) % cols != 0:
         rows += 1
 
-    if rows >= 3:
-        fig_size = (12, 7)
-    else:
-        fig_size = (12, 4)
+    threshold = 3
+    fig_size = (12, 7) if rows >= threshold else (12, 4)
 
     sns.set_style("darkgrid")
     fig, axes = plt.subplots(ncols=cols, nrows=rows, figsize=fig_size)

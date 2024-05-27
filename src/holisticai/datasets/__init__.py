@@ -11,6 +11,9 @@ from holisticai.datasets._dataloaders import (
     load_us_crime,
 )
 from holisticai.datasets._dataset import load_dataset
+from holisticai.datasets._make_classification import make_classification
+from holisticai.datasets._make_multiclass import make_multiclass
+from holisticai.datasets._make_regression import make_regression
 
 __all__ = [
     "load_adult",
@@ -20,4 +23,7 @@ __all__ = [
     "load_us_crime",
     "load_heart",
     "load_dataset",
+    "make_classification",
+    "make_multiclass",
+    "make_regression",
 ]
