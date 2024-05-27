@@ -73,7 +73,7 @@ exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
 [tool.ruff]
 extend = "ruff_default.toml"
-exclude = ["docs/**", "tests/**", "tutorials/**"]
+exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/mitigation/**"]
 
 [tool.hatch.envs.docs]
 dependencies = [
