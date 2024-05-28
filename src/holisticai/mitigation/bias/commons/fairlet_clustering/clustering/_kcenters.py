@@ -6,18 +6,51 @@ from holisticai.mitigation.bias.commons.fairlet_clustering._utils import distanc
 
 
 class KCenters(object):
+    """
+    K-Centers algorithm for clustering.
+
+    Parameters
+    ----------
+    n_clusters : int, optional
+        The number of clusters to identify. Default is 5.
+
+    Attributes
+    ----------
+    k : int
+        The number of centers to identify.
+    data : list
+        The points in the dataset.
+    centers : list
+        The indices of the centers.
+    costs : list
+        The cost of the centers.
+    cluster_centers_ : list
+        The centers of the clusters.
+    labels : list
+        The mapping of points to their closest centers.
+
+    Methods
+    -------
+    fit(data)
+        Performs the k-centers algorithm.
+    assign()
+        Assigns every point in the dataset to the closest center.
+    """
     def __init__(self, n_clusters=5):
-        """
-        k (int) : Number of centers to be identified
-        """
         self.k = n_clusters
 
     def fit(self, data):
         """
         Performs the k-centers algorithm.
 
-        Args:
-                data (list) : Points in the dataset
+        Parameters
+        ----------
+        data : list
+            The points in the dataset.
+
+        Returns
+        -------
+        None
         """
         # Randomly choosing an initial center
         # random.seed(42)
@@ -49,8 +82,10 @@ class KCenters(object):
         """
         Assigning every point in the dataset to the closest center.
 
-        Returns:
-                mapping (list) : tuples of the form (point, center)
+        Returns
+        -------
+        list
+            The mapping of points to their closest centers.
         """
         mapping = [
             (

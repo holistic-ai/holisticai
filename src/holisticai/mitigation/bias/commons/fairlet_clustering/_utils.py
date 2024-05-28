@@ -6,13 +6,19 @@ def distance(a, b, order=2):
     """
     Calculates the specified norm between two vectors.
 
-    Args:
-            a (list) : First vector
-            b (list) : Second vector
-            order (int) : Order of the norm to be calculated as distance
+    Parameters
+    ----------
+    a : list
+        First vector
+    b : list
+        Second vector
+    order : int, optional
+        Order of the norm to be calculated as distance. Default is 2.
 
-    Returns:
-            Resultant norm value
+    Returns
+    -------
+    float
+        Resultant norm value
     """
     assert len(a) == len(b), "Length of the vectors for distance don't match."
     return np.linalg.norm(x=np.array(a) - np.array(b), ord=order)
@@ -23,13 +29,19 @@ def balance_calculation(data, centers, mapping):
     Checks fairness for each of the clusters defined by k-centers.
     Returns balance using the total and class counts.
 
-    Args:
-            data (list)
-            centers (list)
-            mapping (list) : tuples of the form (data, center)
+    Parameters
+    ----------
+    data : list
+        data points
+    centers : list
+        centers
+    mapping : list
+        tuples of the form (data, center)
 
-    Returns:
-            fair (dict) : key=center, value=(sum of 1's corresponding to fairness variable, number of points in center)
+    Returns
+    -------
+    float
+        Balance value
     """
     fair = dict([(i, [0, 0]) for i in centers])
     for i in mapping:
@@ -54,11 +66,20 @@ def plot_analysis(degrees, costs, balances, step_size):
     """
     Plots the curves for costs and balances.
 
-    Args:
-            degrees (list)
-            costs (list)
-            balances (list)
-            step_size (int)
+    Parameters:
+    ----------
+    degrees : list
+        List of degrees
+    costs : list
+        List of costs
+    balances : list
+        List of balances
+    step_size : int
+        Step size for x-axis
+
+    Returns
+    -------
+    None
     """
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 5))
     ax[0].plot(costs, marker=".", color="blue")

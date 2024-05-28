@@ -8,6 +8,33 @@ from ._utils import get_median, make_histogram_bins
 class NumericalRepairer:
     """
     The algorithm used to repair numerical features in a dataset to mitigate disparate impact.
+
+    Parameters
+    ----------
+    feature_to_repair : int
+        The index of the feature to repair.
+    repair_level : float
+        The level of repair to apply to the feature. A value of 0 means no repair, while a value of 1 means full repair.
+    kdd : bool, optional
+        Whether to use the K-nearest neighbor density estimator to calculate bin sizes. Default is False.
+    features_to_ignore : list, optional
+        A list of feature names to ignore during repair. Default is an empty list.
+
+    Attributes
+    ----------
+    feature_to_repair : int
+        The index of the feature to repair.
+    repair_level : float
+        The level of repair to apply to the feature.
+    kdd : bool
+        Whether to use the K-nearest neighbor density estimator to calculate bin sizes.
+    features_to_ignore : list
+        A list of feature names to ignore during repair.
+
+    Methods
+    -------
+    repair(data_to_repair)
+        Repairs the numerical feature in the input dataset to mitigate disparate impact.
     """
 
     def __init__(
@@ -17,18 +44,6 @@ class NumericalRepairer:
         kdd: bool = False,
         features_to_ignore: List[str] = [],
     ):
-        """
-        Parameters
-        ----------
-        feature_to_repair : int
-            The index of the feature to repair.
-        repair_level : float
-            The level of repair to apply to the feature. A value of 0 means no repair, while a value of 1 means full repair.
-        kdd : bool, optional
-            Whether to use the K-nearest neighbor density estimator to calculate bin sizes. Default is False.
-        features_to_ignore : List[str], optional
-            A list of feature names to ignore during repair. Default is an empty list.
-        """
         self.feature_to_repair = feature_to_repair
         self.repair_level = repair_level
         self.kdd = kdd
@@ -42,9 +57,9 @@ class NumericalRepairer:
 
         Parameters
         ----------
-        index_bins : List[List[int]]
+        index_bins : list
             A list of indices for each bin in the dataset.
-        data_to_repair : List[List[float]]
+        data_to_repair : list
             The input dataset to repair.
 
         Returns
@@ -65,12 +80,12 @@ class NumericalRepairer:
 
         Parameters
         ----------
-        data_to_repair : List[List[float]]
+        data_to_repair : list
             The input dataset to repair.
 
         Returns
         -------
-        List[List[float]]
+        list
             The repaired dataset.
         """
 

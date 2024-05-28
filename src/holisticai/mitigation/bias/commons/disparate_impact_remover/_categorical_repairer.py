@@ -19,6 +19,44 @@ from ._utils import (
 
 
 class CategoricalRepairer:
+    """
+    Repair categorical features in a dataset.
+
+    Parameters
+    ----------
+    feature_to_repair : int
+        The index of the feature to repair.
+    repair_level : float
+        The level of repair to apply to the feature.
+    kdd : bool, optional
+        Whether to use the KDD method for repair.
+    features_to_ignore : list, optional
+        The list of features to ignore during repair.
+
+    Attributes
+    ----------
+    feature_to_repair : int
+        The index of the feature to repair.
+    repair_level : float
+        The level of repair to apply to the feature.
+    kdd : bool
+        Whether to use the KDD method for repair.
+    features_to_ignore : list
+        The list of features to ignore during repair.
+
+    Methods
+    -------
+    repair(data_to_repair)
+        Repairs the categorical features in the given dataset.
+    preprocessing(data_to_repair)
+        Preprocesses the dataset before repairing the categorical features.
+    compute_stratified_group_data(data_dict, stratified_group_indices, all_stratified_groups)
+        Computes the stratified group data for the given dataset.
+    string_repair(col, data_dict, col_id, all_stratified_groups, stratified_group_indices, stratified_group_data, mode_feature_to_repair)
+        Repairs the string feature in the dataset.
+    numeric_repair(col, data_dict, col_id, unique_col_vals, index_lookup, all_stratified_groups, stratified_group_data, val_sets)
+        Repairs the numeric feature in the dataset.
+    """
     def __init__(
         self, feature_to_repair, repair_level, kdd=False, features_to_ignore=[]
     ):
@@ -28,6 +66,19 @@ class CategoricalRepairer:
         self.features_to_ignore = features_to_ignore
 
     def repair(self, data_to_repair):
+        """
+        Repair the categorical features in the dataset.
+
+        Parameters
+        ----------
+        data_to_repair : list
+            The dataset to repair.
+
+        Returns
+        -------
+        list
+            The repaired dataset.
+        """
         (
             col_ids,
             cols_to_repair,
@@ -81,6 +132,19 @@ class CategoricalRepairer:
         return repaired_data
 
     def preprocessing(self, data_to_repair):
+        """
+        Preprocess the dataset before repairing the categorical features.
+
+        Parameters
+        ----------
+        data_to_repair : list
+            The dataset to repair.
+
+        Returns
+        -------
+        tuple
+            The preprocessed dataset.
+        """
         num_cols = len(data_to_repair[0])
         col_ids = list(range(num_cols))
 
@@ -169,6 +233,23 @@ class CategoricalRepairer:
     def compute_stratified_group_data(
         self, data_dict, stratified_group_indices, all_stratified_groups
     ):
+        """
+        Compute the stratified group data for the given dataset.
+
+        Parameters
+        ----------
+        data_dict : dict
+            The dictionary containing the dataset.
+        stratified_group_indices : dict
+            The dictionary containing the indices of the stratified groups.
+        all_stratified_groups : list
+            The list of all stratified groups.
+
+        Returns
+        -------
+        dict
+            The stratified group data.
+        """
         stratified_group_data = defaultdict(dict)
         for group in all_stratified_groups:
             for col_id, col_dict in data_dict.items():
@@ -193,6 +274,26 @@ class CategoricalRepairer:
         stratified_group_data,
         mode_feature_to_repair,
     ):
+        """
+        Repair the string feature in the dataset.
+
+        Parameters
+        ----------
+        col : list
+            The column to repair.
+        data_dict : dict
+            The dictionary containing the dataset.
+        col_id : int
+            The index of the column to repair.
+        all_stratified_groups : list
+            The list of all stratified groups.
+        stratified_group_indices : dict
+            The dictionary containing the indices of the stratified groups.
+        stratified_group_data : dict
+            The dictionary containing the stratified group data.
+        mode_feature_to_repair : str
+            The mode feature to repair.
+        """
         feature = CategoricalFeature(col)
         categories = list(feature.bin_index_dict.keys())
 
@@ -262,7 +363,28 @@ class CategoricalRepairer:
         stratified_group_data,
         val_sets,
     ):
+        """
+        Repair the numeric feature in the dataset.
 
+        Parameters
+        ----------
+        col : list
+            The column to repair.
+        data_dict : dict
+            The dictionary containing the dataset.
+        col_id : int
+            The index of the column to repair.
+        unique_col_vals : dict
+            The dictionary containing the unique column values.
+        index_lookup : dict
+            The dictionary containing the index lookup.
+        all_stratified_groups : list
+            The list of all stratified groups.
+        stratified_group_data : dict
+            The dictionary containing the stratified group data.
+        val_sets : dict
+            The dictionary containing the value sets.
+        """
         num_quantiles = min(
             len(val_sets[group][col_id]) for group in all_stratified_groups
         )
