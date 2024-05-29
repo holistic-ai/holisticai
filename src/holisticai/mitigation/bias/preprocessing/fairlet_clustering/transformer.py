@@ -21,17 +21,51 @@ CLUSTERING_CATALOG = {"KCenter": KCenters, "KMedoids": KMedoids}
 
 class FairletClusteringPreprocessing(BaseEstimator, BMPre):
     """
-    Fairlet decomposition is a pre-processing approach that computes
-    fair micro-clusters where fairness is guaranteed. They then use
-    the fairlet centers as a newly transformed dataset from the original.
-    This transformed fairlet-based dataset is then provided to vanilla
-    clustering algorithms, and hence, we obtain approximately
+    Fairlet decomposition is a pre-processing approach that computes\
+    fair micro-clusters where fairness is guaranteed. They then use\
+    the fairlet centers as a newly transformed dataset from the original.\
+    This transformed fairlet-based dataset is then provided to vanilla\
+    clustering algorithms, and hence, we obtain approximately\
     fair clustering outputs as a result of the fairlets themselves being fair.
 
+    Parameters
+    ----------
+    decomposition : str, optional
+        Fairlet decomposition strategy, available: Vanilla, Scalable, MCF. Default is Vanilla.
+
+    p : int, optional
+        fairlet decomposition parameter for Vanilla and Scalable strategy. Default is 1.
+
+    q : int, optional
+        fairlet decomposition parameter for Vanilla and Scalable strategy. Default is 3.
+
+    seed : int, optional
+        Random seed. Default is None.
+        
+    Attributes
+    ----------
+    decomposition : DecompositionMixin
+        Fairlet decomposition strategy
+    mapping : matrix-like, optional
+        Mapping of the fairlets
+    centers : matrix-like, optional
+        Fairlet centers
+    X : matrix-like
+        Input matrix
+    sample_weight : matrix-like
+        Samples weights vector
+
+    Methods
+    -------
+    fit_transform(X, group_a, group_b, sample_weight)
+        Fit the model
+    transform(X)
+        Transform the model
+    
     References
     ----------
-        Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
-        Machine Learning. PMLR, 2019.
+    .. [1] `Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
+        Machine Learning. PMLR, 2019.`
     """
 
     def __init__(
@@ -41,21 +75,6 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
         q: Optional[float] = 3,
         seed: Optional[int] = None,
     ):
-        """
-        Parameters
-        ----------
-            decomposition : str
-                Fairlet decomposition strategy, available: Vanilla, Scalable, MCF
-
-            p : int
-                fairlet decomposition parameter for Vanilla and Scalable strategy
-
-            q : int
-                fairlet decomposition parameter for Vanilla and Scalable strategy
-
-            seed : int
-                Random seed.
-        """
         self.decomposition = DECOMPOSITION_CATALOG[decomposition](p=p, q=q)
         self.p = p
         self.q = q
@@ -69,11 +88,7 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
         sample_weight: Optional[np.ndarray] = None,
     ):
         """
-        Fit the model
-
-        Description
-        -----------
-        Learn a fair cluster.
+        Fits the model by learning a fair cluster.
 
         Parameters
         ----------
@@ -87,12 +102,13 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
         group_b : array-like
             binary mask vector
 
-        sample_weight (optional) : array-like
-            Samples weights vector
+        sample_weight : array-like, optional
+            Samples weights vector. Default is None.
 
         Returns
         -------
-        the same object
+        matrix
+            Transformed matrix
         """
         params = self._load_data(X=X, sample_weight=sample_weight, group_a=group_a, group_b=group_b)
         X = params["X"]
@@ -117,5 +133,18 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
         return Xt
 
     def transform(self, X):
+        """
+        Transforms the model by learning a fair cluster.
+
+        Parameters
+        ----------
+        X : matrix-like
+            input matrix
+
+        Returns
+        -------
+        matrix
+            Transformed matrix
+        """
         fairlets_midxs = pairwise_distances_argmin(X, Y=self.X)
         return self.centers[self.mapping[fairlets_midxs]]

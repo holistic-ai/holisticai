@@ -12,35 +12,74 @@ class DisparateImpactRemover(BMPre):
     Disparate impact remover edits feature values to increase group fairness
     while preserving rank-ordering within groups.
 
+    Parameters
+    ----------
+    repair_level : float, optional
+        The amount of repair to be applied. It should be between 0.0 and 1.0. Default is 1.
+
+    Attributes
+    ----------
+    repair_level : float
+        The amount of repair to be applied.
+    sensgroup : SensitiveGroups
+        SensitiveGroups object
+
+    Methods
+    -------
+    fit()
+        Fit the model
+    transform(X, group_a, group_b)
+        Transform data
+    fit_transform(X, group_a, group_b)
+        Fit the model and transform data
+
     References
     ----------
-        [1] Feldman, Michael, et al. "Certifying and removing disparate impact."
+    .. [1] Feldman, Michael, et al. "Certifying and removing disparate impact."
         proceedings of the 21th ACM SIGKDD international conference on knowledge
         discovery and data mining. 2015.
     """
 
     def __init__(self, repair_level=1.0):
-        """
-        Disparate Impact Remover Preprocessing Bias Mitigator
-
-        Parameters
-        ----------
-        repair_level : float, default=1.0
-            The amount of repair to be applied. It should be between 0.0 and 1.0.
-
-        Description
-        -----------
-        Initializes the Disparate Impact Remover Preprocessing Bias Mitigator class.
-        """
         self._assert_parameters(repair_level)
         self.repair_level = repair_level
         self.sensgroup = SensitiveGroups()
 
     def _assert_parameters(self, repair_level):
+        """
+        Assert parameters
+
+        Parameters
+        ----------
+        repair_level : float
+            The amount of repair to be applied
+
+        Raises
+        ------
+        ValueError
+            If repair_level is not between 0.0 and 1.0
+        """
         if not 0.0 <= repair_level <= 1.0:
             raise ValueError("'repair_level' must be between 0.0 and 1.0.")
 
     def repair_data(self, X, group_a, group_b):
+        """
+        Repair data to a fair representation
+
+        Parameters
+        ----------
+        X : array-like
+            Input data
+        group_a : array-like
+            mask vector
+        group_b : array-like
+            mask vector
+
+        Returns
+        -------
+        array-like
+            Repaired input data matrix
+        """
         # Combine the two group masks into a single matrix
         sensitive_features = np.c_[group_a, group_b]
 
@@ -59,25 +98,21 @@ class DisparateImpactRemover(BMPre):
 
     def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
-        Transform data
-
-        Description
-        -----------
         Transform data to a fair representation
 
         Parameters
         ----------
-        X : ndarray
+        X : array-like
             Input data
 
-        group_a : ndarray
+        group_a : array-like
             mask vector
 
-        group_b : ndarray
+        group_b : array-like
             mask vector
 
-        Return
-        ------
+        Returns
+        -------
             Self
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
@@ -88,7 +123,31 @@ class DisparateImpactRemover(BMPre):
         return self.repair_data(X, group_a, group_b)
 
     def fit(self):
+        """
+        Fit the model
+
+        Returns
+        -------
+            Self
+        """
         return self
 
     def fit_transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
+        """
+        Fit the model and transform data
+
+        Parameters
+        ----------
+        X : array-like
+            Input data
+        group_a : array-like
+            mask vector
+        group_b : array-like
+            mask vector
+        
+        Returns
+        -------
+        array-like
+            Repaired input data matrix
+        """
         return self.fit().transform(X, group_a, group_b)
