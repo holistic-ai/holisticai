@@ -12,9 +12,8 @@ from sklearn.metrics import (
 
 
 def cluster_balance(group_a, group_b, y_pred):
-    """
-    Cluster Balance
-    -----------
+    """Cluster Balance
+
     Given a clustering and protected attribute. The cluster balance is\
     the minimum over all groups and clusters of the ratio of the representation\
     of members of that group in that cluster to the representation overall.
@@ -85,9 +84,8 @@ def cluster_balance(group_a, group_b, y_pred):
 
 
 def min_cluster_ratio(group_a, group_b, y_pred):
-    """
-    Minimum Cluster Ratio
-    -----------
+    """Minimum Cluster Ratio
+
     Given a clustering and protected attributes. The min cluster ratio is\
     the minimum over all clusters of the ratio of number of group_a members\
     to the number of group_b members.
@@ -141,9 +139,8 @@ def min_cluster_ratio(group_a, group_b, y_pred):
 
 
 def _avg_cluster_ratio(group_a, group_b, y_pred):
-    """
-    Average Cluster Ratio
-    -----------
+    """Average Cluster Ratio
+
     Given a clustering and protected attributes. The average cluster ratio is\
     the average over all clusters of the ratio of group_a members to group_b\
     members in that cluster.
@@ -202,9 +199,8 @@ def _avg_cluster_ratio(group_a, group_b, y_pred):
 
 
 def _cluster_dist(y_pred_g, clusters):
-    """
-    Group distribution over clusters
-    -----------
+    """Group distribution over clusters
+
     This function computes the distribution of the group across clusters.
 
     Parameters
@@ -225,9 +221,8 @@ def _cluster_dist(y_pred_g, clusters):
 
 
 def cluster_dist_l1(group_a, group_b, y_pred):
-    """
-    Cluster Distribution Total Variation
-    -----------
+    """Cluster Distribution Total Variation
+
     This function computes the distribution of group_a and group_b across clusters.\
     It then outputs the total variation distance between these distributions.
 
@@ -281,9 +276,8 @@ def cluster_dist_l1(group_a, group_b, y_pred):
 
 
 def cluster_dist_kl(group_a, group_b, y_pred):
-    """
-    Cluster Distribution KL
-    -----------
+    """Cluster Distribution KL
+
     This function computes the distribution of group_a and group_b\
     membership across the clusters. It then returns the KL distance\
     from the distribution of group_a to the distribution of group_b.
@@ -341,9 +335,8 @@ def cluster_dist_kl(group_a, group_b, y_pred):
 
 
 def cluster_dist_entropy(group, y_pred):
-    """
-    Minority Cluster Distribution Entropy
-    -----------
+    """Minority Cluster Distribution Entropy
+
     The entropy of the distribution of the group
     over the clusters.
 
@@ -396,9 +389,8 @@ def cluster_dist_entropy(group, y_pred):
 
 
 def _ami_diff(group_a, group_b, y_pred, y_true):
-    """
-    Adjusted Mutual information Difference
-    -----------
+    """Adjusted Mutual information Difference
+
     We compute the difference of the adjusted mutual information\
     on group_a and group_b.
 
@@ -452,9 +444,8 @@ def _ami_diff(group_a, group_b, y_pred, y_true):
 
 
 def social_fairness_ratio(group_a, group_b, data, centroids):
-    """
-    Social Fairness Ratio
-    -----------
+    """Social Fairness Ratio
+
     Given a centroid based clustering, this function compute the average\
     distance to the nearest centroid for both groups. The metric is the\
     ratio of the resulting distance for group_a to group_b.
@@ -533,9 +524,8 @@ def social_fairness_ratio(group_a, group_b, data, centroids):
 
 
 def silhouette_diff(group_a, group_b, data, y_pred):
-    """
-    Silhouette Difference
-    -----------
+    """Silhouette Difference
+
     We compute the difference of the mean silhouette score for both\
     groups.
 
@@ -609,9 +599,8 @@ def clustering_bias_metrics(
     centroids=None,
     metric_type="equal_outcome",
 ):
-    """
-    Clustering bias metrics batch computation
-    -----------
+    """Clustering bias metrics batch computation
+
     This function computes all the relevant clustering bias metrics,\
     and displays them as a pandas dataframe.
 

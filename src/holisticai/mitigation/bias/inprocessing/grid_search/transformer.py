@@ -1,62 +1,28 @@
 from typing import Optional
 
 import numpy as np
-import pandas as pd
-from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin, clone
+from sklearn.base import BaseEstimator, clone
 
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 
 from ..commons.classification import _constraints as cc
 from ..commons.regression import _constraints as rc
 from ..commons.regression import _losses as rl
-from ._grid_generator import GridGenerator
 from .algorithm import GridSearchAlgorithm
 
 
 class GridSearchReduction(BaseEstimator, BMImp):
-    """
+    """Grid Search Reduction
+
     Grid search technique can be used for fair classification or fair regression.
-    - For classification it reduces fair classification to a sequence of cost-sensitive classification problems,
+    (1) For classification it reduces fair classification to a sequence of cost-sensitive classification problems,
     returning the deterministic classifier with the lowest empirical error subject to fair classification constraints among the
     candidates searched.
-    - For regression it uses the same priniciple to return a deterministic regressor with the lowest empirical error subject to the
+    (2) For regression it uses the same priniciple to return a deterministic regressor with the lowest empirical error subject to the
     constraint of bounded group loss.
 
-    References:
-        Agarwal, Alekh, et al. "A reductions approach to fair classification."
-        International Conference on Machine Learning. PMLR, 2018.
-
-        Agarwal, Alekh, Miroslav Dudík, and Zhiwei Steven Wu.
-        "Fair regression: Quantitative definitions and reduction-based algorithms."
-        International Conference on Machine Learning. PMLR, 2019.
-    """
-
-    CONSTRAINTS = [
-        "DemographicParity",
-        "EqualizedOdds",
-        "TruePositiveRateParity",
-        "FalsePositiveRateParity",
-        "ErrorRateParity",
-        "BoundedGroupLoss",
-    ]
-
-    def __init__(
-        self,
-        constraints: str = "EqualizedOdds",
-        constraint_weight: Optional[float] = 0.5,
-        loss: str = "ZeroOne",
-        min_val: float = None,
-        max_val: float = None,
-        grid_size: Optional[int] = 10,
-        grid_limit: Optional[float] = 2.0,
-        verbose: Optional[int] = 0.0,
-    ):
-        """
-        Init Grid Search Reduction Transformer
-
-        Parameters
-        ----------
-
+    Parameters
+    ----------
         constraints : string
             The disparity constraints expressed as string:
                 - "DemographicParity",
@@ -90,7 +56,47 @@ class GridSearchReduction(BaseEstimator, BMImp):
         verbose : int
             If >0, will show progress percentage.
 
-        """
+    Methods
+    -------
+        fit(X, y_true, group_a, group_b)
+            Fit model using Grid Search Reduction.
+
+        predict(X)
+            Prediction
+
+        predict_proba(X)
+            Probability Prediction
+
+    References
+    ----------
+        [1] Agarwal, Alekh, et al. "A reductions approach to fair classification."
+        International Conference on Machine Learning. PMLR, 2018.
+
+        [2] Agarwal, Alekh, Miroslav Dudík, and Zhiwei Steven Wu.
+        "Fair regression: Quantitative definitions and reduction-based algorithms."
+        International Conference on Machine Learning. PMLR, 2019.
+    """
+
+    CONSTRAINTS = [
+        "DemographicParity",
+        "EqualizedOdds",
+        "TruePositiveRateParity",
+        "FalsePositiveRateParity",
+        "ErrorRateParity",
+        "BoundedGroupLoss",
+    ]
+
+    def __init__(
+        self,
+        constraints: str = "EqualizedOdds",
+        constraint_weight: Optional[float] = 0.5,
+        loss: str = "ZeroOne",
+        min_val: float = None,
+        max_val: float = None,
+        grid_size: Optional[int] = 10,
+        grid_limit: Optional[float] = 2.0,
+        verbose: Optional[int] = 0.0,
+    ):
         self.constraints = constraints
         self.constraint_weight = constraint_weight
         self.loss = loss

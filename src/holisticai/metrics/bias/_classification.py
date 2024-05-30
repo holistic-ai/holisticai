@@ -19,9 +19,8 @@ from sklearn.neighbors import NearestNeighbors
 
 
 def _group_success_rate(g, y):
-    """
-    Group success rate.
-    -----------
+    """Group success rate.
+
     This function computes the success rate for a given subgroup.
 
     Parameters
@@ -41,9 +40,8 @@ def _group_success_rate(g, y):
 
 
 def statistical_parity(group_a, group_b, y_pred):
-    """
-    Statistical parity.
-    -----------
+    """Statistical parity.
+
     This function computes the statistical parity (difference of success rates)\
     between group_a and group_b.
 
@@ -92,9 +90,8 @@ def statistical_parity(group_a, group_b, y_pred):
 
 
 def success_rate(group_a, group_b, y_pred):
-    """
-    Success Rate
-    -----------
+    """Success Rate
+
     Calculates the raw success rates for each group.
 
     Parameters
@@ -117,9 +114,8 @@ def success_rate(group_a, group_b, y_pred):
 
 
 def disparate_impact(group_a, group_b, y_pred):
-    """
-    Disparate Impact.
-    -----------
+    """Disparate Impact.
+
     This function computes the disparate impact (ratio of success rates)\
     between group_a and group_b class.
 
@@ -174,9 +170,8 @@ def disparate_impact(group_a, group_b, y_pred):
 
 
 def four_fifths(group_a, group_b, y_pred):
-    """
-    Four Fifths
-    -----------
+    """Four Fifths
+
     This function computes the four fifths rule (ratio of success rates)\
     between group_a and group_b. We return the minimum of the ratio taken both ways.
 
@@ -219,9 +214,8 @@ def four_fifths(group_a, group_b, y_pred):
 
 
 def cohen_d(group_a, group_b, y_pred):
-    """
-    Cohen D
-    -----------
+    """Cohen D
+
     This function computes the Cohen D statistic (normalised statistical parity)\
     between group_a and group_b.
 
@@ -281,9 +275,8 @@ def cohen_d(group_a, group_b, y_pred):
 
 
 def z_test_diff(group_a, group_b, y_pred):
-    """
-    Z Test (Difference)
-    -----------
+    """Z Test (Difference)
+
     This function computes the Z-test statistic for the difference\
     in success rates. Also known as 2-SD Statistic.
 
@@ -342,9 +335,8 @@ def z_test_diff(group_a, group_b, y_pred):
 
 
 def z_test_ratio(group_a, group_b, y_pred):
-    """
-    Z Test (Ratio)
-    -----------
+    """Z Test (Ratio)
+
     This function computes the Z-test statistic for the ratio\
     in success rates. Also known as 2-SD Statistic.
 
@@ -402,9 +394,8 @@ def z_test_ratio(group_a, group_b, y_pred):
 
 
 def _correlation_diff(group_a, group_b, y_pred, y_true):
-    """
-    Correlation difference
-    -----------
+    """Correlation difference
+
     This function computes the difference in correlation between predicted\
     and true labels for group_a and group_b.
 
@@ -455,9 +446,8 @@ def _correlation_diff(group_a, group_b, y_pred, y_true):
 
 
 def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
-    """
-    Equality of opportunity difference
-    -----------
+    """Equality of opportunity difference
+
     This function computes the difference in true positive\
     rates for group_a and group_b.
 
@@ -509,9 +499,8 @@ def equal_opportunity_diff(group_a, group_b, y_pred, y_true):
 
 
 def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
-    """
-    False positive rate difference
-    ----------
+    """False positive rate difference
+
     This function computes the difference in false positive\
     rates between group_a and group_b.
 
@@ -563,9 +552,8 @@ def false_positive_rate_diff(group_a, group_b, y_pred, y_true):
 
 
 def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
-    """
-    False negative Rate difference
-    ----------
+    """False negative Rate difference
+
     This function computes the difference in false negative\
     rates for group_a and group_b.
 
@@ -617,9 +605,8 @@ def false_negative_rate_diff(group_a, group_b, y_pred, y_true):
 
 
 def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
-    """
-    True negative Rate difference
-    ----------
+    """True negative Rate difference
+
     This function computes the difference in true negative\
     rates for group_a and group_b.
 
@@ -671,9 +658,8 @@ def true_negative_rate_diff(group_a, group_b, y_pred, y_true):
 
 
 def average_odds_diff(group_a, group_b, y_pred, y_true):
-    """
-    Average Odds Difference
-    -----------
+    """Average Odds Difference
+
     This function computes the difference in average odds\
     between group_a and group_b.
 
@@ -726,9 +712,8 @@ def average_odds_diff(group_a, group_b, y_pred, y_true):
 
 
 def accuracy_diff(group_a, group_b, y_score, y_true):
-    """
-    Accuracy Difference
-    ----------
+    """Accuracy Difference
+
     This function computes the difference in accuracy\
     of predictions for group_a and group_b
 
@@ -780,9 +765,8 @@ def accuracy_diff(group_a, group_b, y_score, y_true):
 
 
 def abroca(group_a, group_b, y_score, y_true):
-    """
-    ABROCA (area between roc curves)
-    -----------
+    """ABROCA (area between roc curves)
+
     This function computes the area between the roc curve\
     of group_a and the roc curve of group_b
 
@@ -836,9 +820,8 @@ def abroca(group_a, group_b, y_score, y_true):
 def classification_bias_metrics(
     group_a=None, group_b=None, y_pred=None, y_true=None, y_score=None, X=None, metric_type="group", **kargs  # noqa: N803
 ):
-    """
-    Classification bias metrics batch computation
-    -----------
+    """Classification bias metrics batch computation
+
     This function computes all the relevant classification bias metrics,\
     and displays them as a pandas dataframe. It also includes a fair reference\
     value for comparison.
@@ -973,13 +956,12 @@ def classification_bias_metrics(
     raise ValueError(msg)
 
 
-### Inidivudal Metrics
+### Individual Metrics
 
 
 def benefit_function(y_pred, y_true):
-    """
-    Benefit function
-    -----------
+    """Benefit function
+
     This function computes the benefit function\
     used in the generalized entropy index.
 
@@ -999,9 +981,8 @@ def benefit_function(y_pred, y_true):
 
 
 def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
-    """
-    The Theil index
-    -----------
+    """The Theil index
+
     The Theil index is a measure of inequality that is commonly used in economics.\
     It is used to measure the inequality of a distribution, such as the distribution\
     of income or wealth. The Theil index is a special case of general entropy indices\
@@ -1036,9 +1017,8 @@ def theil_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 
 
 def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int = 2) -> float:
-    """
-    Generalized entropy index
-    -----------
+    """Generalized entropy index
+
     Generalized entropy index is a measure of inequality that is proposed as a unified\
     individual and group fairness measure [1]. It is used to measure the extent of inequality\
     in the distribution of a variable. The measure is based on the idea that inequality can\
@@ -1099,9 +1079,8 @@ def generalized_entropy_index(y_pred: np.ndarray, y_true: np.ndarray, alpha: int
 
 
 def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
-    """
-    Coefficient of variation
-    -----------
+    """Coefficient of variation
+
     Calculates the coefficient of variation, which is a special case that calculates two times the square\
     root of the generalized entropy index with alpha=2.
 
@@ -1128,9 +1107,8 @@ def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
 
 
 def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -> float:  # noqa: N803
-    """
-    Consistency score
-    -----------
+    """Consistency score
+
     Compares a model's classification prediction of a given data item X to its k-nearest neighbors.
 
     Parameters

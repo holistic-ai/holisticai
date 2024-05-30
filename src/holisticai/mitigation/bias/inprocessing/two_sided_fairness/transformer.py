@@ -9,12 +9,30 @@ from .algorithm import FairRecAlg
 
 
 class FairRec(BMImp):
-    """
+    """Fair Recommendation System (FairRec)
+
     FairRecommendationSystem (FairRec), exhibes the desired two-sided fairness by
     mapping the fair recommendation problem to a fair allocation problem; moreover,
     it is agnostic to the specifics of the data-driven model (that estimates the
     product-customer relevance scores) which makes it more scalable and easy to adapt [1].
-    References:
+
+    Parameters
+    ----------
+        rec_size : int
+            Specifies the number of recommended items.
+        MMS_fraction : float
+            Maximin Share (MMS) threshold of producers exposure.
+
+    Methods
+    -------
+        fit(X)
+            Fit model using Fair Recommendation System.
+
+        predict(X)
+            Predict the closest cluster each sample in X belongs to.
+
+    References
+    ----------
         [1] Patro, Gourab K., et al. "Fairrec: Two-sided fairness for personalized
         recommendations in two-sided platforms." Proceedings of The Web Conference 2020. 2020.
     """
@@ -22,16 +40,6 @@ class FairRec(BMImp):
     def __init__(
         self, rec_size: Optional[int] = 10, MMS_fraction: Optional[float] = 0.5
     ):
-        """
-        Init FairRec algorithm
-        Parameters
-        ----------
-        rec_size : int
-            Specifies the number of recommended items.
-        MMS_fraction : float
-            Maximin Share (MMS) threshold of producers exposure.
-        """
-
         self.rec_size = rec_size
         self.MMS_fraction = MMS_fraction
 

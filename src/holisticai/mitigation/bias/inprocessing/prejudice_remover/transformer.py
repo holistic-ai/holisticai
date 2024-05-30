@@ -13,13 +13,55 @@ from .model import PRLogiticRegression, PRParamInitializer
 
 
 class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
-    """
+    """Prejudice Remover
+    
     Prejudice remover is an in-processing technique that adds a
     discrimination-aware regularization term to the learning objective.
 
+    Parameters
+    ----------
+        eta : float
+            fairness penalty parameter
+
+        C : float
+            Inverse of regularization strength (same as sklearn).
+
+        fit_intercept : bool
+            Specifies if a constant must be added to the decision function (same as sklearn).
+
+        penalty : str
+            Specify the norm of the penalty (same as sklearn).
+
+        init_type : str
+            Specifies how the model parameters will be initialized:
+            - Zero : Set all model parameters with zero value.
+            - Random : Initialize model parameters with random values.
+            - StandarLR : Initialize model parameters with fitted sklearn LR.
+            - StandarLRbyGroup : Initialize model parameters with fitted sklearn LR for group_a and group_b.
+
+        maxiter : str
+            Maximum number of iterations.
+
+        verbose : int
+            Log progress if value > 0.
+
+        print_interval : int
+        Each `print_interval` steps print information.
+
+    Methods
+    -------
+        fit(X, y_true, group_a, group_b)
+            Fit model using Prejudice Remover.
+
+        predict(X, group_a, group_b)
+            Predict the closest cluster each sample in X belongs to.
+
+        predict_proba(X, group_a, group_b)
+            Predict the probability of each sample in X belongs to each class.
+
     References
     ----------
-        Kamishima, Toshihiro, et al. "Fairness-aware classifier with prejudice remover regularizer."
+        [1] Kamishima, Toshihiro, et al. "Fairness-aware classifier with prejudice remover regularizer."
         Joint European conference on machine learning and knowledge discovery in databases.
         Springer, Berlin, Heidelberg, 2012.
     """
@@ -35,39 +77,6 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         verbose: Optional[int] = 0,
         print_interval: Optional[int] = 20,
     ):
-        """
-        Parameters
-        ----------
-            eta : float
-                fairness penalty parameter
-
-            C : float
-                Inverse of regularization strength (same as sklearn).
-
-            fit_intercept : bool
-                Specifies if a constant must be added to the decision function (same as sklearn).
-
-            penalty : str
-                Specify the norm of the penalty (same as sklearn).
-
-            init_type : str
-                Specifies how the model parameters will be initialized:
-                - Zero : Set all model parameters with zero value.
-                - Random : Initialize model parameters with random values.
-                - StandarLR : Initialize model parameters with fitted sklearn LR.
-                - StandarLRbyGroup : Initialize model parameters with fitted sklearn LR for group_a and group_b.
-
-            maxiter : str
-                Maximum number of iterations.
-
-            verbose : int
-                Log progress if value > 0.
-
-            print_interval : int
-                Each `print_interval` steps print information.
-
-        """
-
         # Default estimator parameters
         self.eta = eta
         self.C = C
