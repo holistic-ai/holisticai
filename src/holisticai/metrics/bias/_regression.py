@@ -14,9 +14,8 @@ def _calc_success_rate(group_membership: np.array, threshold=float):
 
 
 def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
-    """
-    Success rate (Regression version)
-    -------------------------------
+    """Success rate (Regression version)
+
     Calculates the raw success rates for each group.
 
     Parameters
@@ -30,6 +29,7 @@ def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
     threshold: float, str, optional
         The number above which the result is considered a success. Ranged between 0 and 1.
         Also accepts 'median' and 'mean'.
+
     Returns
     -------
     dict
@@ -54,9 +54,8 @@ def success_rate_regression(group_a, group_b, y_pred, threshold=0.50):
 
 
 def disparate_impact_regression(group_a, group_b, y_pred, q=0.8):
-    r"""
-    Disparate Impact quantile (Regression version)
-    -----------
+    r"""Disparate Impact quantile (Regression version)
+
     This function computes the ratio of success rates between group_a and
     group_b, where sucess means predicted score exceeds a given quantile (default = 0.8).
 
@@ -125,9 +124,8 @@ def disparate_impact_regression(group_a, group_b, y_pred, q=0.8):
 
 
 def statistical_parity_regression(group_a, group_b, y_pred, q=0.5):
-    """
-    Statistical Parity quantile (Regression version)
-    -----------
+    """Statistical Parity quantile (Regression version)
+
     This function computes the difference of success rates between group_a and\
     group_b, where sucess means that the predicted score exceeds a given quantile.
 
@@ -191,9 +189,8 @@ def statistical_parity_regression(group_a, group_b, y_pred, q=0.5):
 
 
 def no_disparate_impact_level(group_a, group_b, y_pred):
-    """
-    No disparate impact level
-    -----------
+    """No disparate impact level
+
     This function computes the maximum score such that thresholding at that score\
     does not allow adverse impact.
 
@@ -245,9 +242,8 @@ def no_disparate_impact_level(group_a, group_b, y_pred):
 
 
 def avg_score_diff(group_a, group_b, y_pred, q=0):
-    """
-    Average Score Difference
-    -----------
+    """Average Score Difference
+
     This function computes the difference in average scores between\
     group_a and group_b.
 
@@ -314,9 +310,8 @@ def avg_score_diff(group_a, group_b, y_pred, q=0):
 
 
 def avg_score_ratio(group_a, group_b, y_pred, q=0):
-    """
-    Average Score Ratio
-    -----------
+    """Average Score Ratio
+
     This function computes the ratio in average scores between\
     group_a and group_b.
 
@@ -383,9 +378,8 @@ def avg_score_ratio(group_a, group_b, y_pred, q=0):
 
 
 def zscore_diff(group_a, group_b, y_pred, q=0):
-    """
-    ZScore Difference
-    -----------
+    """ZScore Difference
+
     This function computes the spread in Zscores between\
     group_a and group_b. The Zscore is a normalised\
     version of Disparate Impact.
@@ -463,9 +457,8 @@ def zscore_diff(group_a, group_b, y_pred, q=0):
 
 
 def statistical_parity_auc(group_a, group_b, y_pred):
-    """
-    Statistical parity (AUC)
-    -----------
+    """Statistical parity (AUC)
+
     This function computes the area under the statistical parity\
     versus threshold curve.
 
@@ -514,9 +507,8 @@ def statistical_parity_auc(group_a, group_b, y_pred):
 
 
 def _weighed_statistical_parity_auc(group_a, group_b, y_pred):
-    """
-    Weighed Statistical parity (AUC)
-    -----------
+    """Weighed Statistical parity (AUC)
+
     This function computes the area under the statistical\
     parity versus threshold curve, weighed by the 2t distribution.
 
@@ -566,9 +558,8 @@ def _weighed_statistical_parity_auc(group_a, group_b, y_pred):
 
 
 def max_statistical_parity(group_a, group_b, y_pred):
-    """
-    Max absolute statistical parity
-    -----------
+    """Max absolute statistical parity
+
     This function computes the maximum over all thresholds of\
     the absolute statistical parity between group_a and group_b.
 
@@ -617,9 +608,8 @@ def max_statistical_parity(group_a, group_b, y_pred):
 
 
 def correlation_diff(group_a, group_b, y_pred, y_true, q=0):
-    """
-    Correlation difference
-    -----------
+    """Correlation difference
+
     This function computes the difference in correlation between predictions\
     and targets for group_a and group_b.
 
@@ -692,9 +682,8 @@ def correlation_diff(group_a, group_b, y_pred, y_true, q=0):
 
 
 def rmse_ratio(group_a, group_b, y_pred, y_true, q=0):
-    """
-    RMSE ratio
-    -----------
+    """RMSE ratio
+
     This function computes the ratio of the RMSE for group_a and group_b.
 
     If q is a vector, this function returns a vector with the\
@@ -767,9 +756,8 @@ def rmse_ratio(group_a, group_b, y_pred, y_true, q=0):
 
 
 def mae_ratio(group_a, group_b, y_pred, y_true, q=0):
-    """
-    MAE ratio
-    -----------
+    """MAE ratio
+
     This function computes the ratio of the MAE for group_a and group_b.
 
     If q is a vector, this function returns a vector with the\
@@ -842,9 +830,8 @@ def mae_ratio(group_a, group_b, y_pred, y_true, q=0):
 
 
 def regression_bias_metrics(group_a, group_b, y_pred, y_true=None, metric_type="group"):
-    """
-    Regression bias metrics batch computation
-    -----------
+    """Regression bias metrics batch computation
+
     This function computes all the relevant regression bias metrics,\
     and displays them as a pandas dataframe.
 
@@ -986,9 +973,8 @@ def regression_bias_metrics(group_a, group_b, y_pred, y_true=None, metric_type="
 
 
 def jain_index(y_pred: np.ndarray, y_true: np.ndarray) -> float:
-    """
-    The Jain index (Fairness index)
-    -----------
+    """The Jain index (Fairness index)
+
     The Jain index is an index proposed for resources allocation that measures the "equality" of user allocation [1].
     For our purposes, from the point of view of fairness, it measures the equality of the error distributed in the\
     model outcomes. Empirically, we could say that a model with a Jain index of 1 is a model that distributes the error\

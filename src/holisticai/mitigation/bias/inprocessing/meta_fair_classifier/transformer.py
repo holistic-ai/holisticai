@@ -15,9 +15,34 @@ class MetaFairClassifier(BMImp):
     and returns a classifier optimized w.r.t. that fairness metric.
     The algorithm support only binary protected groups -> group_a = 1 - group_b
 
+    Parameters
+    ----------
+        tau : float
+            Fairness penalty parameter (0,1). Higher parameter increate the threshold
+            for a valid estimator.
+
+        constraint : str
+            The type of fairness metric to be used, currently supported:
+            - StatisticalRate: Statistical rate/disparate impact
+            - FalseDiscovery: False discovery rate ratio
+
+        seed : int
+            Random seed.
+
+    Methods
+    -------
+        fit(X, y, group_a, group_b)
+            Fit model using Meta Fair Classifier.
+
+        predict(X)
+            Predict the closest cluster each sample in X belongs to.
+
+        predict_proba(X)
+            Predict the probability of each sample in X belongs to each class.
+
     References
     ----------
-        Celis, L. Elisa, et al. "Classification with fairness constraints:
+        [1] Celis, L. Elisa, et al. "Classification with fairness constraints:
         A meta-algorithm with provable guarantees." Proceedings of the conference on
         fairness, accountability, and transparency. 2019.
     """
@@ -29,21 +54,6 @@ class MetaFairClassifier(BMImp):
         seed: Optional[int] = None,
         verbose: Optional[int] = 0,
     ):
-        """
-        Parameters
-        ----------
-            tau : float
-                Fairness penalty parameter (0,1). Higher parameter increate the threshold
-                for a valid estimator.
-
-            constraint : str
-                The type of fairness metric to be used, currently supported:
-                - StatisticalRate: Statistical rate/disparate impact
-                - FalseDiscovery: False discovery rate ratio
-
-            seed : int
-                Random seed.
-        """
         # Constant parameters
         steps = 10
         eps = 0.01

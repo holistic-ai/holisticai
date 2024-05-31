@@ -7,9 +7,8 @@ from holisticai.utils._validation import _multiclass_checks
 
 
 def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
-    """
-    Confusion Matrix
-    ----------
+    """Confusion Matrix
+
     This function computes the confusion matrix. The i, jth\
     entry is the number of elements with predicted class i\
     and true class j.
@@ -80,9 +79,8 @@ def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
 
 
 def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tensor=False):  # noqa: FBT002
-    """
-    Confusion Tensor
-    ----------
+    """Confusion Tensor
+
     This function computes the confusion tensor. The k, i, jth\
     entry is the number of instances of group k with predicted\
     class i and true class j.
@@ -176,9 +174,8 @@ def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tenso
 
 
 def frequency_matrix(p_attr, y_pred, groups=None, classes=None, normalize="group"):
-    """
-    Frequency Matrix
-    ----------
+    """Frequency Matrix
+
     This function computes the frequency matrix. For each\
     group, class pair we compute the count of that group\
     for admission within that class. We include the option to normalise\
@@ -255,9 +252,8 @@ def frequency_matrix(p_attr, y_pred, groups=None, classes=None, normalize="group
 
 
 def accuracy_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
-    """
-    Multiclass Accuracy Matrix
-    ----------
+    """Multiclass Accuracy Matrix
+
     Given a protected attribute and multiclass classification task,\
     for each group and class this function computes the accuracy of\
     predictions on that group for the one vs all classifier of that class.
@@ -321,9 +317,8 @@ def accuracy_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
 
 
 def precision_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
-    """
-    Multiclass Precision Matrix
-    ----------
+    """Multiclass Precision Matrix
+
     Given a protected attribute and multiclass classification task,\
     for each group and class this function computes the precision of\
     predictions on that group for the one vs all classifier of that class.
@@ -387,9 +382,8 @@ def precision_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
 
 
 def recall_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
-    """
-    Multiclass Recall Matrix
-    ----------
+    """Multiclass Recall Matrix
+
     Given a protected attribute and multiclass classification task,\
     for each group and class this function computes the recall of\
     predictions on that group for the one vs all classifier of that class.
@@ -453,9 +447,8 @@ def recall_matrix(p_attr, y_pred, y_true, groups=None, classes=None):
 
 
 def multiclass_equality_of_opp(p_attr, y_pred, y_true, groups=None, classes=None, aggregation_fun="mean"):
-    """
-    Multiclass Equality of Opportunity
-    ----------
+    """Multiclass Equality of Opportunity
+
     This metric is a multiclass generalisation of Equality of\
     Opportunity. For each group, compute the matrix of error\
     rates (normalised confusion matrix). Compute all distances\
@@ -530,9 +523,8 @@ def multiclass_equality_of_opp(p_attr, y_pred, y_true, groups=None, classes=None
 
 
 def multiclass_average_odds(p_attr, y_pred, y_true, groups=None, classes=None, aggregation_fun="mean"):
-    """
-    Multiclass Average Odds
-    ----------
+    """Multiclass Average Odds
+
     This metric is a multiclass generalisation of Average\
     Odds. For each group, compute the matrix of error\
     rates (normalised confusion matrix). Average these\
@@ -608,9 +600,8 @@ def multiclass_average_odds(p_attr, y_pred, y_true, groups=None, classes=None, a
 
 
 def multiclass_true_rates(p_attr, y_pred, y_true, groups=None, classes=None, aggregation_fun="mean"):
-    """
-    Multiclass True Rates
-    ----------
+    """Multiclass True Rates
+
     This metric is a multiclass generalisation of TPR\
     Difference. For each group, compute the matrix of error\
     rates (normalised confusion matrix). Compute all distances\
@@ -684,9 +675,8 @@ def multiclass_true_rates(p_attr, y_pred, y_true, groups=None, classes=None, agg
 
 
 def multiclass_statistical_parity(p_attr, y_pred, groups=None, classes=None, aggregation_fun="mean"):
-    """
-    Multiclass statistical parity
-    ----------
+    """Multiclass statistical parity
+
     This function computes statistical parity for a classification task\
     with multiple classes and a protected attribute with multiple groups.\
     For each group compute the vector of success rates for entering\
@@ -756,9 +746,8 @@ def multiclass_statistical_parity(p_attr, y_pred, groups=None, classes=None, agg
 
 
 def multiclass_bias_metrics(p_attr, y_pred, y_true, groups=None, classes=None, metric_type="equal_outcome"):
-    """
-    Multiclass bias metrics batch computation
-    ----------
+    """Multiclass bias metrics batch computation
+
     This function computes all the relevant multiclass bias metrics,\
     and displays them as a pandas dataframe.
 

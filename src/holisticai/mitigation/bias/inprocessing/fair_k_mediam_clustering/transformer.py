@@ -10,10 +10,38 @@ from .algorithm import KMediamClusteringAlgorithm
 
 
 class FairKmedianClustering(BaseEstimator, BMImp):
-    """
+    """Fair K-median Clustering
+    
     Fair K-median clustering inprocessing bias mitigation is an approximation algorithms for
     group representative k-median clustering. Implementation of Algorithm 2. from [1]. The
     algorithm reduces the max group cost function.
+
+    Parameters
+    ----------
+        n_clusters: int
+            number of clusters.
+
+        max_iter: int
+            Max number of iteration for LS or epochs for GA.
+
+        strategy: str
+            Minimization method used. Available:
+            - LS (Local Search).
+            - GA (Genetic Algorithm)
+
+        verbose: int
+            if > 0 , print progress information.
+
+        seed: int
+            random seed.
+
+        algorithm: KMediamClusteringAlgorithm
+            Algorithm used to fit the model.
+
+    Methods
+    -------
+        fit(X, group_a, group_b)
+            Fit model using Fair K-median Clustering.
 
     Reference:
     ----------
@@ -30,24 +58,6 @@ class FairKmedianClustering(BaseEstimator, BMImp):
         strategy: Optional[str] = "LS",
         verbose: Optional[int] = 0,
     ):
-        """
-        Parameters
-        ----------
-
-        n_clusters: int
-            number of clusters.
-
-        max_iter: int
-            Max number of iteration for LS or epochs for GA.
-
-        strategy: str
-            Minimization method used. Available:
-            - LS (Local Search).
-            - GA (Genetic Algorithm)
-
-        verbose: int
-            if > 0 , print progress information.
-        """
         self.n_clusters = n_clusters
         self.max_iter = max_iter
         self.verbose = verbose

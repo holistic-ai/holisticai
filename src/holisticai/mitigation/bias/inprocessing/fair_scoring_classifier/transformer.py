@@ -9,13 +9,39 @@ from .algorithm import FairScoreClassifierAlgorithm
 
 
 class FairScoreClassifier(BaseEstimator, BMImp):
-    """
+    """Fair Score Classifier
+
     Generates a classification model that integrates fairness constraints for multiclass classification. This algorithm
     returns a matrix of lambda coefficients that scores a given input vector. The higher the score, the higher the probability
     of the input vector to be classified as the majority class.
 
+    Parameters
+    ----------
+        objectives : dict
+            The weighted objectives list to be optimized.
+
+        constraints : dict
+            The constraints list to be used in the optimization. The keys are the constraints names and the values are the bounds.
+
+        lambda_bound : int
+            Lower and upper bound for the scoring system cofficients.
+
+        time_limit : int
+        The time limit for the optimization algorithm.
+
+    Methods
+    -------
+        fit(X, y, group_a, group_b)
+            Fit model using Fair Score Classifier.
+
+        predict(X)
+            Predict the closest cluster each sample in X belongs to.
+
+        transform_estimator(estimator)
+            Transform the estimator to be used in the pipeline.
+
     References:
-        Julien Rouzot, Julien Ferry, Marie-José Huguet. Learning Optimal Fair Scoring Systems for Multi-
+        [1] Julien Rouzot, Julien Ferry, Marie-José Huguet. Learning Optimal Fair Scoring Systems for Multi-
         Class Classification. ICTAI 2022 - The 34th IEEE International Conference on Tools with Artificial
         Intelligence, Oct 2022, Virtual, United States. ￿
     """
@@ -27,20 +53,6 @@ class FairScoreClassifier(BaseEstimator, BMImp):
         lambda_bound: int = 9,
         time_limit: int = 100,
     ):
-        """
-        Init FairScoreClassifier object
-
-        Parameters
-        ----------
-        objectives : dict
-            The weighted objectives list to be optimized.
-
-        constraints : dict
-            The constraints list to be used in the optimization. The keys are the constraints names and the values are the bounds.
-
-        lambda_bound : int
-            Lower and upper bound for the scoring system cofficients.
-        """
         self.objectives = objectives
         self.constraints = constraints
         self.lambda_bound = lambda_bound

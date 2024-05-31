@@ -10,15 +10,55 @@ from .algorithm import DebiasingLearningAlgorithm
 
 
 class DebiasingLearningMF(BMImp, RecommenderSystemBase):
-    """
+    """Debiasing Learning Matrix Factorization
+
     Debiasing Learning Matrix Factorization handles selection biases by adapting
     models and estimation techniques from causal inference. The strategy leads to
     unbiased performance estimators despite biased data, and to a matrix factorization
     method that provides substantially improved prediction performance on real-world data.
 
-    References:
-            [1] Schnabel, Tobias, et al. "Recommendations as treatments: Debiasing learning
-            and evaluation." international conference on machine learning. PMLR, 2016.
+    Parameters
+    ----------
+        K : int
+            Specifies the number of dimensions.
+        
+        normalization : str
+            Strategy to normalize rating matrix. Avaiables are:
+                    - 'Vanilla',
+                    - 'SelfNormalized'
+                    - 'UserNormalized'
+                    - 'ItemNormalized'
+
+        lamda : float
+            Model parameter.
+
+        metric: str
+            Metric used as cost function.
+
+        clip_val: float
+            Propensity Clip Value
+
+        seed: int
+            Random Seed
+
+        bias_mode: str
+            Bias value using in the model:
+            - "None": No bias
+            - "Free": Use bias wihtout regularizer in the cost function.
+            - "Regularized": Use bias with regularizer in the cost function.
+
+        verbose : int
+            If >0, will show progress percentage.
+
+    Methods
+    -------
+        fit(X, propensities)
+            Fit model using Debiasing Learning Matrix Factorization.
+    
+    References
+    ----------
+        [1] Schnabel, Tobias, et al. "Recommendations as treatments: Debiasing learning
+        and evaluation." international conference on machine learning. PMLR, 2016.
     """
 
     def __init__(
@@ -32,43 +72,6 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
         seed: Optional[int] = None,
         verbose: Optional[int] = 0,
     ):
-        """
-        Init Debiasing Learning Matrix Factorization
-
-        Parameters
-        ----------
-
-        K : int
-                Specifies the number of dimensions.
-
-        normalization : str
-                Strategy to normalize rating matrix. Avaiables are:
-                - 'Vanilla',
-        - 'SelfNormalized'
-        - 'UserNormalized'
-        - 'ItemNormalized'
-
-        lamda : float
-                Model parameter.
-
-        metric: str
-                Metric used as cost function.
-
-        clip_val: float
-                Propensity Clip Value
-
-        seed: int
-                Random Seed
-
-        bias_mode: str
-                Bias value using in the model:
-                - "None": No bias
-                - "Free": Use bias wihtout regularizer in the cost function.
-                - "Regularized": Use bias with regularizer in the cost function.
-
-        verbose : int
-                If >0, will show progress percentage.
-        """
         self.seed = seed
         self.normalization = normalization
         self.metric = metric

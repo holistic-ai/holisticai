@@ -8,4 +8,4 @@ This section will guide you through the installation of the `holisticai` open-so
    :maxdepth: 2
 
    install
-   quickstart
+   quickstart.ipynb

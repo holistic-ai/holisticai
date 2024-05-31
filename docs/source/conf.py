@@ -131,4 +131,4 @@ html_css_files = [
 ]
 
 # Custom section headers
-napoleon_custom_sections = ["Interpretation", "Description", "Parameters", "Returns"]
+napoleon_custom_sections = ["Interpretation", "Description", "Parameters", "Methods", "Returns"]
