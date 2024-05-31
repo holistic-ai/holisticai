@@ -5,6 +5,44 @@ import networkx as nx
 
 
 class CategoricalFeature:
+    """
+    Represents a categorical feature.
+
+    Parameters
+    ----------
+    data : list
+        The list of categorical data.
+    name : str, optional
+        The name of the categorical feature.
+
+    Attributes
+    ----------
+    data : list
+        The list of categorical data.
+    name : str
+        The name of the categorical feature.
+    bin_data : dict
+        The dictionary containing the count of observations in each category.
+    category_count : dict
+        The dictionary containing the count of each category.
+    num_bins : int
+        The number of bins (categories).
+    bin_fulldata : dict
+        The dictionary containing the list of observations for each category.
+    bin_index_dict : dict
+        The dictionary mapping category names to their corresponding index.
+    bin_index_dict_reverse : dict
+        The dictionary mapping category indices to their corresponding name.
+
+    Methods
+    -------
+    create_graph(count_generator)
+        Creates a graph representation of the categorical feature.
+    repair(DG)
+        Repairs the categorical feature based on the given graph.
+
+    """
+
     def __init__(self, data, name="no_name"):
         self.data = data
         self.name = name
@@ -42,9 +80,18 @@ class CategoricalFeature:
 
     def create_graph(self, count_generator):
         """
-        Description
-        -----------
-        Creates graph given a CategoricalFeature object.
+        Creates a graph representation of the categorical feature.
+
+        Parameters
+        ----------
+        count_generator : function
+            A function that generates the desired count for each category.
+
+        Returns
+        -------
+        networkx.DiGraph
+            The graph representation of the categorical feature.
+
         """
         DG = nx.DiGraph()  # using networkx package
         bin_list = list(self.bin_data.items())
@@ -84,6 +131,22 @@ class CategoricalFeature:
         return DG
 
     def repair(self, DG):
+        """
+        Repairs the categorical feature based on the given graph.
+
+        Parameters
+        ----------
+        DG : networkx.DiGraph
+            The graph representation of the categorical feature.
+
+        Returns
+        -------
+        CategoricalFeature
+            The repaired categorical feature.
+        int
+            The count of observations in the overflow category.
+
+        """
         mincostFlow = nx.max_flow_min_cost(
             DG, "s", "t"
         )  # max_flow_min_cost returns Dictionary of dictionaries. Keyed by nodes such that mincostFlow[u][v] is the flow edge (u,v)

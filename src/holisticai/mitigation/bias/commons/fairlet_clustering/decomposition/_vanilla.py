@@ -4,6 +4,38 @@ from ._base import DecompositionMixin
 
 
 class VanillaFairletDecomposition(DecompositionMixin):
+    """
+    Vanilla (p,q)-fairlet decomposition of given points (Lemma 3 in NIPS17 paper).
+
+    Parameters
+    ----------
+    p : int
+        The balance parameter p.
+    q : int
+        The balance parameter q.
+
+    Attributes
+    ----------
+    fairlets : list
+        The list of fairlets.
+    fairlet_centers : list
+        The list of fairlet centers.
+    p : int
+        The balance parameter p.
+    q : int
+        The balance parameter q.
+
+    Methods
+    -------
+    balanced(p, q, r, b)
+        Checks if the input sets are balanced.
+    make_fairlet(points, dataset)
+        Adds fairlet to fairlet decomposition, returns median cost.
+    fit_transform(dataset, group_a, group_b)
+        Computes vanilla (p,q)-fairlet decomposition of given points.
+    decompose(blues, reds, dataset)
+        Decomposes the input sets into fairlets.
+    """
     def __init__(self, p, q):
         self.fairlets = []
         self.fairlet_centers = []
@@ -11,6 +43,25 @@ class VanillaFairletDecomposition(DecompositionMixin):
         self.q = q
 
     def balanced(self, p, q, r, b):
+        """
+        Checks if the input sets are balanced.
+
+        Parameters
+        ----------
+        p : int
+            The balance parameter p.
+        q : int
+            The balance parameter q.
+        r : int
+            The number of red points.
+        b : int
+            The number of blue points.
+
+        Returns
+        -------
+        bool
+            True if the input sets are balanced, False otherwise.
+        """
         if r == 0 and b == 0:
             return True
         if r == 0 or b == 0:
@@ -18,7 +69,21 @@ class VanillaFairletDecomposition(DecompositionMixin):
         return min(r * 1.0 / b, b * 1.0 / r) >= p * 1.0 / q
 
     def make_fairlet(self, points, dataset):
-        "Adds fairlet to fairlet decomposition, returns median cost"
+        """
+        Adds fairlet to fairlet decomposition, returns median cost
+
+        Parameters
+        ----------
+        points : list
+            The list of points in the fairlet.
+        dataset : list
+            The points in the dataset.
+
+        Returns
+        -------
+        float
+            The median cost of the fairlet.
+        """
         self.fairlets.append(points)
         cost_list = [
             sum([np.linalg.norm(dataset[center] - dataset[point]) for point in points])
@@ -31,15 +96,48 @@ class VanillaFairletDecomposition(DecompositionMixin):
     def fit_transform(self, dataset, group_a, group_b):
         """
         Computes vanilla (p,q)-fairlet decomposition of given points (Lemma 3 in NIPS17 paper).
-        Returns cost.
-        Input: Balance parameters p,q which are non-negative integers satisfying p<=q and gcd(p,q)=1.
-        "blues" and "reds" are sets of points indices with balance at least p/q.
+
+        Parameters
+        ----------
+        dataset : list
+            The points in the dataset. Balance parameters p,q which are non-negative integers satisfying p<=q and
+            gcd(p,q)=1.
+        group_a : list
+            The set of points indices with balance at least p/q.
+        group_b : list
+            The set of points indices with balance at least p/q.
+
+        Returns
+        -------
+        list
+            The list of fairlets.
+        list
+            The list of fairlet centers.
+        float
+            The cost of the fairlet decomposition.
         """
         blues = list(np.where(group_a)[0])
         reds = list(np.where(group_b)[0])
         return self.fairlets, self.fairlet_centers, self.decompose(blues, reds, dataset)
 
     def decompose(self, blues, reds, dataset):
+        """
+        Decomposes the input sets into fairlets.
+
+        Parameters
+        ----------
+        blues : list
+            The set of blue points.
+        reds : list
+            The set of red points.
+        dataset : list
+            The points in the dataset.
+
+        Returns
+        -------
+        float
+            The cost of the fairlet decomposition.
+        """
         p = self.p
         q = self.q
         assert p <= q, "Please use balance parameters in the correct order"

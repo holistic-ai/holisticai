@@ -9,12 +9,30 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class Reweighing(BMPre):
     """
-    Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before
+    Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before\
     classification.
+
+    Parameters
+    ----------
+    None
+
+    Attributes
+    ----------
+    sens_groups : SensitiveGroups
+        SensitiveGroups object
+    
+    Methods
+    -------
+    fit(y_true, group_a, group_b, sample_weight)
+        Fit the model
+    transform(X)
+        Transform data
+    fit_transform(X, y_true, group_a, group_b, sample_weight)
+        Fit the model and transform data
 
     References
     ----------
-        Kamiran, Faisal, and Toon Calders. "Data preprocessing techniques for classification
+    .. [1] Kamiran, Faisal, and Toon Calders. "Data preprocessing techniques for classification\
         without discrimination." Knowledge and information systems 33.1 (2012): 1-33.
     """
 
@@ -29,11 +47,9 @@ class Reweighing(BMPre):
         sample_weight: Optional[np.ndarray] = None,
     ):
         """
-        Fit.
-
-        Description
+        Fit
         ----------
-        Access fitted sample_weight param with self.estimator_params["sample_weight"].
+        Fit the model. Access fitted sample_weight param with self.estimator_params["sample_weight"].
 
         Parameters
         ----------
@@ -43,8 +59,8 @@ class Reweighing(BMPre):
             Group membership vector (binary)
         group_b : array-like
             Group membership vector (binary)
-        sample_weight (optional) : array-like
-            Samples weights vector
+        sample_weight  : array-like, optional
+            Samples weights vector. Default is None.
 
         Returns
         -------
@@ -110,9 +126,7 @@ class Reweighing(BMPre):
         sample_weight: Optional[np.ndarray] = None,
     ):
         """
-        Fit transform.
-
-        Description
+        Fit transform
         ----------
         Access fitted sample_weight param with self.estimator_params["sample_weight"].
         The transform returns the same object inputed.
@@ -127,11 +141,11 @@ class Reweighing(BMPre):
             Group membership vector (binary)
         group_b : array-like
             Group membership vector (binary)
-        sample_weight (optional) : array-like
-            Samples weights vector
+        sample_weight : array-like, optional
+            Samples weights vector. Default is None.
 
         Returns
         -------
-            X
+        self
         """
         return self.fit(y_true, group_a, group_b, sample_weight).transform(X)

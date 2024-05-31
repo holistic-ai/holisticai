@@ -15,19 +15,21 @@ class KMedoids:
 
     Parameters
     ----------
-    n_clusters : int, optional, default: 8
+    n_clusters : int, optional
         The number of clusters to form as well as the number of medoids to
-        generate.
+        generate. Default is 8.
 
-    metric : string, or callable, optional, default: 'euclidean'
+    metric : str, or callable, optional
         What distance metric to use. See :func:metrics.pairwise_distances
         metric can be 'precomputed', the user must then feed the fit method
-        with a precomputed kernel matrix and not the design matrix X.
+        with a precomputed kernel matrix and not the design matrix X. 
+        Default is 'euclidean'. Possible values are 'euclidean', 'manhattan',
 
-    method : {'alternate', 'pam'}, default: 'alternate'
+    method : str, optional
         Which algorithm to use. 'alternate' is faster while 'pam' is more accurate.
+        Default is 'alternate'. Possible values are 'alternate' and 'pam'.
 
-    init : {'random', 'heuristic', 'k-medoids++', 'build'}, optional, default: 'build'
+    init : str, optional
         Specify medoid initialization method. 'random' selects n_clusters
         elements from the dataset. 'heuristic' picks the n_clusters points
         with the smallest sum distance to every other point. 'k-medoids++'
@@ -37,34 +39,56 @@ class KMedoids:
         algorithm. Often 'build' is more efficient but slower than other
         initializations on big datasets and it is also very non-robust,
         if there are outliers in the dataset, use another initialization.
+        Default is 'heuristic'. Possible values are 'random', 'heuristic', 'k-medoids++' and 'build'.
 
         .. _k-means++: https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf
 
-    max_iter : int, optional, default : 300
+    max_iter : int, optional
         Specify the maximum number of iterations when fitting. It can be zero in
         which case only the initialization is computed which may be suitable for
         large datasets when the initialization is sufficiently efficient
-        (i.e. for 'build' init).
+        (i.e. for 'build' init). Default is 300.
 
     random_state : int, RandomState instance or None, optional
         Specify random state for the random number generator. Used to
-        initialise medoids when init='random'.
+        initialise medoids when init='random'. Default is None.
 
     Attributes
     ----------
-    cluster_centers_ : array, shape = (n_clusters, n_features)
-            or None if metric == 'precomputed'
-        Cluster centers, i.e. medoids (elements from the original dataset)
+    cluster_centers_ : array, None if metric == 'precomputed'
+        Cluster centers, i.e. medoids (elements from the original dataset), shape = (n_clusters, n_features)
 
-    medoid_indices_ : array, shape = (n_clusters,)
-        The indices of the medoid rows in X
+    medoid_indices_ : array-like
+        The indices of the medoid rows in X, shape = (n_clusters,)
 
-    labels_ : array, shape = (n_samples,)
-        Labels of each point
+    labels_ : array-like
+        Labels of each point, shape = (n_samples,)
 
     inertia_ : float
         Sum of distances of samples to their closest cluster center.
 
+    n_iter_ : int
+        Number of iterations run.
+
+    members : array-like
+        The indices of the medoid rows in X, shape = (n_clusters,)
+
+    centers : array-like
+        The indices of the medoid rows in X, shape = (n_clusters,)
+
+    Methods
+    -------
+    fit(X)
+        Compute k-medoids clustering.
+
+    predict(X)
+        Predict the closest cluster each sample in X belongs to.
+
+    transform(X)
+        Transform X to a cluster-distance space.
+
+    assign()
+        Assigns every point in the dataset to the closest center.
     """
 
     def __init__(
@@ -84,7 +108,23 @@ class KMedoids:
         self.random_state = random_state
 
     def _check_nonnegative_int(self, value, desc, strict=True):
-        """Validates if value is a valid integer > 0"""
+        """
+        Check if a value is a nonnegative integer.
+
+        Parameters
+        ----------
+        value : int
+            The value to check.
+        desc : str
+            The description of the value.
+        strict : bool, optional
+            If True, the value must be strictly positive. Default is True.
+
+        Raises
+        ------
+        ValueError
+            If the value is not a nonnegative integer.
+        """
         if strict:
             negative = (value is None) or (value <= 0)
         else:
@@ -95,7 +135,14 @@ class KMedoids:
             )
 
     def _check_init_args(self):
-        """Validates the input arguments."""
+        """
+        Check the validity of the input arguments.
+
+        Raises
+        ------
+        ValueError
+            If the input arguments are invalid.
+        """
 
         # Check n_clusters and max_iter
         self._check_nonnegative_int(self.n_clusters, "n_clusters")
@@ -109,19 +156,25 @@ class KMedoids:
             )
 
     def fit(self, X, y=None, sample_weight=None):
-        """Fit K-Medoids to the provided data.
+        """
+        Fit K-Medoids to the provided data.
 
         Parameters
         ----------
-        X : {array-like, sparse matrix}, shape = (n_samples, n_features), \
-                or (n_samples, n_samples) if metric == 'precomputed'
-            Dataset to cluster.
+        X : array-like or sparse matrix
+            The data to cluster. It must be an array of shape (n_samples, n_features) or (n_samples, n_samples) 
+            if metric == 'precomputed'
 
         y : Ignored
+            Not used, present here for API consistency by convention.
+
+        sample_weight : array-like, shape (n_samples,), optional
+            The weights for each sample. If None, all samples are given equal weight.
 
         Returns
         -------
-        self
+        self : object
+            Returns the instance itself.
         """
         random_state_ = check_random_state(self.random_state)
 
@@ -175,10 +228,31 @@ class KMedoids:
         return self
 
     def assign(self):
+        """
+        Assigns every point in the dataset to the closest center.
+
+        Returns
+        -------
+        list
+            The indices of the medoid rows in X
+        """
         return list(enumerate(self.medoid_indices_))
 
     def _update_medoid_idxs_in_place(self, D, labels, medoid_idxs, sample_weight):
-        """In-place update of the medoid indices"""
+        """
+        In-place update of the medoid indices
+        
+        Parameters
+        ----------
+        D : array-like
+            The distance matrix between the data points, shape (n_samples, n_samples)
+        labels : array-like
+            The cluster labels for each data point, shape (n_samples,)
+        medoid_idxs : array-like
+            The indices of the medoid rows in X, shape = (n_clusters,)
+        sample_weight : array-like, optional
+            The weights for each sample. If None, all samples are given equal weight, shape (n_samples,)
+        """
 
         # Update the medoids for each cluster
         for k in range(self.n_clusters):
@@ -214,22 +288,37 @@ class KMedoids:
                 medoid_idxs[k] = cluster_k_idxs[min_cost_idx]
 
     def _compute_cost(self, D, medoid_idxs):
-        """Compute the cose for a given configuration of the medoids"""
-        return self._compute_inertia(D[:, medoid_idxs])
-
-    def transform(self, X):
-        """Transforms X to cluster-distance space.
+        """
+        Compute the cose for a given configuration of the medoids.
 
         Parameters
         ----------
-        X : {array-like, sparse matrix}, shape (n_query, n_features), \
-                or (n_query, n_indexed) if metric == 'precomputed'
-            Data to transform.
+        D : array-like
+            The distance matrix between the data points, shape (n_samples, n_samples)
+        medoid_idxs : array-like
+            The indices of the medoid rows in X, shape = (n_clusters,)
 
         Returns
         -------
-        X_new : {array-like, sparse matrix}, shape=(n_query, n_clusters)
-            X transformed in the new space of distances to cluster centers.
+        float
+            The cost of the configuration.
+        """
+        return self._compute_inertia(D[:, medoid_idxs])
+
+    def transform(self, X):
+        """
+        Transforms X to cluster-distance space.
+
+        Parameters
+        ----------
+        X : array-like or sparse matrix
+            Data to transform. It must be an array of shape (n_query, n_features) or (n_query, n_indexed) 
+            if metric == 'precomputed'
+
+        Returns
+        -------
+        array-like or sparse matrix
+            X transformed in the new space of distances to cluster centers, shape=(n_query, n_clusters)
         """
         X = check_array(X, accept_sparse=["csr", "csc"])
 
@@ -247,14 +336,14 @@ class KMedoids:
 
         Parameters
         ----------
-        X : {array-like, sparse matrix}, shape (n_query, n_features), \
-                or (n_query, n_indexed) if metric == 'precomputed'
-            New data to predict.
+        X : array-like or sparse matrix
+            New data to predict. It must be an array of shape (n_query, n_features) or (n_query, n_indexed) 
+            if metric == 'precomputed'
 
         Returns
         -------
-        labels : array, shape = (n_query,)
-            Index of the cluster each sample belongs to.
+        array-like
+            Index of the cluster each sample belongs to, shape = (n_query,)
         """
         X = check_array(X, accept_sparse=["csr", "csc"])
 
@@ -271,17 +360,19 @@ class KMedoids:
             )
 
     def _compute_inertia(self, distances):
-        """Compute inertia of new samples. Inertia is defined as the sum of the
+        """
+        Compute inertia of new samples. Inertia is defined as the sum of the
         sample distances to closest cluster centers.
 
         Parameters
         ----------
-        distances : {array-like, sparse matrix}, shape=(n_samples, n_clusters)
-            Distances to cluster centers.
+        distances : array-like or sparse matrix
+            Distances to cluster centers, shape=(n_samples, n_clusters)
 
         Returns
         -------
-        Sum of sample distances to closest cluster centers.
+        float
+            Sum of distances of samples to their closest cluster center.
         """
 
         # Define inertia as the sum of the sample-distances
@@ -291,7 +382,23 @@ class KMedoids:
         return inertia
 
     def _initialize_medoids(self, D, n_clusters, random_state_):
-        """Select initial mediods when beginning clustering."""
+        """
+        Select initial mediods when beginning clustering.
+
+        Parameters
+        ----------
+        D : array-like
+            The distance matrix between the data points, shape (n_samples, n_samples)
+        n_clusters : int
+            The number of clusters to form as well as the number of medoids to generate.
+        random_state_ : RandomState instance
+            The random number generator.
+
+        Returns
+        -------
+        array-like
+            The indices of the medoid rows in X, shape = (n_clusters,)
+        """
 
         if self.init == "random":  # Random initialization
             # Pick random k medoids as the initial ones.
@@ -308,17 +415,18 @@ class KMedoids:
         return medoids
 
     def _kpp_init(self, D, n_clusters, random_state_, n_local_trials=None):
-        """Init n_clusters seeds with a method similar to k-means++
+        """
+        Init n_clusters seeds with a method similar to k-means++
 
         Parameters
         -----------
-        D : array, shape (n_samples, n_samples)
-            The distance matrix we will use to select medoid indices.
+        D : array-like
+            The distance matrix we will use to select medoid indices, shape (n_samples, n_samples)
 
-        n_clusters : integer
+        n_clusters : int
             The number of seeds to choose
 
-        random_state : RandomState
+        random_state : RandomState instance
             The generator used to initialize the centers.
 
         n_local_trials : integer, optional
@@ -327,13 +435,19 @@ class KMedoids:
             Set to None to make the number of trials depend logarithmically
             on the number of seeds (2+log(k)); this is the default.
 
-        Notes
-        -----
-        Selects initial cluster centers for k-medoid clustering in a smart way
-        to speed up convergence. see: Arthur, D. and Vassilvitskii, S.
+        Returns
+        -------
+        array-like
+            The indices of the medoid rows in X, shape = (n_clusters,)
+
+        References
+        ----------
+        .. [1] Arthur, D. and Vassilvitskii, S.
         "k-means++: the advantages of careful seeding". ACM-SIAM symposium
         on Discrete algorithms. 2007
 
+        Notes
+        -----
         Version ported from http://www.stanford.edu/~darthur/kMeansppTest.zip,
         which is the implementation used in the aforementioned paper.
         """

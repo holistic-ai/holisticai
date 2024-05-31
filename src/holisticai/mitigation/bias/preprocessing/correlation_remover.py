@@ -6,38 +6,30 @@ from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 
 class CorrelationRemover(BMPre):
     """
-    CorrelationRemover applies a linear transformation to the non-sensitive feature columns
-    in order to remove their correlation with the sensitive feature columns while retaining
+    CorrelationRemover applies a linear transformation to the non-sensitive feature columns\
+    in order to remove their correlation with the sensitive feature columns while retaining\
     as much information as possible (as measured by the least-squares error).
 
     Notes
     -----
-    This method will change the original dataset by removing all correlation with sensitive
-    values. Note that the lack of correlation does not imply anything about statistical dependence.
-    Therefore, it is expected this to be most appropriate as a preprocessing step for
+    This method will change the original dataset by removing all correlation with sensitive\
+    values. Note that the lack of correlation does not imply anything about statistical dependence.\
+    Therefore, it is expected this to be most appropriate as a preprocessing step for\
     (generalized) linear models.
-
-    Reference
-    ---------
-
     """
 
     def __init__(self, alpha=1):
         """
         Parameters
         ----------
-            alpha : float
-                parameter to control how much to filter, for alpha=1.0 we filter out
-                all information while for alpha=0.0 we don't apply any.
+        alpha : float, optional
+            parameter to control how much to filter, for alpha=1.0 we filter out
+            all information while for alpha=0.0 we don't apply any. Default is 1.
         """
         self.alpha = alpha
 
     def fit(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
-        Fit.
-
-        Description
-        -----------
         Learn the projection required to make the dataset uncorrelated with groups (group_a and group_b).
 
         Parameters
@@ -51,7 +43,7 @@ class CorrelationRemover(BMPre):
 
         Return
         ------
-            Self
+        Self
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         X = params["X"]
@@ -68,8 +60,6 @@ class CorrelationRemover(BMPre):
     def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
 
         """
-        Description
-        ----------
         Transform X by applying the correlation remover.
 
         Parameters
@@ -105,10 +95,6 @@ class CorrelationRemover(BMPre):
         group_b: np.ndarray,
     ):
         """
-        Fit and transform
-
-        Description
-        ----------
         Fit and transform
 
         Parameters

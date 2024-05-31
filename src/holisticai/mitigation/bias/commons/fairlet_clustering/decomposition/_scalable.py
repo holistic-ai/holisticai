@@ -12,17 +12,63 @@ EPSILON = 0.0001
 
 
 class TreeNode:
+    """
+    A node in the quadtree used for fairlet decomposition
+
+    Attributes
+    ----------
+    children : list
+        The children of the node.
+    cluster : list
+        The indices of the cluster.
+    reds : list
+        The indices of the red points.
+    blues : list
+        The indices of the blue points.
+
+    Methods
+    -------
+    set_cluster(cluster)
+        Sets the cluster of the node.
+    add_child(child)
+        Adds a child to the node.
+    populate_colors(colors)
+        Populates the red and blue points for each node.
+    """
     def __init__(self):
         self.children = []
 
     def set_cluster(self, cluster):
+        """
+        Sets the cluster of the node.
+
+        Parameters
+        ----------
+        cluster : list
+            The indices of the cluster.
+        """
         self.cluster = cluster
 
     def add_child(self, child):
+        """
+        Adds a child to the node.
+
+        Parameters
+        ----------
+        child : TreeNode
+            The child node to add.
+        """
         self.children.append(child)
 
     def populate_colors(self, colors):
-        "Populate auxiliary lists of red and blue points for each node, bottom-up"
+        """
+        Populate auxiliary lists of red and blue points for each node, bottom-up
+
+        Parameters
+        ----------
+        colors : list
+            The colors of the points.
+        """
         self.reds = []
         self.blues = []
         if len(self.children) == 0:
@@ -44,6 +90,38 @@ from ._vanilla import VanillaFairletDecomposition
 
 
 class ScalableFairletDecomposition(VanillaFairletDecomposition):
+    """
+    A scalable version of the fairlet decomposition algorithm
+
+    Parameters
+    ----------
+    p : int
+        The number of red points in a fairlet.
+    q : int
+        The number of blue points in a fairlet.
+
+    Attributes
+    ----------
+    fairlets : list
+        The fairlets.
+    fairlet_centers : list
+        The centers of the fairlets.
+    p : int
+        The number of red points in a fairlet.
+    q : int
+        The number of blue points in a fairlet.
+    sensgroups : SensitiveGroups
+        The sensitive groups.
+
+    Methods
+    -------
+    decompose(node, dataset, donelist, depth)
+        Decomposes the dataset into fairlets.
+    fit_transform(dataset, group_a, group_b)
+        Fits the dataset and transforms it into fairlets.
+    balanced(p, q, reds, blues)
+        Checks if the dataset is balanced.
+    """
     def __init__(self, p, q):
         self.fairlets = []
         self.fairlet_centers = []
@@ -53,6 +131,25 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         self.sensgroups = SensitiveGroups()
 
     def decompose(self, node, dataset, donelist, depth):
+        """
+        Decomposes the dataset into fairlets.
+
+        Parameters
+        ----------
+        node : TreeNode
+            The node in the quadtree.
+        dataset : list
+            The dataset.
+        donelist : list
+            The list of points that have already been clustered.
+        depth : int
+            The depth of the node in the quadtree.
+
+        Returns
+        -------
+        int
+            The cost of the decomposition.
+        """
         p = self.p
         q = self.q
 
@@ -157,6 +254,27 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         )
 
     def fit_transform(self, dataset, group_a, group_b):
+        """
+        Fits the dataset and transforms it into fairlets.
+
+        Parameters
+        ----------
+        dataset : list
+            The dataset.
+        group_a : list
+            The first group.
+        group_b : list
+            The second group.
+
+        Returns
+        -------
+        list
+            The fairlets.
+        list
+            The centers of the fairlets.
+        float
+            The cost of the decomposition.
+        """
         sensitive_groups = np.c_[group_a, group_b]
         colors = self.sensgroups.fit_transform(sensitive_groups, convert_numeric=True)
         root = build_quadtree(dataset)
@@ -177,7 +295,24 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
 
 
 def build_quadtree(dataset, max_levels=0, random_shift=True):
-    "If max_levels=0 there no level limit, quadtree will partition until all clusters are singletons"
+    """
+    Builds a quadtree for the given dataset. If max_levels=0 there no level limit, 
+    quadtree will partition until all clusters are singletons
+
+    Parameters
+    ----------
+    dataset : numpy.ndarray
+        The dataset.
+    max_levels : int, optional
+        The maximum number of levels in the quadtree. Default is 0.
+    random_shift : bool, optional
+        Whether to randomly shift the dataset. Default is True.
+
+    Returns
+    -------
+    TreeNode
+        The root of the quadtree.
+    """
     dimension = dataset.shape[1]
     lower = np.amin(dataset, axis=0)
     upper = np.amax(dataset, axis=0)
@@ -196,10 +331,29 @@ def build_quadtree(dataset, max_levels=0, random_shift=True):
 
 def build_quadtree_aux(dataset, cluster, lower, upper, max_levels, shift):
     """
-    "lower" is the "bottom-left" (in all dimensions) corner of current hypercube
-    "upper" is the "upper-right" (in all dimensions) corner of current hypercube
-    """
+    Builds a quadtree recursively to partition the dataset into clusters.
 
+    Parameters
+    ----------
+    dataset : numpy.ndarray
+        The input dataset.
+    cluster : list
+        The indices of the data points in the current cluster.
+    lower : numpy.ndarray
+        The lower bounds of the current partition.
+    upper : numpy.ndarray
+        The upper bounds of the current partition.
+    max_levels : int
+        The maximum number of levels to build the quadtree.
+    shift : numpy.ndarray
+        The shift vector to adjust the partition.
+
+    Returns
+    -------
+    TreeNode:
+        The root node of the quadtree.
+
+    """
     dimension = dataset.shape[1]
     cell_too_small = True
     for i in range(dimension):
