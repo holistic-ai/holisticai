@@ -53,10 +53,13 @@ class UTransformersHandler:
         }
 
         # Validate if all objects with bias mitigator stem (BIAS_TAGS) are linked with a correct Bias Mitigator Transformer objects
-        if not mitigator_groups_by_name == mitigator_groups_by_object:
-            raise NameError(
+        if mitigator_groups_by_name != mitigator_groups_by_object:
+            msg = (
                 f"Mitigator objects and name doesn't match, grouped by name: {mitigator_groups_by_name} \
                 and grouped by object type:{mitigator_groups_by_object}"
+            )
+            raise NameError(
+                msg
             )
 
         num_post_mitigators = len(mitigator_groups_by_name[BIAS_TAGS.POST])
@@ -67,14 +70,15 @@ class UTransformersHandler:
                 *mitigator_groups_by_name[BIAS_TAGS.POST]
             )
             assert all(
-                [name.startswith(BIAS_TAGS.POST) for name in post_classifier_step_names]
+                name.startswith(BIAS_TAGS.POST) for name in post_classifier_step_names
             ), f"Only bias mitigators postprocessor are supported, \
                 utransformer postprocessors founded: {post_classifier_step_names}"
 
         # Validate that exists only one bias mitigator postprocessor
         # TODO: Evaluate in other cases.
         if not len(mitigator_groups_by_name[BIAS_TAGS.POST]) <= 1:
-            raise NotSupportedErr("Pipeline supports max 1 postprocessor mitigator.")
+            msg = "Pipeline supports max 1 postprocessor mitigator."
+            raise NotSupportedErr(msg)
 
     def drop_post_processing_steps(self, steps):
         """
@@ -124,7 +128,7 @@ class UTransformersHandler:
         None
         """
         step = self.pos_processing_steps[0]
-        step[1].fit(X=Xt, y_true=y, **kargs)
+        step[1].fit(X=Xt, y=y, **kargs)
 
     def transform_postprocessing(self, **kargs):
         """
@@ -148,5 +152,4 @@ class UTransformersHandler:
             Dictionaty with post-processed prediction vectors
         """
         step = self.pos_processing_steps[0]
-        yt = step[1].transform(**kargs)
-        return yt
+        return step[1].transform(**kargs)

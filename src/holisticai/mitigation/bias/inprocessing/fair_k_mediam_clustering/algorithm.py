@@ -2,7 +2,6 @@ import random
 
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
-from tqdm import tqdm
 
 
 class KMediamClusteringAlgorithm:
@@ -83,8 +82,7 @@ class KMediamClusteringAlgorithm:
             # Check if any other point is a better center
             r = list(range(self.n))
             random.shuffle(r)
-            t = tqdm(r, desc=f"Cost: {min_cost:.4f}", leave=True)
-            for c in t:
+            for c in r:
                 for i in range(self.k):
                     centers = list(chosen_centers)
                     # Try replacing i center

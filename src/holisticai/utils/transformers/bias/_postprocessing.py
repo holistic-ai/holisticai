@@ -1,7 +1,6 @@
 from typing import Optional, Union
 
 import numpy as np
-
 from holisticai.utils._validation import _check_valid_y_proba
 from holisticai.utils.transformers._transformer_base import BMTransformerBase
 
@@ -18,9 +17,9 @@ class BMPostprocessing(BMTransformerBase):
 
         params = {}
 
-        if self._has_valid_argument(kargs, "y_true"):
-            y_true = np.array(kargs.get("y_true")).ravel()
-            params.update({"y_true": y_true})
+        if self._has_valid_argument(kargs, "y"):
+            y = np.array(kargs.get("y")).ravel()
+            params.update({"y": y})
 
         if self._has_valid_argument(kargs, "y_proba"):
             y_proba = np.array(kargs.get("y_proba"))
@@ -39,8 +38,8 @@ class BMPostprocessing(BMTransformerBase):
             params.update({"y_pred": y_pred})
 
         if self._has_valid_argument(kargs, "y_pred"):
-            y_pred = np.array(kargs.get("y_pred")).ravel()
-            params.update({"y_pred": y_pred})
+            y = np.array(kargs.get("y_pred")).ravel()
+            params.update({"y_pred": y})
 
         params_to_numpy_format = ["group_a", "group_b", "y_score"]
         for param_name in params_to_numpy_format:
@@ -53,8 +52,8 @@ class BMPostprocessing(BMTransformerBase):
         if self._has_valid_argument(kargs, "sample_weight"):
             params.update({"sample_weight": self._to_numpy(kargs, "sample_weight")})
 
-        elif "y_true" in locals():
-            params.update({"sample_weight": np.ones_like(y_true).astype(np.float64)})
+        elif "y" in locals():
+            params.update({"sample_weight": np.ones_like(y).astype(np.float64)})
 
         return params
 

@@ -1,8 +1,6 @@
 import numpy as np
-
+from holisticai.mitigation.bias.postprocessing.wasserstein_barycenters.algorithm import WassersteinBarycenterAlgorithm
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
-
-from .algorithm import WassersteinBarycenterAlgorithm
 
 
 class WassersteinBarycenter(BMPost):

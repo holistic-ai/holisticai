@@ -104,6 +104,8 @@ import os
 import shutil
 import sys
 
+#sys.path.insert(0, os.path.abspath('../src'))
+
 sys.path.insert(0, os.path.abspath(".."))
 
 # make copy of notebooks in docs folder, as they must be here for sphinx to

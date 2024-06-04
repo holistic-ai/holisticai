@@ -40,7 +40,7 @@ class LPDebiaserBinary(BMPost):
 
     def fit(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
         y_pred: Optional[np.ndarray] = None,
@@ -55,7 +55,7 @@ class LPDebiaserBinary(BMPost):
         For Multiclass classification only y_pred must be used.
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector
         y_pred : array-like
             Predicted label vector (num_examples,).
@@ -72,7 +72,7 @@ class LPDebiaserBinary(BMPost):
         Self
         """
         params = self._load_data(
-            y_true=y_true,
+            y=y,
             y_pred=y_pred,
             y_proba=y_proba,
             group_a=group_a,
@@ -81,7 +81,7 @@ class LPDebiaserBinary(BMPost):
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
-        y_true = params["y_true"]
+        y = params["y"]
         y_pred = params.get("y_pred", None)
         y_proba = params.get("y_proba", None)
 
@@ -100,7 +100,7 @@ class LPDebiaserBinary(BMPost):
             constraint=constraint, objective=objective
         )
 
-        self.algorithm.fit(y_true=y_true, y_pred=y_pred, y_proba=y_proba, p_attr=p_attr)
+        self.algorithm.fit(y_true=y, y_pred=y_pred, y_proba=y_proba, p_attr=p_attr)
 
         return self
 
@@ -151,7 +151,7 @@ class LPDebiaserBinary(BMPost):
 
     def fit_transform(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
         y_pred: Optional[np.ndarray] = None,
@@ -162,7 +162,7 @@ class LPDebiaserBinary(BMPost):
 
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector
         y_pred : array-like
             Predicted vector (nb_examlpes,)
@@ -180,7 +180,7 @@ class LPDebiaserBinary(BMPost):
         dictionnary with new predictions
         """
         return self.fit(
-            y_true=y_true,
+            y=y,
             y_proba=y_proba,
             y_pred=y_pred,
             group_a=group_a,

@@ -1,15 +1,12 @@
-from lib2to3.pgen2.token import OP
 from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin
-
+from holisticai.mitigation.bias.inprocessing.prejudice_remover.algorithm import PrejudiceRemoverAlgorithm
+from holisticai.mitigation.bias.inprocessing.prejudice_remover.algorithm_utils import ObjectiveFunction, PRLogger
+from holisticai.mitigation.bias.inprocessing.prejudice_remover.losses import PRBinaryCrossEntropy
+from holisticai.mitigation.bias.inprocessing.prejudice_remover.model import PRLogiticRegression, PRParamInitializer
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-
-from .algorithm import PrejudiceRemoverAlgorithm
-from .algorithm_utils import ObjectiveFunction, PRLogger
-from .losses import PRBinaryCrossEntropy
-from .model import PRLogiticRegression, PRParamInitializer
+from sklearn.base import BaseEstimator, ClassifierMixin
 
 
 class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
@@ -88,7 +85,7 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         self.verbose = verbose
         self.print_interval = print_interval
 
-    def transform_estimator(self):
+    def transform_estimator(self, _):
         # Regularized Binary Cross Entropy
         loss_ = PRBinaryCrossEntropy(C=self.C, eta=self.eta)
 
@@ -120,19 +117,18 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         )
 
         # Algorithm class
-        algorithm = PrejudiceRemoverAlgorithm(
+        return PrejudiceRemoverAlgorithm(
             estimator=self.estimator,
             logger=logger_,
             objective_fn=objective_fn_,
             maxiter=self.maxiter,
         )
 
-        return algorithm
 
     def fit(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
     ):
@@ -148,7 +144,7 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
             X : ndarray
                 input data
 
-            y_true : ndarray
+            y : ndarray
                 Target vector
 
             group_a : ndarray
@@ -159,9 +155,9 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         Returns:
             Self
         """
-        params = self._load_data(X=X, y_true=y_true, group_a=group_a, group_b=group_b)
+        params = self._load_data(X=X, y=y, group_a=group_a, group_b=group_b)
         X = params["X"]
-        y_true = params["y_true"]
+        y = params["y"]
         group_b = params["group_b"]
         group_a = params["group_a"]
         sensitive_features = np.stack([group_a, group_b], axis=1)
@@ -169,7 +165,7 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         self.classes_ = params["classes_"]
 
         self.algorithm = self._build_algorithm()
-        self.algorithm.fit(X=X, y=y_true, sensitive_features=sensitive_features)
+        self.algorithm.fit(X=X, y=y, sensitive_features=sensitive_features)
         return self
 
     def predict(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):

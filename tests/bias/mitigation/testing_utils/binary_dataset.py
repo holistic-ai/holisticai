@@ -1,6 +1,6 @@
 import pandas as pd
 
-from holisticai.datasets import load_adult
+from holisticai.datasets import load_dataset
 
 from .data_utils import (
     get_protected_values,
@@ -80,7 +80,7 @@ def process_binary_dataset(size="small"):
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_adult()
+    dataset = load_dataset("adult")
     protected_attribute = "sex"
     output_variable = "class"
     drop_columns = ["education", "race", "sex", "class"]

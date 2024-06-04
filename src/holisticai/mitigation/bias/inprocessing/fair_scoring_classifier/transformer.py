@@ -1,11 +1,11 @@
+from typing import Literal
+
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator
-
+from holisticai.mitigation.bias.inprocessing.fair_scoring_classifier.algorithm import FairScoreClassifierAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
-
-from .algorithm import FairScoreClassifierAlgorithm
+from sklearn.base import BaseEstimator
 
 
 class FairScoreClassifier(BaseEstimator, BMImp):
@@ -48,15 +48,17 @@ class FairScoreClassifier(BaseEstimator, BMImp):
 
     def __init__(
         self,
-        objectives: dict,
+        objectives: Literal['a','ab'],
         constraints: dict = {},
         lambda_bound: int = 9,
         time_limit: int = 100,
+        verbose: int = 0
     ):
         self.objectives = objectives
         self.constraints = constraints
         self.lambda_bound = lambda_bound
         self.time_limit = time_limit
+        self.verbose = verbose
 
     def fit(self, X, y, group_a, group_b):
         """
@@ -84,13 +86,15 @@ class FairScoreClassifier(BaseEstimator, BMImp):
         -------
         the same object
         """
-        sensgroup = SensitiveGroups()
-        p_attr = sensgroup.fit_transform(
-            np.stack([group_a, group_b], axis=1), convert_numeric=True
+        self.sensgroup = SensitiveGroups()
+        groups = np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1).reshape([-1,2])
+        p_attr = self.sensgroup.fit_transform(
+            groups, convert_numeric=True
         )
         Xtrain = np.hstack([np.ones((X.shape[0], 1)), X, p_attr.values.reshape(-1, 1)])
         fairness_groups = [Xtrain.shape[1] - 1]
-        fairness_labels = np.arange(y.shape[1]).tolist()
+        y_oh = pd.get_dummies(np.squeeze(y))
+        fairness_labels = np.arange(y_oh.shape[1]).tolist()
 
         self.model_ = FairScoreClassifierAlgorithm(
             self.objectives,
@@ -99,14 +103,14 @@ class FairScoreClassifier(BaseEstimator, BMImp):
             self.constraints,
             self.lambda_bound,
             self.time_limit,
+            self.verbose
         )
-        self.model_.fit(Xtrain, y)
+        self.model_.fit(Xtrain, np.array(y_oh))
         return self
 
     def predict(self, X, group_a, group_b):
-        sensgroup = SensitiveGroups()
-        p_attr = sensgroup.fit_transform(
-            np.stack([group_a, group_b], axis=1), convert_numeric=True
+        p_attr = self.sensgroup.transform(
+            np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1), convert_numeric=True
         )
         X_ = np.hstack([np.ones((X.shape[0], 1)), X, p_attr.values.reshape(-1, 1)])
         preds = self.model_.predict(X_)

@@ -70,4 +70,6 @@ def process_regression_dataset(size="small", return_df=False):
     if return_df:
         return post_process_dataframe(df, group_a, group_b)
     df, group_a, group_b = post_process_dataframe(df, group_a, group_b)
+    y = df[output_variable]
+    X = df.drop(columns=output_variable)
     return post_process_dataset(df, output_variable, group_a, group_b)

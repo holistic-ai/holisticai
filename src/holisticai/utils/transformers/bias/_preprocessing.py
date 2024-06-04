@@ -17,14 +17,14 @@ class BMPreprocessing(BMTransformerBase):
         """Save postprocessing atributes and convert data to standard format parameters."""
 
         params = {}
-        if "y_true" in kargs:
-            y_true = np.array(kargs.get("y_true")).ravel()
-            params.update({"y_true": y_true})
+        if "y" in kargs:
+            y = np.array(kargs.get("y")).ravel()
+            params.update({"y": y})
 
         params_to_numpy_format = ["group_a", "group_b"]
         for param_name in params_to_numpy_format:
             if param_name in kargs:
-                params.update({param_name: self._to_numpy(kargs, param_name)})
+                params.update({param_name: self._to_numpy(kargs, param_name).astype(dtype=bool)})
 
         if "X" in kargs:
             params.update({"X": self._to_numpy(kargs, "X", ravel=False)})
@@ -32,8 +32,8 @@ class BMPreprocessing(BMTransformerBase):
         if ("sample_weight" in kargs) and (kargs["sample_weight"] is not None):
             params.update({"sample_weight": self._to_numpy(kargs, "sample_weight")})
 
-        elif "y_true" in locals():
-            params.update({"sample_weight": np.ones_like(y_true).astype(np.float64)})
+        elif "y" in locals():
+            params.update({"sample_weight": np.ones_like(y).astype(np.float64)})
 
         elif "X" in kargs:
             params.update(
