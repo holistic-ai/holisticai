@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 import itertools
 import sys
-from typing import Optional, Tuple, Union
+from typing import Literal, Optional
 
 import numpy as np
-from sklearn.metrics import balanced_accuracy_score
-
 from holisticai.metrics import bias as metrics
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
+from sklearn.metrics import balanced_accuracy_score
 
 
 def statistical_parity(group_a, group_b, y_pred, y_true):
@@ -23,7 +24,7 @@ class RejectOptionClassification(BMPost):
     2012 IEEE 12th International Conference on Data Mining. IEEE, 2012.
     """
 
-    ALLOWED_METRICS = [
+    ALLOWED_METRICS = Literal[
         "Statistical parity difference",
         "Average odds difference",
         "Equal opportunity difference",
@@ -31,15 +32,15 @@ class RejectOptionClassification(BMPost):
 
     def __init__(
         self,
-        low_class_thresh: Optional[float] = 0.01,
-        high_class_thresh: Optional[float] = 0.99,
-        num_class_thresh: Optional[int] = 100,
-        num_ROC_margin: Optional[int] = 50,
-        metric_name: Optional[str] = "Statistical parity difference",
-        metric_ub: Optional[float] = 0.05,
-        metric_lb: Optional[float] = -0.05,
-        num_workers: Optional[int] = 4,
-        verbose: Optional[int] = 0,
+        low_class_thresh: float | None = 0.01,
+        high_class_thresh: float | None = 0.99,
+        num_class_thresh: int | None = 100,
+        num_ROC_margin: int | None = 50,
+        metric_name: str | None = "Statistical parity difference",
+        metric_ub: float | None = 0.05,
+        metric_lb: float | None = -0.05,
+        num_workers: int | None = 4,
+        verbose: int | None = 0,
     ):
         """
         Create a Reject Option Classification Post-processing instance.
@@ -103,14 +104,16 @@ class RejectOptionClassification(BMPost):
             or (self.num_class_thresh < 1)
             or (self.num_ROC_margin < 1)
         ):
-            raise ValueError("Input parameter values out of bounds")
+            msg = "Input parameter values out of bounds"
+            raise ValueError(msg)
 
         if metric_name not in allowed_metrics:
-            raise ValueError("metric name not in the list of allowed metrics")
+            msg = "metric name not in the list of allowed metrics"
+            raise ValueError(msg)
 
     def fit(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         y_proba: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
@@ -125,7 +128,7 @@ class RejectOptionClassification(BMPost):
 
         Parameters
         ----------            
-        y_true : array-like
+        y : array-like
             Target vector (nb_examlpes,)        
         y_proba : matrix-like
             Predicted probability matrix (num_examples, num_classes). The probability 
@@ -141,11 +144,11 @@ class RejectOptionClassification(BMPost):
         Self
         """
 
-        params = self._load_data(y_true=y_true, y_proba=y_proba, group_a=group_a, group_b=group_b)
+        params = self._load_data(y=y, y_proba=y_proba, group_a=group_a, group_b=group_b)
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
-        y_true = params["y_true"]
+        y = params["y"]
         likelihoods = params["y_score"]
         y_proba = params["y_proba"]
 
@@ -161,12 +164,13 @@ class RejectOptionClassification(BMPost):
             fair_metric = metrics.equal_opportunity_diff
 
         else:
-            raise ValueError("metric name not in the list of allowed metrics")
+            msg = "metric name not in the list of allowed metrics"
+            raise ValueError(msg)
 
         args_iterator = [
             (
                 fair_metric,
-                y_true,
+                y,
                 likelihoods,
                 group_a,
                 group_b,

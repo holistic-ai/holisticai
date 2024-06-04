@@ -18,38 +18,38 @@ seed = 42
 
 def running_without_pipeline_classification(small_categorical_dataset):
 
-    train_data, test_data = small_categorical_dataset
-    X, y, group_a, group_b = train_data
+    train = small_categorical_dataset['train']
+    test = small_categorical_dataset['test']
 
     scaler = StandardScaler()
-    Xt = scaler.fit_transform(X)
+    Xt = scaler.fit_transform(train['x'])
 
     model = LogisticRegression()
     inprocessing_model = ExponentiatedGradientReduction(
         constraints="DemographicParity"
     ).transform_estimator(model)
 
-    fit_params = {"group_a": group_a, "group_b": group_b}
-    inprocessing_model.fit(Xt, y, **fit_params)
+    fit_params = {"group_a": train['group_a'], "group_b": train['group_b']}
+    inprocessing_model.fit(Xt, train['y'], **fit_params)
 
     # Test
-    X, y, group_a, group_b = test_data
-    Xt = scaler.transform(X)
+    Xt = scaler.transform(test['x'])
 
     y_pred = inprocessing_model.predict(Xt)
 
     df = classification_bias_metrics(
-        group_a,
-        group_b,
+        test['group_a'],
+        test['group_b'],
         y_pred,
-        y,
+        test['y'],
         metric_type="both",
     )
     return df
 
 
 def running_with_pipeline_classification(small_categorical_dataset):
-    train_data, test_data = small_categorical_dataset
+    train = small_categorical_dataset['train']
+    test = small_categorical_dataset['test']
 
     model = LogisticRegression()
     inprocessing_model = ExponentiatedGradientReduction(
@@ -63,33 +63,32 @@ def running_with_pipeline_classification(small_categorical_dataset):
         ]
     )
 
-    X, y, group_a, group_b = train_data
-    fit_params = {"bm__group_a": group_a, "bm__group_b": group_b}
+    fit_params = {"bm__group_a": train['group_a'], "bm__group_b": train['group_b']}
 
-    pipeline.fit(X, y, **fit_params)
+    pipeline.fit(train['x'], train['y'], **fit_params)
 
-    X, y, group_a, group_b = test_data
     predict_params = {
-        "bm__group_a": group_a,
-        "bm__group_b": group_b,
+        "bm__group_a": test['group_a'],
+        "bm__group_b": test['group_b'],
     }
-    y_pred = pipeline.predict(X, **predict_params)
+    y_pred = pipeline.predict(test['x'], **predict_params)
     df = classification_bias_metrics(
-        group_a,
-        group_b,
+        test['group_a'],
+        test['group_b'],
         y_pred,
-        y,
+        test['y'],
         metric_type="both",
     )
     return df
 
 
 def running_without_pipeline_regression(small_regression_dataset):
-    train_data, test_data = small_regression_dataset
-    X, y, group_a, group_b = train_data
+    train = small_regression_dataset['train']
+    test = small_regression_dataset['test']
+    
 
     scaler = StandardScaler()
-    Xt = scaler.fit_transform(X)
+    Xt = scaler.fit_transform(train['x'])
 
     model = LinearRegression()
     inprocessing_model = ExponentiatedGradientReduction(
@@ -100,28 +99,27 @@ def running_without_pipeline_regression(small_regression_dataset):
         upper_bound=0.001,
     ).transform_estimator(model)
 
-    fit_params = {"group_a": group_a, "group_b": group_b}
-    inprocessing_model.fit(Xt, y, **fit_params)
+    fit_params = {"group_a": train['group_a'], "group_b": train['group_b']}
+    inprocessing_model.fit(Xt, train['y'], **fit_params)
 
     # Test
-    X, y, group_a, group_b = test_data
-    Xt = scaler.transform(X)
+    Xt = scaler.transform(test['x'])
 
     y_pred = inprocessing_model.predict(Xt)
-    print(y_pred.shape)
-    print(y.shape)
+
     df = regression_bias_metrics(
-        group_a,
-        group_b,
+        test['group_a'],
+        test['group_b'],
         y_pred,
-        y,
+        test['y'],
         metric_type="both",
     )
     return df
 
 
 def running_with_pipeline_regression(small_regression_dataset):
-    train_data, test_data = small_regression_dataset
+    train = small_regression_dataset['train']
+    test = small_regression_dataset['test']
 
     model = LinearRegression()
     inprocessing_model = ExponentiatedGradientReduction(
@@ -139,22 +137,20 @@ def running_with_pipeline_regression(small_regression_dataset):
         ]
     )
 
-    X, y, group_a, group_b = train_data
-    fit_params = {"bm__group_a": group_a, "bm__group_b": group_b}
+    fit_params = {"bm__group_a": train['group_a'], "bm__group_b": train['group_b']}
 
-    pipeline.fit(X, y, **fit_params)
+    pipeline.fit(train['x'], train['y'], **fit_params)
 
-    X, y, group_a, group_b = test_data
     predict_params = {
-        "bm__group_a": group_a,
-        "bm__group_b": group_b,
+        "bm__group_a": test['group_a'],
+        "bm__group_b": test['group_b'],
     }
-    y_pred = pipeline.predict(X, **predict_params)
+    y_pred = pipeline.predict(test['x'], **predict_params)
     df = regression_bias_metrics(
-        group_a,
-        group_b,
+        test['group_a'],
+        test['group_b'],
         y_pred,
-        y,
+        test['y'],
         metric_type="both",
     )
     return df

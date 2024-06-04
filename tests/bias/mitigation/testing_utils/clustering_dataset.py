@@ -83,4 +83,6 @@ def process_clustering_dataset(size="small"):
     df, group_a, group_b = preprocess_heart_dataset(
         df, protected_attribute, output_variable, drop_columns
     )
+    y = df[output_variable]
+    X = df.drop(columns=output_variable)
     return post_process_dataset(df, output_variable, group_a, group_b)

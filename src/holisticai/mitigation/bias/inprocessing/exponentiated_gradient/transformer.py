@@ -1,9 +1,8 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, ClassifierMixin, clone
-
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
+from sklearn.base import BaseEstimator, ClassifierMixin, clone
 
 from ..commons.classification import _constraints as cc
 from ..commons.regression import _constraints as rc
@@ -24,7 +23,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         International Conference on Machine Learning. PMLR, 2018.
     """
 
-    CONSTRAINTS = [
+    CONSTRAINTS = Literal[
         "DemographicParity",
         "EqualizedOdds",
         "TruePositiveRateParity",
@@ -45,6 +44,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         upper_bound: float = 0.01,
         verbose: Optional[int] = 0,
         estimator=None,
+        seed : int =0,
     ):
 
         """
@@ -92,6 +92,9 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
 
         verbose : int
             If >0, will show progress percentage.
+
+        seed: int
+            seed for random initialization
         """
 
         self.constraints = constraints
@@ -105,6 +108,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         self.upper_bound = upper_bound
         self.verbose = verbose
         self.estimator = estimator
+        self.seed = seed
 
     def transform_estimator(self, estimator):
 
@@ -118,7 +122,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
     def fit(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
     ):
@@ -129,7 +133,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         ----------
         X : matrix-like
             Input matrix
-        y_true : array-like
+        y : array-like
             Target vector
         group_a : array-like
             Group membership vector (binary)
@@ -141,11 +145,11 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         Self
 
         """
-        params = self._load_data(X=X, y_true=y_true, group_a=group_a, group_b=group_b)
+        params = self._load_data(X=X, y=y, group_a=group_a, group_b=group_b)
         group_a = params["group_a"]
         group_b = params["group_b"]
         X = params["X"]
-        y_true = params["y_true"]
+        y = params["y"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
 
@@ -171,9 +175,10 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
             nu=self.nu,
             eta0=self.eta0,
             verbose=self.verbose,
+            seed=self.seed
         )
 
-        self.model_.fit(X, y_true, sensitive_features=sensitive_features)
+        self.model_.fit(X, y, sensitive_features=sensitive_features)
 
         return self
 

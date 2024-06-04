@@ -1,7 +1,6 @@
 def post_process_recommender(df):
     df = df.fillna(0)
-    data_matrix = df.to_numpy()
-    return data_matrix
+    return df.to_numpy()
 
 
 def get_protected_values(df, protected_attribute, protected_value):
@@ -22,8 +21,7 @@ def get_protected_values(df, protected_attribute, protected_value):
     np.ndarray
         A boolean array with True for the protected group and False for the unprotected group
     """
-    group = df[protected_attribute] == protected_value
-    return group
+    return df[protected_attribute] == protected_value
 
 
 def remove_nans(df):
@@ -43,8 +41,7 @@ def remove_nans(df):
     df = df.iloc[
         :, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < 1000]
     ]
-    df = df.dropna()
-    return df
+    return df.dropna()
 
 
 def post_process_dataset(df, output_variable, group_a, group_b):
@@ -69,13 +66,12 @@ def post_process_dataset(df, output_variable, group_a, group_b):
     """
     y = df[output_variable]
     X = df.drop(columns=output_variable)
-    data = [
+    return [
         X.values,
         y.values.ravel(),
         group_a.values.ravel(),
         group_b.values.ravel(),
     ]
-    return data
 
 
 def post_process_dataframe(df, group_a, group_b):

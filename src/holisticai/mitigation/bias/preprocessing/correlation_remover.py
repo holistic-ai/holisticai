@@ -89,7 +89,6 @@ class CorrelationRemover(BMPre):
         X = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
-
         sensitive_features = np.stack([group_a, group_b], axis=1).astype(np.int32)
         self.sensitive_mean_ = sensitive_features.mean()
         sensitive_features_center = sensitive_features - self.sensitive_mean_

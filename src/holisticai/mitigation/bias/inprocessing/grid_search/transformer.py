@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 import pandas as pd
@@ -31,7 +31,7 @@ class GridSearchReduction(BaseEstimator, BMImp):
         International Conference on Machine Learning. PMLR, 2019.
     """
 
-    CONSTRAINTS = [
+    CONSTRAINTS = Literal[
         "DemographicParity",
         "EqualizedOdds",
         "TruePositiveRateParity",
@@ -107,7 +107,7 @@ class GridSearchReduction(BaseEstimator, BMImp):
     def fit(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
     ):
@@ -119,7 +119,7 @@ class GridSearchReduction(BaseEstimator, BMImp):
         ----------
         X : matrix-like
             Input matrix
-        y_true : array-like
+        y : array-like
             Target vector
         group_a : array-like
             Group membership vector (binary)
@@ -131,11 +131,11 @@ class GridSearchReduction(BaseEstimator, BMImp):
             Self
         """
 
-        params = self._load_data(X=X, y_true=y_true, group_a=group_a, group_b=group_b)
+        params = self._load_data(X=X, y=y, group_a=group_a, group_b=group_b)
         group_a = params["group_a"]
         group_b = params["group_b"]
         X = params["X"]
-        y_true = params["y_true"]
+        y = params["y"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
 
@@ -162,7 +162,7 @@ class GridSearchReduction(BaseEstimator, BMImp):
             verbose=self.verbose,
         )
 
-        self.model_.fit(X, y_true, sensitive_features=sensitive_features)
+        self.model_.fit(X, y, sensitive_features=sensitive_features)
 
         return self
 

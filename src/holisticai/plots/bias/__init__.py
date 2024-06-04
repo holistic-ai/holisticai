@@ -11,6 +11,9 @@ from holisticai.plots.bias._bias_exploratory_plots import (  # type: ignore
     group_pie_plot,
     histogram_plot,
 )
+
+# Exploration View
+from holisticai.plots.bias._bias_exploratory_view import bias_data_exploration, bias_model_exploration
 from holisticai.plots.bias._bias_multiclass_plots import (
     accuracy_bar_plot,
     disparate_impact_plot,
@@ -60,4 +63,6 @@ __all__ = [
     "bias_report_regression",
     "bias_report_clustering",
     "bias_metrics_report",
+    "bias_data_exploration",
+    "bias_model_exploration"
 ]

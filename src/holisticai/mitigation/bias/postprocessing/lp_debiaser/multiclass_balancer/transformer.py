@@ -51,7 +51,7 @@ class LPDebiaserMulticlass(BMPost):
 
     def fit(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         y_pred: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
@@ -65,7 +65,7 @@ class LPDebiaserMulticlass(BMPost):
         For Multiclass classification only y_pred must be used.
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector
         y_pred : array-like
             Predicted label vector (num_examples,).
@@ -78,12 +78,12 @@ class LPDebiaserMulticlass(BMPost):
         Self
         """
         params = self._load_data(
-            y_true=y_true, y_pred=y_pred, group_a=group_a, group_b=group_b
+            y=y, y_pred=y_pred, group_a=group_a, group_b=group_b
         )
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
-        y_true = params["y_true"]
+        y = params["y"]
         y_pred = params["y_pred"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
@@ -101,7 +101,7 @@ class LPDebiaserMulticlass(BMPost):
             constraint=constraint, objective=objective
         )
 
-        self.algorithm.fit(y_true=y_true, y_pred=y_pred, p_attr=p_attr)
+        self.algorithm.fit(y_true=y, y_pred=y_pred, p_attr=p_attr)
         return self
 
     def transform(
@@ -140,7 +140,7 @@ class LPDebiaserMulticlass(BMPost):
 
     def fit_transform(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         y_pred: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
@@ -150,7 +150,7 @@ class LPDebiaserMulticlass(BMPost):
 
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector
         y_pred : array-like
             Predicted vector (nb_examlpes,)
@@ -164,7 +164,7 @@ class LPDebiaserMulticlass(BMPost):
         dictionnary with new predictions
         """
         return self.fit(
-            y_true=y_true,
+            y=y,
             y_pred=y_pred,
             group_a=group_a,
             group_b=group_b,

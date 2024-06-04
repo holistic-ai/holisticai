@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
-
+from holisticai.mitigation.bias.postprocessing.plugin_estimator_and_recalibration.algorithm import (
+    PluginEstimationAndCalibrationAlgorithm,
+)
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
-
-from .algorithm import PluginEstimationAndCalibrationAlgorithm
 
 
 class PluginEstimationAndCalibration(BMPost):
@@ -18,7 +20,7 @@ class PluginEstimationAndCalibration(BMPost):
         guarantees." Advances in Neural Information Processing Systems 33 (2020): 19137-19148.
     """
 
-    def __init__(self, L: Optional[int] = 25, beta: Optional[float] = 0.1):
+    def __init__(self, L: int | None = 25, beta: float | None = 0.1):
         """Create a Plugin Estimation and Calibration Post-processing instance."""
         self.algorithm = PluginEstimationAndCalibrationAlgorithm(L=L, beta=beta)
 

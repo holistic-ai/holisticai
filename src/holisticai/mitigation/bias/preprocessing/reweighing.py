@@ -23,7 +23,7 @@ class Reweighing(BMPre):
 
     def fit(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
         sample_weight: Optional[np.ndarray] = None,
@@ -37,7 +37,7 @@ class Reweighing(BMPre):
 
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector
         group_a : array-like
             Group membership vector (binary)
@@ -52,20 +52,20 @@ class Reweighing(BMPre):
         """
 
         params = self._load_data(
-            y_true=y_true, sample_weight=sample_weight, group_a=group_a, group_b=group_b
+            y=y, sample_weight=sample_weight, group_a=group_a, group_b=group_b
         )
-        y_true = params["y_true"]
+        y = params["y"]
         sample_weight = params["sample_weight"]
         group_a = params["group_a"]
         group_b = params["group_b"]
 
         group_lbs = self.sens_groups.fit_transform(np.stack([group_a, group_b], axis=1))
 
-        classes = np.unique(y_true)
+        classes = np.unique(y)
 
         df = pd.DataFrame()
 
-        df["LABEL"] = pd.Series(y_true)
+        df["LABEL"] = pd.Series(y)
 
         df["GROUP_ID"] = group_lbs
 
@@ -87,13 +87,13 @@ class Reweighing(BMPre):
 
         df_group_values_weights = df_values_prob / df_group_values_prob
 
-        sample_weight = np.ones_like(y_true, dtype=np.float32)
+        self.sample_weight = np.ones_like(y, dtype=np.float32)
         for g in self.sens_groups.group_names:
             for l in classes:
                 mask = df[f"{g}-{l}"]
-                sample_weight[mask] = df_group_values_weights.at[g, l]
+                self.sample_weight[mask] = df_group_values_weights.at[g, l]
 
-        self.update_estimator_param("sample_weight", sample_weight)
+        self.update_estimator_param("sample_weight", self.sample_weight)
 
         return self
 
@@ -104,7 +104,7 @@ class Reweighing(BMPre):
     def fit_transform(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
         sample_weight: Optional[np.ndarray] = None,
@@ -121,7 +121,7 @@ class Reweighing(BMPre):
         ----------
         X : matrix-like
             Input matrix
-        y_true : array-like
+        y : array-like
             Target vector
         group_a : array-like
             Group membership vector (binary)
@@ -134,4 +134,4 @@ class Reweighing(BMPre):
         -------
             X
         """
-        return self.fit(y_true, group_a, group_b, sample_weight).transform(X)
+        return self.fit(y, group_a, group_b, sample_weight).transform(X)

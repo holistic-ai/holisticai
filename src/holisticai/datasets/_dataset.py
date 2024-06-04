@@ -2,153 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from holisticai.datasets._dataloaders import load_adult, load_last_fm, load_law_school, load_student
-from holisticai.datasets.dataset_processing_utils import (
-    get_protected_values,
-)
+from holisticai.utils.obj_rep.datasets import generate_html
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-
-
-def load_adult_dataset():
-    data = load_adult()
-    protected_attribute = "sex"
-    output_variable = "class"
-    drop_columns = ["education", "race", "sex"]
-    df = pd.concat([data["data"], data["target"]], axis=1)
-    df = df.dropna().reset_index(drop=True)
-    group_a = get_protected_values(df, protected_attribute, "Female")
-    group_b = get_protected_values(df, protected_attribute, "Male")
-    df = df.drop(drop_columns, axis=1)
-    y = df.pop(output_variable).map({"<=50K": 0, ">50K": 1})
-    df = pd.get_dummies(df, columns=df.columns[df.dtypes == "category"])
-    bool_columns = df.columns[df.dtypes == "bool"]
-    df[bool_columns] = df[bool_columns].astype(int)
-    x = df
-    return Dataset(x=x, y=y, group_a=group_a, group_b=group_b)
-
-
-def load_law_school_dataset():
-    bunch = load_law_school()
-    protected_attribute = "race1"
-    output_variable = "bar"
-    drop_columns = ["ugpagt3", "race1", "gender", "bar"]
-    df = bunch["frame"]
-    df = df.dropna()
-    group_a = get_protected_values(df, protected_attribute, "white")
-    group_b = get_protected_values(df, protected_attribute, "non-white")
-    y = df[output_variable]  # binary label vector
-    y = y.map({"FALSE": 0, "TRUE": 1})
-    x = df.drop(drop_columns, axis=1)
-    return Dataset(x=x, y=y, group_a=group_a, group_b=group_b)
-
-def load_student_multiclass_dataset():
-    output_column = "G3"
-    protected_attributes = ['sex', 'address', 'Mjob', 'Fjob']
-    drop_columns = ["G1", "G2", "G3", 'sex', 'address', 'Mjob', 'Fjob']
-    bunch = load_student()
-    df = bunch["frame"]
-
-    # we don't want to encode protected attributes
-    df = df.dropna()
-    y = df[output_column].to_numpy()
-    buckets = np.array([8, 11, 14])
-    y_cat = pd.Series((y.reshape(-1, 1) > buckets.reshape(1, -1)).sum(axis=1))
-    p_attr = df[protected_attributes]
-
-    for col in df.select_dtypes(include=["object"]):
-        df[col] = pd.factorize(df[col])[0]
-    df = df.drop(drop_columns, axis=1)
-    df = pd.get_dummies(df, columns=df.columns[df.dtypes == "object"])
-    df["target"] = y_cat
-    df = df.reset_index(drop=True)
-
-    p_attr = p_attr.reset_index(drop=True)
-    x = df.astype(float)
-    y = df["target"]
-    x = df.drop(columns="target")
-    return Dataset(x=x, y=y, p_attr=p_attr)
-
-def load_student_dataset():
-    outputs = ["G1", "G2", "G3"]
-    protected_attributes = ['sex', 'address', 'Mjob', 'Fjob']
-    drop_columns = ["G1", "G2", "G3", 'sex', 'address', 'Mjob', 'Fjob']
-    bunch = load_student()
-    df = bunch["frame"]
-
-    # we don't want to encode protected attributes
-    df = df.dropna()
-    y = df[outputs]
-    p_attr = df[protected_attributes]
-
-    for col in df.select_dtypes(include=["object"]):
-        df[col] = pd.factorize(df[col])[0]
-    df = df.drop(drop_columns, axis=1)
-    df = pd.get_dummies(df, columns=df.columns[df.dtypes == "object"])
-    df = df.reset_index(drop=True)
-    p_attr = p_attr.reset_index(drop=True)
-    x = df.astype(float)
-    y = y.reset_index(drop=True)
-    return Dataset(x=x, y=y, p_attr=p_attr)
-
-
-def process_lastfm_dataset():
-    """
-    Processes the lastfm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
-
-    Parameters
-    ----------
-    size : str
-        The size of the dataset to return. Either 'small' or 'large'
-
-    Returns
-    -------
-    data_matrix : np.ndarray
-        The numerical pivot array
-    p_attr : np.ndarray
-        The protected attribute
-    """
-    bunch = load_last_fm()
-    df = bunch["frame"]
-    protected_attribute = "sex"
-    user_column = "user"
-    item_column = "artist"
-
-    from holisticai.utils import recommender_formatter
-
-    df["score"] = np.random.randint(1, 5, len(df))
-    df[protected_attribute] = df[protected_attribute] == "m"
-    df = df.drop_duplicates()
-    df_pivot, p_attr = recommender_formatter(
-        df,
-        users_col=user_column,
-        groups_col=protected_attribute,
-        items_col=item_column,
-        scores_col="score",
-        aggfunc="mean",
-    )
-    df_pivot = df_pivot.fillna(0)
-    return Dataset(data_pivot=df_pivot, p_attr=pd.Series(p_attr))
-
-
-def load_dataset(dataset_name):
-    match dataset_name:
-        case "adult":
-            return load_adult_dataset()
-        case "law_school":
-            return load_law_school_dataset()
-        case "student_multiclass":
-            return load_student_multiclass_dataset()
-        case "student":
-            return load_student_dataset()
-        case "lastfm":
-            return process_lastfm_dataset()
-    raise NotImplementedError
 
 class DatasetDict(dict):
     def __init__(self, **datasets):
@@ -162,80 +22,160 @@ class DatasetDict(dict):
         return f"DatasetDict({{\n    {datasets_repr}\n}})"
 
     def _repr_html_(self):
-        datasets_repr = "".join(
-            f"<div style='margin: 10px 0;'>"
-            f"{name}:<span style='font-weight: bold;'> {dataset.__class__.__name__}<br></span>"
-            f"{dataset.repr_info()}"
-            f"</div>"
-            for name, dataset in self.datasets.items()
-        )
-        return (
-            #f"<div style='background-color: #E3F2FD; border: 1px solid #00ACC1; padding: 5px; border-radius: 2px; color: black; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; line-height: 1.5; letter-spacing: 0.02em; max-width: 600px; margin: 10px;'>"
-            f"<div style='background-color: #E3F2FD; border: 1px solid #00ACC1; padding: 20px; border-radius: 10px; color: black; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; line-height: 1.5; letter-spacing: 0.02em; margin: 10px; display: inline-block;'>"
-            f"<span style='font-weight: bold;'>DatasetDict</span><br>{datasets_repr}</div>"
-        )
+        dataset_info=[]
+        for name, dataset in self.datasets.items():
+            dataset_info.append({'type': 'Dataset',
+                                 'name': name,
+                                 'features': dataset.features,
+                                 'num_rows': dataset.num_rows})
+
+        datasetdict_info = {
+        'DatasetDict': dataset_info
+        }
+        return generate_html(datasetdict_info)
+
+def concatenate_datasets(part_datasets : list[Dataset]):
+    features = part_datasets[0].features
+    return Dataset(**{feat: pd.concat([p[feat] for p in part_datasets], axis=0).reset_index(drop=True) for feat in features})
+
+def convert_to_pandas(data):
+    if all(isinstance(i, (list, tuple)) for i in data):
+        return pd.DataFrame(data)
+    return pd.Series(data)
+
+def split_dataframe_by_level(df, level=0):
+    dataframes = {}
+    for key in df.columns.levels[level]:
+        dataframes[key] = df.xs(key, axis=1, level=level)
+    return dataframes
+
+def apply_fn_to_multilevel_df(df, fn):
+    result_df = pd.DataFrame()
+    for level in df.columns.levels[0]:
+        subset = df.xs(level, axis=1, level=0)
+        result = subset.apply(fn, axis=1, result_type='expand')
+        result.columns = pd.MultiIndex.from_product([[level], result.columns])
+        result_df = pd.concat([result_df, result], axis=1)
+    return result_df
+
+#dataset = dataset.groupby(['y','group_a']).select(range(SHARD_SIZE))
+class GroupByDataset:
+    def __init__(self, groupby_obj):
+        self.groupby_obj = groupby_obj
+
+    def head(self, k):
+        return Dataset(self.groupby_obj.head(k))
 
 
+def dataframe_to_level_dict_with_series(df, row_index):
+    """
+    Converts a DataFrame with two-level columns into a dictionary where:
+    - Level 0 names become dictionary keys.
+    - Corresponding DataFrames (without level 0) are values.
+    - Level 1 names become new column names.
 
+    Args:
+        df (pandas.DataFrame): The DataFrame to convert.
+        row_index (int): The index of the row to use as the Series.
+
+    Returns:
+        dict: The resulting dictionary with level 0 keys and DataFrames as values.
+    """
+
+    if not isinstance(df.columns, pd.MultiIndex) or len(df.columns.levels) != 2:
+        msg = "DataFrame must have MultiIndex columns with two levels."
+        raise ValueError(msg)
+
+    data = {}
+    for level_0_name in df.columns.levels[0]:
+        feature = df[level_0_name]
+        if feature.shape[1]==1:
+            data[level_0_name] = feature.iloc[row_index, 0]
+        else:
+            data[level_0_name] = feature.iloc[row_index]
+    return data
 
 class Dataset(dict):
     def update_metadata(self):
-        self.features = list(self.data.keys())
-        self.num_rows = len(next(iter(self.data.values())))
+        self.features = list(self.data.columns.get_level_values(0).unique())
+        self.num_rows = len(self.data)
+        self.indices = self.data.index
 
-    def __init__(self, **kargs):
-        self.data = kargs
-        for name,value in kargs.items():
-            if type(value) in [pd.DataFrame, pd.Series]:
-                self.data[name] = value.reset_index(drop=True)
-            #elif type(value) is np.ndarray:
-            #    self.data[name]=value
-            else:
-                print(type(value))
-                raise NotImplementedError
+    def __init__(self, data : pd.DataFrame | None = None, **kargs):
+        if data is None:
+            self.data = {}
+            for name, value in kargs.items():
+                if isinstance(value, pd.DataFrame):
+                    self.data[name] = value.reset_index(drop=True)
+                elif isinstance(value, pd.Series):
+                    self.data[name] = pd.Series(value.reset_index(drop=True), name=name)
+                else:
+                    msg = f"Variable '{name}' is of type {type(value)}, but only pd.DataFrame and pd.Series are supported."
+                    raise TypeError(msg)
+            self.data = pd.concat(self.data.values(), axis=1, keys=self.data.keys())
+            self.data.reset_index(drop=True)
+        else:
+            self.data = data.reset_index(drop=True)
         self.update_metadata()
+
+    def rename(self, renames):
+        return Dataset(self.data.rename(columns=renames, level=0))
+
+    def select(self, indices: Iterable):
+        existing_indices = [idx for idx in indices if idx in self.indices]
+        return Dataset(self.data.iloc[existing_indices])
+
+    def filter(self, fn):
+        def fnw(row):
+            new_row = {k[0] if k[0]==k[1] else k:v for k,v in row.to_dict().items()}
+            return fn(new_row)
+
+        new_datad = self.data[self.data.apply(fnw, axis=1)]
+        return Dataset(new_datad)
+
+    def groupby(self, key : list[str]|str):
+        if isinstance(key,list):
+            key = [(key[0],key[0]),(key[1],key[1])]
+        elif isinstance(key,str):
+            key = [tuple(key , key)]
+        else:
+            raise TypeError
+        return GroupByDataset(self.data.groupby(key))
 
     def map(self, fn):
-        updated_data = fn(self.data)
-        for name,value in updated_data.items():
-            self.data[name] = value
-        self.update_metadata()
-        return self
+        def fnw(x):
+            return {(k, k) if type(k) is str else k: v for k, v in fn(x).items()}  # noqa: E721
+        updated_data = self.data.apply(fnw, axis=1, result_type='expand')
+        updated_data = pd.DataFrame(updated_data)
+        new_data = self.data.combine_first(updated_data)
+        return Dataset(new_data)
 
     def train_test_split(self, test_size=0.3, **kargs):
-
-        keys = list(self.data.keys())
-        values = list(self.data.values())
-        splits = train_test_split(*values, test_size=test_size, **kargs)
-        train = Dataset(**dict(zip(keys, splits[::2])))
-        test = Dataset(**dict(zip(keys, splits[1::2])))
+        train_df,test_df = train_test_split(self.data, test_size=test_size, **kargs)
+        train = Dataset(train_df)
+        test = Dataset(test_df)
         return DatasetDict(train=train, test=test)
 
     def __repr__(self):
         return f"Dataset({{\n" f"        features: {self.features},\n" f"        num_rows: {self.num_rows}\n" f"    }})"
 
     def repr_info(self):
-        return (
-            f"<ul>"
-            f"<li><span style='font-weight: normal;'>features: {self.features}</span></li>"
-            f"<li><span style='font-weight: normal;'>num_rows: {self.num_rows}</span></li>"
-            f"</ul>"
-        )
+        return {
+        'Dataset': {
+            'features': self.features,
+            'num_rows': self.num_rows
+        }
+        }
 
     def _repr_html_(self):
-        return (
-        #f"<div style='background-color: #E3F2FD; border: 1px solid #00ACC1; padding: 5px; border-radius: 2px; color: black; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; line-height: 1.5; letter-spacing: 0.02em; max-width: 600px; margin: 10px;'>"
-        f"<div style='background-color: #E3F2FD; border: 1px solid #00ACC1; padding: 20px; border-radius: 10px; color: black; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; line-height: 1.5; letter-spacing: 0.02em; margin: 10px; display: inline-block;'>"
-        f"<span style='font-weight: bold;'>Dataset</span><br>"
-        f"{self.repr_info()}"
-        f"</div>")
+        dataset_info = self.repr_info()
+        return generate_html(dataset_info)
 
     def __getitem__(self, key: str | int):
         if isinstance(key, str):
-            return self.data[key]
+            return self.data.xs(key, level=0, axis=1)
         if isinstance(key, int):
-            return {f: v.iloc[key]  for f, v in self.data.items()}
+            return dataframe_to_level_dict_with_series(self.data, key)
+            ##print(self.data.iloc[key])
+            #return self.data.iloc[key]
         raise NotImplementedError
-
-    def select(self, indices: Iterable):
-        return Dataset(**{f: v.iloc[indices] for f, v in zip(self.features, self.data)})

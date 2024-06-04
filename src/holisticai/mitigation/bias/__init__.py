@@ -75,6 +75,7 @@ __all__ = [
 ]
 
 import importlib
+from typing import Literal
 
 torch_spec = importlib.util.find_spec("torch")
 if torch_spec is not None:
@@ -87,3 +88,37 @@ if networkx_spec is not None:
     from holisticai.mitigation.bias.preprocessing import DisparateImpactRemover
 
 __all__ += ["DisparateImpactRemoverRS", "DisparateImpactRemover"]
+
+MITIGATOR_NAME= Literal[
+    "CorrelationRemover",
+    "Reweighing",
+    "LearningFairRepresentation",
+    "ExponentiatedGradientReduction",
+    "GridSearchReduction",
+    "CalibratedEqualizedOdds",
+    "EqualizedOdds",
+    "RejectOptionClassification",
+    "WassersteinBarycenter",
+    "MLDebiaser",
+    "LPDebiaserBinary",
+    "LPDebiaserMulticlass",
+    "PluginEstimationAndCalibration",
+    "PrejudiceRemover",
+    "MetaFairClassifier",
+    "VariationalFairClustering",
+    "FairletClustering",
+    "FairletClusteringPreprocessing",
+    "FairKCenterClustering",
+    "FairKmedianClustering",
+    "BlindSpotAwareMF",
+    "DebiasingLearningMF",
+    "PopularityPropensityMF",
+    "FairRec",
+    "FairScoreClassifier",
+    "DebiasingExposure",
+    "FairTopK",
+    "MCMF",
+    "AdversarialDebiasing",
+    "DisparateImpactRemoverRS",
+    "DisparateImpactRemover"
+]

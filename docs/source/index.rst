@@ -54,15 +54,7 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
 
 .. note::
     
-<<<<<<< HEAD
-    metrics
-    mitigation
-    datasets
-    pipeline
-    tutorials
-=======
     The library is developed by the Research Team at Holistic AI, a company that aims to ensure that AI can be trusted to deliver on its transformative potential for society.
->>>>>>> f460e981628f108ab8ac26bd32657b66ed24e02d
 
 .. admonition:: Learn more about the Holistic AI company
         :class: dropdown admonition-youtube

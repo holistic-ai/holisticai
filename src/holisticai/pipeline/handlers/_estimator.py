@@ -80,7 +80,18 @@ class EstimatorHandler:
         self.estimator = steps[-1][1]
         return steps
 
-    def run_predictions(self, Xt):
+    def get_fit_params(self, Xt):
+        kargs = {}
+
+        y_pred = self.estimator.predict(Xt)
+        kargs["y_pred"] = y_pred
+
+        if hasattr(self.estimator, "predict_proba"):
+            y_proba = self.estimator.predict_proba(Xt)
+            kargs["y_proba"] = y_proba
+        return kargs
+
+    def get_transform_params(self, Xt):
         kargs = {}
 
         y_pred = self.estimator.predict(Xt)

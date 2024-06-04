@@ -137,7 +137,7 @@ class LearningFairRepresentation(BMPreprocessing):
     def fit(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
     ):
@@ -152,7 +152,7 @@ class LearningFairRepresentation(BMPreprocessing):
         ----------
         X : matrix-like
             Input data
-        y_true : array-like
+        y : array-like
             Target vector
         group_a : array-like
             Group membership vector (binary)
@@ -168,11 +168,11 @@ class LearningFairRepresentation(BMPreprocessing):
 
         params = self._load_data(
             X=X,
-            y_true=y_true,
+            y=y,
             group_a=group_a,
             group_b=group_b,
         )
-        y_true = params["y_true"].reshape([-1, 1])
+        y = params["y"].reshape([-1, 1])
         group_a = params["group_a"]
         group_b = params["group_b"]
         X = params["X"]
@@ -185,7 +185,7 @@ class LearningFairRepresentation(BMPreprocessing):
         parameters_bounds = [(0, 1)] * self.k + [(None, None)] * features_dim * self.k
         args = (
             X,
-            y_true,
+            y,
             group_a == 1,
             group_b == 1,
             self.k,
@@ -249,7 +249,7 @@ class LearningFairRepresentation(BMPreprocessing):
     def fit_transform(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
     ):
@@ -264,7 +264,7 @@ class LearningFairRepresentation(BMPreprocessing):
         ----------
         X : matrix-like
             Input data
-        y_true : array-like
+        y : array-like
             Target vector
         group_a : array-like
             Group membership vector (binary)
@@ -275,4 +275,4 @@ class LearningFairRepresentation(BMPreprocessing):
         ------
             Self
         """
-        return self.fit(X, y_true, group_a, group_b).transform(X, group_a, group_b)
+        return self.fit(X, y, group_a, group_b).transform(X, group_a, group_b)

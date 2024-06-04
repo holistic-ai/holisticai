@@ -1,12 +1,10 @@
-from typing import Optional
+from __future__ import annotations
 
 import numpy as np
-
+from holisticai.mitigation.bias.inprocessing.meta_fair_classifier.algorithm import MetaFairClassifierAlgorithm
+from holisticai.mitigation.bias.inprocessing.meta_fair_classifier.algorithm_utils import MFLogger
+from holisticai.mitigation.bias.inprocessing.meta_fair_classifier.constraints import FalseDiscovery, StatisticalRate
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-
-from .algorithm import MetaFairClassifierAlgorithm
-from .algorithm_utils import MFLogger
-from .constraints import FalseDiscovery, StatisticalRate
 
 
 class MetaFairClassifier(BMImp):
@@ -24,10 +22,10 @@ class MetaFairClassifier(BMImp):
 
     def __init__(
         self,
-        tau: Optional[float] = 0.8,
-        constraint: Optional[str] = "StatisticalRate",
-        seed: Optional[int] = None,
-        verbose: Optional[int] = 0,
+        tau: float = 0.8,
+        constraint: str = "StatisticalRate",
+        seed: int | None = None,
+        verbose: int = 0,
     ):
         """
         Parameters
@@ -62,13 +60,13 @@ class MetaFairClassifier(BMImp):
         )
         self.seed = seed
 
-    def transform_estimator(self):
+    def transform_estimator(self,_):
         return self
 
     def fit(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
     ):
@@ -85,7 +83,7 @@ class MetaFairClassifier(BMImp):
         X : numpy array
             input matrix
 
-        y_true : numpy array
+        y : numpy array
             target vector
 
         group_a : numpy array
@@ -98,15 +96,15 @@ class MetaFairClassifier(BMImp):
         -------
         the same object
         """
-        params = self._load_data(y_true=y_true, group_a=group_a, group_b=group_b)
-        y_true = params["y_true"]
+        params = self._load_data(y=y, group_a=group_a, group_b=group_b)
+        y = params["y"]
         group_a = params["group_a"]
         group_b = params["group_b"]
-        sensitive_features = np.stack([group_a, group_b], axis=1)
+        sensitive_features = np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1)
         self.classes_ = params["classes_"]
 
         self.algorithm.fit(
-            X=X, y=y_true, sensitive_features=sensitive_features, random_state=self.seed
+            X=X, y=y, sensitive_features=sensitive_features, random_state=self.seed
         )
         return self
 

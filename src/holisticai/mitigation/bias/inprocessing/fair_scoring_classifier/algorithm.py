@@ -18,20 +18,21 @@ class FairScoreClassifierAlgorithm:
 
     def __init__(
         self,
-        objectives: dict,
+        objectives: str,
         fairness_groups: list,
         fairness_labels: list,
         constraints: dict = {},
         lambda_bound: int = 9,
         time_limit: int = 100,
+        verbose: int = 0
     ):
         """
         Init FairScoreClassifier object
 
         Parameters
         ----------
-        objectives : dict
-            The weighted objectives list to be optimized.
+        objectives : str
+            The bjectives list to be optimized.
 
         fairness_groups : list
             The sensitive groups indexes.
@@ -51,19 +52,15 @@ class FairScoreClassifierAlgorithm:
         self.constraints = constraints
         self.lambda_bound = lambda_bound
         self.time_limit = time_limit
+        self.verbose = verbose
 
     def fit(self, X, y):
-        print("Start fitting")
-
         N_class = get_class_count(y)
         class_indexes = get_class_indexes(y)
 
         self.lambdas = self.solve_model(X, y, N_class, class_indexes)
-
-        accuracy = get_accuracy(X, y, self.lambdas)
-        balanced_accuracy = get_balanced_accuracy(X, y, self.lambdas)
-        print(f"Accuracy : {accuracy}")
-        print(f"Balanced accuracy : {balanced_accuracy}")
+        #accuracy = get_accuracy(X, y, self.lambdas)
+        #balanced_accuracy = get_balanced_accuracy(X, y, self.lambdas)
 
     def solve_model(self, X, y, N_class, class_indexes):
         N = len(X)
@@ -96,13 +93,11 @@ class FairScoreClassifierAlgorithm:
         if "a" in self.objectives or "ba" in self.objectives:
             for i in range(N):
                 for offset in range(1, L):
-                    constraints.append(
-                        -M * z[i]
-                        <= cp.sum(l[y_idx[i], :] @ X[i, :])
-                        - gamma * y_idx[i]
-                        - cp.sum(l[(y_idx[i] + offset) % L, :] @ X[i, :])
-                        - gamma * ((y_idx[i] + offset) % L)
-                    )
+                    new_contrant = -M * z[i] <= cp.sum(l[y_idx[i], :] @ X[i, :])
+                    - gamma * y_idx[i]
+                    - cp.sum(l[(y_idx[i] + offset) % L, :] @ X[i, :])
+                    - gamma * ((y_idx[i] + offset) % L)
+                    constraints.append(new_contrant)
 
         if "s" in self.constraints:
             constraints.append(-self.lambda_bound * alpha <= l)
@@ -118,13 +113,11 @@ class FairScoreClassifierAlgorithm:
             for i in range(N):
                 for index in range(L):
                     for offset in range(1, L):
-                        constraints.append(
-                            -M * (1 - pos[i, index])
-                            <= cp.sum(l[index, :] @ X[i, :])
-                            - gamma * index
-                            - cp.sum(l[(index + offset) % L, :] @ X[i, :])
-                            - gamma * ((index + offset) % L)
-                        )
+                        new_constaint = -M * (1 - pos[i, index]) <= cp.sum(l[index, :] @ X[i, :])
+                        - gamma * index
+                        - cp.sum(l[(index + offset) % L, :] @ X[i, :])
+                        - gamma * ((index + offset) % L)
+                        constraints.append(new_constaint)
                 constraints.append(cp.sum(pos[i, :]) == 1)
 
         if "s" in self.constraints:
@@ -257,7 +250,7 @@ class FairScoreClassifierAlgorithm:
             cost += (1 / (self.constraints["s"] * L * N)) * cp.sum(alpha)
 
         prob = cp.Problem(cp.Minimize(cost), constraints)
-        prob.solve(solver=cp.CBC, verbose=True, maximumSeconds=self.time_limit)
+        prob.solve(solver=cp.CBC, verbose=self.verbose==1, maximumSeconds=self.time_limit)
         return l.value
 
     def predict(self, X):

@@ -1,10 +1,11 @@
-from typing import Optional, Tuple, Union
+from __future__ import annotations
+
+from typing import Literal, Optional
 
 import numpy as np
+from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from scipy.optimize import linprog
 from sklearn.metrics import confusion_matrix
-
-from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 
 class EqualizedOdds(BMPost):
@@ -20,7 +21,7 @@ class EqualizedOdds(BMPost):
         Advances in neural information processing systems 30 (2017).
     """
 
-    SOLVERS = [
+    SOLVERS = Literal[
         "highs",
         "highs-ds",
         "highs-ipm",
@@ -29,7 +30,7 @@ class EqualizedOdds(BMPost):
         "simplex",
     ]
 
-    def __init__(self, solver: Optional[str] = "highs", seed: Optional[int] = 42):
+    def __init__(self, solver: str | None = "highs", seed: int | None = 42):
         """
         Create a Equalized Odds Post-processing instance.
 
@@ -159,7 +160,7 @@ class EqualizedOdds(BMPost):
 
     def fit(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         y_pred: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
@@ -173,7 +174,7 @@ class EqualizedOdds(BMPost):
 
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector (nb_examlpes,)
         y_pred : array-like
             Predicted vector (nb_examlpes,)
@@ -190,19 +191,19 @@ class EqualizedOdds(BMPost):
             np.random.seed(self.seed)
 
         params = self._load_data(
-            y_true=y_true, y_pred=y_pred, group_a=group_a, group_b=group_b
+            y=y, y_pred=y_pred, group_a=group_a, group_b=group_b
         )
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
-        y_true = params["y_true"]
+        y = params["y"]
         y_pred = params["y_pred"]
 
         parameters_group_a = self._objective_function_parameters_by_group(
-            y_true, y_pred, group_a
+            y, y_pred, group_a
         )
         parameters_group_b = self._objective_function_parameters_by_group(
-            y_true, y_pred, group_b
+            y, y_pred, group_b
         )
         A_eq, b_eq, C = self._build_objective_function(
             parameters_group_a, parameters_group_b

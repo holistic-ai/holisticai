@@ -1,8 +1,8 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Literal
 
 import numpy as np
-from sklearn.metrics._classification import _check_zero_division, _prf_divide
-
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 
@@ -39,13 +39,13 @@ class CalibratedEqualizedOdds(BMPost):
 
     """
 
-    COST_CONSTRAINT = ["fnr", "fpr", "weighted"]
+    COST_CONSTRAINT = Literal["fnr", "fpr", "weighted"]
 
     def __init__(
         self,
-        cost_constraint: Optional[str] = "fnr",
-        alpha: Optional[float] = None,
-        seed: Optional[int] = 42,
+        cost_constraint: str = "fnr",
+        alpha: float | None = None,
+        seed: int | None = 42,
     ):
         """
         Create a Calibrated Equalized Odds Post-processing instance.
@@ -72,7 +72,7 @@ class CalibratedEqualizedOdds(BMPost):
         self.alpha = alpha
         self.random_state = np.random.RandomState(seed)
 
-    def _build_cost(self, y_true, y_score, base_rate, sample_weight):
+    def _build_cost(self, y, y_score, base_rate, sample_weight):
         if self.cost_constraint == "fpr":
             alpha = 0
         elif self.cost_constraint == "fnr":
@@ -80,21 +80,18 @@ class CalibratedEqualizedOdds(BMPost):
         elif self.cost_constraint == "weighted":
             alpha = base_rate if self.alpha is None else self.alpha
         else:
-            raise ValueError(f"unknown cost constraint: {self.cost_constraint}")
+            msg = f"unknown cost constraint: {self.cost_constraint}"
+            raise ValueError(msg)
 
-        gfpr = generalized_fpr(y_true, y_score, sample_weight=sample_weight)
-        gfnr = generalized_fnr(y_true, y_score, sample_weight=sample_weight)
+        gfpr = generalized_fpr(y, y_score, sample_weight=sample_weight)
+        gfnr = generalized_fnr(y, y_score, sample_weight=sample_weight)
 
         return (1 - alpha) * gfpr + alpha * gfnr
 
-    def _build_cost_variables(self, y_true, y_score, sample_weight):
-        base_rate = y_true.mean()
-        build_cost = lambda score: self._build_cost(
-            y_true=y_true,
-            y_score=score,
-            base_rate=base_rate,
-            sample_weight=sample_weight,
-        )
+    def _build_cost_variables(self, y, y_score, sample_weight):
+        base_rate = y.mean()
+        def build_cost(score):
+            return self._build_cost(y=y, y_score=score, base_rate=base_rate, sample_weight=sample_weight)
 
         cost = build_cost(y_score)
         trivial_cost = build_cost(np.full_like(y_score, base_rate))
@@ -108,11 +105,11 @@ class CalibratedEqualizedOdds(BMPost):
 
     def fit(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         y_proba: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        sample_weight: Optional[np.ndarray] = None,
+        sample_weight: np.ndarray | None = None,
     ):
         """
         Compute parameters for calibrated equalized odds.
@@ -123,7 +120,7 @@ class CalibratedEqualizedOdds(BMPost):
 
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector
         y_proba : matrix-like
             Predicted probability matrix (num_examples, num_classes). The probability
@@ -142,7 +139,7 @@ class CalibratedEqualizedOdds(BMPost):
         Self
         """
         params = self._load_data(
-            y_true=y_true,
+            y=y,
             y_proba=y_proba,
             group_a=group_a,
             group_b=group_b,
@@ -151,22 +148,21 @@ class CalibratedEqualizedOdds(BMPost):
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
-        y_true = params["y_true"]
+        y = params["y"]
         y_score = params["y_score"]
         sample_weight = params["sample_weight"]
 
         self.base_rate_a, a_cost, a_trivial_cost = self._build_cost_variables(
-            y_true[group_a], y_score[group_a], sample_weight=sample_weight[group_a]
+            y[group_a], y_score[group_a], sample_weight=sample_weight[group_a]
         )
 
         self.base_rate_b, b_cost, b_trivial_cost = self._build_cost_variables(
-            y_true[group_b], y_score[group_b], sample_weight=sample_weight[group_b]
+            y[group_b], y_score[group_b], sample_weight=sample_weight[group_b]
         )
 
         b_costs_more = b_cost > a_cost
         self.a_mix_rate = (b_cost - a_cost) / (a_trivial_cost - a_cost) if b_costs_more else 0
         self.b_mix_rate = 0 if b_costs_more else (a_cost - b_cost) / (b_trivial_cost - b_cost)
-
         return self
 
     def transform(
@@ -175,7 +171,7 @@ class CalibratedEqualizedOdds(BMPost):
         y_proba: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        threshold: Optional[float] = 0.5,
+        threshold: float | None = 0.5,
     ):
         """
         Apply transform function to predictions and likelihoods
@@ -229,12 +225,12 @@ class CalibratedEqualizedOdds(BMPost):
 
     def fit_transform(
         self,
-        y_true: np.ndarray,
+        y: np.ndarray,
         y_proba: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        sample_weight: Optional[np.ndarray] = None,
-        threshold: Optional[float] = 0.5,
+        sample_weight: np.ndarray | None = None,
+        threshold: float | None = 0.5,
     ):
         """
         Fit and transform
@@ -245,7 +241,7 @@ class CalibratedEqualizedOdds(BMPost):
 
         Parameters
         ----------
-        y_true : array-like
+        y : array-like
             Target vector
         y_proba : matrix-like
             Predicted probability matrix (num_examples, num_classes). The probability
@@ -268,25 +264,23 @@ class CalibratedEqualizedOdds(BMPost):
         dictionnary with new predictions
         """
         return self.fit(
-            y_true,
+            y,
             y_proba,
             group_a,
             group_b,
             sample_weight,
-        ).transform(y_true, y_proba, group_a, group_b, threshold)
+        ).transform(y, y_proba, group_a, group_b, threshold)
 
 
-def generalized_fpr(y_true, y_score, sample_weight):
-    neg_idx = y_true != 1
+def generalized_fpr(y, y_score, sample_weight):
+    neg_idx = y != 1
     neg_weights = sample_weight[neg_idx]
     neg = neg_weights.sum()
-    fpr = (y_score[neg_idx] * neg_weights).sum() / neg
-    return fpr
+    return (y_score[neg_idx] * neg_weights).sum() / neg
 
 
-def generalized_fnr(y_true, y_score, sample_weight):
-    pos_idx = y_true == 1
+def generalized_fnr(y, y_score, sample_weight):
+    pos_idx = y == 1
     pos_weights = sample_weight[pos_idx]
     pos = pos_weights.sum()
-    fnr = ((1 - y_score)[pos_idx] * pos_weights).sum() / pos
-    return fnr
+    return ((1 - y_score)[pos_idx] * pos_weights).sum() / pos

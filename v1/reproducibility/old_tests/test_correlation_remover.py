@@ -19,35 +19,35 @@ def running_without_pipeline(small_regression_dataset):
 
     from holisticai.metrics.bias import regression_bias_metrics
 
-    train_data, test_data = small_regression_dataset
-    X, y, group_a, group_b = train_data
+    train = small_regression_dataset['train']
+    test = small_regression_dataset['test']
 
     scaler = StandardScaler()
-    Xt = scaler.fit_transform(X)
+    print(train['x'])
+    Xt = scaler.fit_transform(train['x'])
 
     prep = CorrelationRemover()
 
-    fit_params = {"group_a": group_a, "group_b": group_b}
+    fit_params = {"group_a": train['group_a'], "group_b": train['group_b']}
 
     Xt = prep.fit_transform(Xt, **fit_params)
 
     model = LinearRegression()
 
-    model.fit(Xt, y)
+    model.fit(Xt, train['y'])
 
     # Test
-    X, y, group_a, group_b = test_data
-    transform_params = {"group_a": group_a, "group_b": group_b}
-    Xt = scaler.transform(X)
+    transform_params = {"group_a": test['group_a'], "group_b": test['group_b']}
+    Xt = scaler.transform(test['x'])
     Xt = prep.transform(Xt, **transform_params)
 
     y_pred = model.predict(Xt)
 
     df = regression_bias_metrics(
-        group_a,
-        group_b,
+        test['group_a'],
+        test['group_b'],
         y_pred,
-        y,
+        test['y'],
         metric_type="both",
     )
     return df
@@ -58,7 +58,9 @@ def running_with_pipeline(small_regression_dataset):
 
     from holisticai.metrics.bias import regression_bias_metrics
 
-    train_data, test_data = small_regression_dataset
+    train = small_regression_dataset['train']
+    test = small_regression_dataset['test']
+
     model = LinearRegression()
 
     pipeline = Pipeline(
@@ -69,22 +71,20 @@ def running_with_pipeline(small_regression_dataset):
         ]
     )
 
-    X, y, group_a, group_b = train_data
-    fit_params = {"bm__group_a": group_a, "bm__group_b": group_b}
+    fit_params = {"bm__group_a": train['group_a'], "bm__group_b": train['group_b']}
 
-    pipeline.fit(X, y, **fit_params)
+    pipeline.fit(train['x'], train['y'], **fit_params)
 
-    X, y, group_a, group_b = test_data
     predict_params = {
-        "bm__group_a": group_a,
-        "bm__group_b": group_b,
+        "bm__group_a": test['group_a'],
+        "bm__group_b": test['group_b'],
     }
-    y_pred = pipeline.predict(X, **predict_params)
+    y_pred = pipeline.predict(test['x'], **predict_params)
     df = regression_bias_metrics(
-        group_a,
-        group_b,
+        test['group_a'],
+        test['group_b'],
         y_pred,
-        y,
+        test['y'],
         metric_type="both",
     )
     return df
