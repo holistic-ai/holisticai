@@ -11,8 +11,4 @@ Data loaders
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.datasets.load_adult
-    holisticai.datasets.load_student
-    holisticai.datasets.load_law_school
-    holisticai.datasets.load_last_fm
-    holisticai.datasets.load_us_crime
+    holisticai.datasets.load_dataset

@@ -11,10 +11,30 @@ from .common_utils.utils import updateP, updateQ
 
 
 class PopularityPropensityMF(BMImp, RecommenderSystemBase):
-    """
+    """Popularity Propensity Matrix Factorization
+
     Popularity Propensity Matrix Factorization can be used for Recommender Systems.
     This model is trained with propensity matrix factorization defined in (Eq. 1) [1]. Here the propensity P(u,i)
     is estimated based on popularity.
+
+    Parameters
+    ----------
+        K : int
+            Specifies the number of dimensions.
+
+        beta : float
+            Parameter used to update P and Q.
+
+        steps : int
+            Number of iterations.
+
+        verbose : int
+            If >0, will show progress percentage.
+
+    Methods
+    -------
+        fit(X)
+            Fit model using Popularity Propensity Matrix Factorization.
 
     References:
         [1] Tobias Schnabel, Adith Swaminathan, Ashudeep Singh, Navin Chandak, and
@@ -29,24 +49,6 @@ class PopularityPropensityMF(BMImp, RecommenderSystemBase):
         steps: Optional[int] = 100,
         verbose: Optional[int] = 0,
     ):
-        """
-        Init Popularity Propensity Matrix Factorization
-
-        Parameters
-        ----------
-
-        K : int
-            Specifies the number of dimensions.
-
-        beta : float
-            Parameter used to update P and Q.
-
-        steps : int
-            Number of iterations.
-
-        verbose : int
-            If >0, will show progress percentage.
-        """
         self.K = K
         self.beta = beta
         self.steps = steps

@@ -5,6 +5,38 @@ from ._base import DecompositionMixin
 
 
 class VanillaFairletDecomposition(DecompositionMixin):
+    """
+    Vanilla (p,q)-fairlet decomposition of given points (Lemma 3 in NIPS17 paper).
+
+    Parameters
+    ----------
+    p : int
+        The balance parameter p.
+    q : int
+        The balance parameter q.
+
+    Attributes
+    ----------
+    fairlets : list
+        The list of fairlets.
+    fairlet_centers : list
+        The list of fairlet centers.
+    p : int
+        The balance parameter p.
+    q : int
+        The balance parameter q.
+    
+    Methods
+    -------
+    balanced(p, q, r, b)
+        Checks if the input sets are balanced.
+    make_fairlet(points, dataset)
+        Adds fairlet to fairlet decomposition, returns median cost.
+    fit_transform(dataset, group_a, group_b)
+        Computes vanilla (p,q)-fairlet decomposition of given points.
+    decompose(blues, reds, dataset)
+        Decomposes the input sets into fairlets.
+    """
     def __init__(self, p, q):
         self.fairlets = []
         self.fairlet_centers = []
@@ -12,6 +44,25 @@ class VanillaFairletDecomposition(DecompositionMixin):
         self.q = q
 
     def balanced(self, p, q, r, b):
+        """
+        Checks if the input sets are balanced.
+
+        Parameters
+        ----------
+        p : int
+            The balance parameter p.
+        q : int
+            The balance parameter q.
+        r : int
+            The number of red points.
+        b : int
+            The number of blue points.
+
+        Returns
+        -------
+        bool
+            True if the input sets are balanced, False otherwise.
+        """
         if r == 0 and b == 0:
             return True
         if r == 0 or b == 0:
@@ -20,15 +71,19 @@ class VanillaFairletDecomposition(DecompositionMixin):
 
     def make_fairlet(self, points, dataset):
         """
-        Description
-        -----------
         Adds fairlet to fairlet decomposition, returns median cost
 
-        dataset: matrix-like
-            input data
+        Parameters
+        ----------
+        points : list
+            The list of points.
+        dataset : array-like
+            The dataset.
 
-        points:
-
+        Returns
+        -------
+        float
+            The median cost.
         """
 
         self.fairlets.append(points)
@@ -42,12 +97,12 @@ class VanillaFairletDecomposition(DecompositionMixin):
 
     def fit_transform(self, dataset, group_a, group_b):
         """
-        Description
-        -----------
         Computes vanilla (p,q)-fairlet decomposition of given points (Lemma 3 in NIPS17 paper).
 
         Parameters
         ----------
+        dataset : array-like
+            The dataset.
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
@@ -55,8 +110,12 @@ class VanillaFairletDecomposition(DecompositionMixin):
 
         Returns
         ------
-        cost.
-
+        list
+            The list of fairlets.
+        list
+            The list of fairlet centers.
+        float
+            The cost of the fairlet decomposition.
         """
         blues = list(np.where(group_a)[0])
         reds = list(np.where(group_b)[0])
@@ -67,6 +126,23 @@ class VanillaFairletDecomposition(DecompositionMixin):
         )
 
     def _decompose(self, blues, reds, dataset):
+        """
+        Decomposes the input sets into fairlets.
+
+        Parameters
+        ----------
+        blues : list
+            The set of blue points.
+        reds : list
+            The set of red points.
+        dataset : array-like
+            The dataset.
+
+        Returns
+        -------
+        float
+            The cost of the fairlet decomposition.
+        """
         p = self.p
         q = self.q
         assert p <= q, "Please use balance parameters in the correct order"

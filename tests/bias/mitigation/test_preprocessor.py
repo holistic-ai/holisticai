@@ -38,7 +38,7 @@ def get_preprocessor(mitigator_name : MITIGATOR_NAME = "CorrelationRemover", par
 ])
 def test_multiclass_preprocessor(mitigator_name, mitigator_params, fit_params, extra_model_fit_params, multiclass_dataset):
     metrics1 = run_preprocessing_categorical(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, fit_params, extra_model_fit_params, mitigator_params, is_multiclass=True)
-    metrics2 = run_preprocessing_catergorical_peline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, mitigator_params, is_multiclass=True)
+    metrics2 = run_preprocessing_catergorical_pipeline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, mitigator_params, is_multiclass=True)
     check_results(metrics1, metrics2)
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params, extra_model_fit_params", [
@@ -48,8 +48,17 @@ def test_multiclass_preprocessor(mitigator_name, mitigator_params, fit_params, e
 ])
 def test_categorical_preprocessor(mitigator_name, mitigator_params, fit_params, extra_model_fit_params, categorical_dataset):
     metrics1 = run_preprocessing_categorical(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, fit_params, extra_model_fit_params, mitigator_params)
-    metrics2 = run_preprocessing_catergorical_peline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, mitigator_params)
+    metrics2 = run_preprocessing_catergorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, mitigator_params)
     check_results(metrics1, metrics2)
+
+@pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
+    ("CorrelationRemover", {"alpha":1.0}, ['X','group_a','group_b']),
+])
+def test_regression_preprocessor(mitigator_name, mitigator_params, fit_params, regression_dataset):
+    metrics1 = run_preprocessing_regression(regression_dataset, LinearRegression, mitigator_name, fit_params, mitigator_params)
+    metrics2 = run_preprocessing_regression_pipeline(regression_dataset, LinearRegression, mitigator_name, mitigator_params)
+    check_results(metrics1, metrics2)
+
 
 def run_preprocessing_categorical(dataset, bias_metrics, estimator_class, mitigator_name, preprocessor_fit_param_names, extra_model_fit_params,  mitigator_params, is_multiclass=False):
     train = dataset['train']
@@ -73,7 +82,7 @@ def run_preprocessing_categorical(dataset, bias_metrics, estimator_class, mitiga
     else:
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
-def run_preprocessing_catergorical_peline(dataset, bias_metrics, estimator_class, mitigator_name, mitigator_params, is_multiclass=False):
+def run_preprocessing_catergorical_pipeline(dataset, bias_metrics, estimator_class, mitigator_name, mitigator_params, is_multiclass=False):
     train = dataset['train']
     test = dataset['test']
 
@@ -92,15 +101,6 @@ def run_preprocessing_catergorical_peline(dataset, bias_metrics, estimator_class
     else:
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
     
-
-@pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
-    ("CorrelationRemover", {"alpha":1.0}, ['X','group_a','group_b']),
-])
-def test_regression_preprocessor(mitigator_name, mitigator_params, fit_params, regression_dataset):
-    metrics1 = run_preprocessing_regression(regression_dataset, LinearRegression, mitigator_name, fit_params, mitigator_params)
-    metrics2 = run_preprocessing_regression_peline(regression_dataset, LinearRegression, mitigator_name, mitigator_params)
-    check_results(metrics1, metrics2)
-
 def run_preprocessing_regression(dataset, estimator_class, mitigator_name, preprocessor_fit_param_names,  mitigator_params):
     train = dataset['train']
     test = dataset['test']
@@ -117,7 +117,7 @@ def run_preprocessing_regression(dataset, estimator_class, mitigator_name, prepr
     
     return regression_bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
-def run_preprocessing_regression_peline(dataset, estimator_class, mitigator_name, mitigator_params):
+def run_preprocessing_regression_pipeline(dataset, estimator_class, mitigator_name, mitigator_params):
     train = dataset['train']
     test = dataset['test']
 

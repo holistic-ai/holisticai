@@ -11,6 +11,27 @@ from holisticai.utils.transformers.bias import BMPreprocessing
 
 
 def get_x_hat_y_hat(prototypes, w, x):
+    """
+    Get x_hat and y_hat
+
+    Parameters
+    ----------
+    prototypes : array-like
+        Prototypes
+    w : array-like
+        Weights
+    x : array-like
+        Input data
+
+    Returns
+    -------
+    array-like
+        M
+    array-like
+        x_hat
+    array-like
+        y_hat
+    """
     M = softmax(-cdist(x, prototypes), axis=1)
     x_hat = np.matmul(M, prototypes)
     y_hat = np.maximum(
@@ -20,6 +41,50 @@ def get_x_hat_y_hat(prototypes, w, x):
 
 
 class ObjectiveFunction:
+    """
+    Objective function for optimization
+
+    Parameters
+    ----------
+    maxiter : int
+        Maximum number of iterations
+    features_dim : int
+        Number of features
+    verbose : int
+        If zero, then no output
+    x : array-like
+        Input data
+    y : array-like
+        Target vector
+    m_a : array-like
+        Mask vector
+    m_b : array-like
+        Mask vector
+    k : int, optional
+        Number of prototypes. Default is 10
+    A_x : float, optional
+        Input recontruction quality term weight. Default is 0.01
+    A_y : float, optional
+        Output prediction error. Default is 0.1
+    A_z : float, optional
+        Fairness constraint term weight. Default is 0.5
+
+    Attributes
+    ----------
+    verbose : int
+        If zero, then no output
+    x : array-like
+        Input data
+    y : array-like
+        Target vector
+
+    Methods
+    -------
+    __call__(parameters)
+        Call the objective function
+    log_progress(total_loss, L_x, L_y, L_z)
+        Log the progress
+    """
     def __init__(
         self,
         maxiter,
@@ -46,6 +111,19 @@ class ObjectiveFunction:
         self.progress_bar = tqdm(total=maxiter, desc="Optimization Progress")
 
     def __call__(self, parameters):
+        """
+        Call the objective function
+
+        Parameters
+        ----------
+        parameters : array-like
+            Parameters
+
+        Returns
+        -------
+        float
+            Total loss
+        """
         w = parameters[: self.k]
         prototypes = parameters[self.k :].reshape(self.prototypes_shape)
 
@@ -70,6 +148,20 @@ class ObjectiveFunction:
         return total_loss
 
     def log_progress(self, total_loss, L_x, L_y, L_z):
+        """
+        Log the progress
+
+        Parameters
+        ----------
+        total_loss : float
+            Total loss
+        L_x : float
+            L_x
+        L_y : float
+            L_y
+        L_z : float
+            L_z
+        """
         self.progress_bar.update()
         self.progress_bar.set_postfix_str(
             f"loss: {total_loss:.3f} L_x: {L_x:.3f} L_y: {L_y:.3f} L_z: {L_z:.3f}"
@@ -78,12 +170,67 @@ class ObjectiveFunction:
 
 class LearningFairRepresentation(BMPreprocessing):
     """
-    Learning fair representations finds a latent representation which encodes the data well
+    Learning fair representations finds a latent representation which encodes the data well\
     while obfuscates information about protected attributes.
+
+    Parameters
+    ----------
+    k : int, optional
+        Number of prototypes. Default is 5
+    Ax : float, optional
+        Input recontruction quality term weight. Default is 0.01
+    Ay : float, optional
+        Output prediction error. Default is 1.0
+    Az : float, optional
+        Fairness constraint term weight. Default is 50.0
+    maxiter : int, optional
+        Maximum number of iterations. Default is 5000
+    maxfun : int, optional
+        Maximum number of function evaluations. Default is 5000
+    verbose : int, optional
+        If zero, then no output. Default is 0
+    seed : int, optional
+        Seed to make `predict` repeatable. Default is None
+
+    Attributes
+    ----------
+    seed : int
+        Seed to make `predict` repeatable
+    k : int
+        Number of prototypes
+    Ax : float
+        Input recontruction quality term weight
+    Ay : float
+        Output prediction error
+    Az : float
+        Fairness constraint term weight
+    w : array-like
+        Weights
+    prototypes : array-like
+        Prototypes
+    learned_model : array-like
+        Learned model
+    maxiter : int
+        Maximum number of iterations
+    maxfun : int
+        Maximum number of function evaluations
+    problem_type : str
+        Problem type
+    verbose : int
+        If zero, then no output
+
+    Methods
+    -------
+    fit(X, y_true, group_a, group_b)
+        Fit data to learn a fair representation transform
+    transform(X, group_a, group_b)
+        Transform data to a fair representation
+    fit_transform(X, y_true, group_a, group_b)
+        Fit and transform
 
     References
     ----------
-        Zemel, Rich, et al. "Learning fair representations."
+    .. [1] Zemel, Rich, et al. "Learning fair representations."
         International conference on machine learning. PMLR, 2013.
     """
 
@@ -98,28 +245,6 @@ class LearningFairRepresentation(BMPreprocessing):
         verbose: Optional[int] = 0,
         seed: Optional[int] = None,
     ):
-        """
-        Learning Fair Representation Preprocessing Bias Mitigator
-
-        Description
-        -----------
-        Initialize Mitigator class.
-
-        Parameters
-        ----------
-        k : int
-            Number of prototypes.
-        Ax : float
-            Input recontruction quality term weight.
-        Az : float
-            Fairness constraint term weight.
-        Ay : float
-            Output prediction error.
-        verbose : int
-            If zero, then no output.
-        seed : int
-            Seed to make `predict` repeatable.
-        """
         self.seed = seed
         self.k = k
         self.Ax = Ax
@@ -142,10 +267,6 @@ class LearningFairRepresentation(BMPreprocessing):
         group_b: np.ndarray,
     ):
         """
-        Fit.
-
-        Description
-        -----------
         Fit data to learn a fair representation transform.
 
         Parameters
@@ -214,8 +335,6 @@ class LearningFairRepresentation(BMPreprocessing):
     def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
         Transform data
-
-        Description
         -----------
         Transform data to a fair representation
 
@@ -230,7 +349,8 @@ class LearningFairRepresentation(BMPreprocessing):
 
         Return
         ------
-            Transformed X
+        array-like
+            Transformed data
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         X = params["X"]
@@ -254,10 +374,6 @@ class LearningFairRepresentation(BMPreprocessing):
         group_b: np.ndarray,
     ):
         """
-        Fit and transform
-
-        Description
-        ----------
         Fit and transform
 
         Parameters

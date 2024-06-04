@@ -11,66 +11,34 @@ from .algorithm import ExponentiatedGradientAlgorithm
 
 
 class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
-    """
+    """Exponentiated gradient reduction 
+
     Exponentiated gradient reduction is an in-processing technique that reduces
     fair classification to a sequence of cost-sensitive classification problems,
     returning a randomized classifier with the lowest empirical error subject to
     fair classification constraints.
 
-    References
+    Parameters
     ----------
-        Agarwal, Alekh, et al. "A reductions approach to fair classification."
-        International Conference on Machine Learning. PMLR, 2018.
-    """
-
-    CONSTRAINTS = Literal[
-        "DemographicParity",
-        "EqualizedOdds",
-        "TruePositiveRateParity",
-        "FalsePositiveRateParity",
-        "ErrorRateParity",
-    ]
-
-    def __init__(
-        self,
-        constraints: str = "EqualizedOdds",
-        eps: Optional[float] = 0.01,
-        max_iter: Optional[int] = 50,
-        nu: Optional[float] = None,
-        eta0: Optional[float] = 2.0,
-        loss: str = "ZeroOne",
-        min_val: float = None,
-        max_val: float = None,
-        upper_bound: float = 0.01,
-        verbose: Optional[int] = 0,
-        estimator=None,
-        seed : int =0,
-    ):
-
-        """
-
-        Parameters
-        ----------
+    
         estimator : sklearn-like
             The model you want to mitigate bias for.
 
         constraints (str or BaseMoment): If string, keyword
             denoting the :class:`BaseMoment` object
             defining the disparity constraints:
-            [
-                "DemographicParity",
-                "EqualizedOdds",
-                "TruePositiveRateParity",
-                "FalsePositiveRateParity",
-                "ErrorRateParity",
-            ]
+                - "DemographicParity"
+                - "EqualizedOdds"
+                - "TruePositiveRateParity"
+                - "FalsePositiveRateParity"
+                - "ErrorRateParity"
 
         eps: Allowed fairness constraint violation; the solution is
             guaranteed to have the error within ``2*best_gap`` of the best
             error under constraint eps; the constraint violation is at most
             ``2*(eps+best_gap)``.
 
-        T: Maximum number of iterations.
+        num_iter: Maximum number of iterations.
 
         nu: Convergence threshold for the duality gap, corresponding to a
             conservative automatic setting based on the statistical
@@ -95,8 +63,38 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
 
         seed: int
             seed for random initialization
-        """
 
+    Reference
+    ---------
+        Agarwal, Alekh, et al. "A reductions approach to fair classification."
+        International Conference on Machine Learning. PMLR, 2018.
+    """
+
+    CONSTRAINTS = Literal[
+        "DemographicParity",
+        "EqualizedOdds",
+        "TruePositiveRateParity",
+        "FalsePositiveRateParity",
+        "ErrorRateParity",
+    ]
+
+
+    def __init__(
+        self,
+        constraints: str = "EqualizedOdds",
+        eps: Optional[float] = 0.01,
+        max_iter: Optional[int] = 50,
+        nu: Optional[float] = None,
+        eta0: Optional[float] = 2.0,
+        loss: str = "ZeroOne",
+        min_val: float = None,
+        max_val: float = None,
+        upper_bound: float = 0.01,
+        verbose: Optional[int] = 0,
+        estimator=None,
+        seed: int=0
+    ):
+                
         self.constraints = constraints
         self.eps = eps
         self.max_iter = max_iter

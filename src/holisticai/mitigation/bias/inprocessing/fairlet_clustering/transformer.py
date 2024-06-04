@@ -22,15 +22,47 @@ CLUSTERING_CATALOG = {"KCenters": KCenters, "KMedoids": KMedoids}
 
 
 class FairletClustering(BaseEstimator, BMImp):
-    """
-    Fairlet Clustering inprocessing bias mitigation works in two steps:
-    - The pointset is partitioned into subsets called fairlets that satisfy
+    """Fairlet Clustering
+
+    Fairlet Clustering inprocessing bias mitigation works in two steps: 
+    (1) The pointset is partitioned into subsets called fairlets that satisfy
     the fairness requirement and approximately preserve the k-median objective.
-    - Fairlets are merged into k clusters by one of the existing k-median algorithms.
+    (2) Fairlets are merged into k clusters by one of the existing k-median algorithms.
+
+    Parameters
+    ----------
+        n_clusters : int
+            The number of clusters to form as well as the number of centroids to generate.
+
+        decomposition : str
+            Fairlet decomposition strategy, available: Vanilla, Scalable
+
+        clustering_model : str
+            specified lambda parameter
+
+        p : int
+            fairlet decomposition parameter for Vanilla and Scalable strategy
+
+        q : int
+            fairlet decomposition parameter for Vanilla and Scalable strategy
+
+        seed : int
+        Random seed.
+
+    Methods
+    -------
+        fit(X, group_a, group_b)
+            Fit model using Fairlet Clustering.
+
+        predict(X)
+            Predict the closest cluster each sample in X belongs to.
+
+        fit_predict(X, group_a, group_b)
+            Fit and Predict the cluster for the given samples.
 
     Reference
     ---------
-        Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
+        [1] Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
         Machine Learning. PMLR, 2019.
     """
 
@@ -43,27 +75,6 @@ class FairletClustering(BaseEstimator, BMImp):
         q: Optional[float] = 3,
         seed: Optional[int] = None,
     ):
-        """
-        Parameters
-        ----------
-            n_clusters : int
-                The number of clusters to form as well as the number of centroids to generate.
-
-            decomposition : str
-                Fairlet decomposition strategy, available: Vanilla, Scalable
-
-            clustering_model : str
-                specified lambda parameter
-
-            p : int
-                fairlet decomposition parameter for Vanilla and Scalable strategy
-
-            q : int
-                fairlet decomposition parameter for Vanilla and Scalable strategy
-
-            seed : int
-                Random seed.
-        """
         if decomposition in ["Scalable", "Vanilla"]:
             self.decomposition = DECOMPOSITION_CATALOG[decomposition](p=p, q=q)
         self.clustering_model = CLUSTERING_CATALOG[clustering_model](n_clusters=n_clusters)

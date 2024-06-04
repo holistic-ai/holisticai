@@ -89,15 +89,15 @@ def _check_classes_input(classes, y_pred, y_true=None):
         _classes = set(classes)
         __classes = set(y_pred)
         if _classes != __classes:
-            raise ValueError("classes is not a reordering of unique values in y_pred.")
+            msg = "classes is not a reordering of unique values in y_pred."
+            raise ValueError(msg)
     # case 2
     else:
         _classes = set(classes)
         __classes = set(y_pred).union(set(y_true))
         if _classes != __classes:
-            raise ValueError(
-                "classes is not a reordering of unique values in y_pred or y_true."
-            )
+            msg = "classes is not a reordering of unique values in y_pred or y_true."
+            raise ValueError(msg)
 
 
 def _check_groups_input(groups, p_attr):
@@ -124,7 +124,8 @@ def _check_groups_input(groups, p_attr):
     _groups = set(groups)
     __groups = set(p_attr)
     if _groups != __groups:
-        raise ValueError("groups is not a reordering of unique values in p_attr.")
+        msg = "groups is not a reordering of unique values in p_attr."
+        raise ValueError(msg)
 
 
 def _check_binary(arr, name=""):
@@ -197,6 +198,7 @@ def _check_nan_mat(mat, name=""):
     """
     if np.isnan(mat).any():
         return ValueError(name + " has NaN values.")
+    return None
 
 
 def _array_like_to_numpy(arr, name=""):
@@ -222,15 +224,13 @@ def _array_like_to_numpy(arr, name=""):
         if len(out.shape) == 1:
             return out
         else:
-            raise ValueError()
+            raise ValueError
     except:
-        raise TypeError(
-            "input {} is not array-like. \
-This includes numpy 1d arrays, lists, \
-pandas Series or pandas 1d DataFrame".format(
-                name
-            )
+        msg = (
+            f"input {name} is not array-like. This includes numpy 1d arrays, lists,\
+            pandas Series or pandas 1d DataFrame"
         )
+        raise TypeError(msg)
 
 
 def _matrix_like_to_numpy(arr, name=""):
@@ -256,15 +256,13 @@ def _matrix_like_to_numpy(arr, name=""):
         if len(out.shape) == 2:
             return out
         else:
-            raise ValueError()
+            raise ValueError
     except:
-        raise TypeError(
-            "input {} is not matrix-like. \
-This includes numpy 2d arrays, list of lists \
-or pandas 2d DataFrame".format(
-                name
-            )
+        msg = (
+            f"input {name} is not matrix-like. This includes numpy 2d arrays, list of lists \
+                or pandas 2d DataFrame"
         )
+        raise TypeError(msg)
 
 
 def _matrix_like_to_dataframe(arr, name=""):
@@ -274,9 +272,11 @@ def _matrix_like_to_dataframe(arr, name=""):
             columns = [f"Feature {f}" for f in range(out.shape[1])]
             return pd.DataFrame(out, columns=columns)
         else:
-            raise ValueError("input is not matrix-like.")
+            msg = "input is not matrix-like."
+            raise ValueError(msg)
     except:
-        raise TypeError("input is not matrix-like.")
+        msg = "input is not matrix-like."
+        raise TypeError(msg)
 
 
 def _array_like_to_series(arr, name=""):
@@ -285,9 +285,11 @@ def _array_like_to_series(arr, name=""):
         if len(out.shape) == 1:
             return pd.Series(out)
         else:
-            raise ValueError("input is not array-like.")
+            msg = "input is not array-like."
+            raise ValueError(msg)
     except:
-        raise TypeError("input is not array-like.")
+        msg = "input is not array-like."
+        raise TypeError(msg)
 
 
 def _coerce_and_check_arr(arr, name="input"):
@@ -433,7 +435,8 @@ def _regression_checks(group_a, group_b, y_pred, y_true=None, q=None):
     if q is not None:
         q = np.atleast_1d(np.array(q).squeeze())
         if len(q.shape) > 1:
-            raise ValueError("q should be float or array-like")
+            msg = "q should be float or array-like"
+            raise ValueError(msg)
 
     return group_a, group_b, y_pred, y_true, q
 
@@ -470,11 +473,11 @@ def _clustering_checks(
     if centroids is not None:
         centroids = _coerce_and_check_mat(centroids, name="centroids")
 
-    if centroids is not None and data is not None:
-        if data.shape[1] != centroids.shape[1]:
-            raise ValueError(
-                "data and centroids datapoints do not have same dimensionality"
-            )
+    if centroids is not None and data is not None and data.shape[1] != centroids.shape[1]:
+        msg = "data and centroids datapoints do not have same dimensionality"
+        raise ValueError(
+            msg
+        )
 
     return group_a, group_b, y_pred, y_true, data, centroids
 
@@ -514,9 +517,9 @@ def _recommender_checks(
         mat_true = _matrix_like_to_numpy(mat_true, name="mat_true")
         _check_same_shape([mat_pred, mat_true], names="mat_pred, mat_true")
 
-    if top is not None:
-        if not isinstance(top, int):
-            raise ValueError("top has to be an integer")
+    if top is not None and not isinstance(top, int):
+        msg = "top has to be an integer"
+        raise ValueError(msg)
 
     if normalize is not None:
         normalize = bool(normalize)
@@ -558,10 +561,7 @@ def _multiclass_checks(
 
     # define groups if not defined (where possible)
     if groups is None:
-        if p_attr is not None:
-            groups = np.sort(np.unique(p_attr))
-        else:
-            groups = None
+        groups = np.sort(np.unique(p_attr)) if p_attr is not None else None
     else:
         _check_groups_input(groups, p_attr)
 
@@ -573,21 +573,21 @@ def _multiclass_checks(
             classes = np.sort(np.unique(y_pred))
         else:
             classes = None
+    elif y_true is not None and y_pred is not None:
+        _check_classes_input(classes, y_pred, y_true)
+    elif y_true is None and y_pred is not None:
+        _check_classes_input(classes, y_pred)
     else:
-        if y_true is not None and y_pred is not None:
-            _check_classes_input(classes, y_pred, y_true)
-        elif y_true is None and y_pred is not None:
-            _check_classes_input(classes, y_pred)
-        else:
-            classes = None
+        classes = None
 
     return p_attr, y_pred, y_true, groups, classes
 
 
 def _check_valid_y_proba(y_proba: np.ndarray):
     atol = 1e-3
+    threshold = 2
     y_shape = np.shape(y_proba)
-    assert len(y_shape) == 2, f"""y_proba must be 2d tensor, found: {y_shape}"""
+    assert len(y_shape) == threshold, f"""y_proba must be 2d tensor, found: {y_shape}"""
 
     sum_all_probs = np.sum(y_proba, axis=1)
     assert np.all(
@@ -621,7 +621,8 @@ def _check_numerical_dataframe(df: pd.DataFrame):
     try:
         return df.astype(float)
     except ValueError:
-        raise ValueError("DataFrame cannot be converted to numerical values")
+        msg = "DataFrame cannot be converted to numerical values"
+        raise ValueError(msg)
 
 
 def _check_columns(df: pd.DataFrame, column: str):
@@ -644,4 +645,5 @@ def _check_columns(df: pd.DataFrame, column: str):
     ValueError or None
     """
     if column not in df.columns:
-        raise ValueError(f"Column '{column}' does not exist in DataFrame")
+        msg = f"Column '{column}' does not exist in DataFrame"
+        raise ValueError(msg)

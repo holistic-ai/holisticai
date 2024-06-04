@@ -1,7 +1,6 @@
 from typing import Optional
 
 import numpy as np
-import pandas as pd
 import torch
 
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
@@ -13,39 +12,16 @@ from .trainer import TrainArgs, Trainer
 
 
 class AdversarialDebiasing(BMImp):
-    """
+    """Adversarial Debiasing
+
     Adversarial debiasing learns a classifier to maximize prediction accuracy and simultaneously reduce an
     adversary's ability to determine the protected attribute from the predictions. This approach leads to a fair classifier as the
     predictions cannot carry any group discrimination information that the adversary can exploit.
 
     Obs: Pytorch must be installed in order to use this techinique (pytorch = ">=1.12.1").
 
-    References:
-        B. H. Zhang, B. Lemoine, and M. Mitchell, "Mitigating Unwanted
-        Biases with Adversarial Learning," AAAI/ACM Conference on Artificial
-        Intelligence, Ethics, and Society, 2018.
-    """
-
-    def __init__(
-        self,
-        features_dim: int = None,
-        keep_prob: Optional[float] = 0.1,
-        hidden_size: Optional[int] = 128,
-        batch_size: Optional[int] = 32,
-        shuffle: Optional[bool] = True,
-        epochs: Optional[int] = 10,
-        initial_lr: Optional[float] = 0.01,
-        use_debias: Optional[bool] = True,
-        adversary_loss_weight: Optional[float] = 0.1,
-        verbose: Optional[int] = 1,
-        print_interval: Optional[int] = 100,
-        device: Optional[str] = "cpu",
-        seed: Optional[int] = None,
-    ):
-
-        """
-        Parameters
-        ----------
+    Parameters
+    ----------
         features_dim: int
             Number of input feature X: (n_samples, features_dim)
 
@@ -85,10 +61,43 @@ class AdversarialDebiasing(BMImp):
         seed: int
             seed for random state
 
-        Return
-        ------
-        self
-        """
+    Methods
+    -------
+        fit(X, y_true, group_a, group_b)
+            Fit model using Adversarial Debiasing.
+
+        predict(X)
+            Predict the closest cluster each sample in X belongs to.
+
+        predict_proba(X)
+            Predict the probability of each sample in X belongs to each class.
+
+        predict_score(X)
+            Predict the probability of each sample in X belongs to the positive class.
+
+    References
+    ----------
+        [1] B. H. Zhang, B. Lemoine, and M. Mitchell, "Mitigating Unwanted
+        Biases with Adversarial Learning," AAAI/ACM Conference on Artificial
+        Intelligence, Ethics, and Society, 2018.
+    """
+
+    def __init__(
+        self,
+        features_dim: int = None,
+        keep_prob: Optional[float] = 0.1,
+        hidden_size: Optional[int] = 128,
+        batch_size: Optional[int] = 32,
+        shuffle: Optional[bool] = True,
+        epochs: Optional[int] = 10,
+        initial_lr: Optional[float] = 0.01,
+        use_debias: Optional[bool] = True,
+        adversary_loss_weight: Optional[float] = 0.1,
+        verbose: Optional[int] = 1,
+        print_interval: Optional[int] = 100,
+        device: Optional[str] = "cpu",
+        seed: Optional[int] = None,
+    ):
         # default classifier config
         self.features_dim = features_dim
         self.keep_prob = keep_prob

@@ -37,13 +37,12 @@ def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds",
             return FairScoreClassifier(**parameters)
     raise NotImplementedError
 
-
 @pytest.mark.parametrize("mitigator_name, mitigator_params, model_params", [
     ("FairScoreClassifier", {'objectives':'ab', 'constraints':{}}, {"random_state":42}),
 ])
 def test_multiclass_inprocessor(mitigator_name, mitigator_params, model_params, multiclass_dataset):
     metrics1 = run_inprocessing_categorical(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params, is_multiclass=True)
-    metrics2 = run_inprocessing_catergorical_peline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params, is_multiclass=True)
+    metrics2 = run_inprocessing_catergorical_pipeline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params, is_multiclass=True)
     check_results(metrics1, metrics2)
 
 
@@ -55,7 +54,7 @@ def test_multiclass_inprocessor(mitigator_name, mitigator_params, model_params, 
 ])
 def test_categorical_inprocessor(mitigator_name, mitigator_params, model_params, categorical_dataset):
     metrics1 = run_inprocessing_categorical(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params)
-    metrics2 = run_inprocessing_catergorical_peline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params)
+    metrics2 = run_inprocessing_catergorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params)
     check_results(metrics1, metrics2)
 
 
@@ -65,7 +64,7 @@ def test_categorical_inprocessor(mitigator_name, mitigator_params, model_params,
 ])
 def test_regression_inprocessor(mitigator_name, mitigator_params, model_params, regression_dataset):
     metrics1 = run_inprocessing_categorical(regression_dataset, regression_bias_metrics, LinearRegression, mitigator_name, model_params, mitigator_params)
-    metrics2 = run_inprocessing_catergorical_peline(regression_dataset, regression_bias_metrics, LinearRegression, mitigator_name, model_params, mitigator_params)
+    metrics2 = run_inprocessing_catergorical_pipeline(regression_dataset, regression_bias_metrics, LinearRegression, mitigator_name, model_params, mitigator_params)
     check_results(metrics1, metrics2)
 
 
@@ -86,7 +85,7 @@ def run_inprocessing_categorical(dataset, bias_metrics, estimator_class, mitigat
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
 
-def run_inprocessing_catergorical_peline(dataset, bias_metrics, estimator_class, mitigator_name, model_params, mitigator_params, is_multiclass=False):
+def run_inprocessing_catergorical_pipeline(dataset, bias_metrics, estimator_class, mitigator_name, model_params, mitigator_params, is_multiclass=False):
     train = dataset['train']
     test = dataset['test']
 

@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Iterable
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from holisticai.utils.obj_rep.datasets import generate_html
 
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 class DatasetDict(dict):
     def __init__(self, **datasets):
@@ -58,7 +56,7 @@ def apply_fn_to_multilevel_df(df, fn):
         result_df = pd.concat([result_df, result], axis=1)
     return result_df
 
-#dataset = dataset.groupby(['y','group_a']).select(range(SHARD_SIZE))
+
 class GroupByDataset:
     def __init__(self, groupby_obj):
         self.groupby_obj = groupby_obj
@@ -95,6 +93,8 @@ def dataframe_to_level_dict_with_series(df, row_index):
             data[level_0_name] = feature.iloc[row_index]
     return data
 
+
+
 class Dataset(dict):
     def update_metadata(self):
         self.features = list(self.data.columns.get_level_values(0).unique())
@@ -110,7 +110,7 @@ class Dataset(dict):
                 elif isinstance(value, pd.Series):
                     self.data[name] = pd.Series(value.reset_index(drop=True), name=name)
                 else:
-                    msg = f"Variable '{name}' is of type {type(value)}, but only pd.DataFrame and pd.Series are supported."
+                    msg = f"Variable '{name}' is of type {type(value)}, but only pd.DataFrame and pd.Series are supported."  # noqa: E501
                     raise TypeError(msg)
             self.data = pd.concat(self.data.values(), axis=1, keys=self.data.keys())
             self.data.reset_index(drop=True)
@@ -171,11 +171,17 @@ class Dataset(dict):
         dataset_info = self.repr_info()
         return generate_html(dataset_info)
 
+    def _repr_html_(self):
+        return (
+        #f"<div style='background-color: #E3F2FD; border: 1px solid #00ACC1; padding: 5px; border-radius: 2px; color: black; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; line-height: 1.5; letter-spacing: 0.02em; max-width: 600px; margin: 10px;'>"
+        f"<div style='background-color: #E3F2FD; border: 1px solid #00ACC1; padding: 20px; border-radius: 10px; color: black; font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif; line-height: 1.5; letter-spacing: 0.02em; margin: 10px; display: inline-block;'>"  # noqa: E501
+        f"<span style='font-weight: bold;'>Dataset</span><br>"
+        f"{self.repr_info()}"
+        f"</div>")
+
     def __getitem__(self, key: str | int):
         if isinstance(key, str):
             return self.data.xs(key, level=0, axis=1)
         if isinstance(key, int):
             return dataframe_to_level_dict_with_series(self.data, key)
-            ##print(self.data.iloc[key])
-            #return self.data.iloc[key]
         raise NotImplementedError

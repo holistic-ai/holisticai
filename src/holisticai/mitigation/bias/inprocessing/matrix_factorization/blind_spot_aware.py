@@ -8,33 +8,15 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 
 
 class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
-    """
+    """Blind Spot Aware Matrix Factorization
+    
     A blind spot aware Matrix Factorization takes into account the blind spot
     inherent in the learning phase of the RS. The blind spot size is the
     number of item with a predicted ratings Ru,i that is smaller than a
     threshold.
 
-    References:
-        [1] Sun, Wenlong, et al. "Debiasing the human-recommender system
-        feedback loop in collaborative filtering." Companion Proceedings
-        of The 2019 World Wide Web Conference. 2019.
-    """
-
-    def __init__(
-        self,
-        K: Optional[int] = 10,
-        beta: Optional[float] = 0.002,
-        steps: Optional[int] = 200,
-        alpha: Optional[float] = 0.002,
-        lamda: Optional[float] = 0.2,
-        verbose: Optional[int] = 0,
-    ):
-        """
-        Init Blind Spot Aware Matrix Factorization
-
-        Parameters
-        ----------
-
+    Parameters
+    ----------
         K : int
             Specifies the number of dimensions.
 
@@ -52,7 +34,28 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
 
         verbose : int
             If >0, will show progress percentage.
-        """
+
+    Methods
+    -------
+        fit(X)
+            Fit model using Blind Spot Aware Matrix Factorization.
+
+    References
+    ----------
+        [1] Sun, Wenlong, et al. "Debiasing the human-recommender system
+        feedback loop in collaborative filtering." Companion Proceedings
+        of The 2019 World Wide Web Conference. 2019.
+    """
+
+    def __init__(
+        self,
+        K: Optional[int] = 10,
+        beta: Optional[float] = 0.002,
+        steps: Optional[int] = 200,
+        alpha: Optional[float] = 0.002,
+        lamda: Optional[float] = 0.2,
+        verbose: Optional[int] = 0,
+    ):
         self.beta = beta
         self.steps = steps
         self.alpha = alpha

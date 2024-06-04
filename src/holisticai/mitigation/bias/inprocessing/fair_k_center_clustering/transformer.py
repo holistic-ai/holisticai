@@ -21,27 +21,14 @@ STRATEGIES_CATALOG = {
 
 
 class FairKCenterClustering(BaseEstimator, BMImp):
-    """
+    """Fair K-Center Clustering
+
     Fair K-Center Clustering inprocessing bias mitigation implements an approximation algorithm
     for the k-centers problem under the fairness contraint with running time linear in the
     size of the dataset and k (number of cluster).
 
-    Reference
-    ---------
-        Kleindessner, Matthäus, Pranjal Awasthi, and Jamie Morgenstern. "Fair k-center clustering
-        for data summarization." International Conference on Machine Learning. PMLR, 2019.
-    """
-
-    def __init__(
-        self,
-        req_nr_per_group: Optional[list] = [200, 200],
-        nr_initially_given: Optional[int] = 100,
-        strategy: Optional[str] = "Fair K-Center",
-        seed: Optional[int] = None,
-    ):
-        """
-        Parameters
-        ----------
+    Parameters
+    ----------
         req_nr_per_group : list
             Number of cluster for each group that will be founded.
             - Integer-vector of length m with entries in 0,...,k.
@@ -57,7 +44,28 @@ class FairKCenterClustering(BaseEstimator, BMImp):
 
         seed: int,
             Initial random seed.
-        """
+
+    Methods
+    -------
+        fit(X, group_a, group_b)
+            Fit model using Fair K-Center Clustering.
+
+        predict(X)
+            Predict the closest cluster each sample in X belongs to.
+
+    Reference
+    ---------
+        [1] Kleindessner, Matthäus, Pranjal Awasthi, and Jamie Morgenstern. "Fair k-center clustering
+        for data summarization." International Conference on Machine Learning. PMLR, 2019.
+    """
+
+    def __init__(
+        self,
+        req_nr_per_group: Optional[list] = [200, 200],
+        nr_initially_given: Optional[int] = 100,
+        strategy: Optional[str] = "Fair K-Center",
+        seed: Optional[int] = None,
+    ):
         self.req_nr_per_group = np.array(req_nr_per_group)
         self.nr_initially_given = nr_initially_given
         self.strategy = strategy

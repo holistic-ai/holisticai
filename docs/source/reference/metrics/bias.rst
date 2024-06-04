@@ -1,9 +1,9 @@
 Bias Metrics
-=======
+==============
 
 `holisticai.metrics.bias` is a python module measuring *bias* in algorithms. Metrics are included for *classification*, *regression*, *clustering*, *recommender* and *multiclass* tasks.
 
-.. _binary classification:
+.. _binary_classification:
 
 Binary Classification
 ----------------------
@@ -27,7 +27,7 @@ Binary Classification
     holisticai.metrics.bias.z_test_ratio
 
 
-.. _multiclass classification:
+.. _multiclass_classification:
 
 Multiclass Classification
 -------------------------

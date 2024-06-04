@@ -26,7 +26,6 @@ dependencies = ["scikit-learn>=1.0.2"]
 
 [project.optional-dependencies]
 bias = [
-  "tqdm>=4.64.1",
   "cvxpy[cbc]>1.3.0",
   "cvxopt>=1.3.0",
   "seaborn>=0.11.2",
@@ -34,7 +33,6 @@ bias = [
 ]
 explainability = ["lime>=0.2.0.1", "shap>=0.42.1", "pydotplus", "dtreeviz"]
 all = [
-  "tqdm>=4.64.1",
   "cvxpy[cbc]>1.3.0",
   "cvxopt>=1.3.0",
   "seaborn>=0.11.2",
@@ -71,11 +69,15 @@ tests = ["tests", "*/holisticai/tests"]
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
+[tool.hatch.envs.hatch-static-analysis]
+config-path = "ruff_default.toml"
+
 [tool.ruff]
 extend = "ruff_default.toml"
-exclude = ["docs/**", "tests/**", "tutorials/**"]
+exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/mitigation/**"]
 
-[tool.hatch.envs.docs]
+[tool.hatch.envs.sphinx]
+inherits = ["all"]
 dependencies = [
   "sphinx",
   "pydata-sphinx-theme",
@@ -85,9 +87,11 @@ dependencies = [
   "sphinx_design",
   "sphinx_togglebutton",
   "sphinxcontrib.youtube",
+  "pandas",
 ]
+paths = ["./src"]
 
-[tool.hatch.envs.docs.scripts]
+[tool.hatch.envs.sphinx.scripts]
 foo = ["which sphinx-build"]
 foo2 = ["which python"]
 build = [
@@ -96,10 +100,10 @@ build = [
 
 [tool.hatch.envs.testing]
 dependencies = [
-  "tqdm>=4.64.1",
   "cvxpy[cbc]>1.3.0",
   "cvxopt>=1.3.0",
   "seaborn>=0.11.2",
+  "matplotlib>=3.7.3",
   "networkx>=3.1",
   "pydotplus",
   "dtreeviz",

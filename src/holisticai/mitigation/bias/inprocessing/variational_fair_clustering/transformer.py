@@ -10,16 +10,50 @@ from .algorithm import FairClusteringAlgorithm
 
 
 class VariationalFairClustering(BaseEstimator, BMImp):
-    """
+    """Variational Fair Clustering
+
     Variational Fair Clustering helps you to find clusters with specified proportions
     of different demographic groups pertaining to a sensitive attribute of the dataset
     (group_a and group_b) for any well-known clustering method such as K-means, K-median
     or Spectral clustering (Normalized cut).
 
+    Parameters
+    ----------
+        n_clusters : int
+            The number of clusters to form as well as the number of centroids to generate.
+
+        lipchitz_value : float
+            Lipchitz value in bound update
+
+        lmbda : float
+            specified lambda parameter
+
+        method : str
+            cluster option : {'kmeans', 'kmedian'} (TODO: 'ncut' take too much time consuming)
+
+        normalize_input : str
+            Normalize input data X
+
+        seed : int
+            Random seed.
+
+        verbose : bool
+            If true , print metrics
+
+    Methods
+    -------
+        fit(X, group_a, group_b)
+            Fit model using Variational Fair Clustering.
+
+        predict(X, group_a, group_b)
+            Predict the closest cluster each sample in X belongs to.
+
+        fit_predict(X, group_a, group_b)
+            Fit and Predict the cluster for the given samples.
 
     References
     ----------
-        Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI
+        [1] Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI
         Conference on Artificial Intelligence. Vol. 35. No. 12. 2021.
     """
 
@@ -33,30 +67,6 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         seed: Optional[int] = None,
         verbose: Optional[int] = 0,
     ):
-        """
-        Parameters
-        ----------
-            n_clusters : int
-                The number of clusters to form as well as the number of centroids to generate.
-
-            lipchitz_value : float
-                Lipchitz value in bound update
-
-            lmbda : float
-                specified lambda parameter
-
-            method : str
-                cluster option : {'kmeans', 'kmedian'} (TODO: 'ncut' take too much time consuming)
-
-            normalize_input : str
-                Normalize input data X
-
-            seed : int
-                Random seed.
-
-            verbose : bool
-                If true , print metrics
-        """
         # Constant parameters
         self.algorithm = FairClusteringAlgorithm(
             K=n_clusters,

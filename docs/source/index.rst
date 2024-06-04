@@ -1,15 +1,30 @@
 holisticai documentation
 ===================
 
+.. image:: https://img.shields.io/pypi/v/holisticai
+.. image:: https://img.shields.io/pypi/dm/holisticai.svg?label=PyPI%20downloads
+.. image:: https://img.shields.io/github/license/holistic-ai/holisticai
+.. image:: https://readthedocs.org/projects/holisticai/badge/?version=latest
+
+
 Welcome to the Holistic AI library! This is an open-source tool to assess and improve the trustworthiness of AI systems. The current version of the library offers a set of techniques to easily measure and mitigate Bias across a variety of tasks.  
 
 
-.. button-link:: https://join.slack.com/t/holisticaicommunity/shared_invite/zt-2jamouyrn-BrMfeoBZIHT8HbLzB3P9QQ 
-    :class: btn-primary
+.. grid:: 4
+    :gutter: 0
+    :padding: 1 1 0 0
 
-    :fab:`slack` Join our Slack community
+    .. grid-item::
+        .. button-link:: https://holisticai.com         
+            :class: btn-primary
 
+            :fa:`globe` Holistic AI website
 
+    .. grid-item::
+        .. button-link:: https://join.slack.com/t/holisticaicommunity/shared_invite/zt-2jamouyrn-BrMfeoBZIHT8HbLzB3P9QQ 
+            :class: btn-primary
+
+            :fab:`slack` Slack Community
 
 .. grid:: 1 2 2 2
     :gutter: 4
@@ -52,10 +67,6 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
 
         Learn how to contribute to the library
 
-.. note::
-    
-    The library is developed by the Research Team at Holistic AI, a company that aims to ensure that AI can be trusted to deliver on its transformative potential for society.
-
 .. admonition:: Learn more about the Holistic AI company
         :class: dropdown admonition-youtube
 
@@ -71,4 +82,4 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
     reference/index
     gallery/index
     contributor/index
-    whatsnew/index
+    changelog/index

@@ -14,12 +14,13 @@ metrics_dict = {
 }
 
 SHARD_SIZE=50
+
 @pytest.fixture
 def categorical_dataset():
-    dataset = load_dataset("adult")
-    dataset = dataset.rename({"x":"X"})
-    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']})
-    dataset = dataset.groupby(['y','group_a']).head(SHARD_SIZE)
+    dataset = load_dataset("adult") # x,y,p_attr
+    dataset = dataset.rename({"x":"X"}) # X,y,p_attr
+    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']}) # X, y, p_attr, group_a, group_b
+    dataset = dataset.groupby(['y','group_a']).head(SHARD_SIZE) # 0-ga | 0-gb  | 1-ga | 1-gb
     return dataset.train_test_split(test_size=0.2, stratify=dataset['y'], random_state=0)
 
 @pytest.fixture

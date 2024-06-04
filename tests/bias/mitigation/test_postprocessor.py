@@ -68,7 +68,15 @@ def test_categorical_postprocessor(mitigator_name, mitigator_params, fit_params,
     metrics2 = run_postprocessing_catergorical_peline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, mitigator_params)
     check_results(metrics1, metrics2)
 
-
+@pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
+    ("PluginEstimationAndCalibration", {}, ['y_pred','group_a','group_b']),
+    ("WassersteinBarycenter", {}, ['y_pred','group_a','group_b']),
+])
+def test_regression_postprocessor(mitigator_name, mitigator_params, fit_params, regression_dataset):
+    metrics1 = run_postrocessing_regression(regression_dataset, LinearRegression, mitigator_name, fit_params, mitigator_params)
+    metrics2 = run_postprocessing_regression_peline(regression_dataset, LinearRegression, mitigator_name, mitigator_params)
+    check_results(metrics1, metrics2)
+    
 def run_postprocessing_categorical(dataset, bias_metrics, estimator_class, mitigator_name, postprocessor_fit_param_names, mitigator_params, is_multiclass=False):
     train = dataset['train']
     test = dataset['test']
@@ -121,14 +129,6 @@ def run_postprocessing_catergorical_peline(dataset, bias_metrics, estimator_clas
     else:
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
-@pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
-    ("PluginEstimationAndCalibration", {}, ['y_pred','group_a','group_b']),
-    ("WassersteinBarycenter", {}, ['y_pred','group_a','group_b']),
-])
-def test_regression_postprocessor(mitigator_name, mitigator_params, fit_params, regression_dataset):
-    metrics1 = run_postrocessing_regression(regression_dataset, LinearRegression, mitigator_name, fit_params, mitigator_params)
-    metrics2 = run_postprocessing_regression_peline(regression_dataset, LinearRegression, mitigator_name, mitigator_params)
-    check_results(metrics1, metrics2)
 
 def run_postrocessing_regression(dataset, estimator_class, mitigator_name, postprocessor_fit_param_names,  mitigator_params):
     train = dataset['train']

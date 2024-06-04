@@ -10,17 +10,63 @@ EPSILON = 0.0001
 
 
 class TreeNode:
+    """
+    A node in the quadtree used for scalable fairlet decomposition
+
+    Attributes
+    ----------
+    children : list
+        List of children nodes
+    cluster : list
+        List of indices of points in the cluster
+    reds : list
+        List of indices of red points in the cluster
+    blues : list
+        List of indices of blue points in the cluster
+
+    Methods
+    -------
+    set_cluster(cluster)
+        Set the cluster attribute
+    add_child(child)
+        Add a child node
+    populate_colors(colors)
+        Populate the reds and blues lists for each node
+    """
     def __init__(self):
         self.children = []
 
     def set_cluster(self, cluster):
+        """
+        Set the cluster attribute
+
+        Parameters
+        ----------
+        cluster : list
+            List of indices of points in the cluster
+        """
         self.cluster = cluster
 
     def add_child(self, child):
+        """
+        Add a child node
+
+        Parameters
+        ----------
+        child : TreeNode
+            Child node to add
+        """
         self.children.append(child)
 
     def populate_colors(self, colors):
-        "Populate auxiliary lists of red and blue points for each node, bottom-up"
+        """
+        Populate auxiliary lists of red and blue points for each node, bottom-up
+
+        Parameters
+        ----------
+        colors : list
+            List of colors for each point in the dataset
+        """
         self.reds = []
         self.blues = []
         if len(self.children) == 0:
@@ -39,6 +85,32 @@ class TreeNode:
 
 
 class ScalableFairletDecomposition(VanillaFairletDecomposition):
+    """
+    Scalable fairlet decomposition algorithm
+
+    Parameters
+    ----------
+    p : float
+        Balance parameter
+    q : float
+        Balance parameter
+
+    Attributes
+    ----------
+    fairlets : list
+        List of fairlets
+    fairlet_centers : list
+        List of fairlet centers
+    sensgroups : SensitiveGroups
+        Sensitive groups transformer
+
+    Methods
+    -------
+    fit_transform(dataset, group_a, group_b)
+        Fit the model and transform the dataset
+    balanced(p, q, R, B)
+        Check if a set of points is balanced
+    """
     def __init__(self, p, q):
         self.fairlets = []
         self.fairlet_centers = []
@@ -48,6 +120,25 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         self.sensgroups = SensitiveGroups()
 
     def _decompose(self, node, dataset, donelist, depth):
+        """
+        Recursively decompose a node in the quadtree
+
+        Parameters
+        ----------
+        node : TreeNode
+            Node to decompose
+        dataset : np.ndarray
+            Dataset
+        donelist : list
+            List of points that have already been clustered
+        depth : int
+            Depth of the node in the quadtree
+
+        Returns
+        -------
+        float
+            Cost of the decomposition
+        """
         p = self.p
         q = self.q
 
@@ -152,6 +243,23 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         )
 
     def fit_transform(self, dataset, group_a, group_b):
+        """
+        Fit the model and transform the dataset
+
+        Parameters
+        ----------
+        dataset : np.ndarray
+            Dataset
+        group_a : np.ndarray
+            Group membership vector (binary)
+        group_b : np.ndarray
+            Group membership vector (binary)
+
+        Returns
+        -------
+        tuple
+            Tuple containing fairlets, fairlet centers, and cost
+        """
         sensitive_groups = np.c_[group_a, group_b]
         colors = self.sensgroups.fit_transform(sensitive_groups, convert_numeric=True)
         root = build_quadtree(dataset)
@@ -169,7 +277,23 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
 
 
 def build_quadtree(dataset, max_levels=0, random_shift=True):
-    "If max_levels=0 there no level limit, quadtree will partition until all clusters are singletons"
+    """
+    If max_levels=0 there no level limit, quadtree will partition until all clusters are singletons
+    
+    Parameters
+    ----------
+    dataset : np.ndarray
+        Dataset
+    max_levels : int, optional
+        Maximum depth of the quadtree. Default is 0.
+    random_shift : bool, optional
+        Whether to randomly shift the dataset. Default is True.
+        
+    Returns
+    -------
+    TreeNode
+        Root node of the quadtree
+    """
     dimension = dataset.shape[1]
     lower = np.amin(dataset, axis=0)
     upper = np.amax(dataset, axis=0)
@@ -188,8 +312,27 @@ def build_quadtree(dataset, max_levels=0, random_shift=True):
 
 def build_quadtree_aux(dataset, cluster, lower, upper, max_levels, shift):
     """
-    "lower" is the "bottom-left" (in all dimensions) corner of current hypercube
-    "upper" is the "upper-right" (in all dimensions) corner of current hypercube
+    Recursive helper function for building a quadtree
+
+    Parameters
+    ----------
+    dataset : np.ndarray
+        Dataset
+    cluster : list
+        List of indices of points in the cluster
+    lower : np.ndarray
+        Lower bounds of the cell
+    upper : np.ndarray
+        Upper bounds of the cell
+    max_levels : int
+        Maximum depth of the quadtree
+    shift : np.ndarray
+        Shift vector
+
+    Returns
+    -------
+    TreeNode
+        Root node of the quadtree
     """
 
     dimension = dataset.shape[1]

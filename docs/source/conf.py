@@ -14,7 +14,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import sys,os
+import sys
+import os
 sys.path.insert(0, os.path.abspath(".."))
 work_dir = '/'.join(os.getcwd().split("/")[:-2])
 src_path = os.path.join(work_dir,'src')
@@ -88,7 +89,7 @@ html_theme_options = {
     "github_url": "https://github.com/holistic-ai/holisticai",
     "twitter_url": "https://twitter.com/holistic_ai",
     "show_version_warning_banner": True,
-    "announcement": "Visit our website and <a href='https://www.holisticai.com/demo'>schedule a demo</a> with our experts to find out how Holistic AI can help you shield against AI risks.",
+#    "announcement": "Visit our website and <a href='https://www.holisticai.com/demo'>schedule a demo</a> with our experts to find out how Holistic AI can help you shield against AI risks.",
     "icon_links": [
         {
             "name": "Community",
@@ -96,12 +97,14 @@ html_theme_options = {
             "icon": "fa-brands fa-slack",
             "type": "fontawesome",
         }
-   ]
+   ],
 }
 
 import os
 import shutil
 import sys
+
+#sys.path.insert(0, os.path.abspath('../src'))
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -130,4 +133,4 @@ html_css_files = [
 ]
 
 # Custom section headers
-napoleon_custom_sections = ["Interpretation", "Description", "Parameters", "Returns"]
+napoleon_custom_sections = ["Interpretation", "Description", "Parameters", "Methods", "Returns"]
