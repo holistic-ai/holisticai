@@ -19,7 +19,7 @@ SHARD_SIZE=50
 def categorical_dataset():
     dataset = load_dataset("adult") # x,y,p_attr
     dataset = dataset.rename({"x":"X"}) # X,y,p_attr
-    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']}) # X, y, p_attr, group_a, group_b
+    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']}, vectorized=True) # X, y, p_attr, group_a, group_b
     dataset = dataset.groupby(['y','group_a']).head(SHARD_SIZE) # 0-ga | 0-gb  | 1-ga | 1-gb
     return dataset.train_test_split(test_size=0.2, stratify=dataset['y'], random_state=0)
 
@@ -28,14 +28,14 @@ def regression_dataset():
     dataset = load_dataset("us_crime")
     dataset = dataset.rename({"x":"X"})
     dataset = dataset.select(range(2*SHARD_SIZE))
-    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']})
+    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']}, vectorized=True)
     return dataset.train_test_split(test_size=0.2, random_state=0)
 
 @pytest.fixture
 def multiclass_dataset():
     dataset = load_dataset("us_crime_multiclass")
     dataset = dataset.rename({"x":"X"})
-    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']})
+    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']}, vectorized=True)
     dataset = dataset.groupby(['y','group_a']).head(SHARD_SIZE)
     return dataset.train_test_split(test_size=0.2, stratify=dataset['y'], random_state=0)
 
@@ -43,7 +43,7 @@ def multiclass_dataset():
 @pytest.fixture
 def small_clustering_dataset():
     dataset = load_dataset("clinical_records")
-    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']})
+    dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']}, vectorized=True)
     return dataset.train_test_split(test_size=0.2, stratify=dataset['y'], random_state=0)
 
 
