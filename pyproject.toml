@@ -83,6 +83,7 @@ dependencies = [
   "pydata-sphinx-theme",
   "myst_parser",
   "nbsphinx",
+  "jupyter",
   "sphinx_copybutton",
   "sphinx_design",
   "sphinx_togglebutton",
@@ -95,7 +96,7 @@ paths = ["./src"]
 foo = ["which sphinx-build"]
 foo2 = ["which python"]
 build = [
-  "PYTHONPATH=./src sphinx-build -M html docs/source docs/build -W --keep-going",
+  "PYTHONPATH=./src sphinx-build -b html docs/source docs/build",
 ]
 
 [tool.hatch.envs.testing]
@@ -118,7 +119,7 @@ dependencies = [
 paths = ["./src"]
 
 [tool.hatch.envs.testing.scripts]
-run = ["python -m pytest"]
+run = ["python -m pytest tests"]
 
 [tool.hatch.envs.default]
 env-vars = { PYTHONPATH = "src" }

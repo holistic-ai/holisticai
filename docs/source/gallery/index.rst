@@ -6,7 +6,10 @@ This gallery contains a collection of examples that demonstrate the usage of ``h
 
 .. toctree::
     :maxdepth: 2
+    
+    
+    Bias <tutorials/bias>
 
-    tutorials/bias/index
-    cookbook/index
-    videos/index
+    CookBook <cookbook/index>
+
+    Videos <videos/index>
