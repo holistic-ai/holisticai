@@ -1,5 +1,6 @@
 """
-The :mod:`holisticai.metrics.bias` module includes classification, regression, multiclass, recommender and clustering bias metrics
+The :mod:`holisticai.metrics.bias` module includes classification, \
+regression, multiclass, recommender and clustering bias metrics
 """
 
 # Classification

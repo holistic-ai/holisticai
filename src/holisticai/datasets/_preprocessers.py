@@ -18,8 +18,8 @@ def load_adult_dataset():
     drop_columns = ["education", "race", "sex"]
     df = pd.concat([data["data"], data["target"]], axis=1)
     df = df.dropna().reset_index(drop=True)
-    group_a = pd.Series(get_protected_values(df, protected_attribute, "Female"), name='group_a')
-    group_b = pd.Series(get_protected_values(df, protected_attribute, "Male"), name='group_b')
+    group_a = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_a")
+    group_b = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
     p_attr = pd.concat([group_a, group_b], axis=1)
     df = df.drop(drop_columns, axis=1)
     y = df.pop(output_variable).map({"<=50K": 0, ">50K": 1})
@@ -37,18 +37,19 @@ def load_law_school_dataset():
     drop_columns = ["ugpagt3", "race1", "gender", "bar"]
     df = bunch["frame"]
     df = df.dropna()
-    group_a = pd.Series(get_protected_values(df, protected_attribute, "white"), name='group_a')
-    group_b = pd.Series(get_protected_values(df, protected_attribute, "non-white"), name='group_b')
+    group_a = pd.Series(get_protected_values(df, protected_attribute, "white"), name="group_a")
+    group_b = pd.Series(get_protected_values(df, protected_attribute, "non-white"), name="group_b")
     p_attr = pd.concat([group_a, group_b], axis=1)
     y = df[output_variable]  # binary label vector
     y = y.map({"FALSE": 0, "TRUE": 1})
     x = df.drop(drop_columns, axis=1)
     return Dataset(x=x, y=y, p_attr=p_attr)
 
+
 def load_student_multiclass_dataset():
     output_column = "G3"
-    protected_attributes = ['sex', 'address', 'Mjob', 'Fjob']
-    drop_columns = ["G1", "G2", "G3", 'sex', 'address', 'Mjob', 'Fjob']
+    protected_attributes = ["sex", "address", "Mjob", "Fjob"]
+    drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
     bunch = load_student()
     df = bunch["frame"]
 
@@ -70,10 +71,11 @@ def load_student_multiclass_dataset():
     x = df.drop(columns="target")
     return Dataset(x=x, y=y, p_attr=p_attr)
 
+
 def load_student_dataset():
     outputs = ["G1", "G2", "G3"]
-    protected_attributes = ['sex', 'address', 'Mjob', 'Fjob']
-    drop_columns = ["G1", "G2", "G3", 'sex', 'address', 'Mjob', 'Fjob']
+    protected_attributes = ["sex", "address", "Mjob", "Fjob"]
+    drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
     bunch = load_student()
     df = bunch["frame"]
 
@@ -95,7 +97,8 @@ def load_student_dataset():
 
 def load_lastfm_dataset():
     """
-    Processes the lastfm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
+    Processes the lastfm dataset and returns the data, output variable,\
+    protected group A and protected group B as numerical arrays
 
     Parameters
     ----------
@@ -134,7 +137,8 @@ def load_lastfm_dataset():
 
 def load_us_crime_dataset():
     """
-    Processes the US crime dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+    Processes the US crime dataset and returns the data, output variable, \
+    protected group A and protected group B as numerical arrays or as dataframe if needed
 
     Parameters
     ----------
@@ -151,26 +155,27 @@ def load_us_crime_dataset():
     data = load_us_crime()
     protected_attribute = "racePctWhite"
     output_variable = "ViolentCrimesPerPop"
+    max_nan_values_per_column = 1000
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df = df.iloc[
-        :, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < 1000]
-    ]
+    df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < max_nan_values_per_column]]
     df = df.dropna()
     threshold = 0.5
     group_a = df[protected_attribute] > threshold
     group_b = ~group_a
     p_attr = pd.concat([group_a, group_b], axis=1)
-    p_attr.columns = ['group_a', 'group_b']
+    p_attr.columns = ["group_a", "group_b"]
     y = df[output_variable]
     remove_columns = [protected_attribute, output_variable]
     x = df.drop(columns=remove_columns)
     numeric_features = x.select_dtypes(include=[np.number]).columns
-    #categorical_features = x.select_dtypes(include=["object"]).columns
-    return Dataset(x=x[numeric_features],  y=y, p_attr=p_attr)
+    # categorical_features = x.select_dtypes(include=["object"]).columns
+    return Dataset(x=x[numeric_features], y=y, p_attr=p_attr)
+
 
 def load_us_crime_multiclass_dataset():
     """
-    Processes the US crime dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+    Processes the US crime dataset and returns the data, output variable, \
+    protected group A and protected group B as numerical arrays or as dataframe if needed
 
     Parameters
     ----------
@@ -187,26 +192,27 @@ def load_us_crime_multiclass_dataset():
     data = load_us_crime()
     protected_attribute = "racePctWhite"
     output_column = "ViolentCrimesPerPop"
+    max_nan_values_per_column = 1000
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df = df.iloc[
-        :, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < 1000]
-    ]
+    df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < max_nan_values_per_column]]
     df = df.dropna()
     threshold = 0.5
     group_a = df[protected_attribute] > threshold
     group_b = ~group_a
     p_attr = pd.concat([group_a, group_b], axis=1)
-    p_attr.columns = ['group_a', 'group_b']
+    p_attr.columns = ["group_a", "group_b"]
     y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3))
     remove_columns = [protected_attribute, output_column]
     x = df.drop(columns=remove_columns)
     numeric_features = x.select_dtypes(include=[np.number]).columns
-    #categorical_features = x.select_dtypes(include=["object"]).columns
-    return Dataset(x=x[numeric_features],  y=y_cat, p_attr=p_attr)
+    # categorical_features = x.select_dtypes(include=["object"]).columns
+    return Dataset(x=x[numeric_features], y=y_cat, p_attr=p_attr)
+
 
 def load_clinical_records_dataset():
     """
-    Processes the heart dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
+    Processes the heart dataset and returns the data, output variable, \
+    protected group A and protected group B as numerical arrays
 
     Parameters
     ----------
@@ -229,10 +235,10 @@ def load_clinical_records_dataset():
     group_b = df[protected_attribute] == 1
 
     p_attr = pd.concat([group_a, group_b], axis=1)
-    p_attr.columns = ['group_a', 'group_b']
+    p_attr.columns = ["group_a", "group_b"]
     y = df[output_variable]
     x = df.drop(columns=drop_columns)
-    return Dataset(x=x, y =y, p_attr=p_attr)
+    return Dataset(x=x, y=y, p_attr=p_attr)
 
 
 def load_dataset(dataset_name):

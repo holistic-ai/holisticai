@@ -11,8 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from holisticai.metrics.bias import average_odds_diff, statistical_parity
 from holisticai.utils._validation import _check_same_shape
-
-from .utils_fairea import (
+from holisticai.utils.trade_off_analysers.utils_fairea import (
     do_line_segments_intersect,
     get_area,
     get_baseline_bounds,

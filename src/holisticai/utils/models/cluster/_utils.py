@@ -20,5 +20,7 @@ def distance(a, b, order=2):
     -------
         Resultant norm value
     """
-    assert len(a) == len(b), "Length of the vectors for distance don't match."
+    if len(a) != len(b):
+        msg = "Length of the vectors for distance don't match."
+        raise ValueError(msg)
     return np.linalg.norm(x=np.array(a) - np.array(b), ord=order)

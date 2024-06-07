@@ -1,7 +1,4 @@
-from typing import Optional, Union
-
 import numpy as np
-import pandas as pd
 
 from holisticai.utils.transformers._transformer_base import BMTransformerBase
 
@@ -36,8 +33,6 @@ class BMPreprocessing(BMTransformerBase):
             params.update({"sample_weight": np.ones_like(y).astype(np.float64)})
 
         elif "X" in kargs:
-            params.update(
-                {"sample_weight": np.ones(len(params["X"])).astype(np.float64)}
-            )
+            params.update({"sample_weight": np.ones(len(params["X"])).astype(np.float64)})
 
         return params

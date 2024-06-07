@@ -1,6 +1,7 @@
 class WEstimator:
     """
-    This wrap the estimator class and helps link parameters with updates done by unconventional transformers during pipeline execution.
+    This wrap the estimator class and helps link parameters with \
+    updates done by unconventional transformers during pipeline execution.
     """
 
     def __init__(self, obj, params_hdl):
@@ -19,7 +20,8 @@ class WEstimator:
     def __getattribute__(self, name):
         """
         This function return the attribute using the following the rules:
-        - for `fit` function: return a wrapped function that update the input arguments with the cache and then call fit function.
+        - for `fit` function: return a wrapped function that update the \
+        input arguments with the cache and then call fit function.
         - for any other function we check:
             - if the estimator has the attribute -> invoke it
             - else -> try to invoke the function from the Wrapper class.
@@ -33,16 +35,13 @@ class WEstimator:
                 if y is not None:
                     fit_params.update({"y": y})
                 fit_params.update(kargs)
-                return getattr(object.__getattribute__(self, "obj"), name)(
-                    X, **fit_params
-                )
+                return getattr(object.__getattribute__(self, "obj"), name)(X, **fit_params)
 
             output = fitwrapper
+        elif hasattr(object.__getattribute__(self, "obj"), name):
+            output = getattr(object.__getattribute__(self, "obj"), name)
         else:
-            if hasattr(object.__getattribute__(self, "obj"), name):
-                output = getattr(object.__getattribute__(self, "obj"), name)
-            else:
-                output = object.__getattribute__(self, name)
+            output = object.__getattribute__(self, name)
         return output
 
 

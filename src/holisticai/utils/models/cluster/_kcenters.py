@@ -1,9 +1,8 @@
 import numpy as np
+from holisticai.utils.models.cluster._utils import distance
 
-from ._utils import distance
 
-
-class KCenters(object):
+class KCenters:
     def __init__(self, n_clusters=5):
         """
         k (int) : Number of centers to be identified
@@ -26,13 +25,10 @@ class KCenters(object):
 
         while True:
             # Remaining points in the data set
-            rem_points = list(set(range(0, len(self.data))) - set(self.centers))
+            rem_points = list(set(range(len(self.data))) - set(self.centers))
 
             # Finding the point which has the closest center most far-off
-            point_center = [
-                (i, min([distance(self.data[i], self.data[j]) for j in self.centers]))
-                for i in rem_points
-            ]
+            point_center = [(i, min([distance(self.data[i], self.data[j]) for j in self.centers])) for i in rem_points]
             point_center = sorted(point_center, key=lambda x: x[1], reverse=True)
 
             self.costs.append(point_center[0][1])
@@ -43,7 +39,6 @@ class KCenters(object):
 
         self.cluster_centers_ = [self.data[j] for j in self.centers]
         self.labels = self.assign()
-        return
 
     def assign(self):
         """
@@ -52,7 +47,7 @@ class KCenters(object):
         Returns:
                 mapping (list) : tuples of the form (point, center)
         """
-        mapping = [
+        return [
             (
                 i,
                 sorted(
@@ -63,5 +58,3 @@ class KCenters(object):
             )
             for i in range(len(self.data))
         ]
-
-        return mapping

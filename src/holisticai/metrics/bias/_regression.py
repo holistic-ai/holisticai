@@ -949,8 +949,7 @@ def regression_bias_metrics(group_a, group_b, y_pred, y_true=None, metric_type="
         if metric_type == "both":
             # TODO: remove both for next version
             warnings.warn(
-                "`both` option will be depreciated in the next versions, use group",
-                DeprecationWarning, stacklevel=2
+                "`both` option will be depreciated in the next versions, use group", DeprecationWarning, stacklevel=2
             )
 
         metrics = out_metrics + opp_metrics

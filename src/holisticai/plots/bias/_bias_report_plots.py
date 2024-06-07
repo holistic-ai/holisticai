@@ -94,10 +94,7 @@ def bias_metrics_report(
     if len(metric_names) % cols != 0:
         rows += 1
 
-    if rows >= 3:
-        fig_size = (12, 7)
-    else:
-        fig_size = (12, 4)
+    fig_size = (12, 7) if rows >= 3 else (12, 4)  # noqa: PLR2004
 
     sns.set_style("darkgrid")
     fig, axes = plt.subplots(ncols=cols, nrows=rows, figsize=fig_size)
@@ -111,9 +108,7 @@ def bias_metrics_report(
             ax=axes[row, col],
         )
         axes[row, col].set_title(name)
-        axes[row, col].axhline(
-            y=metric_data["Reference"].values[0], color="black", linestyle="--"
-        )
+        axes[row, col].axhline(y=metric_data["Reference"].values[0], color="black", linestyle="--")
         axes[row, col].set_ylabel("Score")
 
         if i == len(metric_names) - 1 and i % cols != cols - 1:
@@ -136,9 +131,7 @@ def bias_metrics_report(
         if i == 0:
             axes[row, col].legend(
                 [
-                    plt.Line2D(
-                        [0], [0], linestyle="--", color="black", lw=2, label="Reference"
-                    ),
+                    plt.Line2D([0], [0], linestyle="--", color="black", lw=2, label="Reference"),
                     plt.Rectangle(
                         [0, 0],
                         1,

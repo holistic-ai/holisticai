@@ -1,15 +1,11 @@
 # Base Imports
-import ipywidgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import seaborn as sns
 
 # utils
 from holisticai.utils import get_colors
 from holisticai.utils._validation import _check_binary, _regression_checks
-from IPython.display import display
-from matplotlib import pyplot as plt
 
 # sklearn imports
 from sklearn.metrics import roc_curve
@@ -46,9 +42,7 @@ def abroca_plot(group_a, group_b, y_score, y_true, ax=None, size=None, title=Non
     matplotlib ax
     """
     # check and coerce
-    group_a, group_b, y_score, y_true, _ = _regression_checks(
-        group_a, group_b, y_score, y_true, None
-    )
+    group_a, group_b, y_score, y_true, _ = _regression_checks(group_a, group_b, y_score, y_true, None)
     _check_binary(y_true, "y_true")
 
     # split data by groups

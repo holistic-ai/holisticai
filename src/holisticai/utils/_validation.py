@@ -5,380 +5,6 @@ import numpy as np
 import pandas as pd
 
 
-def _check_same_shape(list_of_arr, names=""):
-    """
-    Check same shape
-
-    Description
-    ----------
-    This function checks if all numpy arrays
-    in a list have same length
-
-    Parameters
-    ----------
-    list_of_arr : list of numpy arrays
-        input
-    names : str
-        the name of the inputs
-
-    Returns
-    -------
-    ValueError or None
-    """
-    num_dims = len(list_of_arr[0].shape)
-    for i in range(num_dims):
-        try:
-            n = len(np.unique([x.shape[i] for x in list_of_arr]))
-            if n > 1:
-                raise ValueError(names + " do not all have the same shape.")
-        except:
-            raise ValueError(names + " do not all have the same shape.")
-
-
-def _check_non_empty(arr, name="", quantile=0):
-    """
-    Check non empty
-
-    Description
-    ----------
-    This function checks if a numpy array has
-    a sum of 0.
-
-    Parameters
-    ----------
-    arr : binary array
-        input
-    name : str
-        the name of the input
-    quantile : float
-        quantile
-
-    Returns
-    -------
-    warning or None
-    """
-    num_a = arr.sum()
-    if num_a == 0:
-        warnings.warn(name + " has no members at quantile " + str(quantile))
-
-
-def _check_classes_input(classes, y_pred, y_true=None):
-    """
-    Check classes input (multiclass)
-
-    Description
-    ----------
-    This function checks the input classes is
-    composed of the unique values of y_pred (and y_true)
-
-    Parameters
-    ----------
-    classes : numpy array
-        Class vector (categorical)
-    y_pred : numpy array
-        Predictions vector (categorical)
-    y_true : numpy array
-        Target vector (categorical)
-
-    Returns
-    -------
-    ValueError or None
-    """
-    # case 1 : y_true is None
-    if y_true is None:
-        _classes = set(classes)
-        __classes = set(y_pred)
-        if _classes != __classes:
-            msg = "classes is not a reordering of unique values in y_pred."
-            raise ValueError(msg)
-    # case 2
-    else:
-        _classes = set(classes)
-        __classes = set(y_pred).union(set(y_true))
-        if _classes != __classes:
-            msg = "classes is not a reordering of unique values in y_pred or y_true."
-            raise ValueError(msg)
-
-
-def _check_groups_input(groups, p_attr):
-    """
-    Check groups input (multiclass)
-
-    Description
-    ----------
-    This function checks the groups input is
-    composed of the unique values of p_attr
-
-    Parameters
-    ----------
-    groups : numpy array
-        Class vector (categorical)
-    p_attr : numpy array
-        Predictions vector (categorical)
-
-    Returns
-    -------
-    ValueError or None
-    """
-    # compare sets
-    _groups = set(groups)
-    __groups = set(p_attr)
-    if _groups != __groups:
-        msg = "groups is not a reordering of unique values in p_attr."
-        raise ValueError(msg)
-
-
-def _check_binary(arr, name=""):
-    """
-    Check binary
-
-    Description
-    ----------
-    This function checks if a numpy array
-    is binary.
-
-    Parameters
-    ----------
-    arr : numpy array
-        input
-    name : str
-        the name of the input
-
-    Returns
-    -------
-    ValueError or None
-    """
-    if not np.array_equal(arr, arr.astype(bool)):
-        raise ValueError(name + " is not a binary vector.")
-
-
-def _check_nan(arr, name=""):
-    """
-    Check for nan
-
-    Description
-    ----------
-    This function checks if a numpy array
-    has a nan.
-
-    Parameters
-    ----------
-    arr : numpy array
-        input
-    name : str
-        the name of the input
-
-    Returns
-    -------
-    ValueError or None
-    """
-    if pd.isnull(pd.Series(arr)).any():
-        raise ValueError(name + " has NaN values.")
-
-
-def _check_nan_mat(mat, name=""):
-    """
-    Check for nan
-
-    Description
-    ----------
-    This function checks if a numpy ndarray
-    has a nan.
-
-    Parameters
-    ----------
-    mat : numpy ndarray
-        input
-    name : str
-        the name of the input
-
-    Returns
-    -------
-    ValueError or None
-    """
-    if np.isnan(mat).any():
-        return ValueError(name + " has NaN values.")
-    return None
-
-
-def _array_like_to_numpy(arr, name=""):
-    """
-    Coerce input to numpy (if possible)
-
-    Description
-    ----------
-    This function coerces to numpy where
-    possible, and return an error if not.
-
-    Parameters
-    ----------
-    arr : array-like
-        Input to coerce
-
-    Returns
-    -------
-    numpy array or TypeError
-    """
-    try:
-        out = np.squeeze(np.asarray(arr))
-        if len(out.shape) == 1:
-            return out
-        else:
-            raise ValueError
-    except:
-        msg = (
-            f"input {name} is not array-like. This includes numpy 1d arrays, lists,\
-            pandas Series or pandas 1d DataFrame"
-        )
-        raise TypeError(msg)
-
-
-def _matrix_like_to_numpy(arr, name=""):
-    """
-    Coerce input to numpy (if possible)
-
-    Description
-    ----------
-    This function coerces to numpy where
-    possible, and return an error if not.
-
-    Parameters
-    ----------
-    arr : matrix-like
-        Input to coerce
-
-    Returns
-    -------
-    numpy array or TypeError
-    """
-    try:
-        out = np.squeeze(np.asarray(arr))
-        if len(out.shape) == 2:
-            return out
-        else:
-            raise ValueError
-    except:
-        msg = (
-            f"input {name} is not matrix-like. This includes numpy 2d arrays, list of lists \
-                or pandas 2d DataFrame"
-        )
-        raise TypeError(msg)
-
-
-def _matrix_like_to_dataframe(arr, name=""):
-    try:
-        out = np.squeeze(np.asarray(arr))
-        if len(out.shape) == 2:
-            columns = [f"Feature {f}" for f in range(out.shape[1])]
-            return pd.DataFrame(out, columns=columns)
-        else:
-            msg = "input is not matrix-like."
-            raise ValueError(msg)
-    except:
-        msg = "input is not matrix-like."
-        raise TypeError(msg)
-
-
-def _array_like_to_series(arr, name=""):
-    try:
-        out = np.squeeze(np.asarray(arr))
-        if len(out.shape) == 1:
-            return pd.Series(out)
-        else:
-            msg = "input is not array-like."
-            raise ValueError(msg)
-    except:
-        msg = "input is not array-like."
-        raise TypeError(msg)
-
-
-def _coerce_and_check_arr(arr, name="input"):
-    """
-    Coerce and check array-like
-
-    Description
-    ----------
-    This function coerces to numpy where
-    possible, and return an error if not.
-    Also checks for nan values.
-
-    Parameters
-    ----------
-    arr : array-like
-        Input to coerce
-    name : str
-        The name of array
-
-    Returns
-    -------
-    numpy array or TypeError
-    """
-    # coerce to numpy if possible
-    np_arr = _array_like_to_numpy(arr, name=name)
-    # check for nan values
-    _check_nan(np_arr, name=name)
-    # return
-    return np_arr
-
-
-def _coerce_and_check_mat(mat, name="input"):
-    """
-    Coerce and check matrix-like
-
-    Description
-    ----------
-    This function coerces to numpy where
-    possible, and return an error if not.
-    Also checks for nan values.
-
-    Parameters
-    ----------
-    mat : matrix-like
-        Input to coerce
-    name : str
-        The name of array
-
-    Returns
-    -------
-    numpy ndarray or TypeError
-    """
-    # coerce to numpy if possible
-    np_mat = _matrix_like_to_numpy(mat, name=name)
-    # check for nan values
-    _check_nan_mat(np_mat, name=name)
-    # return
-    return np_mat
-
-
-def _coerce_and_check_binary_group(arr, name=""):
-    """
-    Coerce and check binary vector
-
-    Description
-    ----------
-    This function coerces to numpy where
-    possible, and return an error if not.
-    Also checks vector is binary.
-
-    Parameters
-    ----------
-    arr : array-like
-        Input to coerce
-    name : str
-        The name of array
-
-    Returns
-    -------
-    numpy ndarray or TypeError
-    """
-    # coerce to numpy if possible
-    np_arr = _array_like_to_numpy(arr, name=name)
-    # check binary (also checks for nans)
-    _check_binary(np_arr, name=name)
-    # return
-    return np_arr
-
-
 def _classification_checks(group_a, group_b, y_pred, y_true=None):
     """
     Classification checks
@@ -582,22 +208,49 @@ def _multiclass_checks(
 
     return p_attr, y_pred, y_true, groups, classes
 
+def _check_non_empty(arr, name="", quantile=0):
+    """
+    Check non empty
+
+    Description
+    ----------
+    This function checks if a numpy array has
+    a sum of 0.
+
+    Parameters
+    ----------
+    arr : binary array
+        input
+    name : str
+        the name of the input
+    quantile : float
+        quantile
+
+    Returns
+    -------
+    warning or None
+    """
+    num_a = arr.sum()
+    if num_a == 0:
+        warnings.warn(name + " has no members at quantile " + str(quantile))
 
 def _check_valid_y_proba(y_proba: np.ndarray):
     atol = 1e-3
     threshold = 2
     y_shape = np.shape(y_proba)
-    assert len(y_shape) == threshold, f"""y_proba must be 2d tensor, found: {y_shape}"""
+    if len(y_shape) != threshold:
+        msg = f"""y_proba must be 2d tensor, found: {y_shape}"""
+        raise ValueError(msg)
 
     sum_all_probs = np.sum(y_proba, axis=1)
-    assert np.all(
-        np.isclose(sum_all_probs, 1, atol=atol)
-    ), f"""probability must sum to 1 across the possible classes, found: {sum_all_probs}"""
+    if not np.all(np.isclose(sum_all_probs, 1, atol=atol)):
+        msg = f"""probability must sum to 1 across the possible classes, found: {sum_all_probs}"""
+        raise ValueError(msg)
 
     correct_proba_values = np.all(y_proba <= 1) and np.all(y_proba >= 0)
-    assert (
-        correct_proba_values
-    ), f"""probability values must be in the interval [0,1], found: {y_proba}"""
+    if not correct_proba_values:
+        msg = f"""probability values must be in the interval [0,1], found: {y_proba}"""
+        raise ValueError(msg)
 
 
 def _check_numerical_dataframe(df: pd.DataFrame):
@@ -622,7 +275,7 @@ def _check_numerical_dataframe(df: pd.DataFrame):
         return df.astype(float)
     except ValueError:
         msg = "DataFrame cannot be converted to numerical values"
-        raise ValueError(msg)
+        raise ValueError(msg)  # noqa: B904
 
 
 def _check_columns(df: pd.DataFrame, column: str):
@@ -647,3 +300,317 @@ def _check_columns(df: pd.DataFrame, column: str):
     if column not in df.columns:
         msg = f"Column '{column}' does not exist in DataFrame"
         raise ValueError(msg)
+
+
+def _check_same_shape(list_of_arr, names=""):
+    """
+    Check same shape
+
+    Description
+    ----------
+    This function checks if all numpy arrays
+    in a list have same length
+
+    Parameters
+    ----------
+    list_of_arr : list of numpy arrays
+        input
+    names : str
+        the name of the inputs
+
+    Returns
+    -------
+    ValueError or None
+    """
+    num_dims = len(list_of_arr[0].shape)
+    for i in range(num_dims):
+        try:
+            n = len(np.unique([x.shape[i] for x in list_of_arr]))
+            if n > 1:
+                raise ValueError(names + " do not all have the same shape.")  # noqa: TRY301
+        except ValueError as exc:
+            raise ValueError(names + " do not all have the same shape.") from exc
+
+
+def _check_classes_input(classes, y_pred, y_true=None):
+    """
+    Check classes input (multiclass)
+
+    Description
+    ----------
+    This function checks the input classes is
+    composed of the unique values of y_pred (and y_true)
+
+    Parameters
+    ----------
+    classes : numpy array
+        Class vector (categorical)
+    y_pred : numpy array
+        Predictions vector (categorical)
+    y_true : numpy array
+        Target vector (categorical)
+
+    Returns
+    -------
+    ValueError or None
+    """
+    # case 1 : y_true is None
+    if y_true is None:
+        _classes = set(classes)
+        __classes = set(y_pred)
+        if _classes != __classes:
+            msg = "classes is not a reordering of unique values in y_pred."
+            raise ValueError(msg)
+    # case 2
+    else:
+        _classes = set(classes)
+        __classes = set(y_pred).union(set(y_true))
+        if _classes != __classes:
+            msg = "classes is not a reordering of unique values in y_pred or y_true."
+            raise ValueError(msg)
+
+
+def _check_groups_input(groups, p_attr):
+    """
+    Check groups input (multiclass)
+
+    Description
+    ----------
+    This function checks the groups input is
+    composed of the unique values of p_attr
+
+    Parameters
+    ----------
+    groups : numpy array
+        Class vector (categorical)
+    p_attr : numpy array
+        Predictions vector (categorical)
+
+    Returns
+    -------
+    ValueError or None
+    """
+    # compare sets
+    _groups = set(groups)
+    __groups = set(p_attr)
+    if _groups != __groups:
+        msg = "groups is not a reordering of unique values in p_attr."
+        raise ValueError(msg)
+
+
+def _check_binary(arr, name=""):
+    """
+    Check binary
+
+    Description
+    ----------
+    This function checks if a numpy array
+    is binary.
+
+    Parameters
+    ----------
+    arr : numpy array
+        input
+    name : str
+        the name of the input
+
+    Returns
+    -------
+    ValueError or None
+    """
+    if not np.array_equal(arr, arr.astype(bool)):
+        raise ValueError(name + " is not a binary vector.")
+
+
+def _check_nan(arr, name=""):
+    """
+    Check for nan
+
+    Description
+    ----------
+    This function checks if a numpy array
+    has a nan.
+
+    Parameters
+    ----------
+    arr : numpy array
+        input
+    name : str
+        the name of the input
+
+    Returns
+    -------
+    ValueError or None
+    """
+    if pd.isnull(pd.Series(arr)).any():
+        raise ValueError(name + " has NaN values.")
+
+
+def _check_nan_mat(mat, name=""):
+    """
+    Check for nan
+
+    Description
+    ----------
+    This function checks if a numpy ndarray
+    has a nan.
+
+    Parameters
+    ----------
+    mat : numpy ndarray
+        input
+    name : str
+        the name of the input
+
+    Returns
+    -------
+    ValueError or None
+    """
+    if np.isnan(mat).any():
+        return ValueError(name + " has NaN values.")
+    return None
+
+
+def _array_like_to_numpy(arr, name=""):
+    """
+    Coerce input to numpy (if possible)
+
+    Description
+    ----------
+    This function coerces to numpy where
+    possible, and return an error if not.
+
+    Parameters
+    ----------
+    arr : array-like
+        Input to coerce
+
+    Returns
+    -------
+    numpy array or TypeError
+    """
+    try:
+        out = np.squeeze(np.asarray(arr))
+        if len(out.shape) == 1:
+            return out
+        raise ValueError
+    except TypeError as exc:
+        msg = f"input {name} is not array-like. This includes numpy 1d arrays, lists,\
+            pandas Series or pandas 1d DataFrame"
+        raise TypeError(msg) from exc
+
+
+def _matrix_like_to_numpy(arr, name=""):
+    """
+    Coerce input to numpy (if possible)
+
+    Description
+    ----------
+    This function coerces to numpy where
+    possible, and return an error if not.
+
+    Parameters
+    ----------
+    arr : matrix-like
+        Input to coerce
+
+    Returns
+    -------
+    numpy array or TypeError
+    """
+    try:
+        out = np.squeeze(np.asarray(arr))
+        if len(out.shape) == 2:  # noqa: PLR2004
+            return out
+        raise ValueError
+    except TypeError as exc:
+        msg = f"input {name} is not matrix-like. This includes numpy 2d arrays, list of lists \
+                or pandas 2d DataFrame"
+        raise TypeError(msg) from exc
+
+
+def _coerce_and_check_arr(arr, name="input"):
+    """
+    Coerce and check array-like
+
+    Description
+    ----------
+    This function coerces to numpy where
+    possible, and return an error if not.
+    Also checks for nan values.
+
+    Parameters
+    ----------
+    arr : array-like
+        Input to coerce
+    name : str
+        The name of array
+
+    Returns
+    -------
+    numpy array or TypeError
+    """
+    # coerce to numpy if possible
+    np_arr = _array_like_to_numpy(arr, name=name)
+    # check for nan values
+    _check_nan(np_arr, name=name)
+    # return
+    return np_arr
+
+
+def _coerce_and_check_mat(mat, name="input"):
+    """
+    Coerce and check matrix-like
+
+    Description
+    ----------
+    This function coerces to numpy where
+    possible, and return an error if not.
+    Also checks for nan values.
+
+    Parameters
+    ----------
+    mat : matrix-like
+        Input to coerce
+    name : str
+        The name of array
+
+    Returns
+    -------
+    numpy ndarray or TypeError
+    """
+    # coerce to numpy if possible
+    np_mat = _matrix_like_to_numpy(mat, name=name)
+    # check for nan values
+    _check_nan_mat(np_mat, name=name)
+    # return
+    return np_mat
+
+
+def _coerce_and_check_binary_group(arr, name=""):
+    """
+    Coerce and check binary vector
+
+    Description
+    ----------
+    This function coerces to numpy where
+    possible, and return an error if not.
+    Also checks vector is binary.
+
+    Parameters
+    ----------
+    arr : array-like
+        Input to coerce
+    name : str
+        The name of array
+
+    Returns
+    -------
+    numpy ndarray or TypeError
+    """
+    # coerce to numpy if possible
+    np_arr = _array_like_to_numpy(arr, name=name)
+    # check binary (also checks for nans)
+    _check_binary(np_arr, name=name)
+    # return
+    return np_arr

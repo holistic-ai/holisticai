@@ -53,9 +53,7 @@ def abroca_plot(group_a, group_b, y_pred, y_true, ax=None, size=None, title=None
     >>> abroca_plot(group_a, group_b, y_pred, y)
     """
     # check and coerce
-    group_a, group_b, y_pred, y_true = _classification_checks(
-        group_a, group_b, y_pred, y_true
-    )
+    group_a, group_b, y_pred, y_true = _classification_checks(group_a, group_b, y_pred, y_true)
     _check_binary(y_true, "y_true")
 
     # split data by groups

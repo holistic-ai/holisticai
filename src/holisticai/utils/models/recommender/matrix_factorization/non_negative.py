@@ -1,9 +1,8 @@
-from typing import Optional
+from __future__ import annotations
 
 import numpy as np
-from sklearn.decomposition import NMF
-
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
+from sklearn.decomposition import NMF
 
 
 class NonNegativeMF(RecommenderSystemBase):
@@ -18,7 +17,7 @@ class NonNegativeMF(RecommenderSystemBase):
         Conference. 2019.
     """
 
-    def __init__(self, K: Optional[int] = 10):
+    def __init__(self, K: int | None = 10):
         """
         Init Wrapper Non Negative Matrix Factorization
 
@@ -30,7 +29,7 @@ class NonNegativeMF(RecommenderSystemBase):
         """
         self.K = K
 
-    def fit(self, X: Optional[np.ndarray]):
+    def fit(self, X: np.ndarray | None):
         """
         Fit model
 

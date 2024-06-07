@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def convert_float_to_categorical(target, nb_classes, numeric_classes=True):
+def convert_float_to_categorical(target, nb_classes, numeric_classes=True):  # noqa: FBT002
     """
     Converts a float target variable to a categorical variable with the specified number of classes
 
@@ -25,6 +25,6 @@ def convert_float_to_categorical(target, nb_classes, numeric_classes=True):
     v = np.array(target.quantile(labels_values)).squeeze()
     v[0], v[-1] = v[0] - eps, v[-1] + eps
     y = target.copy()
-    for (i, c) in enumerate(labels):
+    for i, c in enumerate(labels):
         y[(target.values >= v[i]) & (target.values < v[i + 1])] = c
     return y.astype(np.int32)

@@ -40,9 +40,7 @@ def success_rate_curve(group_a, group_b, y_pred, ax=None, size=None, title=None)
     matplotlib ax
     """
     # check and coerce inputs
-    group_a, group_b, y_pred, _, _ = _regression_checks(
-        group_a, group_b, y_pred, None, None
-    )
+    group_a, group_b, y_pred, _, _ = _regression_checks(group_a, group_b, y_pred, None, None)
 
     # calculation
     thresh = np.linspace(1, 0, 150)
@@ -71,9 +69,7 @@ def success_rate_curve(group_a, group_b, y_pred, ax=None, size=None, title=None)
     return ax
 
 
-def statistical_parity_curve(
-    group_a, group_b, y_pred, x_axis="score", ax=None, size=None, title=None
-):
+def statistical_parity_curve(group_a, group_b, y_pred, x_axis="score", ax=None, size=None, title=None):
     """
     Statistical Parity Curve
 
@@ -105,9 +101,7 @@ def statistical_parity_curve(
     matplotlib ax
     """
     # check and coerce inputs
-    group_a, group_b, y_pred, _, _ = _regression_checks(
-        group_a, group_b, y_pred, None, None
-    )
+    group_a, group_b, y_pred, _, _ = _regression_checks(group_a, group_b, y_pred, None, None)
 
     # calculations
     thresh = np.linspace(0, 1, 150)
@@ -148,9 +142,7 @@ def statistical_parity_curve(
         ax.set_ylabel("Success Rate A - Sucess Rate B")
         ax.legend()
     elif x_axis == "quantile":
-        ax.plot(
-            thresh, pass_a - pass_b, color=colors[0], label="statistical parity curve"
-        )
+        ax.plot(thresh, pass_a - pass_b, color=colors[0], label="statistical parity curve")
         ax.plot([0, 1], [0.1, 0.1], linestyle="--", label="upper bound", color="grey")
         ax.plot([0, 1], [-0.1, -0.1], linestyle="--", label="lower bound", color="grey")
         ax.set_xlabel("Quantile")
@@ -168,9 +160,7 @@ def statistical_parity_curve(
     return ax
 
 
-def disparate_impact_curve(
-    group_a, group_b, y_pred, x_axis="score", ax=None, size=None, title=None
-):
+def disparate_impact_curve(group_a, group_b, y_pred, x_axis="score", ax=None, size=None, title=None):
     """
     Disparate Impact curve
 
@@ -201,9 +191,7 @@ def disparate_impact_curve(
     matplotlib ax
     """
     # check and coerce inputs
-    group_a, group_b, y_pred, _, _ = _regression_checks(
-        group_a, group_b, y_pred, None, None
-    )
+    group_a, group_b, y_pred, _, _ = _regression_checks(group_a, group_b, y_pred, None, None)
 
     # calculations
     thresh = np.linspace(1, 0, 150)
@@ -220,9 +208,7 @@ def disparate_impact_curve(
 
     # charting
     if x_axis == "score":
-        ax.plot(
-            pass_value, pass_a / pass_b, color=colors[0], label="disparate impact curve"
-        )
+        ax.plot(pass_value, pass_a / pass_b, color=colors[0], label="disparate impact curve")
         ax.plot(
             [np.min(pass_value), np.max(pass_value)],
             [0.8, 0.8],
@@ -242,9 +228,7 @@ def disparate_impact_curve(
         ax.legend()
 
     elif x_axis == "quantile":
-        ax.plot(
-            thresh, pass_a / pass_b, color=colors[0], label="disparate impact curve"
-        )
+        ax.plot(thresh, pass_a / pass_b, color=colors[0], label="disparate impact curve")
         ax.plot([0, 1], [0.8, 0.8], linestyle="--", color="grey", label="upper bound")
         ax.plot([0, 1], [1.2, 1.2], linestyle="--", color="grey", label="lower bound")
         ax.set_xlabel("Quantile")
@@ -263,9 +247,7 @@ def disparate_impact_curve(
     return ax
 
 
-def success_rate_curves(
-    p_attr, y_pred, groups=None, x_axis="score", ax=None, size=None, title=None
-):
+def success_rate_curves(p_attr, y_pred, groups=None, x_axis="score", ax=None, size=None, title=None):
     """
     Success Rate Curve
 

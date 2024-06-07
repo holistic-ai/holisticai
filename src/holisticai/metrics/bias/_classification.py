@@ -818,7 +818,7 @@ def abroca(group_a, group_b, y_score, y_true):
 
 
 def classification_bias_metrics(
-    group_a=None, group_b=None, y_pred=None, y_true=None, y_score=None, X=None, metric_type="group", **kargs  # noqa: N803
+    group_a=None, group_b=None, y_pred=None, y_true=None, y_score=None, X=None, metric_type="group", **kargs
 ):
     """Classification bias metrics batch computation
 
@@ -1106,7 +1106,7 @@ def coefficient_of_variation(y_pred: np.ndarray, y_true: np.ndarray) -> float:
     return 2 * np.sqrt(generalized_entropy_index(y_pred, y_true, alpha=2))
 
 
-def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -> float:  # noqa: N803
+def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -> float:
     """Consistency score
 
     Compares a model's classification prediction of a given data item X to its k-nearest neighbors.
@@ -1125,7 +1125,7 @@ def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -
     float
         The consistency score.
     """
-    X = _matrix_like_to_numpy(X)  # noqa: N806
+    X = _matrix_like_to_numpy(X)
     y_pred = _array_like_to_numpy(y_pred)
     _check_binary(y_pred)
 

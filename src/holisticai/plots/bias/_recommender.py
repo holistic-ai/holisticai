@@ -9,7 +9,13 @@ from matplotlib import pyplot as plt
 
 
 def long_tail_plot(
-    mat_pred, top=None, thresh=0.5, normalize=False, ax=None, size=None, title=None  # noqa: FBT002
+    mat_pred,
+    top=None,
+    thresh=0.5,
+    normalize=False,  # noqa: FBT002
+    ax=None,
+    size=None,
+    title=None,
 ):
     """
     Long Tail Plot.

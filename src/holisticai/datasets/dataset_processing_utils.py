@@ -39,14 +39,15 @@ def remove_nans(df):
         The dataframe without NaNs
     """
     df = df.iloc[
-        :, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < 1000]
+        :, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < 1000]  # noqa: PLR2004
     ]
     return df.dropna()
 
 
 def post_process_dataset(df, output_variable, group_a, group_b):
     """
-    Post-processes a dataset by returning the data, output variable, protected group A and protected group B as numerical arrays
+    Post-processes a dataset by returning the data, output variable, \
+    protected group A and protected group B as numerical arrays
 
     Parameters
     ----------
@@ -65,9 +66,9 @@ def post_process_dataset(df, output_variable, group_a, group_b):
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
     y = df[output_variable]
-    X = df.drop(columns=output_variable)
+    x = df.drop(columns=output_variable)
     return [
-        X.values,
+        x.values,
         y.values.ravel(),
         group_a.values.ravel(),
         group_b.values.ravel(),
@@ -76,7 +77,8 @@ def post_process_dataset(df, output_variable, group_a, group_b):
 
 def post_process_dataframe(df, group_a, group_b):
     """
-    Post-processes a dataframe by resetting the index, converting the dataframe to float and resetting the index of the protected groups
+    Post-processes a dataframe by resetting the index, \
+    converting the dataframe to float and resetting the index of the protected groups
 
     Parameters
     ----------

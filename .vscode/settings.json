@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./src/holisticai/utils/models"
+    ]
+}

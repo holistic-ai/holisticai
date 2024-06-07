@@ -32,7 +32,7 @@ def get_data_home(data_home=None):
     return data_home
 
 
-def load_student(data_home=None, return_X_y=False, as_frame=True):
+def load_student(data_home=None, *, return_X_y=False, as_frame=True):
     """
     Load Student Dataset.
 
@@ -87,7 +87,7 @@ def load_student(data_home=None, return_X_y=False, as_frame=True):
     if data_home is None:
         data_home = get_data_home()
 
-    bunch = fetch_openml(
+    return fetch_openml(
         name="UCI-student-performance-mat",
         version=1,
         data_home=data_home,
@@ -95,10 +95,8 @@ def load_student(data_home=None, return_X_y=False, as_frame=True):
         as_frame=as_frame,
     )
 
-    return bunch
 
-
-def load_adult(data_home=None, return_X_y=False, as_frame=True):
+def load_adult(data_home=None, *, return_X_y=False, as_frame=True):
     """
     Load Adult Dataset.
 
@@ -154,7 +152,7 @@ def load_adult(data_home=None, return_X_y=False, as_frame=True):
     if data_home is None:
         data_home = get_data_home()
 
-    bunch = fetch_openml(
+    return fetch_openml(
         name="adult",
         version=2,
         data_home=data_home,
@@ -162,10 +160,8 @@ def load_adult(data_home=None, return_X_y=False, as_frame=True):
         as_frame=as_frame,
     )
 
-    return bunch
 
-
-def load_law_school(data_home=None, return_X_y=False, as_frame=True):
+def load_law_school(data_home=None, *, return_X_y=False, as_frame=True):
     """
     Load Law School Dataset.
 
@@ -220,7 +216,7 @@ def load_law_school(data_home=None, return_X_y=False, as_frame=True):
     if data_home is None:
         data_home = get_data_home()
 
-    bunch = fetch_openml(
+    return fetch_openml(
         name="law-school-admission-bianry",
         version=1,
         data_home=data_home,
@@ -228,10 +224,8 @@ def load_law_school(data_home=None, return_X_y=False, as_frame=True):
         as_frame=as_frame,
     )
 
-    return bunch
 
-
-def load_last_fm(data_home=None, return_X_y=False, as_frame=True):
+def load_last_fm(data_home=None, *, return_X_y=False, as_frame=True):
     """
     Load Last FM Dataset.
 
@@ -286,7 +280,7 @@ def load_last_fm(data_home=None, return_X_y=False, as_frame=True):
     if data_home is None:
         data_home = get_data_home()
 
-    bunch = fetch_openml(
+    return fetch_openml(
         name="LastFM_dataset",
         version=1,
         data_home=data_home,
@@ -294,10 +288,8 @@ def load_last_fm(data_home=None, return_X_y=False, as_frame=True):
         as_frame=as_frame,
     )
 
-    return bunch
 
-
-def load_us_crime(data_home=None, return_X_y=False, as_frame=True):
+def load_us_crime(data_home=None, *, return_X_y=False, as_frame=True):
     """
     Load US Crime Dataset.
 
@@ -352,7 +344,7 @@ def load_us_crime(data_home=None, return_X_y=False, as_frame=True):
     if data_home is None:
         data_home = get_data_home()
 
-    bunch = fetch_openml(
+    return fetch_openml(
         name="us_crime",
         version=1,
         data_home=data_home,
@@ -360,10 +352,8 @@ def load_us_crime(data_home=None, return_X_y=False, as_frame=True):
         as_frame=as_frame,
     )
 
-    return bunch
 
-
-def load_heart(data_home=None, return_X_y=False, as_frame=True):
+def load_heart(data_home=None, *, return_X_y=None, as_frame=True):
     """
     Load heart Dataset.
 
@@ -419,12 +409,10 @@ def load_heart(data_home=None, return_X_y=False, as_frame=True):
     if data_home is None:
         data_home = get_data_home()
 
-    bunch = fetch_openml(
+    return fetch_openml(
         name="heart-failure",
         version=1,
         data_home=data_home,
         return_X_y=return_X_y,
         as_frame=as_frame,
     )
-
-    return bunch
