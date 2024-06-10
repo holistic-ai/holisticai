@@ -3,12 +3,13 @@ import warnings
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from holisticai.pipeline import Pipeline
-from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics
+from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,
     categorical_dataset,
     regression_dataset,
-    multiclass_dataset
+    multiclass_dataset,
+    small_clustering_dataset
 )
 import pytest
 
@@ -35,14 +36,27 @@ def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds",
         case "FairScoreClassifier":
             from holisticai.mitigation.bias import FairScoreClassifier
             return FairScoreClassifier(**parameters)
+        case "FairKCenterClustering":
+            from holisticai.mitigation.bias import FairKCenterClustering
+            return FairKCenterClustering(**parameters)
+        case "FairKMedianClustering":
+            from holisticai.mitigation.bias import FairKMedianClustering
+            return FairKMedianClustering(**parameters)
+        case "FairletClustering":
+            from holisticai.mitigation.bias import FairletClustering
+            return FairletClustering(**parameters)
+        case "VariationalFairClustering":
+            from holisticai.mitigation.bias import VariationalFairClustering
+            return VariationalFairClustering(**parameters)
     raise NotImplementedError
+
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, model_params", [
     ("FairScoreClassifier", {'objectives':'ab', 'constraints':{}}, {"random_state":42}),
 ])
 def test_multiclass_inprocessor(mitigator_name, mitigator_params, model_params, multiclass_dataset):
     metrics1 = run_inprocessing_categorical(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params, is_multiclass=True)
-    metrics2 = run_inprocessing_catergorical_pipeline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params, is_multiclass=True)
+    metrics2 = run_inprocessing_categorical_pipeline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params, is_multiclass=True)
     check_results(metrics1, metrics2)
 
 
@@ -54,7 +68,7 @@ def test_multiclass_inprocessor(mitigator_name, mitigator_params, model_params, 
 ])
 def test_categorical_inprocessor(mitigator_name, mitigator_params, model_params, categorical_dataset):
     metrics1 = run_inprocessing_categorical(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params)
-    metrics2 = run_inprocessing_catergorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params)
+    metrics2 = run_inprocessing_categorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params)
     check_results(metrics1, metrics2)
 
 
@@ -64,8 +78,20 @@ def test_categorical_inprocessor(mitigator_name, mitigator_params, model_params,
 ])
 def test_regression_inprocessor(mitigator_name, mitigator_params, model_params, regression_dataset):
     metrics1 = run_inprocessing_categorical(regression_dataset, regression_bias_metrics, LinearRegression, mitigator_name, model_params, mitigator_params)
-    metrics2 = run_inprocessing_catergorical_pipeline(regression_dataset, regression_bias_metrics, LinearRegression, mitigator_name, model_params, mitigator_params)
+    metrics2 = run_inprocessing_categorical_pipeline(regression_dataset, regression_bias_metrics, LinearRegression, mitigator_name, model_params, mitigator_params)
     check_results(metrics1, metrics2)
+
+@pytest.mark.parametrize("mitigator_name, mitigator_params", [
+    ("FairKCenterClustering", {"seed":42, "req_nr_per_group":(1,1)}),
+    ("FairKMedianClustering", {"seed":42, "n_clusters":2, "strategy":"GA"}),
+    ("FairletClustering", {"seed":42, "n_clusters": 2}),
+    ("VariationalFairClustering", {"seed":42, "n_clusters": 2}),
+])
+def test_clustering_inprocessor(mitigator_name, mitigator_params, small_clustering_dataset):
+    metrics1 = run_inprocessing_clustering(small_clustering_dataset, mitigator_name, mitigator_params)
+    metrics2 = run_inprocessing_clustering_pipeline(small_clustering_dataset, mitigator_name, mitigator_params)
+    check_results(metrics1, metrics2)
+
 
 
 def run_inprocessing_categorical(dataset, bias_metrics, estimator_class, mitigator_name, model_params, mitigator_params, is_multiclass=False):
@@ -85,7 +111,7 @@ def run_inprocessing_categorical(dataset, bias_metrics, estimator_class, mitigat
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
 
-def run_inprocessing_catergorical_pipeline(dataset, bias_metrics, estimator_class, mitigator_name, model_params, mitigator_params, is_multiclass=False):
+def run_inprocessing_categorical_pipeline(dataset, bias_metrics, estimator_class, mitigator_name, model_params, mitigator_params, is_multiclass=False):
     train = dataset['train']
     test = dataset['test']
 
@@ -106,3 +132,63 @@ def run_inprocessing_catergorical_pipeline(dataset, bias_metrics, estimator_clas
         return bias_metrics(test['group_a'],  y_pred, test['y'])
     else:
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
+    
+
+def run_inprocessing_clustering(dataset, mitigator_name, mitigator_params):
+    train = dataset['train']
+
+    inp = get_inprocessor(mitigator_name, mitigator_params)
+    fit_params = {
+        "X": train['X'],
+        "group_a": train['group_a'], 
+        "group_b": train['group_b']
+        }
+    inp.fit(**fit_params)
+    
+    if mitigator_name == "FairKMedianClustering":
+        y_pred = inp.labels_
+    else:
+        y_pred = inp.predict(train['X'], **fit_params)
+    
+    if mitigator_name == "FairKCenterClustering":
+        centroids = inp.all_centroids
+    else:
+        centroids = inp.cluster_centers_
+
+    return clustering_bias_metrics(train['group_a'], train['group_b'], y_pred, train['X'], centroids)
+
+
+def run_inprocessing_clustering_pipeline(dataset, mitigator_name, mitigator_params):
+    train = dataset['train']
+
+    inp = get_inprocessor(mitigator_name, mitigator_params)
+
+    pipeline = Pipeline(
+        steps=[
+            ("bm_inprocessing", inp),
+        ]
+    )
+
+    fit_params = {
+        "bm__group_a": train['group_a'], 
+        "bm__group_b": train['group_b']
+        }
+
+    pipeline.fit(train['X'], **fit_params)
+
+    pred_params = {
+        "bm__group_a": train['group_a'], 
+        "bm__group_b": train['group_b']
+        }
+    if mitigator_name == "FairKMedianClustering":
+        y_pred = pipeline['bm_inprocessing'].labels_
+    else:
+        y_pred = pipeline.predict(X=train['X'], **pred_params)
+
+    if mitigator_name == "FairKCenterClustering":
+        centroids = pipeline['bm_inprocessing'].all_centroids
+    else:
+        centroids = pipeline['bm_inprocessing'].cluster_centers_
+
+    return clustering_bias_metrics(train['group_a'], train['group_b'], y_pred, train['X'], centroids)
+    

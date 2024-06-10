@@ -1,7 +1,7 @@
 # imports
 from .exponentiated_gradient.transformer import ExponentiatedGradientReduction
 from .fair_k_center_clustering.transformer import FairKCenterClustering
-from .fair_k_mediam_clustering.transformer import FairKmedianClustering
+from .fair_k_mediam_clustering.transformer import FairKMedianClustering
 from .fair_scoring_classifier.transformer import FairScoreClassifier
 from .fairlet_clustering.transformer import FairletClustering
 from .grid_search.transformer import GridSearchReduction
@@ -20,7 +20,7 @@ __all__ = [
     "MetaFairClassifier",
     "VariationalFairClustering",
     "FairKCenterClustering",
-    "FairKmedianClustering",
+    "FairKMedianClustering",
     "FairletClustering",
     "BlindSpotAwareMF",
     "DebiasingLearningMF",

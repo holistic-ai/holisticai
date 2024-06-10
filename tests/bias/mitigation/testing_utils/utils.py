@@ -43,6 +43,7 @@ def multiclass_dataset():
 @pytest.fixture
 def small_clustering_dataset():
     dataset = load_dataset("clinical_records")
+    dataset = dataset.rename({"x":"X"})
     dataset = dataset.map(lambda x: {'group_a': x['p_attr']['group_a'], 'group_b': x['p_attr']['group_b']})
     return dataset.train_test_split(test_size=0.2, stratify=dataset['y'], random_state=0)
 

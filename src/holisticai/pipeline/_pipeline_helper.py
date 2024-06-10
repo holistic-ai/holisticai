@@ -1,6 +1,4 @@
-import numpy as np
 from sklearn.pipeline import Pipeline as SKLPipeline
-from sklearn.utils.metaestimators import available_if
 
 from holisticai.pipeline.handlers._estimator import EstimatorHandler
 from holisticai.pipeline.handlers._pipeline_params import PipelineParametersHandler
@@ -25,16 +23,17 @@ class PipelineHelper:
     def __getattribute__(self, name):
         """
         This function return the attribute using the following rules:
-        - for all functions listed in SUPPORTED_FUNCTIONS return a wrapped function that update the input arguments with the cache before call fit function.
+        - for all functions listed in SUPPORTED_FUNCTIONS return a wrapped function that update the input arguments with
+          the cache before call fit function.
         - for any other function we check if the pipeline has the attribute else try the attribute from the main class.
         """
         if name in SUPPORTED_FUNCTIONS:
             return object.__getattribute__(self, "handle_pipeline_methods")(name)
-        else:
+        else:  # noqa: RET505
             return object.__getattribute__(self, name)
 
     def handle_pipeline_methods(self, fn_name):
-        def function(X, y=None, **kargs):
+        def function(X, y=None, **kargs):  # noqa: N803
             params = self.preprocessing_parameters(kargs, y)
 
             if self.post_estimator_transformers:
@@ -93,9 +92,8 @@ class PipelineHelper:
         )
 
         steps = self.utransformers_hdl.drop_post_processing_steps(steps)
-        steps = self.estimator_hdl.wrap_and_link_estimator_step(steps)
+        return self.estimator_hdl.wrap_and_link_estimator_step(steps)
 
-        return steps
 
     def preprocessing_parameters(self, params, y=None):
         """
@@ -128,7 +126,7 @@ class PipelineHelper:
 
         return params
 
-    def fit_post_estimator_transformers(self, Xt, y):
+    def fit_post_estimator_transformers(self, Xt, y):  # noqa: N803
         """
         fit post-estimator transformers.
 
@@ -152,7 +150,7 @@ class PipelineHelper:
         output_kargs = self.estimator_hdl.get_fit_params(Xt)
         self.utransformers_hdl.fit_postprocessing(Xt, y=y, **output_kargs)
 
-    def _transform_post_estimator_transformers(self, Xt, **params):
+    def _transform_post_estimator_transformers(self, Xt, **params):  # noqa: N803
         """
         call transform for post-estimator transformers.
 
@@ -177,7 +175,7 @@ class PipelineHelper:
         output_kargs.update(transform_kargs)
         return self.utransformers_hdl.transform_postprocessing(**output_kargs)
 
-    def _transform_without_final(self, X):
+    def _transform_without_final(self, X):  # noqa: N803
         """Transform the data. Not apply `transform` with the final estimator.
 
         Call `transform` of each transformer in the pipeline. The transformed
@@ -199,7 +197,7 @@ class PipelineHelper:
         Xt : ndarray of shape (n_samples, n_transformed_features)
             Transformed data.
         """
-        Xt = X
+        Xt = X  # noqa: N806
         for _, _, transform in self._iter(with_final=False):
-            Xt = transform.transform(Xt)
+            Xt = transform.transform(Xt)  # noqa: N806
         return Xt

@@ -96,8 +96,6 @@ class KMediamClusteringAlgorithm:
                         # change variables if new cost is better
                         if curr_cost < min_cost:
                             min_cost = curr_cost
-                            t.set_description(f"Cost: {min_cost:.4f}")
-                            t.refresh()  # to show immediately the update
                             chosen_centers = centers
                             chosen_assignment = assignment
                             flag = 0

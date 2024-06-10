@@ -1,9 +1,10 @@
 import warnings
 
 from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.cluster import KMeans
 
 from holisticai.pipeline import Pipeline
-from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics
+from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,
     categorical_dataset,
@@ -44,6 +45,9 @@ def get_postprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds
         case "WassersteinBarycenter":
             from holisticai.mitigation.bias import WassersteinBarycenter
             return WassersteinBarycenter(**parameters)
+        case "MCMF":
+            from holisticai.mitigation.bias import MCMF
+            return MCMF(**parameters)
     raise NotImplementedError
 
 
@@ -53,7 +57,7 @@ def get_postprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds
 ])
 def test_multiclass_postprocessor(mitigator_name, mitigator_params, fit_params, multiclass_dataset):
     metrics1 = run_postprocessing_categorical(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, fit_params, mitigator_params, is_multiclass=True)
-    metrics2 = run_postprocessing_catergorical_peline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, mitigator_params, is_multiclass=True)
+    metrics2 = run_postprocessing_catergorical_pipeline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, mitigator_params, is_multiclass=True)
     check_results(metrics1, metrics2)
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
@@ -65,7 +69,7 @@ def test_multiclass_postprocessor(mitigator_name, mitigator_params, fit_params, 
 ])
 def test_categorical_postprocessor(mitigator_name, mitigator_params, fit_params, categorical_dataset):
     metrics1 = run_postprocessing_categorical(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, fit_params, mitigator_params)
-    metrics2 = run_postprocessing_catergorical_peline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, mitigator_params)
+    metrics2 = run_postprocessing_catergorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, mitigator_params)
     check_results(metrics1, metrics2)
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
@@ -74,8 +78,18 @@ def test_categorical_postprocessor(mitigator_name, mitigator_params, fit_params,
 ])
 def test_regression_postprocessor(mitigator_name, mitigator_params, fit_params, regression_dataset):
     metrics1 = run_postrocessing_regression(regression_dataset, LinearRegression, mitigator_name, fit_params, mitigator_params)
-    metrics2 = run_postprocessing_regression_peline(regression_dataset, LinearRegression, mitigator_name, mitigator_params)
+    metrics2 = run_postprocessing_regression_pipeline(regression_dataset, LinearRegression, mitigator_name, mitigator_params)
     check_results(metrics1, metrics2)
+
+@pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
+    ("MCMF", {}, ['y_pred','group_a','group_b']),
+])
+def test_clustering_postprocessor(mitigator_name, mitigator_params, fit_params, regression_dataset):
+    metrics1 = run_postrocessing_clustering(regression_dataset, KMeans, mitigator_name, fit_params, mitigator_params)
+    metrics2 = run_postprocessing_clustering_pipeline(regression_dataset, KMeans, mitigator_name, mitigator_params)
+    check_results(metrics1, metrics2)
+
+
     
 def run_postprocessing_categorical(dataset, bias_metrics, estimator_class, mitigator_name, postprocessor_fit_param_names, mitigator_params, is_multiclass=False):
     train = dataset['train']
@@ -110,7 +124,7 @@ def run_postprocessing_categorical(dataset, bias_metrics, estimator_class, mitig
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
 
-def run_postprocessing_catergorical_peline(dataset, bias_metrics, estimator_class, mitigator_name, mitigator_params, is_multiclass=False):
+def run_postprocessing_catergorical_pipeline(dataset, bias_metrics, estimator_class, mitigator_name, mitigator_params, is_multiclass=False):
     train = dataset['train']
     test = dataset['test']
 
@@ -152,7 +166,7 @@ def run_postrocessing_regression(dataset, estimator_class, mitigator_name, postp
     
     return regression_bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
-def run_postprocessing_regression_peline(dataset, estimator_class, mitigator_name, mitigator_params):
+def run_postprocessing_regression_pipeline(dataset, estimator_class, mitigator_name, mitigator_params):
     train = dataset['train']
     test = dataset['test']
 
@@ -167,3 +181,35 @@ def run_postprocessing_regression_peline(dataset, estimator_class, mitigator_nam
     y_postd = pipeline.predict(test['X'], bm__group_a=test['group_a'], bm__group_b=test['group_b'])
     
     return regression_bias_metrics(test['group_a'], test['group_b'], y_postd, test['y'])
+
+
+def run_postrocessing_clustering(dataset, estimator_class, mitigator_name, postprocessor_fit_param_names,  mitigator_params):
+    train = dataset['train']
+
+    model = estimator_class()
+    model_fit_params = {'X': train['X']}
+    model.fit(**model_fit_params)
+    y_pred = model.predict(**model_fit_params)
+
+    post = get_postprocessor(mitigator_name, mitigator_params)
+    y_pred = post.fit_transform(train['X'], y_pred, train['group_a'], train['group_b'], model.cluster_centers_)['y_pred']
+    
+    return clustering_bias_metrics(train['group_a'], train['group_b'], y_pred, train['X'], model.cluster_centers_)
+
+def run_postprocessing_clustering_pipeline(dataset, estimator_class, mitigator_name, mitigator_params):
+    train = dataset['train']
+
+    pipeline = Pipeline(
+        steps=[
+            ("estimator", estimator_class()),
+            ("bm_postprocessing", get_postprocessor(mitigator_name, mitigator_params)),
+        ]
+    )
+
+    pipeline.fit(train['X'])
+    predict_params = {'bm__group_a':train['group_a'],
+                  'bm__group_b':train['group_b'],
+                  'bm__centroids':"cluster_centers_"}
+    y_pred = pipeline.predict(train['X'], **predict_params)
+    
+    return clustering_bias_metrics(train['group_a'], train['group_b'], y_pred, train['X'], pipeline['estimator'].cluster_centers_)
