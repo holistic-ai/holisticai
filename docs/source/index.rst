@@ -70,7 +70,15 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
 .. admonition:: Learn more about the Holistic AI company
         :class: dropdown admonition-youtube
 
-        ..  youtube:: oY8UYSlsGtg
+        .. raw:: html
+
+            <div class="video-container">
+
+        .. youtube:: oY8UYSlsGtg
+
+        .. raw:: html
+
+            </div>
 
 .. toctree::
     :maxdepth: 3

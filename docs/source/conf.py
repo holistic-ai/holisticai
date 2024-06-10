@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
+    'sphinx.ext.viewcode',
     "nbsphinx",
     "sphinx_copybutton",
     "sphinx_design",
@@ -48,6 +49,10 @@ extensions = [
     "sphinxcontrib.youtube",
 ]
 
+nbsphinx_allow_errors = True  # Permitir errores en los notebooks
+nbsphinx_execute = 'never'  # Puede ser 'auto', 'always', o 'never'
+
+html_show_sourcelink = False
 # autodoc options
 autodoc_default_options = {"members": True, "inherited-members": True}
 
