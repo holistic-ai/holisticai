@@ -142,11 +142,17 @@ class Dataset(dict):
             raise TypeError
         return GroupByDataset(self.data.groupby(key))
 
-    def map(self, fn):
+    def map(self, fn, vectorized=False): # noqa: FBT002
         def fnw(x):
-            return {(k, k) if type(k) is str else k: v for k, v in fn(x).items()}  # noqa: E721
-        updated_data = self.data.apply(fnw, axis=1, result_type='expand')
-        updated_data = pd.DataFrame(updated_data)
+            return {(k, k) if type(k) is str else k: v for k, v in fn(x).items()} # noqa: E721
+
+        if vectorized:
+            updated_data = pd.DataFrame(fnw(self.data))
+            updated_data.columns = pd.MultiIndex.from_tuples(updated_data.columns)
+        else:
+            updated_data = self.data.apply(fnw, axis=1, result_type='expand')
+            updated_data = pd.DataFrame(updated_data)
+
         new_data = self.data.combine_first(updated_data)
         return Dataset(new_data)
 
