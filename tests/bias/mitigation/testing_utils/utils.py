@@ -39,6 +39,11 @@ def multiclass_dataset():
     dataset = dataset.groupby(['y','group_a']).head(SHARD_SIZE)
     return dataset.train_test_split(test_size=0.2, stratify=dataset['y'], random_state=0)
 
+@pytest.fixture
+def recommender_dataset():
+    dataset = load_dataset("lastfm")
+    dataset = dataset.select(range(2*SHARD_SIZE))
+    return dataset.train_test_split(test_size=0.2, stratify=dataset['p_attr'], random_state=0)
 
 @pytest.fixture
 def small_clustering_dataset():
@@ -149,7 +154,7 @@ def show_result_table(configurations, df_baseline):
     return table.rename(columns={"Value": "Baseline"})
 
 
-def check_results(df1, df2):
+def check_results(df1, df2, atol=1e-5):
     """
     Checks if the results are equal
 
@@ -166,7 +171,7 @@ def check_results(df1, df2):
         The dataframe containing the results
     """
     import numpy as np
-    assert np.isclose(df1["Value"].iloc[0], df2["Value"].iloc[0]), (df1["Value"].iloc[0], df2["Value"].iloc[0])
+    assert np.isclose(df1["Value"].iloc[0], df2["Value"].iloc[0], atol=atol), (df1["Value"].iloc[0], df2["Value"].iloc[0])
 
 
 def fit(model, small_categorical_dataset):

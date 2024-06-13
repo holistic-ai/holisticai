@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler
 
 from holisticai.pipeline import Pipeline
 from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics
+from holisticai.datasets.synthetic.recruitment import generate_rankings
+from holisticai.mitigation.bias.postprocessing.debiasing_exposure.algorithm_utils import exposure_metric
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,
     categorical_dataset,
@@ -19,6 +21,7 @@ seed = 42
 
 from holisticai.mitigation.bias import MITIGATOR_NAME
 
+
 def get_preprocessor(mitigator_name : MITIGATOR_NAME = "CorrelationRemover", parameters: dict = {}):
     match mitigator_name:
         case "CorrelationRemover":
@@ -30,7 +33,11 @@ def get_preprocessor(mitigator_name : MITIGATOR_NAME = "CorrelationRemover", par
         case "LearningFairRepresentation":
             from holisticai.mitigation.bias import LearningFairRepresentation
             return LearningFairRepresentation(**parameters)
+        case "DisparateImpactRemoverRS":
+            from holisticai.mitigation.bias import DisparateImpactRemoverRS
+            return DisparateImpactRemoverRS(**parameters)
     raise NotImplementedError
+
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params, extra_model_fit_params", [
     ("CorrelationRemover", {"alpha":1.0}, ['X','group_a','group_b'], []),
@@ -40,6 +47,7 @@ def test_multiclass_preprocessor(mitigator_name, mitigator_params, fit_params, e
     metrics1 = run_preprocessing_categorical(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, fit_params, extra_model_fit_params, mitigator_params, is_multiclass=True)
     metrics2 = run_preprocessing_catergorical_pipeline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, mitigator_params, is_multiclass=True)
     check_results(metrics1, metrics2)
+
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params, extra_model_fit_params", [
     ("CorrelationRemover", {"alpha":1.0}, ['X','group_a','group_b'], []),
@@ -51,12 +59,23 @@ def test_categorical_preprocessor(mitigator_name, mitigator_params, fit_params, 
     metrics2 = run_preprocessing_catergorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, mitigator_params)
     check_results(metrics1, metrics2)
 
+
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
     ("CorrelationRemover", {"alpha":1.0}, ['X','group_a','group_b']),
 ])
 def test_regression_preprocessor(mitigator_name, mitigator_params, fit_params, regression_dataset):
     metrics1 = run_preprocessing_regression(regression_dataset, LinearRegression, mitigator_name, fit_params, mitigator_params)
     metrics2 = run_preprocessing_regression_pipeline(regression_dataset, LinearRegression, mitigator_name, mitigator_params)
+    check_results(metrics1, metrics2)
+
+
+@pytest.mark.parametrize("mitigator_name, mitigator_params", [
+    ("DisparateImpactRemoverRS", {'query_col': 'X', 'group_col': 'protected', 'score_col': 'score', 'repair_level':1}),
+])
+def test_recsys_preprocessor(mitigator_name, mitigator_params):
+    import pandas as pd
+    metrics1 = run_preprocessing_recsys(exposure_metric, mitigator_name, mitigator_params)
+    metrics2 = pd.DataFrame(columns=['Value'], data=[1.005387, 0.001944], index=['exposure_ratio', 'exposure difference'])
     check_results(metrics1, metrics2)
 
 
@@ -82,6 +101,7 @@ def run_preprocessing_categorical(dataset, bias_metrics, estimator_class, mitiga
     else:
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
+
 def run_preprocessing_catergorical_pipeline(dataset, bias_metrics, estimator_class, mitigator_name, mitigator_params, is_multiclass=False):
     train = dataset['train']
     test = dataset['test']
@@ -100,7 +120,8 @@ def run_preprocessing_catergorical_pipeline(dataset, bias_metrics, estimator_cla
         return bias_metrics(test['group_a'],  y_pred, test['y'])
     else:
         return bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
-    
+
+
 def run_preprocessing_regression(dataset, estimator_class, mitigator_name, preprocessor_fit_param_names,  mitigator_params):
     train = dataset['train']
     test = dataset['test']
@@ -117,6 +138,7 @@ def run_preprocessing_regression(dataset, estimator_class, mitigator_name, prepr
     
     return regression_bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
+
 def run_preprocessing_regression_pipeline(dataset, estimator_class, mitigator_name, mitigator_params):
     train = dataset['train']
     test = dataset['test']
@@ -132,3 +154,11 @@ def run_preprocessing_regression_pipeline(dataset, estimator_class, mitigator_na
     y_pred = pipeline.predict(test['X'], bm__group_a=test['group_a'], bm__group_b=test['group_b'])
     
     return regression_bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
+
+
+def run_preprocessing_recsys(bias_metrics, mitigator_name, mitigator_params):
+    rankings = generate_rankings(M=1000, k=20, p=0.25, return_p_attr=False)
+    pre = get_preprocessor(mitigator_name, mitigator_params)
+    rankings = pre.transform(rankings)
+
+    return bias_metrics(rankings, group_col='protected', query_col='X', score_col='score')
