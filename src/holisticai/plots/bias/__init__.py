@@ -57,9 +57,6 @@ __all__ = [
     "distribution_plot",
     "histogram_plot",
     "correlation_matrix_plot",
-    "bias_report_classification",
-    "bias_report_regression",
-    "bias_report_clustering",
     "bias_metrics_report",
     "group_confusion_matrices",
 ]

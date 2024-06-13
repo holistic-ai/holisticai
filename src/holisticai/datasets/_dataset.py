@@ -142,7 +142,7 @@ class Dataset(dict):
             raise TypeError
         return GroupByDataset(self.data.groupby(key))
 
-    def map(self, fn, vectorized=False): # noqa: FBT002
+    def map(self, fn, vectorized=True): # noqa: FBT002
         def fnw(x):
             return {(k, k) if type(k) is str else k: v for k, v in fn(x).items()} # noqa: E721
 

@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.pipeline import Pipeline as SKLPipeline
 from sklearn.utils.metaestimators import available_if
 
@@ -16,6 +15,7 @@ def _fulfill_conditions(fn_name: str):
             return hasattr(self, "predict_proba") and self.post_estimator_transformers
         if fn_name == "predictions":
             return self.post_estimator_transformers
+        return None
 
     return check
 
@@ -62,9 +62,9 @@ class Pipeline(SKLPipeline, PipelineHelper):
             is completed.
         """
         steps = self.preprocessing_steps(steps)
-        super(Pipeline, self).__init__(steps=steps, memory=memory, verbose=verbose)
+        super(Pipeline, self).__init__(steps=steps, memory=memory, verbose=verbose)  # noqa: UP008
 
-    def fit(self, X, y=None, **fit_params):
+    def fit(self, X, y=None, **fit_params):  # noqa: N803
         """Fit the model.
 
         Fit all the transformers/u-transformers one after the other and transform the
@@ -92,17 +92,17 @@ class Pipeline(SKLPipeline, PipelineHelper):
             Pipeline with fitted steps.
         """
         super().fit(X, y, **fit_params)
-        Xt = self._transform_without_final(X)
+        Xt = self._transform_without_final(X)  # noqa: N806
         self.fit_post_estimator_transformers(Xt, y)
         return self
 
     @available_if(_fulfill_conditions("predict_proba"))
-    def predict_proba(self, X, **predict_proba_params):
+    def predict_proba(self, X, **predict_proba_params):  # noqa: N803
         """Update avaiable conditions for predict_proba"""
         return super().predict_proba(X, **predict_proba_params)
 
     @available_if(_fulfill_conditions("predict_score"))
-    def predict_score(self, X, **predict_score_params):
+    def predict_score(self, X, **predict_score_params):  # noqa: N803
         """
         Return probability vector
 
@@ -126,7 +126,7 @@ class Pipeline(SKLPipeline, PipelineHelper):
         return self.predictions(X, **predict_score_params)["y_score"]
 
     @available_if(_fulfill_conditions("predictions"))
-    def predictions(self, X, **params):
+    def predictions(self, X, **params):  # noqa: N803
         """
         Post-processor prediction
 
@@ -158,5 +158,5 @@ class Pipeline(SKLPipeline, PipelineHelper):
         dict
             dictionary with postprocessor outputs
         """
-        Xt = self._transform_without_final(X)
+        Xt = self._transform_without_final(X)  # noqa: N806
         return self._transform_post_estimator_transformers(Xt, **params)
