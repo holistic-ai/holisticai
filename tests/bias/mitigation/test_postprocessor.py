@@ -1,10 +1,12 @@
 import warnings
-
+import pandas as pd
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.cluster import KMeans
 
 from holisticai.pipeline import Pipeline
 from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
+from holisticai.datasets.synthetic.recruitment import generate_rankings
+from holisticai.mitigation.bias.postprocessing.debiasing_exposure.algorithm_utils import exposure_metric
 from tests.bias.mitigation.testing_utils.utils import (
     check_results,
     categorical_dataset,
@@ -48,6 +50,12 @@ def get_postprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds
         case "MCMF":
             from holisticai.mitigation.bias import MCMF
             return MCMF(**parameters)
+        case "DebiasingExposure":
+            from holisticai.mitigation.bias import DebiasingExposure
+            return DebiasingExposure(**parameters)
+        case "FairTopK":
+            from holisticai.mitigation.bias import FairTopK
+            return FairTopK(**parameters)
     raise NotImplementedError
 
 
@@ -60,6 +68,7 @@ def test_multiclass_postprocessor(mitigator_name, mitigator_params, fit_params, 
     metrics2 = run_postprocessing_catergorical_pipeline(multiclass_dataset, multiclass_bias_metrics, LogisticRegression, mitigator_name, mitigator_params, is_multiclass=True)
     check_results(metrics1, metrics2)
 
+
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
     ("CalibratedEqualizedOdds", {"alpha":1.0}, ['y_proba','y_pred','group_a','group_b']),
     ("EqualizedOdds", {}, ['X','y_pred','group_a','group_b']),
@@ -71,6 +80,7 @@ def test_categorical_postprocessor(mitigator_name, mitigator_params, fit_params,
     metrics1 = run_postprocessing_categorical(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, fit_params, mitigator_params)
     metrics2 = run_postprocessing_catergorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, mitigator_params)
     check_results(metrics1, metrics2)
+
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [
     ("PluginEstimationAndCalibration", {}, ['y_pred','group_a','group_b']),
@@ -89,8 +99,29 @@ def test_clustering_postprocessor(mitigator_name, mitigator_params, fit_params, 
     metrics2 = run_postprocessing_clustering_pipeline(regression_dataset, KMeans, mitigator_name, mitigator_params)
     check_results(metrics1, metrics2)
 
+ 
+def test_recsys_fairtopk():
+    mitigator_name = "FairTopK"
+    mitigator_params = {'top_n': 20, 'p': 0.9, 'alpha': 0.15, 'query_col':'X',
+                    'score_col': 'score', 'group_col': 'protected', 'doc_col': 'Y'}
+    metrics1 = run_postprocessing_fairtopk(exposure_metric, mitigator_name, mitigator_params)
+    metrics2 = pd.DataFrame(columns=['Value'], data=[2.272748, 0.001944], index=['exposure_ratio', 'exposure difference'])
+    check_results(metrics1, metrics2)
 
-    
+
+@pytest.mark.parametrize("mitigator_name, mitigator_params", [
+    ("DebiasingExposure", {'query_col': 'X', 'group_col': 'protected',
+                    'score_col': 'score', 'standardize':True,
+                    'gamma': 2.0, 'number_of_iterations': 10,
+                    'doc_col': 'Y', 'feature_cols': ['score', 'protected'],}),
+])
+def test_recsys_postprocessor(mitigator_name, mitigator_params):
+    import pandas as pd
+    metrics1 = run_postprocessing_recsys(exposure_metric, mitigator_name, mitigator_params)
+    metrics2 = pd.DataFrame(columns=['Value'], data=[0.985410, 0.001944], index=['exposure_ratio', 'exposure difference'])
+    check_results(metrics1, metrics2, atol=0.1)
+
+   
 def run_postprocessing_categorical(dataset, bias_metrics, estimator_class, mitigator_name, postprocessor_fit_param_names, mitigator_params, is_multiclass=False):
     train = dataset['train']
     test = dataset['test']
@@ -166,6 +197,7 @@ def run_postrocessing_regression(dataset, estimator_class, mitigator_name, postp
     
     return regression_bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
 
+
 def run_postprocessing_regression_pipeline(dataset, estimator_class, mitigator_name, mitigator_params):
     train = dataset['train']
     test = dataset['test']
@@ -213,3 +245,19 @@ def run_postprocessing_clustering_pipeline(dataset, estimator_class, mitigator_n
     y_pred = pipeline.predict(train['X'], **predict_params)
     
     return clustering_bias_metrics(train['group_a'], train['group_b'], y_pred, train['X'], pipeline['estimator'].cluster_centers_)
+
+def run_postprocessing_recsys(bias_metrics, mitigator_name, mitigator_params):
+    rankings = generate_rankings(M=1000, k=20, p=0.25, return_p_attr=False)
+    post = get_postprocessor(mitigator_name, mitigator_params)
+    post.fit(rankings)
+    rankings = post.transform(rankings)
+
+    return bias_metrics(rankings, group_col='protected', query_col='X', score_col='score')
+
+
+def run_postprocessing_fairtopk(bias_metrics, mitigator_name, mitigator_params):
+    rankings = generate_rankings(M=1, k=20, p=0.25, return_p_attr=False)
+    post = get_postprocessor(mitigator_name, mitigator_params)
+    rankings = post.transform(rankings)
+
+    return bias_metrics(rankings, group_col='protected', query_col='X', score_col='score')
