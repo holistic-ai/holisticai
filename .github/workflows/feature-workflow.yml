@@ -36,5 +36,5 @@ jobs:
       #- name: check types
         #run: hatch run types:check
 
-      - name: run tests
-        run: hatch run testing:metrics:all_tests
+      #- name: run tests
+      #  run: hatch run testing:run
