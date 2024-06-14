@@ -1,5 +1,4 @@
-from typing import Optional
-
+from typing import Literal
 import numpy as np
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from holisticai.utils.transformers.bias import SensitiveGroups
@@ -17,13 +16,13 @@ class LPDebiaserMulticlass(BMPost):
         arXiv preprint arXiv:2201.04461 (2022).
     """
 
-    CONSTRAINT = ["EqualizedOdds", "EqualizedOpportunity"]
-    OBJ_FUN = ["macro", "micro"]
+    CONSTRAINT = Literal["EqualizedOdds", "EqualizedOpportunity"]
+    OBJ_FUN = Literal["macro", "micro"]
 
     def __init__(
         self,
-        constraint: Optional["CONSTRAINT"] = "EqualizedOdds",
-        loss: Optional["OBJ_FUN"] = "macro",
+        constraint: CONSTRAINT = "EqualizedOdds",
+        loss: OBJ_FUN = "macro",
     ):
         """
         Parameters
