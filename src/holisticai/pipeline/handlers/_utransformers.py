@@ -56,8 +56,9 @@ class UTransformersHandler:
         # Validate if postprocessor bias mitigators are defined after classifier
         if num_post_mitigators > 0:
             post_classifier_step_names, _ = zip(*mitigator_groups_by_name[BIAS_TAGS.POST])
-            assert all(name.startswith(BIAS_TAGS.POST) for name in post_classifier_step_names), f"Only bias mitigators postprocessor are supported, \
-                utransformer postprocessors founded: {post_classifier_step_names}"
+            assert all(
+                name.startswith(BIAS_TAGS.POST) for name in post_classifier_step_names
+            ), f"Only bias mitigators postprocessor are supported, utransformer postprocessors founded: {post_classifier_step_names}"
 
         # Validate that exists only one bias mitigator postprocessor
         # TODO: Evaluate in other cases.
