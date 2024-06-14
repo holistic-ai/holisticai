@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import itertools
 import sys
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 from holisticai.metrics import bias as metrics
@@ -127,18 +127,18 @@ class RejectOptionClassification(BMPost):
         with the best fair metric value and highest balanced accuracy.
 
         Parameters
-        ----------            
+        ----------
         y : array-like
-            Target vector (nb_examlpes,)        
+            Target vector (nb_examlpes,)
         y_proba : matrix-like
-            Predicted probability matrix (num_examples, num_classes). The probability 
+            Predicted probability matrix (num_examples, num_classes). The probability
             estimates must sum to 1 across the possible classes and each matrix value
             must be in the interval [0,1].
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
             Group membership vector (binary)
-            
+
         Returns
         -------
         Self

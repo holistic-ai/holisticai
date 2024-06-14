@@ -54,7 +54,7 @@ class CategoricalFeature:
 
         n = len(self.data)
         count = 0
-        for i in range(0, n):
+        for i in range(n):
             obs = self.data[i]
             if obs in d2:
                 pass  # if obs (i.e. category) is alreay a KEY in bin_index_data then don't do anything
@@ -103,7 +103,7 @@ class CategoricalFeature:
         DG.add_node("s")
         DG.add_node("t")
         for i in range(
-            0, k
+            k
         ):  # lefthand side nodes have capacity = number of observations in category i
             DG.add_node(i)
             DG.add_edge("s", i, capacity=bin_list[i][1], weight=0)
@@ -117,7 +117,7 @@ class CategoricalFeature:
         # Add special node to hold overflow
         DG.add_node(2 * k)
         DG.add_edge(2 * k, "t", capacity=total_items, weight=0)
-        for i in range(0, k):
+        for i in range(k):
             for j in range(
                 k, 2 * k
             ):  # for each edge from a lefthand side node to a righhand side node:
@@ -159,7 +159,7 @@ class CategoricalFeature:
         ] * size_data  # initialize repaired data to be 0. If there are zero's after we fill it in the those observations belong in the overflow, "no category"
         k = self.num_bins
         overflow = 0
-        for i in range(0, k):  # for each lefthand side node i
+        for i in range(k):  # for each lefthand side node i
             overflow += mincostFlow[i][2 * k]
             for j in range(k, 2 * k):  # for each righthand side node j
                 edgeflow = mincostFlow[i][

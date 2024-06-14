@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .._conventions import _ALL, _EVENT, _GROUP_ID, _LABEL, _LOSS, _PREDICTION, _SIGNED
+from .._conventions import _ALL, _EVENT, _GROUP_ID, _LABEL, _LOSS, _PREDICTION
 from .._moments_utils import BaseMoment, format_data
 
 

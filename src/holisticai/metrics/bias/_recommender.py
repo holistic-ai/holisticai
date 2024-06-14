@@ -20,7 +20,7 @@ from holisticai.utils._validation import _recommender_checks
 from sklearn.metrics import mean_absolute_error
 
 
-def aggregate_diversity(mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def aggregate_diversity(mat_pred, top=None, thresh=0.5, normalize=False):
     r"""Aggregate Diversity
 
     Given a matrix of scores, this function computes the recommended items for\
@@ -102,7 +102,7 @@ def aggregate_diversity(mat_pred, top=None, thresh=0.5, normalize=False):  # noq
     return (item_count >= 1).sum() / len(item_count)
 
 
-def gini_index(mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def gini_index(mat_pred, top=None, thresh=0.5, normalize=False):
     """GINI index
 
     Measures the inequality across the frequency distribution\
@@ -186,7 +186,7 @@ def gini_index(mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
     return (w * item_freqs_s).sum() / (num_items - 1)
 
 
-def exposure_entropy(mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def exposure_entropy(mat_pred, top=None, thresh=0.5, normalize=False):
     r"""Exposure Entropy
 
     This function measures the entropy of the item exposure distribution.
@@ -259,7 +259,7 @@ def exposure_entropy(mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: 
     return entropy(item_exposure_dist)
 
 
-def avg_recommendation_popularity(mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def avg_recommendation_popularity(mat_pred, top=None, thresh=0.5, normalize=False):
     """Average Recommendation Popularity
 
     This function computes the average recommendation popularity\
@@ -334,7 +334,7 @@ def avg_recommendation_popularity(mat_pred, top=None, thresh=0.5, normalize=Fals
     return np.nanmean(val)
 
 
-def mad_score(group_a, group_b, mat_pred, normalize=False):  # noqa: FBT002
+def mad_score(group_a, group_b, mat_pred, normalize=False):
     r"""Mean Absolute Deviation
 
     Difference in average score for group_a and group_b.
@@ -424,7 +424,7 @@ def mad_score(group_a, group_b, mat_pred, normalize=False):  # noqa: FBT002
     return avg_a - avg_b
 
 
-def exposure_l1(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def exposure_l1(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=False):
     """Exposure Total Variation
 
     This function computes the total variation norm between the group_a\
@@ -515,7 +515,7 @@ def exposure_l1(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=Fals
     return 0.5 * mean_absolute_error(item_dist_a, item_dist_b) * len(item_dist_a)
 
 
-def exposure_kl(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def exposure_kl(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=False):
     """Exposure KL Divergence
 
     This function computes the KL divergence from the group_a\
@@ -611,7 +611,7 @@ def exposure_kl(group_a, group_b, mat_pred, top=None, thresh=0.5, normalize=Fals
     return entropy(item_dist_a, item_dist_b)
 
 
-def _recommender_metric_ratio(metric, group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def _recommender_metric_ratio(metric, group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     """Metric ratio for recommender systems
 
     This function computes the ratio of a given metric on minority and majority group.
@@ -678,7 +678,7 @@ def _recommender_metric_ratio(metric, group_a, group_b, mat_pred, mat_true, top=
     return metric_a / metric_b
 
 
-def avg_precision_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def avg_precision_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     r"""Average precision ratio
 
     This function computes the ratio of average precision (over users)\
@@ -757,7 +757,7 @@ def avg_precision_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0
     return _recommender_metric_ratio(avg_precision, group_a, group_b, mat_pred, mat_true, top, thresh, normalize)
 
 
-def avg_recall_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def avg_recall_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     r"""Average recall ratio
 
     This function computes the ratio of average recall (over users)
@@ -831,7 +831,7 @@ def avg_recall_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5,
     return _recommender_metric_ratio(avg_recall, group_a, group_b, mat_pred, mat_true, top, thresh, normalize)
 
 
-def avg_f1_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):  # noqa: FBT002
+def avg_f1_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, normalize=False):
     r"""Average f1 ratio
 
     This function computes the ratio of average f1 (over users)
@@ -912,7 +912,7 @@ def avg_f1_ratio(group_a, group_b, mat_pred, mat_true, top=None, thresh=0.5, nor
     return _recommender_metric_ratio(avg_f1, group_a, group_b, mat_pred, mat_true, top, thresh, normalize)
 
 
-def recommender_rmse_ratio(group_a, group_b, mat_pred, mat_true, normalize=False):  # noqa: FBT002
+def recommender_rmse_ratio(group_a, group_b, mat_pred, mat_true, normalize=False):
     """Recommender RMSE ratio
 
     This function computes the ratio of rmse between
@@ -988,7 +988,7 @@ def recommender_rmse_ratio(group_a, group_b, mat_pred, mat_true, normalize=False
     )
 
 
-def recommender_mae_ratio(group_a, group_b, mat_pred, mat_true, normalize=False):  # noqa: FBT002
+def recommender_mae_ratio(group_a, group_b, mat_pred, mat_true, normalize=False):
     """Recommender MAE ratio
 
     This function computes the ratio of mae between
@@ -1071,7 +1071,7 @@ def recommender_bias_metrics(
     mat_true=None,
     top=None,
     thresh=0.5,
-    normalize=False,  # noqa: FBT002
+    normalize=False,
     metric_type="equal_outcome",
 ):
     """Recommender bias metrics batch computation

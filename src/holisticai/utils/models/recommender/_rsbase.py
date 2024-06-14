@@ -1,9 +1,8 @@
-from typing import Optional
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-
-from .item_selection.selectors import ConventionalItemsSelection
+from holisticai.utils.models.recommender.item_selection.selectors import ConventionalItemsSelection
 
 
 class RecommenderSystemBase:
@@ -11,8 +10,7 @@ class RecommenderSystemBase:
     Recommender System Base Transformer
     """
 
-    def predict(self, X: Optional[np.ndarray], top_n: Optional[int] = 10):
-
+    def predict(self, X: np.ndarray | None, top_n: int | None = 10):
         self.item_selection = ConventionalItemsSelection(top_n=top_n)
         time_mask = X > 0
         selected_items = self.item_selection(time_mask, self.pred)[0]

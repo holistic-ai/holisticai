@@ -16,7 +16,7 @@ class BinaryBalancerAlgorithm:
 
         assert not (
             (y_pred is None) and (y_proba is None)
-        ), f"y_pred or y_proba must be passed"
+        ), "y_pred or y_proba must be passed"
 
         # Getting the group info
         self.groups = np.unique(p_attr)
@@ -67,19 +67,19 @@ class BinaryBalancerAlgorithm:
 
     def predict(self, p_attr, y_pred=None, y_proba=None, binom=False):
         """Generates bias-adjusted predictions on new data.
-        
+
         Parameters
         ----------
         y_ : ndarry of shape (n_samples,)
             A binary- or real-valued array of unadjusted predictions.
-        
+
         a : ndarray of shape (n_samples,)
             The protected attributes for the samples in y_.
-        
+
         binom : bool, default False
             Whether to generate adjusted predictions by sampling from a \
             binomial distribution.
-        
+
         Returns
         -------
         y~ : ndarray of shape (n_samples,)

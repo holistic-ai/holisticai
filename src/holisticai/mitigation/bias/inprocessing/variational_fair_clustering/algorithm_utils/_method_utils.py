@@ -31,7 +31,7 @@ def NormalizedCutEnergy(A, S, clustering):
     for k in range(maxclusterid + 1):
         S_k = S[:, k]
         # print S_k
-        if 0 == np.sum(clustering == k):
+        if np.sum(clustering == k) == 0:
             continue  # skip empty cluster
         num_cluster = num_cluster + 1
         if isinstance(A, np.ndarray):
@@ -62,7 +62,7 @@ def NormalizedCutEnergy_discrete(A, clustering):
     for k in range(maxclusterid + 1):
         S_k = np.array(clustering == k, dtype=float)
         # print S_k
-        if 0 == np.sum(clustering == k):
+        if np.sum(clustering == k) == 0:
             continue  # skip empty cluster
         num_cluster = num_cluster + 1
         if isinstance(A, np.ndarray):

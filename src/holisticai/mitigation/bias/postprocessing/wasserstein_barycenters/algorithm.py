@@ -1,5 +1,4 @@
 import numpy as np
-
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 
@@ -38,8 +37,8 @@ class WassersteinBarycenterAlgorithm:
         self.maxY = np.max(self.YL)
 
     def _optimize_ts(self, yt, i1, i2, n1, n2):
-        mask1 = self.SL == self.group_values[i1]
-        mask2 = self.SL == self.group_values[i2]
+        mask1 = self.group_values[i1] == self.SL
+        mask2 = self.group_values[i2] == self.SL
         yl_masked2 = self.YL[mask2]
         tmp2 = np.sum(yl_masked2 < yt) / n2
         yl_masked1 = self.YL[mask1]

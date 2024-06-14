@@ -86,7 +86,7 @@ class KMediamClusteringAlgorithm:
                 for i in range(self.k):
                     centers = list(chosen_centers)
                     # Try replacing i center
-                    if not (c in centers):
+                    if c not in centers:
                         # set new center
                         centers[i] = c
                         # do new assignment calculate new cost
@@ -111,7 +111,7 @@ class KMediamClusteringAlgorithm:
     def _genetic_algorithm(self, X):
         optimization_function = lambda x: self._compute_cost(x)
 
-        from .....utils.optimizers import GAHiperparameters, GeneticAlgorithm
+        from holisticai.utils.optimizers import GAHiperparameters, GeneticAlgorithm
 
         varbound = np.array([[0, len(X) - 1]] * self.k)
 

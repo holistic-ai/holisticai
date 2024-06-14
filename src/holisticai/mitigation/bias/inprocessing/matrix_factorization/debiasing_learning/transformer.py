@@ -2,7 +2,6 @@ from typing import Optional
 
 import numpy as np
 import scipy
-
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 
@@ -21,7 +20,7 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
     ----------
         K : int
             Specifies the number of dimensions.
-        
+
         normalization : str
             Strategy to normalize rating matrix. Avaiables are:
                     - 'Vanilla',
@@ -54,7 +53,7 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
     -------
         fit(X, propensities)
             Fit model using Debiasing Learning Matrix Factorization.
-    
+
     References
     ----------
         [1] Schnabel, Tobias, et al. "Recommendations as treatments: Debiasing learning

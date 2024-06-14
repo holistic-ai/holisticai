@@ -10,7 +10,7 @@ from .algorithm_utils import (
 )
 
 
-class DELTRAlgorithm(object):
+class DELTRAlgorithm:
     def __init__(
         self, gamma, number_of_iterations, learning_rate, lambdaa, init_var, verbose
     ):

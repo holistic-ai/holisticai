@@ -7,7 +7,7 @@ from holisticai.pipeline import Pipeline
 from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
 from holisticai.datasets.synthetic.recruitment import generate_rankings
 from holisticai.mitigation.bias.postprocessing.debiasing_exposure.algorithm_utils import exposure_metric
-from tests.bias.mitigation.testing_utils.utils import (
+from tests.bias.mitigation.utils import (
     check_results,
     categorical_dataset,
     regression_dataset,

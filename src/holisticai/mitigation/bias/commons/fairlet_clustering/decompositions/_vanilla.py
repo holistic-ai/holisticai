@@ -25,7 +25,7 @@ class VanillaFairletDecomposition(DecompositionMixin):
         The balance parameter p.
     q : int
         The balance parameter q.
-    
+
     Methods
     -------
     balanced(p, q, r, b)

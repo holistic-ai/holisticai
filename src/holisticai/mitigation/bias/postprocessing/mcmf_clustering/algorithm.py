@@ -1,9 +1,8 @@
 import numpy as np
+from holisticai.utils.transformers.bias import SensitiveGroups
 from scipy.optimize import linprog
 from scipy.sparse import lil_matrix
 from tqdm import trange
-
-from holisticai.utils.transformers.bias import SensitiveGroups
 
 
 class Algorithm:

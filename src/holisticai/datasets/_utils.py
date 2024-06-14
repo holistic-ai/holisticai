@@ -25,6 +25,27 @@ def convert_float_to_categorical(target, nb_classes, numeric_classes=True):
     v = np.array(target.quantile(labels_values)).squeeze()
     v[0], v[-1] = v[0] - eps, v[-1] + eps
     y = target.copy()
-    for (i, c) in enumerate(labels):
+    for i, c in enumerate(labels):
         y[(target.values >= v[i]) & (target.values < v[i + 1])] = c
     return y.astype(np.int32)
+
+
+def get_protected_values(df, protected_attribute, protected_value):
+    """
+    Returns a boolean array with True for the protected group and False for the unprotected group
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The dataframe containing the protected attribute
+    protected_attribute : str
+        The name of the protected attribute
+    protected_value : str
+        The value of the protected attribute for the protected group
+
+    Returns
+    -------
+    np.ndarray
+        A boolean array with True for the protected group and False for the unprotected group
+    """
+    return df[protected_attribute] == protected_value

@@ -27,11 +27,8 @@ class UTransformersHandler:
             Pipeline parameters handler during fit, fit_transform, transform function execution.
         """
         self.bias_mitigators_validation(steps)
-        self.steps_groups = {
-            tag: [step for step in steps if step[0].startswith(tag)]
-            for tag in BIAS_TAGS
-        }
-        for tag, steps in self.steps_groups.items():
+        self.steps_groups = {tag: [step for step in steps if step[0].startswith(tag)] for tag in BIAS_TAGS}
+        for steps in self.steps_groups.values():
             for step in steps:
                 step[1].link_parameters(params_hdl, estimator_hdl)
 
@@ -43,35 +40,23 @@ class UTransformersHandler:
             BIAS_TAGS.POST: BMPostprocessing,
         }
 
-        mitigator_groups_by_name = {
-            tag: [step for step in steps if step[0].startswith(tag)]
-            for tag in BIAS_TAGS
-        }
+        mitigator_groups_by_name = {tag: [step for step in steps if step[0].startswith(tag)] for tag in BIAS_TAGS}
         mitigator_groups_by_object = {
-            tag: [step for step in steps if isinstance(step[1], tag2info[tag])]
-            for tag in BIAS_TAGS
+            tag: [step for step in steps if isinstance(step[1], tag2info[tag])] for tag in BIAS_TAGS
         }
 
         # Validate if all objects with bias mitigator stem (BIAS_TAGS) are linked with a correct Bias Mitigator Transformer objects
         if mitigator_groups_by_name != mitigator_groups_by_object:
-            msg = (
-                f"Mitigator objects and name doesn't match, grouped by name: {mitigator_groups_by_name} \
+            msg = f"Mitigator objects and name doesn't match, grouped by name: {mitigator_groups_by_name} \
                 and grouped by object type:{mitigator_groups_by_object}"
-            )
-            raise NameError(
-                msg
-            )
+            raise NameError(msg)
 
         num_post_mitigators = len(mitigator_groups_by_name[BIAS_TAGS.POST])
 
         # Validate if postprocessor bias mitigators are defined after classifier
         if num_post_mitigators > 0:
-            post_classifier_step_names, _ = zip(
-                *mitigator_groups_by_name[BIAS_TAGS.POST]
-            )
-            assert all(
-                name.startswith(BIAS_TAGS.POST) for name in post_classifier_step_names
-            ), f"Only bias mitigators postprocessor are supported, \
+            post_classifier_step_names, _ = zip(*mitigator_groups_by_name[BIAS_TAGS.POST])
+            assert all(name.startswith(BIAS_TAGS.POST) for name in post_classifier_step_names), f"Only bias mitigators postprocessor are supported, \
                 utransformer postprocessors founded: {post_classifier_step_names}"
 
         # Validate that exists only one bias mitigator postprocessor

@@ -1,8 +1,6 @@
 from typing import Optional
 
-import numpy as np
 import pandas as pd
-
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 from .algorithm_utils.fail_prob import RecursiveNumericFailProbabilityCalculator
@@ -59,7 +57,7 @@ class FairTopK(BMPost):
             Item groups (nb_examples, 3) [query_id, doc_id, protected]
         """
         if p_attr is None:
-            if not self.group_col in rankings.columns:
+            if self.group_col not in rankings.columns:
                 raise ValueError("protected groups must be provided")
             else:
                 new_rankings = rankings
@@ -112,7 +110,7 @@ class FairTopK(BMPost):
             mtable as list of int elements
         """
 
-        if not (self.top_n, self.p, self.alpha) in self._cache:
+        if (self.top_n, self.p, self.alpha) not in self._cache:
             # create the mtable
             fail_prob_pair = RecursiveNumericFailProbabilityCalculator(
                 self.top_n, self.p, self.alpha

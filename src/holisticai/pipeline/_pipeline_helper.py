@@ -33,11 +33,10 @@ class PipelineHelper:
             return object.__getattribute__(self, name)
 
     def handle_pipeline_methods(self, fn_name):
-        def function(X, y=None, **kargs):  # noqa: N803
+        def function(X, y=None, **kargs):
             params = self.preprocessing_parameters(kargs, y)
 
             if self.post_estimator_transformers:
-
                 if fn_name in POST_PREDICTION:
                     # For predictions we must check supported methods
                     fn = object.__getattribute__(self, "predictions")
@@ -87,13 +86,10 @@ class PipelineHelper:
         """
         self.params_hdl = PipelineParametersHandler()
         self.estimator_hdl = EstimatorHandler(self.params_hdl)
-        self.utransformers_hdl = UTransformersHandler(
-            steps, self.params_hdl, self.estimator_hdl
-        )
+        self.utransformers_hdl = UTransformersHandler(steps, self.params_hdl, self.estimator_hdl)
 
         steps = self.utransformers_hdl.drop_post_processing_steps(steps)
         return self.estimator_hdl.wrap_and_link_estimator_step(steps)
-
 
     def preprocessing_parameters(self, params, y=None):
         """
@@ -126,7 +122,7 @@ class PipelineHelper:
 
         return params
 
-    def fit_post_estimator_transformers(self, Xt, y):  # noqa: N803
+    def fit_post_estimator_transformers(self, Xt, y):
         """
         fit post-estimator transformers.
 
@@ -150,7 +146,7 @@ class PipelineHelper:
         output_kargs = self.estimator_hdl.get_fit_params(Xt)
         self.utransformers_hdl.fit_postprocessing(Xt, y=y, **output_kargs)
 
-    def _transform_post_estimator_transformers(self, Xt, **params):  # noqa: N803
+    def _transform_post_estimator_transformers(self, Xt, **params):
         """
         call transform for post-estimator transformers.
 
@@ -175,7 +171,7 @@ class PipelineHelper:
         output_kargs.update(transform_kargs)
         return self.utransformers_hdl.transform_postprocessing(**output_kargs)
 
-    def _transform_without_final(self, X):  # noqa: N803
+    def _transform_without_final(self, X):
         """Transform the data. Not apply `transform` with the final estimator.
 
         Call `transform` of each transformer in the pipeline. The transformed

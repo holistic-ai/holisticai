@@ -1,6 +1,4 @@
 import numpy as np
-from sklearn.base import TransformerMixin
-
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 
 

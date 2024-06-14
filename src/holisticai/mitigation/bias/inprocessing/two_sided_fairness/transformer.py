@@ -2,7 +2,6 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 
 from .algorithm import FairRecAlg

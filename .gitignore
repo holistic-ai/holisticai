@@ -28,3 +28,7 @@ docs/source/explainability/.generated
 mlruns/
 mlartifacts/
 docs/build
+
+.vscode
+.ruff_cache
+.pytest_cache

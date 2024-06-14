@@ -7,10 +7,7 @@ from holisticai.pipeline._pipeline_helper import PipelineHelper
 def _fulfill_conditions(fn_name: str):
     def check(self):
         if fn_name == "predict_proba":
-            return (
-                hasattr(self._final_estimator, "predict_proba")
-                and not self.post_estimator_transformers
-            )
+            return hasattr(self._final_estimator, "predict_proba") and not self.post_estimator_transformers
         if fn_name == "predict_score":
             return hasattr(self, "predict_proba") and self.post_estimator_transformers
         if fn_name == "predictions":
@@ -64,7 +61,7 @@ class Pipeline(SKLPipeline, PipelineHelper):
         steps = self.preprocessing_steps(steps)
         super(Pipeline, self).__init__(steps=steps, memory=memory, verbose=verbose)  # noqa: UP008
 
-    def fit(self, X, y=None, **fit_params):  # noqa: N803
+    def fit(self, X, y=None, **fit_params):
         """Fit the model.
 
         Fit all the transformers/u-transformers one after the other and transform the
@@ -97,12 +94,12 @@ class Pipeline(SKLPipeline, PipelineHelper):
         return self
 
     @available_if(_fulfill_conditions("predict_proba"))
-    def predict_proba(self, X, **predict_proba_params):  # noqa: N803
+    def predict_proba(self, X, **predict_proba_params):
         """Update avaiable conditions for predict_proba"""
         return super().predict_proba(X, **predict_proba_params)
 
     @available_if(_fulfill_conditions("predict_score"))
-    def predict_score(self, X, **predict_score_params):  # noqa: N803
+    def predict_score(self, X, **predict_score_params):
         """
         Return probability vector
 
@@ -126,7 +123,7 @@ class Pipeline(SKLPipeline, PipelineHelper):
         return self.predictions(X, **predict_score_params)["y_score"]
 
     @available_if(_fulfill_conditions("predictions"))
-    def predictions(self, X, **params):  # noqa: N803
+    def predictions(self, X, **params):
         """
         Post-processor prediction
 

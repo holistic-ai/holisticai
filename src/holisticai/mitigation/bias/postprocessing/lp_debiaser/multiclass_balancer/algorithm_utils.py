@@ -6,7 +6,7 @@ def cp_mat(y_true, y_pred, n_classes):
     """Returns the matrix of conditional probabilities y_pred | y_true"""
     tab = pd.crosstab(y_true, y_pred)
     cols = list(set(range(n_classes)) - set(tab.columns))
-    if not cols == []:
+    if cols != []:
         tab[cols] = 0
     tab = tab.values
     probs = tab.transpose() / tab.sum(axis=1)

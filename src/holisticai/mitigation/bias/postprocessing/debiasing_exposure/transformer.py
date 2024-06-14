@@ -140,7 +140,7 @@ class DebiasingExposure:
             self.feature_cols = [
                 col
                 for col in rankings.columns.to_list()
-                if not (col in restricted_cols)
+                if col not in restricted_cols
             ]
 
         # prepare data

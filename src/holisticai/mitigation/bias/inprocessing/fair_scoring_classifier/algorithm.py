@@ -228,10 +228,10 @@ class FairScoreClassifierAlgorithm:
                         <= self.constraints["eod"]
                     )
 
-        if "a" in self.objectives and not ("s" in self.constraints):
+        if "a" in self.objectives and "s" not in self.constraints:
             cost = (1 / N) * cp.sum(z)
 
-        if "ba" in self.objectives and not ("s" in self.constraints):
+        if "ba" in self.objectives and "s" not in self.constraints:
             cost = 0
             for i, indexes in enumerate(class_indexes):
                 cost += cp.sum(z[indexes]) / N_class[i]

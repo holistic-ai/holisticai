@@ -2,8 +2,6 @@ import copy
 import sys
 from typing import Optional
 
-import numpy as np
-
 from ._grid_generator import GridGenerator
 
 

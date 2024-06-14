@@ -1,10 +1,9 @@
 from typing import Optional
 
 import numpy as np
-from tqdm import tqdm
-
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
+from tqdm import tqdm
 
 from .common_utils.propensity_utils import popularity_model_propensity
 from .common_utils.utils import updateP, updateQ

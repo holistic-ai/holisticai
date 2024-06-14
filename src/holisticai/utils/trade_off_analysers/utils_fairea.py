@@ -25,10 +25,7 @@ def get_closer_bounds(point, x_arr, y_arr, bound="lower"):
     """
     if point in x_arr:
         return point, y_arr[np.where(x_arr == point)[0][0]]
-    if bound == "lower":
-        bounds = x_arr[point > x_arr]
-    else:
-        bounds = x_arr[point < x_arr]
+    bounds = x_arr[point > x_arr] if bound == "lower" else x_arr[point < x_arr]
     if np.any(bounds) == 0:
         return 0, 0
     x_point = bounds[np.argmin((bounds - point) ** 2)]

@@ -1,8 +1,6 @@
-from calendar import c
 from typing import Optional
 
 import numpy as np
-
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from holisticai.utils.transformers.bias import SensitiveGroups
 

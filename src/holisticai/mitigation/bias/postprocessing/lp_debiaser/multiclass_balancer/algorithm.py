@@ -19,18 +19,18 @@ class MulticlassBalancerAlgorithm:
         ----------
         y_true : array-like of shape (n_samples,) or str
             The true labels, either as an array or as a string \
-            specifying a column in data. 
-        
+            specifying a column in data.
+
         y_pred : array-like of shape (n_samples,) or str
             The predicted labels, either as an array or as a string \
             specifying a column in data.
-        
+
         p_attr : array-like of shape (n_samples,) or str
             The protected attribute, either as an array, or as a string \
             specifying the column in data.
         """
 
-        assert y_pred is not None, f"y_pred must be passed"
+        assert y_pred is not None, "y_pred must be passed"
 
         # Getting the group info
         p_y = tools.p_vec(y_true)
@@ -92,7 +92,7 @@ class MulticlassBalancerAlgorithm:
         y~ : ndarray of shape (n_samples,)
             The adjusted binary predictions.
         """
-        assert y_pred is not None, f"y_pred must be passed"
+        assert y_pred is not None, "y_pred must be passed"
 
         pd.options.mode.chained_assignment = None
         y_tilde = y_pred.copy()

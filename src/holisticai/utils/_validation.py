@@ -1,8 +1,9 @@
-# Base Imports
-import warnings
+import logging
 
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
 def _check_same_shape(list_of_arr, names=""):
@@ -31,8 +32,8 @@ def _check_same_shape(list_of_arr, names=""):
             n = len(np.unique([x.shape[i] for x in list_of_arr]))
             if n > 1:
                 raise ValueError(names + " do not all have the same shape.")
-        except:
-            raise ValueError(names + " do not all have the same shape.")
+        except ValueError as e:
+            raise ValueError(names + " do not all have the same shape.") from e
 
 
 def _check_non_empty(arr, name="", quantile=0):
@@ -59,7 +60,7 @@ def _check_non_empty(arr, name="", quantile=0):
     """
     num_a = arr.sum()
     if num_a == 0:
-        warnings.warn(name + " has no members at quantile " + str(quantile))
+        logger.warning(f"{name} has no members at quantile {quantile}")
 
 
 def _check_classes_input(classes, y_pred, y_true=None):
@@ -223,14 +224,11 @@ def _array_like_to_numpy(arr, name=""):
         out = np.squeeze(np.asarray(arr))
         if len(out.shape) == 1:
             return out
-        else:
-            raise ValueError
-    except:
-        msg = (
-            f"input {name} is not array-like. This includes numpy 1d arrays, lists,\
+        raise ValueError
+    except TypeError as e:
+        msg = f"input {name} is not array-like. This includes numpy 1d arrays, lists,\
             pandas Series or pandas 1d DataFrame"
-        )
-        raise TypeError(msg)
+        raise TypeError(msg) from e
 
 
 def _matrix_like_to_numpy(arr, name=""):
@@ -251,45 +249,43 @@ def _matrix_like_to_numpy(arr, name=""):
     -------
     numpy array or TypeError
     """
+    num_dimensions = 2
     try:
         out = np.squeeze(np.asarray(arr))
-        if len(out.shape) == 2:
+        if len(out.shape) == num_dimensions:
             return out
-        else:
-            raise ValueError
-    except:
-        msg = (
-            f"input {name} is not matrix-like. This includes numpy 2d arrays, list of lists \
+        raise ValueError
+    except TypeError as e:
+        msg = f"input {name} is not matrix-like. This includes numpy 2d arrays, list of lists \
                 or pandas 2d DataFrame"
-        )
-        raise TypeError(msg)
+        raise TypeError(msg) from e
 
 
-def _matrix_like_to_dataframe(arr, name=""):
+def _matrix_like_to_dataframe(arr, name=""):  # noqa: ARG001
+    num_dimensions = 2
     try:
         out = np.squeeze(np.asarray(arr))
-        if len(out.shape) == 2:
+        if len(out.shape) == num_dimensions:
             columns = [f"Feature {f}" for f in range(out.shape[1])]
             return pd.DataFrame(out, columns=columns)
-        else:
-            msg = "input is not matrix-like."
-            raise ValueError(msg)
-    except:
-        msg = "input is not matrix-like."
-        raise TypeError(msg)
+        ValueError("input is not matrix-like.")
+    except TypeError as e:
+        raise TypeError("input is not matrix-like.") from e
 
 
-def _array_like_to_series(arr, name=""):
+def _array_like_to_series(arr, name=""):  # noqa: ARG001
+    num_dimensions = 1
+
+    def raise_value_error():
+        raise ValueError("input is not array-like.")
+
     try:
         out = np.squeeze(np.asarray(arr))
-        if len(out.shape) == 1:
+        if len(out.shape) == num_dimensions:
             return pd.Series(out)
-        else:
-            msg = "input is not array-like."
-            raise ValueError(msg)
-    except:
-        msg = "input is not array-like."
-        raise TypeError(msg)
+        raise_value_error()
+    except TypeError as e:
+        raise TypeError("input is not array-like.") from e
 
 
 def _coerce_and_check_arr(arr, name="input"):
@@ -400,9 +396,7 @@ def _classification_checks(group_a, group_b, y_pred, y_true=None):
         _check_same_shape([group_a, group_b, y_pred], names="group_a, group_b, y_pred")
     else:
         y_true = _coerce_and_check_binary_group(y_true, name="y_true")
-        _check_same_shape(
-            [group_a, group_b, y_pred, y_true], names="group_a, group_b, y_pred, y_true"
-        )
+        _check_same_shape([group_a, group_b, y_pred, y_true], names="group_a, group_b, y_pred, y_true")
 
     return group_a, group_b, y_pred, y_true
 
@@ -428,9 +422,7 @@ def _regression_checks(group_a, group_b, y_pred, y_true=None, q=None):
         _check_same_shape([group_a, group_b, y_pred], names="group_a, group_b, y_pred")
     else:
         y_true = _coerce_and_check_arr(y_true, name="y_true")
-        _check_same_shape(
-            [group_a, group_b, y_pred, y_true], names="group_a, group_b, y_pred, y_true"
-        )
+        _check_same_shape([group_a, group_b, y_pred, y_true], names="group_a, group_b, y_pred, y_true")
 
     if q is not None:
         q = np.atleast_1d(np.array(q).squeeze())
@@ -441,9 +433,7 @@ def _regression_checks(group_a, group_b, y_pred, y_true=None, q=None):
     return group_a, group_b, y_pred, y_true, q
 
 
-def _clustering_checks(
-    group_a, group_b, y_pred, y_true=None, data=None, centroids=None
-):
+def _clustering_checks(group_a, group_b, y_pred, y_true=None, data=None, centroids=None):
     """
     Clustering checks
 
@@ -475,9 +465,7 @@ def _clustering_checks(
 
     if centroids is not None and data is not None and data.shape[1] != centroids.shape[1]:
         msg = "data and centroids datapoints do not have same dimensionality"
-        raise ValueError(
-            msg
-        )
+        raise ValueError(msg)
 
     return group_a, group_b, y_pred, y_true, data, centroids
 
@@ -527,9 +515,7 @@ def _recommender_checks(
     return group_a, group_b, mat_pred, mat_true, top, thresh, normalize
 
 
-def _multiclass_checks(
-    p_attr=None, y_pred=None, y_true=None, groups=None, classes=None
-):
+def _multiclass_checks(p_attr=None, y_pred=None, y_true=None, groups=None, classes=None):
     """
     Multiclass checks
 
@@ -595,9 +581,7 @@ def _check_valid_y_proba(y_proba: np.ndarray):
     ), f"""probability must sum to 1 across the possible classes, found: {sum_all_probs}"""
 
     correct_proba_values = np.all(y_proba <= 1) and np.all(y_proba >= 0)
-    assert (
-        correct_proba_values
-    ), f"""probability values must be in the interval [0,1], found: {y_proba}"""
+    assert correct_proba_values, f"""probability values must be in the interval [0,1], found: {y_proba}"""
 
 
 def _check_numerical_dataframe(df: pd.DataFrame):
@@ -620,9 +604,8 @@ def _check_numerical_dataframe(df: pd.DataFrame):
     """
     try:
         return df.astype(float)
-    except ValueError:
-        msg = "DataFrame cannot be converted to numerical values"
-        raise ValueError(msg)
+    except ValueError as e:
+        raise ValueError("DataFrame cannot be converted to numerical values") from e
 
 
 def _check_columns(df: pd.DataFrame, column: str):

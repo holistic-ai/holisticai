@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
@@ -11,13 +12,14 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from holisticai.metrics.bias import average_odds_diff, statistical_parity
 from holisticai.utils._validation import _check_same_shape
-
-from .utils_fairea import (
+from holisticai.utils.trade_off_analysers.utils_fairea import (
     do_line_segments_intersect,
     get_area,
     get_baseline_bounds,
     line,
 )
+
+logger = logging.getLogger(__name__)
 
 METRICS = {
     "acc": accuracy_score,
@@ -81,10 +83,10 @@ class Fairea:
         self.acc_fn = METRICS[acc_metric]
         self.fair_fn = METRICS[fair_metric]
         self.fair_metric = fair_metric
-        self.methods = dict()
-        self.normalized_methods = dict()
+        self.methods = {}
+        self.normalized_methods = {}
         self.best = None
-        self.mitigation_regions = dict()
+        self.mitigation_regions = {}
 
     def create_baseline(
         self,
@@ -95,8 +97,8 @@ class Fairea:
         test_size=0.3,
         data_splits=10,
         repetitions=10,
-        odds={"0": [1, 0], "1": [0, 1]},
-        options=[0, 1],
+        odds={"0": [1, 0], "1": [0, 1]},  # noqa: B006
+        options=[0, 1],  # noqa: B006
         degrees=10,
     ):
         """
@@ -188,8 +190,8 @@ class Fairea:
         test_size=0.3,
         data_splits=10,
         repetitions=10,
-        odds={"0": [1, 0], "1": [0, 1]},
-        options=[0, 1],
+        odds={"0": [1, 0], "1": [0, 1]},  # noqa: B006
+        options=[0, 1],  # noqa: B006
         degrees=10,
     ):
         """
@@ -225,18 +227,18 @@ class Fairea:
         """
         n_samples = int(x.shape[0] * test_size)
 
-        ids = [x for x in range(n_samples)]
-        l = n_samples
+        ids = list(range(n_samples))
 
         results = defaultdict(lambda: defaultdict(list))
 
         for s in range(data_splits):
             if self.verbose:
-                print("Current datasplit:", s)
+                logger.info("Current datasplit: {s}")
+
             np.random.seed(s)
             (
-                X_train,
-                X_test,
+                x_train,
+                x_test,
                 y_train,
                 y_test,
                 _,
@@ -248,15 +250,15 @@ class Fairea:
             pipe = Pipeline([("scaler", StandardScaler()), ("clf", LogisticRegression())])
 
             # Fit the pipeline and make predictions
-            pipe.fit(X_train, y_train)
-            pred = pipe.predict(X_test).reshape(-1, 1)
+            pipe.fit(x_train, y_train)
+            pred = pipe.predict(x_test).reshape(-1, 1)
 
             degrees_ = np.linspace(0, 1, degrees + 1)
 
             # Mutate labels for each degree
             for degree in degrees_:
                 # total number of labels to mutate
-                to_mutate = int(l * degree)
+                to_mutate = int(n_samples * degree)
 
                 for name, o in odds.items():
                     # Store each mutation attempt
@@ -410,10 +412,6 @@ class Fairea:
         ax.legend(loc="best")
         return ax
 
-    def __check_none(self, p):
-        if any(x is None for x in p):
-            return True
-
     def determine_region(self, p, fairness_norm, acc_norm):
         """
         Determines the region of the model.
@@ -510,8 +508,8 @@ class Fairea:
         """
         if self.best is None:
             methods = [v for _, v in self.mitigation_regions.items() if v == "win-win"]
-            if all([method == "win-win" for method in methods]):
-                print("You can choose one of the win-win methods")
+            if all(method == "win-win" for method in methods):
+                logger.warning("You can choose one of the win-win methods")
             else:
-                print("There are not good methods, consider using a different fairness metric")
+                logger.warning("There are not good methods, consider using a different fairness metric")
         return self.best

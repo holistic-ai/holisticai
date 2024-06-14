@@ -1,8 +1,6 @@
 from typing import Optional, Union
 
 import numpy as np
-from sklearn.base import BaseEstimator
-
 from holisticai.mitigation.bias.commons.fairlet_clustering.decompositions import (
     DecompositionMixin,
     ScalableFairletDecomposition,
@@ -13,6 +11,7 @@ from holisticai.mitigation.bias.inprocessing.fairlet_clustering.algorithm import
 )
 from holisticai.utils.models.cluster import KCenters, KMedoids
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
+from sklearn.base import BaseEstimator
 
 DECOMPOSITION_CATALOG = {
     "Scalable": ScalableFairletDecomposition,
@@ -24,7 +23,7 @@ CLUSTERING_CATALOG = {"KCenters": KCenters, "KMedoids": KMedoids}
 class FairletClustering(BaseEstimator, BMImp):
     """Fairlet Clustering
 
-    Fairlet Clustering inprocessing bias mitigation works in two steps: 
+    Fairlet Clustering inprocessing bias mitigation works in two steps:
     (1) The pointset is partitioned into subsets called fairlets that satisfy
     the fairness requirement and approximately preserve the k-median objective.
     (2) Fairlets are merged into k clusters by one of the existing k-median algorithms.

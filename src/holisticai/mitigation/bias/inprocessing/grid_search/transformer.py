@@ -1,9 +1,8 @@
-from typing import Literal, Optional
+from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, clone
-
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
+from sklearn.base import BaseEstimator, clone
 
 from ..commons.classification import _constraints as cc
 from ..commons.regression import _constraints as rc
