@@ -2,7 +2,6 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 from holisticai.utils.transformers.bias import SensitiveGroups
 
@@ -20,7 +19,7 @@ class Reweighing(BMPre):
     ----------
     sens_groups : SensitiveGroups
         SensitiveGroups object
-    
+
     Methods
     -------
     fit(y_true, group_a, group_b, sample_weight)

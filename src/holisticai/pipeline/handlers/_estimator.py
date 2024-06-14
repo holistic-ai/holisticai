@@ -33,16 +33,13 @@ class WEstimator:
                 if y is not None:
                     fit_params.update({"y": y})
                 fit_params.update(kargs)
-                return getattr(object.__getattribute__(self, "obj"), name)(
-                    X, **fit_params
-                )
+                return getattr(object.__getattribute__(self, "obj"), name)(X, **fit_params)
 
             output = fitwrapper
+        elif hasattr(object.__getattribute__(self, "obj"), name):
+            output = getattr(object.__getattribute__(self, "obj"), name)
         else:
-            if hasattr(object.__getattribute__(self, "obj"), name):
-                output = getattr(object.__getattribute__(self, "obj"), name)
-            else:
-                output = object.__getattribute__(self, name)
+            output = object.__getattribute__(self, name)
         return output
 
 

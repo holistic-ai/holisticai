@@ -78,7 +78,7 @@ def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
     return pd.DataFrame(confmat, columns=classes).set_index(np.array(classes))
 
 
-def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tensor=False):  # noqa: FBT002
+def confusion_tensor(p_attr, y_pred, y_true, groups=None, classes=None, as_tensor=False):
     """Confusion Tensor
 
     This function computes the confusion tensor. The k, i, jth\

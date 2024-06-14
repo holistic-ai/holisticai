@@ -31,7 +31,6 @@ class ParametersHandler:
                     dropped_params[name] = value
 
         elif self.param_names:
-
             for name, value in params.items():
                 if name in self.param_names:
                     param_name = name.split("__", 1)[1]
@@ -41,13 +40,12 @@ class ParametersHandler:
 
         if return_dropped:
             return dropped_params
+        return None
 
 
 class PipelineParametersHandler:
     def __init__(self):
-        self.bias_mitigator = ParametersHandler(
-            param_names=["bm__group_a", "bm__group_b"]
-        )
+        self.bias_mitigator = ParametersHandler(param_names=["bm__group_a", "bm__group_b"])
 
     def create_estimator_parameters(self, estimator_name, estimator):
         self.estimator = ParametersHandler(step_name=estimator_name)

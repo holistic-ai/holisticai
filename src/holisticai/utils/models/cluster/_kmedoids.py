@@ -1,11 +1,12 @@
-import warnings
+import logging
 
 import numpy as np
-from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics.pairwise import pairwise_distances, pairwise_distances_argmin
 from sklearn.utils import check_array, check_random_state
 from sklearn.utils.extmath import stable_cumsum
 from sklearn.utils.validation import check_is_fitted
+
+logger = logging.getLogger(__name__)
 
 
 class KMedoids:
@@ -85,14 +86,9 @@ class KMedoids:
 
     def _check_nonnegative_int(self, value, desc, strict=True):
         """Validates if value is a valid integer > 0"""
-        if strict:
-            negative = (value is None) or (value <= 0)
-        else:
-            negative = (value is None) or (value < 0)
+        negative = value is None or value <= 0 if strict else value is None or value < 0
         if negative or not isinstance(value, (int, np.integer)):
-            raise ValueError(
-                "%s should be a nonnegative integer. " "%s was given" % (desc, value)
-            )
+            raise ValueError(f"{desc} should be a nonnegative integer. " f"{value} was given")
 
     def _check_init_args(self):
         """Validates the input arguments."""
@@ -104,11 +100,9 @@ class KMedoids:
         # Check init
         init_methods = ["random", "heuristic", "k-medoids++", "build"]
         if self.init not in init_methods:
-            raise ValueError(
-                "init needs to be one of " + "the following: " + "%s" % init_methods
-            )
+            raise ValueError("init needs to be one of " + "the following: " + f"{init_methods}")
 
-    def fit(self, X, y=None, sample_weight=None):
+    def fit(self, X, y=None, sample_weight=None):  # noqa: ARG002
         """Fit K-Medoids to the provided data.
 
         Parameters
@@ -126,14 +120,14 @@ class KMedoids:
         random_state_ = check_random_state(self.random_state)
 
         self._check_init_args()
-        X = check_array(X, accept_sparse=["csr", "csc"])
+        X = check_array(X, accept_sparse=["csr", "csc"])  # noqa: N806
         if self.n_clusters > X.shape[0]:
             raise ValueError(
                 "The number of medoids (%d) must be less "
                 "than the number of samples %d." % (self.n_clusters, X.shape[0])
             )
 
-        D = pairwise_distances(X, metric=self.metric)
+        D = pairwise_distances(X, metric=self.metric)  # noqa: N806
         medoid_idxs = self._initialize_medoids(D, self.n_clusters, random_state_)
         labels = None
 
@@ -141,7 +135,7 @@ class KMedoids:
         # the medoids keep changing and the maximum number
         # of iterations is not exceeded
 
-        for self.n_iter_ in range(0, self.max_iter):
+        for self.n_iter_ in range(self.max_iter):  # noqa: B020
             old_medoid_idxs = np.copy(medoid_idxs)
             labels = np.argmin(D[medoid_idxs, :], axis=0)
 
@@ -150,12 +144,11 @@ class KMedoids:
 
             if np.all(old_medoid_idxs == medoid_idxs):
                 break
-            elif self.n_iter_ == self.max_iter - 1:
-                warnings.warn(
+            if self.n_iter_ == self.max_iter - 1:
+                logger.warning(
                     "Maximum number of iteration reached before "
                     "convergence. Consider increasing max_iter to "
-                    "improve the fit.",
-                    ConvergenceWarning,
+                    "improve the fit."
                 )
 
         # Set the resulting instance variables.
@@ -187,12 +180,12 @@ class KMedoids:
             cluster_k_idxs = np.where(labels == k)[0]
 
             if len(cluster_k_idxs) == 0:
-                warnings.warn(
-                    "Cluster {k} is empty! "
-                    "self.labels_[self.medoid_indices_[{k}]] "
-                    "may not be labeled with "
-                    "its corresponding cluster ({k}).".format(k=k)
+                message = (
+                    f"Cluster {k} is empty! "
+                    f"self.labels_[self.medoid_indices_[{k}]] "
+                    f"may not be labeled with its corresponding cluster ({k})."
                 )
+                logger.warning(message)
                 continue
 
             in_cluster_distances = D[cluster_k_idxs, cluster_k_idxs[:, np.newaxis]]
@@ -205,9 +198,7 @@ class KMedoids:
 
             min_cost_idx = np.argmin(in_cluster_all_costs)
             min_cost = in_cluster_all_costs[min_cost_idx]
-            curr_cost = in_cluster_all_costs[
-                np.argmax(cluster_k_idxs == medoid_idxs[k])
-            ]
+            curr_cost = in_cluster_all_costs[np.argmax(cluster_k_idxs == medoid_idxs[k])]
 
             # Adopt a new medoid if its distance is smaller then the current
             if min_cost < curr_cost:
@@ -231,16 +222,15 @@ class KMedoids:
         X_new : {array-like, sparse matrix}, shape=(n_query, n_clusters)
             X transformed in the new space of distances to cluster centers.
         """
-        X = check_array(X, accept_sparse=["csr", "csc"])
+        X = check_array(X, accept_sparse=["csr", "csc"])  # noqa: N806
 
         if self.metric == "precomputed":
             check_is_fitted(self, "medoid_indices_")
             return X[:, self.medoid_indices_]
-        else:
-            check_is_fitted(self, "cluster_centers_")
+        check_is_fitted(self, "cluster_centers_")
 
-            Y = self.cluster_centers_
-            return pairwise_distances(X, Y=Y, metric=self.metric)
+        Y = self.cluster_centers_  # noqa: N806
+        return pairwise_distances(X, Y=Y, metric=self.metric)
 
     def predict(self, X):
         """Predict the closest cluster for each sample in X.
@@ -256,19 +246,17 @@ class KMedoids:
         labels : array, shape = (n_query,)
             Index of the cluster each sample belongs to.
         """
-        X = check_array(X, accept_sparse=["csr", "csc"])
+        X = check_array(X, accept_sparse=["csr", "csc"])  # noqa: N806
 
         if self.metric == "precomputed":
             check_is_fitted(self, "medoid_indices_")
             return np.argmin(X[:, self.medoid_indices_], axis=1)
-        else:
-            check_is_fitted(self, "cluster_centers_")
 
-            # Return data points to clusters based on which cluster assignment
-            # yields the smallest distance
-            return pairwise_distances_argmin(
-                X, Y=self.cluster_centers_, metric=self.metric
-            )
+        check_is_fitted(self, "cluster_centers_")
+
+        # Return data points to clusters based on which cluster assignment
+        # yields the smallest distance
+        return pairwise_distances_argmin(X, Y=self.cluster_centers_, metric=self.metric)
 
     def _compute_inertia(self, distances):
         """Compute inertia of new samples. Inertia is defined as the sum of the
@@ -286,9 +274,7 @@ class KMedoids:
 
         # Define inertia as the sum of the sample-distances
         # to closest cluster centers
-        inertia = np.sum(np.min(distances, axis=1))
-
-        return inertia
+        return np.sum(np.min(distances, axis=1))
 
     def _initialize_medoids(self, D, n_clusters, random_state_):
         """Select initial mediods when beginning clustering."""

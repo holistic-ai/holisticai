@@ -4,7 +4,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from holisticai.pipeline import Pipeline
 from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics, recommender_bias_metrics
-from tests.bias.mitigation.testing_utils.utils import (
+from tests.bias.mitigation.utils import (
     check_results,
     categorical_dataset,
     regression_dataset,

@@ -94,7 +94,7 @@ class SparseList(list):
         str
             A string representation of the SparseList.
         """
-        return "<SparseList {}>".format(self.vals)
+        return f"<SparseList {self.vals}>"
 
     def append(self, val):
         """

@@ -1,5 +1,5 @@
 import pandas as pd
-import scipy.stats as stats
+from scipy import stats
 
 
 class MTableGenerator:
@@ -20,7 +20,7 @@ class MTableGenerator:
         if k < 1:
             raise ValueError("Parameter k must be at least 1")
         elif k > self.k:
-            raise ValueError("Parameter k must be at most {0}".format(self.k))
+            raise ValueError(f"Parameter k must be at most {self.k}")
 
         result = stats.binom.ppf(self.alpha, k, self.p)
         return 0 if result < 0 else result
@@ -32,7 +32,7 @@ class MTableGenerator:
         mtable = pd.DataFrame(columns=["m"])
         for i in range(1, self.k + 1):
             if i % 2000 == 0:
-                print("Computing m: {:.0f} of {:.0f}".format(i, self.k))
+                print(f"Computing m: {i:.0f} of {self.k:.0f}")
             mtable.loc[i] = [self.m(i)]
         return mtable
 
@@ -49,7 +49,7 @@ def compute_aux_mtable(mtable):
     last_position = 0
     for position in range(1, len(mtable)):
         if position % 2000 == 0:
-            print("Computing m inverse: {:.0f} of {:.0f}".format(position, len(mtable)))
+            print(f"Computing m inverse: {position:.0f} of {len(mtable):.0f}")
         if mtable.at[position, "m"] == last_m_seen + 1:
             last_m_seen += 1
             aux_mtable.loc[position] = [position, position - last_position]

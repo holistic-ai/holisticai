@@ -3,7 +3,6 @@ import sys
 
 sys.path.append(os.getcwd())
 import numpy as np
-
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 from .algorithm_utils import f_lambda

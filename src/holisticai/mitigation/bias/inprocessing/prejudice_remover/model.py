@@ -1,8 +1,5 @@
 import numpy as np
-import pandas as pd
 from sklearn.linear_model import LogisticRegression
-
-from .losses import PRBinaryCrossEntropy
 
 EPSILON = 1.0e-10
 SIGMOID_RANGE = np.log((1.0 - EPSILON) / EPSILON)

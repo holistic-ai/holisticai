@@ -1,9 +1,7 @@
 # Base Imports
 import numpy as np
-import pandas as pd
-from sklearn import metrics
 
-from ._validation import _array_like_to_numpy
+from holisticai.utils._validation import _array_like_to_numpy
 
 
 def extract_columns(df, cols):
@@ -25,10 +23,7 @@ def extract_columns(df, cols):
     -------
     list of numpy arrays
     """
-    out = []
-    for c in cols:
-        out.append(df[c].to_numpy())
-    return out
+    return [df[c].to_numpy() for c in cols]
 
 
 def extract_group_vectors(p_attr, groups):
@@ -52,10 +47,7 @@ def extract_group_vectors(p_attr, groups):
     list of membership vectors
     """
     p_attr = _array_like_to_numpy(p_attr)
-    out = []
-    for g in groups:
-        out.append(p_attr == g)
-    return out
+    return [p_attr == g for g in groups]
 
 
 def mat_to_binary(mat, top=None, thresh=0.5):
@@ -166,14 +158,10 @@ def slice_arrays_by_quantile(q, scores, arr_ls):
     top = np.quantile(scores, q)
     top_ind = scores.reshape(1, -1) >= top.reshape(-1, 1)
 
-    sliced_arrays = [[arr[i] for i in top_ind] for arr in arr_ls]
-
-    return sliced_arrays
+    return [[arr[i] for i in top_ind] for arr in arr_ls]
 
 
-def recommender_formatter(
-    df, users_col, groups_col, items_col, scores_col, aggfunc="sum"
-):
+def recommender_formatter(df, users_col, groups_col, items_col, scores_col, aggfunc="sum"):
     """
     Recommender formatter
 
@@ -205,9 +193,7 @@ def recommender_formatter(
         df_pivot, p_attr
     """
     # pivot dataframe on users and items
-    df_pivot = df.pivot_table(
-        index=users_col, columns=items_col, values=scores_col, aggfunc=aggfunc
-    )
+    df_pivot = df.pivot_table(index=users_col, columns=items_col, values=scores_col, aggfunc=aggfunc)
     # we need to get group info for each user
     user_to_group = dict(zip(df[users_col], df[groups_col]))
     p_attr = np.array(df_pivot.index.map(user_to_group))

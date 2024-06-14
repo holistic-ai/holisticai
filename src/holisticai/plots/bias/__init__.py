@@ -1,6 +1,7 @@
 """
 The :mod:`holisticai.plots.bias` module includes bias plotters.
 """
+
 # Classification Plots
 # Exploratory plots
 # Multiclass Plots

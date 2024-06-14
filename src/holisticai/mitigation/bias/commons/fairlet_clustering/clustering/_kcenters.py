@@ -1,11 +1,9 @@
-import random
 
 import numpy as np
-
 from holisticai.mitigation.bias.commons.fairlet_clustering._utils import distance
 
 
-class KCenters(object):
+class KCenters:
     """
     K-Centers algorithm for clustering.
 
@@ -61,7 +59,7 @@ class KCenters(object):
 
         while True:
             # Remaining points in the data set
-            rem_points = list(set(range(0, len(self.data))) - set(self.centers))
+            rem_points = list(set(range(len(self.data))) - set(self.centers))
 
             # Finding the point which has the closest center most far-off
             point_center = [(i, min([distance(self.data[i], self.data[j]) for j in self.centers])) for i in rem_points]
@@ -76,7 +74,6 @@ class KCenters(object):
 
         self.cluster_centers_ = [self.data[j] for j in self.centers]
         self.labels = self.assign()
-        return
 
     def assign(self):
         """

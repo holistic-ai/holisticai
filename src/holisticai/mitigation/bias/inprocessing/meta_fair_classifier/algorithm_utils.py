@@ -1,5 +1,4 @@
 import numpy as np
-
 from holisticai.mitigation.bias.inprocessing.commons import Logging
 
 

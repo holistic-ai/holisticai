@@ -1,11 +1,8 @@
 ### The MATLAB module does not work with python 3.7.0. Use 3.6.0 release or older.
 
-import sys
-import time
 from collections import defaultdict
 
 import numpy as np
-
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 EPSILON = 0.0001
@@ -296,7 +293,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
 
 def build_quadtree(dataset, max_levels=0, random_shift=True):
     """
-    Builds a quadtree for the given dataset. If max_levels=0 there no level limit, 
+    Builds a quadtree for the given dataset. If max_levels=0 there no level limit,
     quadtree will partition until all clusters are singletons
 
     Parameters

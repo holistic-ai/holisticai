@@ -7,7 +7,7 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 
 class CalibratedEqualizedOdds(BMPost):
-    """
+    r"""
     Calibrated equalized odds postprocessing optimizes over calibrated classifier score outputs to find
     probabilities with which to change output labels with an equalized odds objective.
     References:

@@ -1,4 +1,3 @@
-from time import time
 
 import numpy as np
 import pandas as pd
@@ -140,7 +139,7 @@ class Lagrangian:
         dual_bounds = [
             (None, None) if i == n_constraints else (0, None)
             for i in range(n_constraints + 1)
-        ]  # noqa: E501
+        ]
         result_dual = opt.linprog(
             dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds, method="simplex"
         )
@@ -162,7 +161,7 @@ class Lagrangian:
         sample_weight = self.constraints.total_samples * w / w.sum()
 
         estimator = clone(estimator=self.estimator, safe=False)
-        estimator.fit(self.constraints.X, y, **{"sample_weight": sample_weight})
+        estimator.fit(self.constraints.X, y, sample_weight=sample_weight)
         return estimator
 
     def best_h(self, lambda_vec):

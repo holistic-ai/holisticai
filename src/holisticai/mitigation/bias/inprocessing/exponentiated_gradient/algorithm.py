@@ -109,7 +109,7 @@ class ExponentiatedGradientAlgorithm:
         last_regret_checked = REGRET_CHECK_START_T
         last_gap = np.PINF
         self.monitor.max_iter = self.max_iter
-        for t in range(0, self.max_iter):
+        for t in range(self.max_iter):
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())

@@ -1,17 +1,16 @@
 from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator
-
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
+from sklearn.base import BaseEstimator
 
 from .algorithm import KMediamClusteringAlgorithm
 
 
 class FairKMedianClustering(BaseEstimator, BMImp):
     """Fair K-Median Clustering
-    
+
     Fair K-median clustering inprocessing bias mitigation is an approximation algorithms for
     group representative k-median clustering. Implementation of Algorithm 2. from [1]. The
     algorithm reduces the max group cost function.

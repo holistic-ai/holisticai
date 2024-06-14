@@ -6,8 +6,8 @@ import seaborn as sns
 from holisticai.metrics.bias import confusion_matrix
 
 # utils
-from ...utils import get_colors
-from ...utils._validation import (
+from holisticai.utils import get_colors
+from holisticai.utils._validation import (
     _check_columns,
     _check_numerical_dataframe,
     _regression_checks,
@@ -45,11 +45,11 @@ def group_pie_plot(y_feat, ax=None, size=None, title=None):
         raise TypeError("input is not a numpy array or pandas series")
 
     # calculations
-    n_b = np.sum(value_counts / np.sum(value_counts) > 0.02)
+    n_b = np.sum(value_counts / np.sum(value_counts) > 0.02)  # noqa: PLR2004
     n_nb = len(value_counts) - n_b
     if n_nb > 0 and n_b > 0:
-        labels = list(labels[:n_b]) + ["Others"]
-        value_counts = list(value_counts[:n_b]) + [np.sum(value_counts[n_b:])]
+        labels = [*list(labels[:n_b]), "Others"]
+        value_counts = [*list(value_counts[:n_b]), np.sum(value_counts[n_b:])]
 
     # setup
     sns.set()
@@ -95,9 +95,7 @@ def _group_confusion_matrices(group_a, group_b, y_pred, y_true, size=None, title
     matplotlib ax
     """
     # check and coerce
-    group_a, group_b, y_pred, y_true, _ = _regression_checks(
-        group_a, group_b, y_pred, y_true, None
-    )
+    group_a, group_b, y_pred, y_true, _ = _regression_checks(group_a, group_b, y_pred, y_true, None)
 
     # Calculating confusion matrices
     a_indices = group_a == 1
@@ -198,12 +196,7 @@ def distribution_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     # charting
     colors = get_colors(len(np.unique(p_attr)), extended_colors=True)
     hai_palette = sns.color_palette(colors)
-    ax = sns.kdeplot(
-        x=y_feat, hue=p_attr, fill=True, palette=hai_palette, common_norm=False, ax=ax
-    )
-
-    # return
-    return ax
+    return sns.kdeplot(x=y_feat, hue=p_attr, fill=True, palette=hai_palette, common_norm=False, ax=ax)
 
 
 def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
@@ -264,9 +257,7 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     return ax
 
 
-def correlation_matrix_plot(
-    df, target_feature, n_features=10, cmap="YlGnBu", ax=None, size=None, title=None
-):
+def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu", ax=None, size=None, title=None):
     """Plot the correlation matrix of a given dataframe with respect to
     a given target and a certain number of features.
 

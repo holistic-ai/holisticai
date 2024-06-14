@@ -1,11 +1,10 @@
 from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator
-from sklearn.metrics.pairwise import pairwise_distances, pairwise_distances_argmin
-
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
+from sklearn.base import BaseEstimator
+from sklearn.metrics.pairwise import pairwise_distances, pairwise_distances_argmin
 
 from .algorithms import (
     fair_k_center_APPROX,

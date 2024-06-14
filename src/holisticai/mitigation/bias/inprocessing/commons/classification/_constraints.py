@@ -204,7 +204,7 @@ class DemographicParity(ClassificationConstraint):
 
     A classifier :math:`h(X)` satisfies demographic parity if
 
-      P[h(X) = 1 | A = a] = P[h(X) = 1] \; \forall a
+      P[h(X) = 1 | A = a] = P[h(X) = 1] \\; \forall a
 
     - base_event : defines a single event, `ALL`.
     - event_prob : will record only the probability 1.
@@ -226,7 +226,7 @@ class EqualizedOdds(ClassificationConstraint):
 
     A classifier :math:`h(X)` satisfies equalized odds if
     .. math::
-       P[h(X) = 1 | A = a, Y = y] = P[h(X) = 1 | Y = y] \; \forall a, y
+       P[h(X) = 1 | A = a, Y = y] = P[h(X) = 1 | Y = y] \\; \forall a, y
 
     - base_event: defines the event corresponding to unique value in the `Y` array.
     - event_prob: will record the fraction of the samples corresponding to each unique value in
@@ -249,7 +249,7 @@ class TruePositiveRateParity(ClassificationConstraint):
 
     A classifier :math:`h(X)` satisfies true positive rate parity if
     .. math::
-       P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \; \forall a
+       P[h(X) = 1 | A = a, Y = 1] = P[h(X) = 1 | Y = 1] \\; \forall a
 
     - base_event: defines the event corresponding to Y = 1 .
     - event_prob: will record the fraction of the samples corresponding to `Y = 1` in the `Y` array.
@@ -271,7 +271,7 @@ class FalsePositiveRateParity(ClassificationConstraint):
 
     A classifier :math:`h(X)` satisfies false positive rate parity if
     .. math::
-       P[h(X) = 1 | A = a, Y = 0] = P[h(X) = 1 | Y = 0] \; \forall a
+       P[h(X) = 1 | A = a, Y = 0] = P[h(X) = 1 | Y = 0] \\; \forall a
 
     - base_event: defines the event corresponding to Y = 0 .
     - event_prob: will record the fraction of the samples corresponding to `Y = 0` in the `Y` array.
@@ -293,7 +293,7 @@ class ErrorRateParity(ClassificationConstraint):
 
     A classifier :math:`h(X)` satisfies error rate parity if
     .. math::
-       P[h(X) \ne Y | A = a] = P[h(X) \ne Y] \; \forall a
+       P[h(X) \ne Y | A = a] = P[h(X) \ne Y] \\; \forall a
 
     - base_event : defines a single event, `ALL`.
     - event_prob : will record only the probability 1.

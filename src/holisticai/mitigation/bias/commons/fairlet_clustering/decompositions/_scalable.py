@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 import numpy as np
-
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 from ._vanilla import VanillaFairletDecomposition
@@ -279,7 +278,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
 def build_quadtree(dataset, max_levels=0, random_shift=True):
     """
     If max_levels=0 there no level limit, quadtree will partition until all clusters are singletons
-    
+
     Parameters
     ----------
     dataset : np.ndarray
@@ -288,7 +287,7 @@ def build_quadtree(dataset, max_levels=0, random_shift=True):
         Maximum depth of the quadtree. Default is 0.
     random_shift : bool, optional
         Whether to randomly shift the dataset. Default is True.
-        
+
     Returns
     -------
     TreeNode

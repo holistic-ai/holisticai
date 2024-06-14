@@ -1,5 +1,4 @@
 import numpy as np
-
 from holisticai.mitigation.bias.commons.disparate_impact_remover._numerical_repairer import (
     NumericalRepairer,
 )
@@ -144,7 +143,7 @@ class DisparateImpactRemover(BMPre):
             mask vector
         group_b : array-like
             mask vector
-        
+
         Returns
         -------
         array-like

@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.metrics import f1_score, precision_score, recall_score
 
 # Formatting
-from . import mat_to_binary
+from holisticai.utils import mat_to_binary
 
 
 def avg_precision(mat_pred, mat_true, top=None, thresh=0.5):
@@ -166,9 +166,7 @@ def recommender_rmse(mat_pred, mat_true):
         Recommender RMSE
     """
     se_diff = (mat_pred - mat_true) ** 2
-    rmse_val = np.sqrt(np.nanmean(se_diff))
-
-    return rmse_val
+    return np.sqrt(np.nanmean(se_diff))
 
 
 def recommender_mae(mat_pred, mat_true):
@@ -195,9 +193,7 @@ def recommender_mae(mat_pred, mat_true):
         Recommender MAE
     """
     abs_diff = np.abs(mat_pred - mat_true)
-    mae_val = np.nanmean(abs_diff)
-
-    return mae_val
+    return np.nanmean(abs_diff)
 
 
 def entropy(p, q=None):
@@ -227,7 +223,6 @@ def entropy(p, q=None):
     if q is None:
         return -np.sum(np.where(p != 0, p * np.log(p), 0))
 
-    else:
-        q = np.array(q)
-        q = q / np.sum(q)
-        return np.sum(np.where(p != 0, p * np.log(p / q), 0))
+    q = np.array(q)
+    q = q / np.sum(q)
+    return np.sum(np.where(p != 0, p * np.log(p / q), 0))

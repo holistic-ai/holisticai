@@ -1,12 +1,11 @@
+from __future__ import annotations
+
 import random
-from typing import Optional
 
 import pandas as pd
 
 
-def generate_rankings(
-    M: Optional[int], k: Optional[int], p: Optional[float], return_p_attr=False, seed: Optional[int] = 42
-):
+def generate_rankings(M: int | None, k: int | None, p: float | None, return_p_attr=False, seed: int | None = 42):
     """
     Generates M rankings of k elements (candidates) using Yang-Stoyanovich process
 
@@ -32,10 +31,8 @@ def generate_rankings(
     rankings = []
     for m in range(M):
         for i in range(k):
-            is_protected = random.random() <= p
-            rankings.append(
-                {"X": m, "Y": k - i, "score": k - i, "protected": is_protected}
-            )
+            is_protected = random.random() <= p  # noqa: S311
+            rankings.append({"X": m, "Y": k - i, "score": k - i, "protected": is_protected})
 
     df = pd.DataFrame(rankings)
     if return_p_attr:

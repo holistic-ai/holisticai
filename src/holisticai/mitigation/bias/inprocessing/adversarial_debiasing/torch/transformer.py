@@ -2,7 +2,6 @@ from typing import Optional
 
 import numpy as np
 import torch
-
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
 

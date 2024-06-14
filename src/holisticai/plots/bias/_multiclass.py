@@ -75,32 +75,28 @@ def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
 
         return None
 
+    if ax is None:
+        fig, ax = plt.subplots(figsize=size)
+
+    sns.barplot(
+        x=sr_list.index.to_list(),
+        y=sr_list[name_classes[1]],
+        palette=hai_palette,
+        ax=ax,
+    )
+    ax.set_xlabel("Group")
+    ax.set_ylabel("Frequency")
+    _, labels = plt.xticks()
+    plt.setp(labels, rotation=45)
+    if title is not None:
+        ax.set_title(title)
     else:
+        ax.set_title(f"Frequency Plot (Class {name_classes[1]})")
 
-        if ax is None:
-            fig, ax = plt.subplots(figsize=size)
-
-        sns.barplot(
-            x=sr_list.index.to_list(),
-            y=sr_list[name_classes[1]],
-            palette=hai_palette,
-            ax=ax,
-        )
-        ax.set_xlabel("Group")
-        ax.set_ylabel("Frequency")
-        _, labels = plt.xticks()
-        plt.setp(labels, rotation=45)
-        if title is not None:
-            ax.set_title(title)
-        else:
-            ax.set_title(f"Frequency Plot (Class {name_classes[1]})")
-
-        return ax
+    return ax
 
 
-def statistical_parity_plot(
-    p_attr, y_pred, pos_label=1, compare_to=None, ax=None, size=None, title=None
-):
+def statistical_parity_plot(p_attr, y_pred, pos_label=1, compare_to=None, ax=None, size=None, title=None):
     """
     Statistical Parity Plot (Binary Classification).
 
@@ -142,9 +138,7 @@ def statistical_parity_plot(
 
     group_dict = dict(zip(groups, range(len(groups))))
     # get success rates.
-    sr_list = frequency_matrix(p_attr, y_pred * 1, groups=groups, normalize="group")[
-        pos_label
-    ].to_numpy()
+    sr_list = frequency_matrix(p_attr, y_pred * 1, groups=groups, normalize="group")[pos_label].to_numpy()
 
     # sort by success rate.
     sr_list_sorted, groups_sorted = zip(*sorted(zip(sr_list, groups), reverse=True))
@@ -183,9 +177,7 @@ def statistical_parity_plot(
     return ax
 
 
-def disparate_impact_plot(
-    p_attr, y_pred, pos_label=1, compare_to=None, ax=None, size=None, title=None
-):
+def disparate_impact_plot(p_attr, y_pred, pos_label=1, compare_to=None, ax=None, size=None, title=None):
     """
     Disparate Impact Plot (Binary Classification).
 
@@ -325,9 +317,7 @@ def frequency_matrix_plot(
     # compute frequency matrix
     colors = get_colors(10, extended_colors=True, reverse=reverse_colors)
     hai_palette = sns.color_palette(colors)
-    sr_mat = frequency_matrix(
-        p_attr, y_pred, groups=groups, classes=classes, normalize=normalize
-    )
+    sr_mat = frequency_matrix(p_attr, y_pred, groups=groups, classes=classes, normalize=normalize)
 
     # setup
     sns.set_theme()
