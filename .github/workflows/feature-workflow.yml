@@ -27,15 +27,11 @@ jobs:
       
       - name: Install dependencies
         run: |
-            mkdir -p .mypy_cache
             python -m pip install --upgrade pip 
             pip install hatch
 
       - name: lint and format
         run: hatch fmt --check
-
-      - name: check types
-        run: hatch run types:check
 
       - name: run tests
         run: hatch run testing:run

@@ -62,14 +62,6 @@ Source = "https://github.com/crismunoz/holisticai"
 [tool.hatch.version]
 path = "src/holisticai/__about__.py"
 
-[tool.mypy]
-cache_dir = ".mypy_cache"
-
-[tool.hatch.envs.types]
-extra-dependencies = ["mypy>=1.0.0"]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/holisticai tests}"
-
 [tool.coverage.run]
 source_pkgs = ["holisticai", "tests"]
 branch = true

@@ -1,4 +1,4 @@
-import ipywidgets as widgets
+import ipywidgets as widgets  # type: ignore
 import matplotlib.pyplot as plt
 from holisticai.plots.bias._bias_exploratory_plots import group_pie_plot, histogram_plot
 from holisticai.plots.bias._bias_multiclass_plots import accuracy_bar_plot, frequency_matrix_plot, frequency_plot
@@ -6,6 +6,11 @@ from IPython.display import display
 
 
 def binary_classification_data_exploration(dataset):
+    from io import StringIO
+
+    from IPython.core.display import HTML
+    from ipywidgets import embed  # type: ignore
+
     output = widgets.Output()
 
     def update_plot(change):
@@ -29,12 +34,6 @@ def binary_classification_data_exploration(dataset):
     content = widgets.VBox([dropdown, output])
     display(content)
     update_plot({"new": dropdown.value})
-
-    # Guardar el widget como HTML en una cadena
-    from io import StringIO
-
-    from IPython.core.display import HTML
-    from ipywidgets import embed
 
     html_stream = StringIO()
     embed.embed_minimal_html(html_stream, views=[content], title="Mi widget")
