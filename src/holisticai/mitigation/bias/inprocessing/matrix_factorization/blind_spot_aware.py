@@ -48,7 +48,7 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
 
     def __init__(
         self,
-        K: Optional[int] = 10,
+        K: int = 10,
         beta: Optional[float] = 0.002,
         steps: Optional[int] = 200,
         alpha: Optional[float] = 0.002,
@@ -62,7 +62,7 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
         self.K = K
         self.verbose = verbose
 
-    def fit(self, X: Optional[np.ndarray], **kargs):
+    def fit(self, X: np.ndarray, **kargs):
         """
         Fit model
 

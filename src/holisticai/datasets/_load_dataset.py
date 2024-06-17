@@ -48,7 +48,7 @@ def load_adult_dataset(protected_attribute: Literal["race", "sex"] | None = None
     return Dataset(X=x, y=y, **params)
 
 
-def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] | None = None):
+def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] = 'race1'):
     bunch = load_law_school()
     protected_attributes = ["race1", "gender"]
     output_variable = "bar"
@@ -56,17 +56,13 @@ def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] | No
     df = bunch["frame"]
     df = df.dropna()
     params = {}
-    if protected_attribute is None:
-        params["p_attr"] = df[protected_attributes]
+    if protected_attribute == "race1":
+        params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "white"), name="group_a")
+        params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "non-white"), name="group_b")
 
-    else:
-        if protected_attribute == "race1":
-            params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "white"), name="group_a")
-            params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "non-white"), name="group_b")
-
-        if protected_attribute == "gender":
-            params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_a")
-            params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
+    if protected_attribute == "gender":
+        params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_a")
+        params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
 
     y = df[output_variable]  # binary label vector
     y = y.map({"FALSE": 0, "TRUE": 1})
@@ -74,9 +70,8 @@ def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] | No
     return Dataset(X=x, y=y, **params)
 
 
-def load_student_multiclass_dataset():
+def load_student_multiclass_dataset(protected_attribute: Literal["sex", "address"]="sex"):
     output_column = "G3"
-    protected_attributes = ["sex", "address", "Mjob", "Fjob"]
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
     bunch = load_student()
     df = bunch["frame"]
@@ -84,7 +79,7 @@ def load_student_multiclass_dataset():
     # we don't want to encode protected attributes
     df = df.dropna()
     y_cat = convert_float_to_categorical(df[output_column], 3)
-    p_attr = df[protected_attributes]
+    p_attr = df[protected_attribute]
 
     for col in df.select_dtypes(include=["object"]):
         df[col] = pd.factorize(df[col])[0]
@@ -100,7 +95,7 @@ def load_student_multiclass_dataset():
     return Dataset(X=x, y=y, p_attr=p_attr)
 
 
-def load_student_dataset(target: Literal["G1", "G2", "G3"] = "G3"):
+def load_student_dataset(target: Literal["G1", "G2", "G3"] = "G3", protected_attribute: Literal["sex", "address", "Mjob", "Fjob"]="sex"):
     # outputs = ["G1", "G2", "G3"]
     # protected_attributes = ["sex", "address", "Mjob", "Fjob"]
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
@@ -109,8 +104,8 @@ def load_student_dataset(target: Literal["G1", "G2", "G3"] = "G3"):
 
     df = df.dropna()
     y = df[target]
-    group_a = pd.Series(df["sex"], name="group_a")
-    group_b = pd.Series(df["sex"], name="group_b")
+    group_a = pd.Series(df[protected_attribute], name="group_a")
+    group_b = pd.Series(df[protected_attribute], name="group_b")
 
     for col in df.select_dtypes(include=["object"]):
         df[col] = pd.factorize(df[col])[0]
