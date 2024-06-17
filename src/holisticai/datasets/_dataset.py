@@ -85,7 +85,9 @@ class GroupByDataset:
     def sample(self, n, random_state=None):
         if random_state is None:
             random_state = self.random_state
-        return Dataset(self.groupby_obj.apply(lambda x: sample_n(x, n, random_state=random_state)).reset_index(drop=True))
+        return Dataset(
+            self.groupby_obj.apply(lambda x: sample_n(x, n, random_state=random_state)).reset_index(drop=True)
+        )
 
     def __iter__(self):
         for group_name, groupby_obj_batch in self.groupby_obj:
@@ -178,7 +180,7 @@ class Dataset:
     def sample(self, n, random_state=None):
         if random_state is None:
             random_state = self.random_state
-        return Dataset(sample_n(self.data,n, random_state=random_state).reset_index(drop=True))
+        return Dataset(sample_n(self.data, n, random_state=random_state).reset_index(drop=True))
 
     def filter(self, fn):
         def fnw(row):
@@ -199,6 +201,7 @@ class Dataset:
 
     def map(self, fn, vectorized=True):
         if vectorized:
+
             def fnw(x):
                 ds = {level: x.xs(level, axis=1, level="features") for level in x.columns.levels[0]}
                 return fn(ds)
@@ -209,6 +212,7 @@ class Dataset:
                 [(key, key) for key, serie in new_data.items()], names=["features", "subfeatures"]
             )
         else:
+
             def fnw(row):
                 result = {}
                 for upper in row.index.levels[0]:
@@ -222,7 +226,9 @@ class Dataset:
 
             updated_data = self.data.apply(fnw, axis=1, result_type="expand")
             updated_data = pd.DataFrame(updated_data)
-            new_columns = pd.MultiIndex.from_tuples([(col, col) for col in updated_data.columns], names=["features", "subfeatures"])
+            new_columns = pd.MultiIndex.from_tuples(
+                [(col, col) for col in updated_data.columns], names=["features", "subfeatures"]
+            )
             updated_data.columns = new_columns
 
         new_data = self.data.combine_first(updated_data)
