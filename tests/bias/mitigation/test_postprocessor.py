@@ -218,7 +218,7 @@ def run_postprocessing_regression_pipeline(dataset, estimator_class, mitigator_n
 def run_postrocessing_clustering(dataset, estimator_class, mitigator_name, postprocessor_fit_param_names,  mitigator_params):
     train = dataset['train']
 
-    model = estimator_class()
+    model = estimator_class(random_state=42)
     model_fit_params = {'X': train['X']}
     model.fit(**model_fit_params)
     y_pred = model.predict(**model_fit_params)
@@ -233,7 +233,7 @@ def run_postprocessing_clustering_pipeline(dataset, estimator_class, mitigator_n
 
     pipeline = Pipeline(
         steps=[
-            ("estimator", estimator_class()),
+            ("estimator", estimator_class(random_state=42)),
             ("bm_postprocessing", get_postprocessor(mitigator_name, mitigator_params)),
         ]
     )

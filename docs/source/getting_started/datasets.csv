@@ -1,0 +1,8 @@
+Adult,adult,Binary Classification, Bias
+Heart Clinical Records,clinical_records,Binary Classification, Bias
+Law School,law_school,Binary Classification, Bias
+Last FM,lastfm,Recommender, Bias
+Student,student,Binary Classification, Bias
+Student (Multiclass),student_multiclass,Multiclassification, Bias
+US Crime,us_crime,Regression, Bias
+US Crime,us_crime_multiclass,Multiclassification, Bias

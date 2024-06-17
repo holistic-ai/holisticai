@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from holisticai.mitigation.bias import FairKmedianClustering
+from holisticai.mitigation.bias import FairKMedianClustering
 from tutorials.utils.datasets import preprocessed_dataset
 
 train_data, test_data = preprocessed_dataset("adult")
@@ -21,7 +21,7 @@ group_a_train = group_a_train.reshape(-1)
 group_b_train = group_b_train.reshape(-1)
 
 Xt = StandardScaler().fit_transform(X_train)
-model = FairKmedianClustering(
+model = FairKMedianClustering(
     n_clusters=4, seed=42, verbose=True, strategy="GA", max_iter=500
 )
 model.fit(Xt, group_a_train, group_b_train)

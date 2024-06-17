@@ -15,7 +15,7 @@ def cp_mat(y_true, y_pred, n_classes):
 
 def p_vec(y, flatten=True):
     """Returns the matrix of probabilities for the levels y"""
-    tab = pd.crosstab(y, ["count"]).values
+    tab = pd.crosstab(y, "count").values
     out = tab / tab.sum()
     if flatten:
         out = out.flatten()
