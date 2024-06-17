@@ -10,7 +10,3 @@ This gallery contains a collection of examples that demonstrate the usage of ``h
     Datasets <tutorials/datasets>
 
     Bias <tutorials/bias>
-
-    CookBook <cookbook/index>
-
-    Videos <videos/index>

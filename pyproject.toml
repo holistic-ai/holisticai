@@ -22,12 +22,19 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["scikit-learn>=1.0.2"]
+dependencies = [
+  "scikit-learn>=1.0.2",
+  "pandas",
+  "matplotlib",
+  "networkx>=3.1",
+  "seaborn",
+  "tqdm",
+  "numpy==1.26",
+  "pybind11>=2.12",
+  ]
 
 [project.optional-dependencies]
 bias = [
-  "cvxpy[cbc]>1.5.0",
-  "cvxopt>=1.3.0",
   "seaborn>=0.11.2",
   "networkx>=3.1",
 ]
@@ -83,6 +90,8 @@ dependencies = [
   "sphinx_togglebutton",
   "sphinxcontrib.youtube",
   "pandas",
+  "numpy==1.26",
+  "pybind11>=2.12"
 ]
 
 [tool.hatch.envs.sphinx.scripts]

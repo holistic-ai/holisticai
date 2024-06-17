@@ -89,7 +89,7 @@ __all__ += ["DisparateImpactRemoverRS", "DisparateImpactRemover"]
 
 cvxpy_spec = importlib.util.find_spec("cvxpy")
 if cvxpy_spec is not None:
-    from .fair_scoring_classifier.transformer import FairScoreClassifier
+    from holisticai.mitigation.bias.inprocessing.fair_scoring_classifier.transformer import FairScoreClassifier
 __all__ += ["FairScoreClassifier"]
 
 MITIGATOR_NAME= Literal[
