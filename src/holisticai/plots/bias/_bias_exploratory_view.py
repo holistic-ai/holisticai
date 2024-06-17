@@ -122,16 +122,16 @@ def clustering_model_exploration(dataset, y_pred):
 
 
 def bias_data_exploration(learning_task, dataset):
-    match learning_task:
-        case "binary_classification":
-            return binary_classification_data_exploration(dataset)
-        case "clustering":
-            return clustering_data_exploration(dataset)
+    if learning_task == "binary_classification":
+        return binary_classification_data_exploration(dataset)
+    if learning_task == "clustering":
+        return clustering_data_exploration(dataset)
+    return None
 
 
 def bias_model_exploration(learning_task, dataset, y_pred):
-    match learning_task:
-        case "binary_classification":
-            return binary_classification_model_exploration(dataset, y_pred)
-        case "clustering":
-            return clustering_model_exploration(dataset, y_pred)
+    if learning_task == "binary_classification":
+        return binary_classification_model_exploration(dataset, y_pred)
+    if learning_task == "clustering":
+        return clustering_model_exploration(dataset, y_pred)
+    return None

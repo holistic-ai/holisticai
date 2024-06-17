@@ -23,26 +23,25 @@ warnings.filterwarnings("ignore")
 seed = 42
 
 from holisticai.mitigation.bias import MITIGATOR_NAME
-
+from holisticai.mitigation.bias import CorrelationRemover
+from holisticai.mitigation.bias import Reweighing
+from holisticai.mitigation.bias import LearningFairRepresentation
+from holisticai.mitigation.bias import FairletClusteringPreprocessing
+from holisticai.mitigation.bias import DisparateImpactRemoverRS
 
 def get_preprocessor(mitigator_name : MITIGATOR_NAME = "CorrelationRemover", parameters: dict = {}):
-    match mitigator_name:
-        case "CorrelationRemover":
-            from holisticai.mitigation.bias import CorrelationRemover
-            return CorrelationRemover(**parameters)
-        case "Reweighing":
-            from holisticai.mitigation.bias import Reweighing
-            return Reweighing(**parameters)
-        case "LearningFairRepresentation":
-            from holisticai.mitigation.bias import LearningFairRepresentation
-            return LearningFairRepresentation(**parameters)
-        case "FairletClusteringPreprocessing":
-            from holisticai.mitigation.bias import FairletClusteringPreprocessing
-            return FairletClusteringPreprocessing(**parameters)
-        case "DisparateImpactRemoverRS":
-            from holisticai.mitigation.bias import DisparateImpactRemoverRS
-            return DisparateImpactRemoverRS(**parameters)
-    raise NotImplementedError
+    if mitigator_name == "CorrelationRemover":
+        return CorrelationRemover(**parameters)
+    elif mitigator_name == "Reweighing":
+        return Reweighing(**parameters)
+    elif mitigator_name == "LearningFairRepresentation":
+        return LearningFairRepresentation(**parameters)
+    elif mitigator_name == "FairletClusteringPreprocessing":
+        return FairletClusteringPreprocessing(**parameters)
+    elif mitigator_name == "DisparateImpactRemoverRS":
+        return DisparateImpactRemoverRS(**parameters)
+    else:
+        raise NotImplementedError
 
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params, extra_model_fit_params", [

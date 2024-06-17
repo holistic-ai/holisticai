@@ -20,43 +20,43 @@ warnings.filterwarnings("ignore")
 seed = 42
 
 from holisticai.mitigation.bias import MITIGATOR_NAME
+from holisticai.mitigation.bias import CalibratedEqualizedOdds
+from holisticai.mitigation.bias import EqualizedOdds
+from holisticai.mitigation.bias import RejectOptionClassification
+from holisticai.mitigation.bias import LPDebiaserBinary
+from holisticai.mitigation.bias import MLDebiaser
+from holisticai.mitigation.bias import LPDebiaserMulticlass
+from holisticai.mitigation.bias import PluginEstimationAndCalibration
+from holisticai.mitigation.bias import WassersteinBarycenter
+from holisticai.mitigation.bias import MCMF
+from holisticai.mitigation.bias import DebiasingExposure
+from holisticai.mitigation.bias import FairTopK
 
 def get_postprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds", parameters: dict = {}):
-    match mitigator_name:
-        case "CalibratedEqualizedOdds":
-            from holisticai.mitigation.bias import CalibratedEqualizedOdds
-            return CalibratedEqualizedOdds(**parameters)
-        case "EqualizedOdds":
-            from holisticai.mitigation.bias import EqualizedOdds
-            return EqualizedOdds(**parameters)
-        case "RejectOptionClassification":
-            from holisticai.mitigation.bias import RejectOptionClassification
-            return RejectOptionClassification(**parameters)
-        case "LPDebiaserBinary":
-            from holisticai.mitigation.bias import LPDebiaserBinary
-            return LPDebiaserBinary(**parameters)
-        case "MLDebiaser":
-            from holisticai.mitigation.bias import MLDebiaser
-            return MLDebiaser(**parameters)
-        case "LPDebiaserMulticlass":
-            from holisticai.mitigation.bias import LPDebiaserMulticlass
-            return LPDebiaserMulticlass(**parameters)
-        case "PluginEstimationAndCalibration":
-            from holisticai.mitigation.bias import PluginEstimationAndCalibration
-            return PluginEstimationAndCalibration(**parameters)
-        case "WassersteinBarycenter":
-            from holisticai.mitigation.bias import WassersteinBarycenter
-            return WassersteinBarycenter(**parameters)
-        case "MCMF":
-            from holisticai.mitigation.bias import MCMF
-            return MCMF(**parameters)
-        case "DebiasingExposure":
-            from holisticai.mitigation.bias import DebiasingExposure
-            return DebiasingExposure(**parameters)
-        case "FairTopK":
-            from holisticai.mitigation.bias import FairTopK
-            return FairTopK(**parameters)
-    raise NotImplementedError
+    if mitigator_name == "CalibratedEqualizedOdds":
+        return CalibratedEqualizedOdds(**parameters)
+    elif mitigator_name == "EqualizedOdds":
+        return EqualizedOdds(**parameters)
+    elif mitigator_name == "RejectOptionClassification":
+        return RejectOptionClassification(**parameters)
+    elif mitigator_name == "LPDebiaserBinary":
+        return LPDebiaserBinary(**parameters)
+    elif mitigator_name == "MLDebiaser":
+        return MLDebiaser(**parameters)
+    elif mitigator_name == "LPDebiaserMulticlass":
+        return LPDebiaserMulticlass(**parameters)
+    elif mitigator_name == "PluginEstimationAndCalibration":
+        return PluginEstimationAndCalibration(**parameters)
+    elif mitigator_name == "WassersteinBarycenter":
+        return WassersteinBarycenter(**parameters)
+    elif mitigator_name == "MCMF":
+        return MCMF(**parameters)
+    elif mitigator_name == "DebiasingExposure":
+        return DebiasingExposure(**parameters)
+    elif mitigator_name == "FairTopK":
+        return FairTopK(**parameters)
+    else:
+        raise NotImplementedError
 
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, fit_params", [

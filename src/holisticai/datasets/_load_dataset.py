@@ -259,21 +259,20 @@ def load_clinical_records_dataset():
 
 
 def load_dataset(dataset_name, **kargs):
-    match dataset_name:
-        case "adult":
-            return load_adult_dataset(**kargs)
-        case "law_school":
-            return load_law_school_dataset(**kargs)
-        case "student_multiclass":
-            return load_student_multiclass_dataset()
-        case "student":
-            return load_student_dataset()
-        case "lastfm":
-            return load_lastfm_dataset()
-        case "us_crime":
-            return load_us_crime_dataset()
-        case "us_crime_multiclass":
-            return load_us_crime_multiclass_dataset()
-        case "clinical_records":
-            return load_clinical_records_dataset()
+    if dataset_name == "adult":
+        return load_adult_dataset(**kargs)
+    if dataset_name == "law_school":
+        return load_law_school_dataset(**kargs)
+    if dataset_name == "student_multiclass":
+        return load_student_multiclass_dataset()
+    if dataset_name == "student":
+        return load_student_dataset()
+    if dataset_name == "lastfm":
+        return load_lastfm_dataset()
+    if dataset_name == "us_crime":
+        return load_us_crime_dataset()
+    if dataset_name == "us_crime_multiclass":
+        return load_us_crime_multiclass_dataset()
+    if dataset_name == "clinical_records":
+        return load_clinical_records_dataset()
     raise NotImplementedError

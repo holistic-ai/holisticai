@@ -103,11 +103,11 @@ class ExponentiatedGradientAlgorithm:
             return nu
 
         eta = self.eta0 / B
-        gap_LP = np.PINF
+        gap_LP = np.inf
         Q_LP = None
         nu = self.nu
         last_regret_checked = REGRET_CHECK_START_T
-        last_gap = np.PINF
+        last_gap = np.inf
         self.monitor.max_iter = self.max_iter
         for t in range(self.max_iter):
 

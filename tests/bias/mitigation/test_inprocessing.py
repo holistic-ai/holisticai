@@ -19,49 +19,49 @@ warnings.filterwarnings("ignore")
 seed = 42
 
 from holisticai.mitigation.bias import MITIGATOR_NAME
+from holisticai.mitigation.bias import ExponentiatedGradientReduction
+from holisticai.mitigation.bias import GridSearchReduction
+from holisticai.mitigation.bias import MetaFairClassifier
+from holisticai.mitigation.bias import PrejudiceRemover
+from holisticai.mitigation.bias import FairScoreClassifier
+from holisticai.mitigation.bias import FairKCenterClustering
+from holisticai.mitigation.bias import FairKMedianClustering
+from holisticai.mitigation.bias import FairletClustering
+from holisticai.mitigation.bias import VariationalFairClustering
+from holisticai.mitigation.bias import PopularityPropensityMF
+from holisticai.mitigation.bias import BlindSpotAwareMF
+from holisticai.mitigation.bias import FairRec
+from holisticai.mitigation.bias import DebiasingLearningMF
 
 def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds", parameters: dict = {}):
-    match mitigator_name:
-        case "ExponentiatedGradientReduction":
-            from holisticai.mitigation.bias import ExponentiatedGradientReduction
-            return ExponentiatedGradientReduction(**parameters)
-        case "GridSearchReduction":
-            from holisticai.mitigation.bias import GridSearchReduction
-            return GridSearchReduction(**parameters)
-        case "MetaFairClassifier":
-            from holisticai.mitigation.bias import MetaFairClassifier
-            return MetaFairClassifier(**parameters)
-        case "PrejudiceRemover":
-            from holisticai.mitigation.bias import PrejudiceRemover
-            return PrejudiceRemover(**parameters)
-        case "FairScoreClassifier":
-            from holisticai.mitigation.bias import FairScoreClassifier
-            return FairScoreClassifier(**parameters)
-        case "FairKCenterClustering":
-            from holisticai.mitigation.bias import FairKCenterClustering
-            return FairKCenterClustering(**parameters)
-        case "FairKMedianClustering":
-            from holisticai.mitigation.bias import FairKMedianClustering
-            return FairKMedianClustering(**parameters)
-        case "FairletClustering":
-            from holisticai.mitigation.bias import FairletClustering
-            return FairletClustering(**parameters)
-        case "VariationalFairClustering":
-            from holisticai.mitigation.bias import VariationalFairClustering
-            return VariationalFairClustering(**parameters)
-        case "PopularityPropensityMF":
-            from holisticai.mitigation.bias import PopularityPropensityMF
-            return PopularityPropensityMF(**parameters)
-        case "BlindSpotAwareMF":
-            from holisticai.mitigation.bias import BlindSpotAwareMF
-            return BlindSpotAwareMF(**parameters)
-        case "FairRec":
-            from holisticai.mitigation.bias import FairRec
-            return FairRec(**parameters)
-        case "DebiasingLearningMF":
-            from holisticai.mitigation.bias import DebiasingLearningMF
-            return DebiasingLearningMF(**parameters)
-    raise NotImplementedError
+    if mitigator_name == "ExponentiatedGradientReduction":
+        return ExponentiatedGradientReduction(**parameters)
+    elif mitigator_name == "GridSearchReduction":
+        return GridSearchReduction(**parameters)
+    elif mitigator_name == "MetaFairClassifier":
+        return MetaFairClassifier(**parameters)
+    elif mitigator_name == "PrejudiceRemover":
+        return PrejudiceRemover(**parameters)
+    elif mitigator_name == "FairScoreClassifier":
+        return FairScoreClassifier(**parameters)
+    elif mitigator_name == "FairKCenterClustering":
+        return FairKCenterClustering(**parameters)
+    elif mitigator_name == "FairKMedianClustering":
+        return FairKMedianClustering(**parameters)
+    elif mitigator_name == "FairletClustering":
+        return FairletClustering(**parameters)
+    elif mitigator_name == "VariationalFairClustering":
+        return VariationalFairClustering(**parameters)
+    elif mitigator_name == "PopularityPropensityMF":
+        return PopularityPropensityMF(**parameters)
+    elif mitigator_name == "BlindSpotAwareMF":
+        return BlindSpotAwareMF(**parameters)
+    elif mitigator_name == "FairRec":
+        return FairRec(**parameters)
+    elif mitigator_name == "DebiasingLearningMF":
+        return DebiasingLearningMF(**parameters)
+    else:
+        raise NotImplementedError
 
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, model_params", [
