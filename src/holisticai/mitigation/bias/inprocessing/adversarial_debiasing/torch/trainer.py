@@ -2,11 +2,9 @@ from statistics import mean
 
 import numpy as np
 import torch
-import torch.optim as optim
-from torch import nn
-from torch.utils.data import DataLoader
-
 from holisticai.mitigation.bias.inprocessing.commons import Logging
+from torch import nn, optim
+from torch.utils.data import DataLoader
 
 
 class TrainArgs:

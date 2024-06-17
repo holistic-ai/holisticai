@@ -1,6 +1,4 @@
-import numpy as np
 from sklearn.pipeline import Pipeline as SKLPipeline
-from sklearn.utils.metaestimators import available_if
 
 from holisticai.pipeline.handlers._estimator import EstimatorHandler
 from holisticai.pipeline.handlers._pipeline_params import PipelineParametersHandler
@@ -25,12 +23,13 @@ class PipelineHelper:
     def __getattribute__(self, name):
         """
         This function return the attribute using the following rules:
-        - for all functions listed in SUPPORTED_FUNCTIONS return a wrapped function that update the input arguments with the cache before call fit function.
+        - for all functions listed in SUPPORTED_FUNCTIONS return a wrapped function that update the input arguments with
+          the cache before call fit function.
         - for any other function we check if the pipeline has the attribute else try the attribute from the main class.
         """
         if name in SUPPORTED_FUNCTIONS:
             return object.__getattribute__(self, "handle_pipeline_methods")(name)
-        else:
+        else:  # noqa: RET505
             return object.__getattribute__(self, name)
 
     def handle_pipeline_methods(self, fn_name):
@@ -38,7 +37,6 @@ class PipelineHelper:
             params = self.preprocessing_parameters(kargs, y)
 
             if self.post_estimator_transformers:
-
                 if fn_name in POST_PREDICTION:
                     # For predictions we must check supported methods
                     fn = object.__getattribute__(self, "predictions")
@@ -88,14 +86,10 @@ class PipelineHelper:
         """
         self.params_hdl = PipelineParametersHandler()
         self.estimator_hdl = EstimatorHandler(self.params_hdl)
-        self.utransformers_hdl = UTransformersHandler(
-            steps, self.params_hdl, self.estimator_hdl
-        )
+        self.utransformers_hdl = UTransformersHandler(steps, self.params_hdl, self.estimator_hdl)
 
         steps = self.utransformers_hdl.drop_post_processing_steps(steps)
-        steps = self.estimator_hdl.wrap_and_link_estimator_step(steps)
-
-        return steps
+        return self.estimator_hdl.wrap_and_link_estimator_step(steps)
 
     def preprocessing_parameters(self, params, y=None):
         """
@@ -199,7 +193,7 @@ class PipelineHelper:
         Xt : ndarray of shape (n_samples, n_transformed_features)
             Transformed data.
         """
-        Xt = X
+        Xt = X  # noqa: N806
         for _, _, transform in self._iter(with_final=False):
-            Xt = transform.transform(Xt)
+            Xt = transform.transform(Xt)  # noqa: N806
         return Xt

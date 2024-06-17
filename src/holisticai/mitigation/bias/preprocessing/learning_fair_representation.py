@@ -1,13 +1,11 @@
-import sys
 from typing import Optional
 
 import numpy as np
 import scipy.optimize as optim
+from holisticai.utils.transformers.bias import BMPreprocessing
 from scipy.spatial.distance import cdist
 from scipy.special import softmax
 from tqdm import tqdm
-
-from holisticai.utils.transformers.bias import BMPreprocessing
 
 
 def get_x_hat_y_hat(prototypes, w, x):

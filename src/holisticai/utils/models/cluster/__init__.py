@@ -1,4 +1,4 @@
-from ._kcenters import KCenters
-from ._kmedoids import KMedoids
+from holisticai.utils.models.cluster._kcenters import KCenters
+from holisticai.utils.models.cluster._kmedoids import KMedoids
 
 __all__ = ["KCenters", "KMedoids"]

@@ -77,7 +77,7 @@ class RecursiveNumericFailProbabilityCalculator:
 
     def get_from_pmf_cache(self, trials, successes):
         key = (trials, successes)
-        if not key in self.pmf_cache:
+        if key not in self.pmf_cache:
             self.pmf_cache[key] = binom.pmf(k=successes, n=trials, p=self.p)
         return self.pmf_cache[key]
 
@@ -145,7 +145,7 @@ class RecursiveNumericFailProbabilityCalculator:
             candidates_assigned_so_far,
         )
 
-        if not key.__hash__ in self.legal_assignment_cache:
+        if key.__hash__ not in self.legal_assignment_cache:
             self.legal_assignment_cache[
                 key.__hash__
             ] = self._find_legal_assignments_aux(

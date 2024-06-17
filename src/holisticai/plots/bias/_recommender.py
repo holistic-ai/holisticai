@@ -8,9 +8,7 @@ from holisticai.utils._validation import _recommender_checks
 from matplotlib import pyplot as plt
 
 
-def long_tail_plot(
-    mat_pred, top=None, thresh=0.5, normalize=False, ax=None, size=None, title=None  # noqa: FBT002
-):
+def long_tail_plot(mat_pred, top=None, thresh=0.5, normalize=False, ax=None, size=None, title=None):
     """
     Long Tail Plot.
 
@@ -93,7 +91,7 @@ def exposure_diff_plot(
     mat_pred,
     top=None,
     thresh=0.5,
-    normalize=False,  # noqa: FBT002
+    normalize=False,
     ax=None,
     size=None,
     title=None,
@@ -199,7 +197,7 @@ def exposure_ratio_plot(
     mat_pred,
     top=None,
     thresh=0.5,
-    normalize=False,  # noqa: FBT002
+    normalize=False,
     ax=None,
     size=None,
     title=None,

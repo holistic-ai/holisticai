@@ -62,7 +62,7 @@ class FairnessUtility:
 
             C, l = km_init(self.K, X, C_init)
             sqdist = ecdist(X, C, squared=True)
-            S = normalize_2(np.exp((-sqdist)))
+            S = normalize_2(np.exp(-sqdist))
             trivial_status = False
 
         return l, C, S, trivial_status

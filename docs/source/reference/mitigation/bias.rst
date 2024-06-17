@@ -30,7 +30,7 @@ In-processing
     holisticai.mitigation.bias.MetaFairClassifier
     holisticai.mitigation.bias.PrejudiceRemover
     holisticai.mitigation.bias.FairKCenterClustering
-    holisticai.mitigation.bias.FairKmedianClustering
+    holisticai.mitigation.bias.FairKMedianClustering
     holisticai.mitigation.bias.FairletClustering
     holisticai.mitigation.bias.VariationalFairClustering
     holisticai.mitigation.bias.FairScoreClassifier

@@ -85,7 +85,7 @@ config-path = "ruff_default.toml"
 
 [tool.ruff]
 extend = "ruff_default.toml"
-exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/mitigation/**"]
+exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/mitigation/**", "src/holisticai/utils/trade_off_analysers/**"]
 
 [tool.hatch.envs.sphinx]
 inherits = ["all"]
@@ -128,6 +128,7 @@ dependencies = [
   "lime>=0.2.0.1",
   "shap>=0.42.1",
   "ipykernel>=6.25.2",
+  "ruff"
 ]
 paths = ["./src"]
 

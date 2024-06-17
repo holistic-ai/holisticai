@@ -9,9 +9,7 @@ class ActiveLearningItemsSelection:
     def __call__(self, time_mask, pred_data, return_only_time_mask=False):
         pred_data = 5 - np.abs(self.theta - pred_data)
         candidate_index = ~time_mask  ## convert all candidate index to True
-        candidate_rating = (
-            pred_data * candidate_index
-        )  ## get predicte rating on those candidate index
+        candidate_rating = pred_data * candidate_index  ## get predicte rating on those candidate index
         sorted_ind = np.argsort(-candidate_rating, axis=1)[
             :, :
         ]  ## get the index of each row, where top n pred are selected
@@ -23,8 +21,7 @@ class ActiveLearningItemsSelection:
         time_mask = ~candidate_index  ## get the new index
         if return_only_time_mask:
             return time_mask
-        else:
-            return items_selected_matrix, time_mask
+        return items_selected_matrix, time_mask
 
 
 class ConventionalItemsSelection:
@@ -33,9 +30,7 @@ class ConventionalItemsSelection:
 
     def __call__(self, time_mask, pred_data, return_only_time_mask=False):
         candidate_index = ~time_mask  ## convert all candidate index to True
-        candidate_rating = (
-            pred_data * candidate_index
-        )  ## get predicte rating on those candidate index
+        candidate_rating = pred_data * candidate_index  ## get predicte rating on those candidate index
         sorted_ind = np.argsort(-candidate_rating, axis=1)[
             :, : self.top_n
         ]  ## get the index of each row, where top n pred are selected
@@ -47,8 +42,7 @@ class ConventionalItemsSelection:
         time_mask = ~candidate_index  ## get the new index
         if return_only_time_mask:
             return time_mask
-        else:
-            return items_selected_matrix, time_mask
+        return items_selected_matrix, time_mask
 
 
 class RandomItemSelection:
@@ -57,9 +51,7 @@ class RandomItemSelection:
 
     def __call__(self, time_mask, pred_data, return_only_time_mask=False):
         candidate_index = ~time_mask  ## convert all candidate index to True
-        candidate_rating = (
-            pred_data * candidate_index
-        )  ## get predicte rating on those candidate index
+        candidate_rating = pred_data * candidate_index  ## get predicte rating on those candidate index
         sorted_ind = np.argsort(-candidate_rating, axis=1)[
             :, :
         ]  ## get the index of each row, where top n pred are selected
@@ -72,5 +64,4 @@ class RandomItemSelection:
         time_mask = ~candidate_index  ## get the new index
         if return_only_time_mask:
             return time_mask
-        else:
-            return items_selected_matrix, time_mask
+        return items_selected_matrix, time_mask

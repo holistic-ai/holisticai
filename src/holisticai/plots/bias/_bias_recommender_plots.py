@@ -1,17 +1,14 @@
 # Base Imports
 import numpy as np
-import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt
 
 # utils
-from ...utils import get_colors, mat_to_binary, normalize_tensor
-from ...utils._validation import _recommender_checks
+from holisticai.utils import get_colors, mat_to_binary, normalize_tensor
+from holisticai.utils._validation import _recommender_checks
+from matplotlib import pyplot as plt
 
 
-def long_tail_plot(
-    mat_pred, top=None, thresh=0.5, normalize=False, ax=None, size=None, title=None
-):
+def long_tail_plot(mat_pred, top=None, thresh=0.5, normalize=False, ax=None, size=None, title=None):
     """
     Long Tail Plot.
 

@@ -1,15 +1,14 @@
 from typing import Optional
 
 import numpy as np
-from tqdm import trange
-
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
+from tqdm import trange
 
 
 class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
     """Blind Spot Aware Matrix Factorization
-    
+
     A blind spot aware Matrix Factorization takes into account the blind spot
     inherent in the learning phase of the RS. The blind spot size is the
     number of item with a predicted ratings Ru,i that is smaller than a
@@ -93,7 +92,7 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
         """
         Q = Q.T
         N, M = R.shape
-        W = np.ones(((N, M)))
+        W = np.ones((N, M))
         i_list, j_list = np.where(R > 0)
         W_s = W[i_list, j_list]
         for _ in trange(self.steps, leave=self.verbose > 0):

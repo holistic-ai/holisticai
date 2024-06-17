@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 import numpy as np
 
@@ -19,8 +19,7 @@ class TransformerBase:
     def get_bias_param(self, param_name, default=None):
         if param_name in self.params_hdl.bias_mitigator:
             return self.params_hdl.bias_mitigator[param_name]
-        else:
-            return default
+        return default
 
     def update_bias_param(self, param_name, param_value):
         if hasattr(self, "params_hdl"):
@@ -31,8 +30,7 @@ class TransformerBase:
     def get_estimator_param(self, param_name, default=None):
         if param_name in self.params_hdl.estimator:
             return self.params_hdl.estimator[param_name]
-        else:
-            return default
+        return default
 
     def update_estimator_param(self, param_name, param_value):
         if hasattr(self, "params_hdl"):
@@ -50,17 +48,15 @@ class BMTransformerBase(ABC, TransformerBase):
     def _get_param(self, kargs, param_name):
         if hasattr(self, param_name):
             return getattr(self, param_name)
-        elif param_name in kargs:
+        if param_name in kargs:
             return kargs[param_name]
-        else:
-            return None
+        return None
 
     def _to_numpy(self, kargs, value_name, ravel=True):
         value = np.array(kargs[value_name])
         return value.ravel() if ravel else value
 
     def _load_data_pipeline(self):
-
         if not hasattr(self, "params_hdl"):
             return {}
 
@@ -73,11 +69,11 @@ class BMTransformerBase(ABC, TransformerBase):
                 params[param_name] = getattr(self, param_name)
 
         es_param_names = ["sample_weight", ("y", "y_true")]
-        for param_name in es_param_names:
+        for param_names in es_param_names:
             if isinstance(param_name, tuple):
-                es_param_name, param_name = param_name
+                es_param_name, param_name = param_names
             else:
-                es_param_name = param_name
+                es_param_name = param_names
 
             if es_param_name in self.params_hdl.estimator:
                 params[param_name] = self.params_hdl.estimator[es_param_name]
@@ -97,7 +93,7 @@ class BMTransformerBase(ABC, TransformerBase):
 
         return wrapped_func
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args, **kargs):  # noqa: ARG003
         obj = object.__new__(cls)
 
         if hasattr(obj, "fit"):

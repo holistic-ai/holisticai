@@ -22,7 +22,7 @@ class KMedoids:
     metric : str, or callable, optional
         What distance metric to use. See :func:metrics.pairwise_distances
         metric can be 'precomputed', the user must then feed the fit method
-        with a precomputed kernel matrix and not the design matrix X. 
+        with a precomputed kernel matrix and not the design matrix X.
         Default is 'euclidean'. Possible values are 'euclidean', 'manhattan',
 
     method : str, optional
@@ -162,7 +162,7 @@ class KMedoids:
         Parameters
         ----------
         X : array-like or sparse matrix
-            The data to cluster. It must be an array of shape (n_samples, n_features) or (n_samples, n_samples) 
+            The data to cluster. It must be an array of shape (n_samples, n_features) or (n_samples, n_samples)
             if metric == 'precomputed'
 
         y : Ignored
@@ -194,7 +194,7 @@ class KMedoids:
         # the medoids keep changing and the maximum number
         # of iterations is not exceeded
 
-        for self.n_iter_ in range(0, self.max_iter):
+        for self.n_iter_ in range(self.max_iter):
             old_medoid_idxs = np.copy(medoid_idxs)
             labels = np.argmin(D[medoid_idxs, :], axis=0)
 
@@ -241,7 +241,7 @@ class KMedoids:
     def _update_medoid_idxs_in_place(self, D, labels, medoid_idxs, sample_weight):
         """
         In-place update of the medoid indices
-        
+
         Parameters
         ----------
         D : array-like
@@ -262,10 +262,10 @@ class KMedoids:
 
             if len(cluster_k_idxs) == 0:
                 warnings.warn(
-                    "Cluster {k} is empty! "
-                    "self.labels_[self.medoid_indices_[{k}]] "
+                    f"Cluster {k} is empty! "
+                    f"self.labels_[self.medoid_indices_[{k}]] "
                     "may not be labeled with "
-                    "its corresponding cluster ({k}).".format(k=k)
+                    f"its corresponding cluster ({k})."
                 )
                 continue
 
@@ -312,7 +312,7 @@ class KMedoids:
         Parameters
         ----------
         X : array-like or sparse matrix
-            Data to transform. It must be an array of shape (n_query, n_features) or (n_query, n_indexed) 
+            Data to transform. It must be an array of shape (n_query, n_features) or (n_query, n_indexed)
             if metric == 'precomputed'
 
         Returns
@@ -337,7 +337,7 @@ class KMedoids:
         Parameters
         ----------
         X : array-like or sparse matrix
-            New data to predict. It must be an array of shape (n_query, n_features) or (n_query, n_indexed) 
+            New data to predict. It must be an array of shape (n_query, n_features) or (n_query, n_indexed)
             if metric == 'precomputed'
 
         Returns

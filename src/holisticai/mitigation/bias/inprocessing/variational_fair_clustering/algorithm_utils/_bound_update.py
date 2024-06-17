@@ -19,12 +19,12 @@ def normalize_2(S_in):
 
 def bound_energy(S, S_in, a_term, b_term):
     E = np.nansum(
-        (
+
             S * np.log(np.maximum(S, 1e-15))
             - S * np.log(np.maximum(S_in, 1e-15))
             + a_term * S
             + b_term * S
-        )
+
     )
     return E
 
@@ -56,7 +56,7 @@ class BoundUpdate:
 
     def transform(self, a_p, group_prob, groups_ids):
         oldE = float("inf")
-        S = np.exp((-a_p))
+        S = np.exp(-a_p)
         S = normalize_2(S)
         a_term = -a_p.copy()
 

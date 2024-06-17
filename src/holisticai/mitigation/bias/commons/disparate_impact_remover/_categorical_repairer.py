@@ -1,8 +1,6 @@
 from collections import defaultdict
 from itertools import product
 
-import numpy as np
-
 from ._categorical_feature import CategoricalFeature
 from ._utils import (
     assign_overflow,

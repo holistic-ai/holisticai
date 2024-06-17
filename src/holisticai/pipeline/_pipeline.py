@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.pipeline import Pipeline as SKLPipeline
 from sklearn.utils.metaestimators import available_if
 
@@ -8,14 +7,12 @@ from holisticai.pipeline._pipeline_helper import PipelineHelper
 def _fulfill_conditions(fn_name: str):
     def check(self):
         if fn_name == "predict_proba":
-            return (
-                hasattr(self._final_estimator, "predict_proba")
-                and not self.post_estimator_transformers
-            )
+            return hasattr(self._final_estimator, "predict_proba") and not self.post_estimator_transformers
         if fn_name == "predict_score":
             return hasattr(self, "predict_proba") and self.post_estimator_transformers
         if fn_name == "predictions":
             return self.post_estimator_transformers
+        return None
 
     return check
 
@@ -62,7 +59,7 @@ class Pipeline(SKLPipeline, PipelineHelper):
             is completed.
         """
         steps = self.preprocessing_steps(steps)
-        super(Pipeline, self).__init__(steps=steps, memory=memory, verbose=verbose)
+        super(Pipeline, self).__init__(steps=steps, memory=memory, verbose=verbose)  # noqa: UP008
 
     def fit(self, X, y=None, **fit_params):
         """Fit the model.
@@ -92,7 +89,7 @@ class Pipeline(SKLPipeline, PipelineHelper):
             Pipeline with fitted steps.
         """
         super().fit(X, y, **fit_params)
-        Xt = self._transform_without_final(X)
+        Xt = self._transform_without_final(X)  # noqa: N806
         self.fit_post_estimator_transformers(Xt, y)
         return self
 
@@ -158,5 +155,5 @@ class Pipeline(SKLPipeline, PipelineHelper):
         dict
             dictionary with postprocessor outputs
         """
-        Xt = self._transform_without_final(X)
+        Xt = self._transform_without_final(X)  # noqa: N806
         return self._transform_post_estimator_transformers(Xt, **params)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
@@ -164,7 +164,7 @@ class EqualizedOdds(BMPost):
         y_pred: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-    ) -> "EqualizedOdds":
+    ) -> EqualizedOdds:
         """
         Compute parameters for equalizing odds.
 

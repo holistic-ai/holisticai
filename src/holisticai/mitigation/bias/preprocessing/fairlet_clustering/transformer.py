@@ -1,9 +1,6 @@
 from typing import Optional, Union
 
 import numpy as np
-from sklearn.base import BaseEstimator
-from sklearn.metrics.pairwise import pairwise_distances_argmin
-
 from holisticai.mitigation.bias.commons.fairlet_clustering.decompositions import (
     DecompositionMixin,
     ScalableFairletDecomposition,
@@ -11,6 +8,8 @@ from holisticai.mitigation.bias.commons.fairlet_clustering.decompositions import
 )
 from holisticai.utils.models.cluster import KCenters, KMedoids
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
+from sklearn.base import BaseEstimator
+from sklearn.metrics.pairwise import pairwise_distances_argmin
 
 DECOMPOSITION_CATALOG = {
     "Scalable": ScalableFairletDecomposition,
@@ -41,7 +40,7 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
 
     seed : int, optional
         Random seed. Default is None.
-        
+
     Attributes
     ----------
     decomposition : DecompositionMixin
@@ -61,7 +60,7 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
         Fit the model
     transform(X)
         Transform the model
-    
+
     References
     ----------
     .. [1] `Backurs, Arturs, et al. "Scalable fair clustering." International Conference on

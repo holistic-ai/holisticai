@@ -1,4 +1,3 @@
-from copy import deepcopy
 
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix

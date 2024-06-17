@@ -11,7 +11,7 @@ from .algorithm import ExponentiatedGradientAlgorithm
 
 
 class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
-    """Exponentiated gradient reduction 
+    """Exponentiated gradient reduction
 
     Exponentiated gradient reduction is an in-processing technique that reduces
     fair classification to a sequence of cost-sensitive classification problems,
@@ -20,7 +20,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
 
     Parameters
     ----------
-    
+
         estimator : sklearn-like
             The model you want to mitigate bias for.
 
@@ -94,7 +94,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         estimator=None,
         seed: int=0
     ):
-                
+
         self.constraints = constraints
         self.eps = eps
         self.max_iter = max_iter

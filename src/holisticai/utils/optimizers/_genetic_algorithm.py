@@ -1,11 +1,14 @@
+import logging
 import sys
 import time
 
 import numpy as np
 from tqdm import tqdm
 
+logger = logging.getLogger(__name__)
 
-class GAHiperparameters(object):
+
+class GAHiperparameters:
     def __init__(self, **kargs):
         self.max_num_iteration = kargs.get("max_num_iteration", None)
         self.population_size = kargs.get("population_size", 100)
@@ -14,12 +17,10 @@ class GAHiperparameters(object):
         self.crossover_probability = kargs.get("crossover_probability", 0.5)
         self.parents_portion = kargs.get("parents_portion", 0.3)
         self.crossover_type = kargs.get("crossover_type", "uniform")
-        self.max_iteration_without_improv = kargs.get(
-            "max_iteration_without_improv", None
-        )
+        self.max_iteration_without_improv = kargs.get("max_iteration_without_improv", None)
 
 
-class GeneticAlgorithm(object):
+class GeneticAlgorithm:
     """
     Genetic Algorithm (Elitist version)
     Implementation of elitist genetic algorithm for solving problems with
@@ -84,52 +85,44 @@ class GeneticAlgorithm(object):
         self.dim = int(dimension)
 
         # input variable type
-        assert (
-            variable_type == "bool" or variable_type == "int" or variable_type == "real"
-        ), "\n variable_type must be 'bool', 'int', or 'real'"
+        if variable_type not in ("bool", "int", "real"):
+            msg = "variable_type must be 'bool', 'int', or 'real'"
+            raise ValueError(msg)
 
         # input variables' type (MIXED)
         if variable_type_mixed is None:
-
             if variable_type == "real":
                 self.var_type = np.array([["real"]] * self.dim)
             else:
                 self.var_type = np.array([["int"]] * self.dim)
         else:
-            assert (
-                type(variable_type_mixed).__module__ == "numpy"
-            ), "\n variable_type must be numpy array"
-            assert (
-                len(variable_type_mixed) == self.dim
-            ), "\n variable_type must have a length equal dimension."
+            if type(variable_type_mixed).__module__ != "numpy":
+                raise ValueError("variable_type must be numpy array")
+            if len(variable_type_mixed) != self.dim:
+                raise ValueError("variable_type must have a length equal to dimension.")
 
             for i in variable_type_mixed:
-                assert i == "real" or i == "int", (
+                assert i in ("real", "int"), (
                     "\n variable_type_mixed is either 'int' or 'real' "
-                    + "ex:['int','real','real']"
-                    + "\n for 'boolean' use 'int' and specify boundary as [0,1]"
+                    "ex:['int','real','real']"
+                    "\n for 'boolean' use 'int' and specify boundary as [0,1]"
                 )
 
             self.var_type = variable_type_mixed
 
         # input variables' boundaries
         if variable_type != "bool" or type(variable_type_mixed).__module__ == "numpy":
+            if type(variable_boundaries).__module__ != "numpy":
+                raise ValueError("variable_boundaries must be numpy array")
 
-            assert (
-                type(variable_boundaries).__module__ == "numpy"
-            ), "\n variable_boundaries must be numpy array"
-
-            assert (
-                len(variable_boundaries) == self.dim
-            ), "\n variable_boundaries must have a length equal dimension"
+            if len(variable_boundaries) != self.dim:
+                raise ValueError("variable_boundaries must have a length equal to dimension.")
 
             for i in variable_boundaries:
                 assert (
-                    len(i) == 2
+                    len(i) == 2  # noqa: PLR2004
                 ), "\n boundary for each variable must be a tuple of length two."
-                assert (
-                    i[0] <= i[1]
-                ), "\n lower_boundaries must be smaller than upper_boundaries [lower,upper]"
+                assert i[0] <= i[1], "\n lower_boundaries must be smaller than upper_boundaries [lower,upper]"
             self.var_bound = variable_boundaries
         else:
             self.var_bound = np.array([[0, 1]] * self.dim)
@@ -139,29 +132,25 @@ class GeneticAlgorithm(object):
 
         self.pop_s = int(self.param["population_size"])
 
-        assert (
-            self.param["parents_portion"] <= 1 and self.param["parents_portion"] >= 0
-        ), "parents_portion must be in range [0,1]"
+        if not (0 <= self.param["parents_portion"] <= 1):
+            raise ValueError("parents_portion must be in range [0,1]")
 
         self.par_s = int(self.param["parents_portion"] * self.pop_s)
         trl = self.pop_s - self.par_s
-        if trl % 2 != 0:
+        if trl % 2 != 0 and trl != 2:  # noqa: PLR2004
             self.par_s += 1
 
         self.prob_mut = self.param["mutation_probability"]
 
-        assert (
-            self.prob_mut <= 1 and self.prob_mut >= 0
-        ), "mutation_probability must be in range [0,1]"
+        if not (0 <= self.prob_mut <= 1):
+            raise ValueError("mutation_probability must be in range [0,1]")
 
         self.prob_cross = self.param["crossover_probability"]
-        assert (
-            self.prob_cross <= 1 and self.prob_cross >= 0
-        ), "mutation_probability must be in range [0,1]"
+        assert self.prob_cross <= 1, "mutation_probability must be less than or equal to 1"
+        assert self.prob_cross >= 0, "mutation_probability must be greater than or equal to 0"
 
-        assert (
-            self.param["elit_ratio"] <= 1 and self.param["elit_ratio"] >= 0
-        ), "elit_ratio must be in range [0,1]"
+        assert self.param["elit_ratio"] <= 1, "elit_ratio must be less than or equal to 1"
+        assert self.param["elit_ratio"] >= 0, "elit_ratio must be greater than or equal to 0"
 
         trl = self.pop_s * self.param["elit_ratio"]
         if trl < 1 and self.param["elit_ratio"] > 0:
@@ -169,46 +158,36 @@ class GeneticAlgorithm(object):
         else:
             self.num_elit = int(trl)
 
-        assert (
-            self.par_s >= self.num_elit
-        ), "\n number of parents must be greater than number of elits"
+        assert self.par_s >= self.num_elit, "\n number of parents must be greater than number of elits"
 
-        if self.param["max_num_iteration"] == None:
+        if self.param["max_num_iteration"] is None:
             self.iterate = 0
-            for i in range(0, self.dim):
+            for i in range(self.dim):
                 if self.var_type[i] == "int":
-                    self.iterate += (
-                        (self.var_bound[i][1] - self.var_bound[i][0])
-                        * self.dim
-                        * (100 / self.pop_s)
-                    )
+                    self.iterate += (self.var_bound[i][1] - self.var_bound[i][0]) * self.dim * (100 / self.pop_s)
                 else:
-                    self.iterate += (
-                        (self.var_bound[i][1] - self.var_bound[i][0])
-                        * 50
-                        * (100 / self.pop_s)
-                    )
+                    self.iterate += (self.var_bound[i][1] - self.var_bound[i][0]) * 50 * (100 / self.pop_s)
             self.iterate = int(self.iterate)
-            if (self.iterate * self.pop_s) > 10000000:
-                self.iterate = 10000000 / self.pop_s
+            max_iterations = 10000000
+            if (self.iterate * self.pop_s) > max_iterations:
+                self.iterate = max_iterations / self.pop_s
         else:
             self.iterate = int(self.param["max_num_iteration"])
 
         self.c_type = self.param["crossover_type"]
-        assert (
-            self.c_type == "uniform"
-            or self.c_type == "one_point"
-            or self.c_type == "two_point"
-        ), "\n crossover_type must 'uniform', 'one_point', or 'two_point' Enter string"
+        assert self.c_type in {
+            "uniform",
+            "one_point",
+            "two_point",
+        }, "\n crossover_type must 'uniform', 'one_point', or 'two_point' Enter string"
 
         self.stop_mniwi = False
-        if self.param["max_iteration_without_improv"] == None:
+        if self.param["max_iteration_without_improv"] is None:
             self.mniwi = self.iterate + 1
         else:
             self.mniwi = int(self.param["max_iteration_without_improv"])
 
     def run(self):
-
         # Initial Population
         self.integers = np.where(self.var_type == "int")
         self.reals = np.where(self.var_type == "real")
@@ -217,17 +196,12 @@ class GeneticAlgorithm(object):
         solo = np.zeros(self.dim + 1)
         var = np.zeros(self.dim)
 
-        for p in range(0, self.pop_s):
-
+        for p in range(self.pop_s):
             for i in self.integers[0]:
-                var[i] = np.random.randint(
-                    self.var_bound[i][0], self.var_bound[i][1] + 1
-                )
+                var[i] = np.random.randint(self.var_bound[i][0], self.var_bound[i][1] + 1)
                 solo[i] = var[i].copy()
             for i in self.reals[0]:
-                var[i] = self.var_bound[i][0] + np.random.random() * (
-                    self.var_bound[i][1] - self.var_bound[i][0]
-                )
+                var[i] = self.var_bound[i][0] + np.random.random() * (self.var_bound[i][1] - self.var_bound[i][0])
                 solo[i] = var[i].copy()
 
             obj = self.sim(var)
@@ -244,8 +218,7 @@ class GeneticAlgorithm(object):
         counter = 0
         with tqdm(total=self.iterate) as pbar:
             while t <= self.iterate:
-
-                if self.verbose == True:
+                if self.verbose is True:
                     pbar.update(1)
 
                 # Sort
@@ -266,11 +239,7 @@ class GeneticAlgorithm(object):
                 normobj = np.zeros(self.pop_s)
 
                 minobj = pop[0, self.dim]
-                if minobj < 0:
-                    normobj = pop[:, self.dim] + abs(minobj)
-
-                else:
-                    normobj = pop[:, self.dim].copy()
+                normobj = pop[:, self.dim] + abs(minobj) if minobj < 0 else pop[:, self.dim].copy()
 
                 maxnorm = np.amax(normobj)
                 normobj = maxnorm - normobj + 1
@@ -284,7 +253,7 @@ class GeneticAlgorithm(object):
                 # Select parents
                 par = np.array([np.zeros(self.dim + 1)] * self.par_s)
 
-                for k in range(0, self.num_elit):
+                for k in range(self.num_elit):
                     par[k] = pop[k].copy()
                 for k in range(self.num_elit, self.par_s):
                     index = np.searchsorted(cumprob, np.random.random())
@@ -293,7 +262,7 @@ class GeneticAlgorithm(object):
                 ef_par_list = np.array([False] * self.par_s)
                 par_count = 0
                 while par_count == 0:
-                    for k in range(0, self.par_s):
+                    for k in range(self.par_s):
                         if np.random.random() <= self.prob_cross:
                             ef_par_list[k] = True
                             par_count += 1
@@ -303,7 +272,7 @@ class GeneticAlgorithm(object):
                 # New generation
                 pop = np.array([np.zeros(self.dim + 1)] * self.pop_s)
 
-                for k in range(0, self.par_s):
+                for k in range(self.par_s):
                     pop[k] = par[k].copy()
 
                 for k in range(self.par_s, self.pop_s, 2):
@@ -332,7 +301,7 @@ class GeneticAlgorithm(object):
                     pop = pop[pop[:, self.dim].argsort()]
                     if pop[0, self.dim] >= self.best_function:
                         t = self.iterate
-                        if self.verbose == True:
+                        if self.verbose is True:
                             pbar.update(t - pbar.n)
                         time.sleep(2)
                         t += 1
@@ -342,7 +311,6 @@ class GeneticAlgorithm(object):
         pop = pop[pop[:, self.dim].argsort()]
 
         if pop[0, self.dim] < self.best_function:
-
             self.best_function = pop[0, self.dim].copy()
             self.best_variable = pop[0, : self.dim].copy()
             pbar.set_description(f"Cost: {self.best_function:.4f}")
@@ -355,33 +323,29 @@ class GeneticAlgorithm(object):
             "variable": self.best_variable,
             "function": self.best_function,
         }
-        if self.verbose == True:
+        if self.verbose is True:
             show = " " * 100
-            sys.stdout.write("\r%s" % (show))
-            sys.stdout.write("\r The best solution found:\n %s" % (self.best_variable))
-            sys.stdout.write("\n\n Objective function:\n %s\n" % (self.best_function))
+            sys.stdout.write(f"\r{show}")
+            sys.stdout.write(f"\r The best solution found:\n {self.best_variable}")
+            sys.stdout.write(f"\n\n Objective function:\n {self.best_function}\n")
             sys.stdout.flush()
-        re = np.array(self.report)
 
-        if self.stop_mniwi == True:
+        if self.stop_mniwi is True:
             sys.stdout.write(
-                "\nWarning: GA is terminated due to the"
-                + " maximum number of iterations without improvement was met!"
+                "\nWarning: GA is terminated due to the" " maximum number of iterations without improvement was met!"
             )
 
     def cross(self, x, y, c_type):
-
         ofs1 = x.copy()
         ofs2 = y.copy()
 
         if c_type == "one_point":
             ran = np.random.randint(0, self.dim)
-            for i in range(0, ran):
+            for i in range(ran):
                 ofs1[i] = y[i].copy()
                 ofs2[i] = x[i].copy()
 
         if c_type == "two_point":
-
             ran1 = np.random.randint(0, self.dim)
             ran2 = np.random.randint(ran1, self.dim)
 
@@ -390,30 +354,25 @@ class GeneticAlgorithm(object):
                 ofs2[i] = x[i].copy()
 
         if c_type == "uniform":
-
-            for i in range(0, self.dim):
+            threshold = 0.5
+            for i in range(self.dim):
                 ran = np.random.random()
-                if ran < 0.5:
+                if ran < threshold:
                     ofs1[i] = y[i].copy()
                     ofs2[i] = x[i].copy()
 
         return np.array([ofs1, ofs2])
 
     def mut(self, x):
-
         for i in self.integers[0]:
             ran = np.random.random()
             if ran < self.prob_mut:
-
                 x[i] = np.random.randint(self.var_bound[i][0], self.var_bound[i][1] + 1)
 
         for i in self.reals[0]:
             ran = np.random.random()
             if ran < self.prob_mut:
-
-                x[i] = self.var_bound[i][0] + np.random.random() * (
-                    self.var_bound[i][1] - self.var_bound[i][0]
-                )
+                x[i] = self.var_bound[i][0] + np.random.random() * (self.var_bound[i][1] - self.var_bound[i][0])
 
         return x
 
@@ -426,9 +385,7 @@ class GeneticAlgorithm(object):
                 elif p1[i] > p2[i]:
                     x[i] = np.random.randint(p2[i], p1[i])
                 else:
-                    x[i] = np.random.randint(
-                        self.var_bound[i][0], self.var_bound[i][1] + 1
-                    )
+                    x[i] = np.random.randint(self.var_bound[i][0], self.var_bound[i][1] + 1)
 
         for i in self.reals[0]:
             ran = np.random.random()
@@ -438,9 +395,7 @@ class GeneticAlgorithm(object):
                 elif p1[i] > p2[i]:
                     x[i] = p2[i] + np.random.random() * (p1[i] - p2[i])
                 else:
-                    x[i] = self.var_bound[i][0] + np.random.random() * (
-                        self.var_bound[i][1] - self.var_bound[i][0]
-                    )
+                    x[i] = self.var_bound[i][0] + np.random.random() * (self.var_bound[i][1] - self.var_bound[i][0])
         return x
 
     def evaluate(self):
@@ -448,5 +403,4 @@ class GeneticAlgorithm(object):
 
     def sim(self, X):
         self.temp = X.copy()
-        obj = self.evaluate()
-        return obj
+        return self.evaluate()
