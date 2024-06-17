@@ -26,14 +26,15 @@ __all__ = [
     "DebiasingLearningMF",
     "PopularityPropensityMF",
     "FairRec",
-    "FairScoreClassifier",
 ]
-
-
-import importlib
+import importlib.util
 
 torch_spec = importlib.util.find_spec("torch")
 if torch_spec is not None:
     from .adversarial_debiasing.torch.transformer import AdversarialDebiasing
+    __all__.append("AdversarialDebiasing")
 
-__all__ += ["AdversarialDebiasing"]
+cvxpy_spec = importlib.util.find_spec("cvxpy")
+if cvxpy_spec is not None:
+    from .fair_scoring_classifier.transformer import FairScoreClassifier
+    __all__.append("FairScoreClassifier")

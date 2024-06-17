@@ -26,27 +26,15 @@ dependencies = ["scikit-learn>=1.0.2"]
 
 [project.optional-dependencies]
 bias = [
-  "cvxpy[cbc]>1.3.0",
+  "cvxpy[cbc]>1.5.0",
   "cvxopt>=1.3.0",
   "seaborn>=0.11.2",
   "networkx>=3.1",
 ]
 explainability = ["lime>=0.2.0.1", "shap>=0.42.1", "pydotplus", "dtreeviz"]
-all = [
-  "cvxpy[cbc]>1.3.0",
-  "cvxopt>=1.3.0",
-  "seaborn>=0.11.2",
-  "networkx>=3.1",
-  "lime>=0.2.0.1",
-  "shap>=0.42.1",
-  "pydotplus",
-  "dtreeviz",
-]
 
 [tool.hatch.envs.all]
 dependencies = [  
-  "cvxpy[cbc]>1.3.0",
-  "cvxopt>=1.3.0",
   "seaborn>=0.11.2",
   "networkx>=3.1",
   "lime>=0.2.0.1",
@@ -83,7 +71,7 @@ extend = "ruff_default.toml"
 exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/mitigation/**", "src/holisticai/utils/trade_off_analysers/**"]
 
 [tool.hatch.envs.sphinx]
-template = "all"
+inherit = ["all"]
 dependencies = [
   "sphinx",
   "pydata-sphinx-theme",
@@ -104,11 +92,10 @@ build = ["bash docs/source/build.sh"]
 
 [tool.hatch.envs.testing]
 dependencies = [
-  "cvxpy[cbc]>1.3.0",
-  "cvxopt>=1.3.0",
   "seaborn>=0.11.2",
-  "matplotlib>=3.7.3",
   "networkx>=3.1",
+  "lime>=0.2.0.1",
+  "shap>=0.42.1",
   "pydotplus",
   "dtreeviz",
   "flake8>=5.0.4",
@@ -118,12 +105,14 @@ dependencies = [
   "lime>=0.2.0.1",
   "shap>=0.42.1",
   "ipykernel>=6.25.2",
-  "ruff"
+  "ruff",
 ]
 paths = ["./src"]
 
 [tool.hatch.envs.testing.scripts]
 run = ["python -m pytest tests"]
+cylp = ['python -c "import cylp"']
+foo = ["which python"]
 
 [tool.hatch.envs.default]
 env-vars = { PYTHONPATH = "src" }

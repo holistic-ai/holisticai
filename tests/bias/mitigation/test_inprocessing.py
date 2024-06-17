@@ -63,7 +63,7 @@ def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds",
     else:
         raise NotImplementedError
 
-
+@pytest.mark.skip(reason="remove CBC dependency to enable this test")
 @pytest.mark.parametrize("mitigator_name, mitigator_params, model_params", [
     ("FairScoreClassifier", {'objectives':'ab', 'constraints':{}}, {"random_state":42}),
 ])
