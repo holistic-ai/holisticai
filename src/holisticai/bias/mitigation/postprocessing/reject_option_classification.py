@@ -5,13 +5,13 @@ import sys
 from typing import Literal
 
 import numpy as np
-from holisticai.metrics import bias as metrics
+import holisticai.bias.metrics as bias_metrics
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from sklearn.metrics import balanced_accuracy_score
 
 
 def statistical_parity(group_a, group_b, y_pred, y_true):
-    return metrics.statistical_parity(group_a, group_b, y_pred)
+    return bias_metrics.statistical_parity(group_a, group_b, y_pred)
 
 
 class RejectOptionClassification(BMPost):
@@ -158,10 +158,10 @@ class RejectOptionClassification(BMPost):
             fair_metric = statistical_parity
 
         elif self.metric_name == "Average odds difference":
-            fair_metric = metrics.average_odds_diff
+            fair_metric = bias_metrics.average_odds_diff
 
         elif self.metric_name == "Equal opportunity difference":
-            fair_metric = metrics.equal_opportunity_diff
+            fair_metric = bias_metrics.equal_opportunity_diff
 
         else:
             msg = "metric name not in the list of allowed metrics"
