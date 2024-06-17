@@ -23,7 +23,6 @@ from holisticai.mitigation.bias import ExponentiatedGradientReduction
 from holisticai.mitigation.bias import GridSearchReduction
 from holisticai.mitigation.bias import MetaFairClassifier
 from holisticai.mitigation.bias import PrejudiceRemover
-from holisticai.mitigation.bias import FairScoreClassifier
 from holisticai.mitigation.bias import FairKCenterClustering
 from holisticai.mitigation.bias import FairKMedianClustering
 from holisticai.mitigation.bias import FairletClustering
@@ -43,6 +42,7 @@ def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds",
     elif mitigator_name == "PrejudiceRemover":
         return PrejudiceRemover(**parameters)
     elif mitigator_name == "FairScoreClassifier":
+        from holisticai.mitigation.bias import FairScoreClassifier
         return FairScoreClassifier(**parameters)
     elif mitigator_name == "FairKCenterClustering":
         return FairKCenterClustering(**parameters)
