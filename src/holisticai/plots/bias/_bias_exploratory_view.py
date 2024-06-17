@@ -1,4 +1,4 @@
-import ipywidgets as widgets
+import ipywidgets as widgets  # type: ignore
 import matplotlib.pyplot as plt
 from holisticai.plots.bias._bias_exploratory_plots import group_pie_plot, histogram_plot
 from holisticai.plots.bias._bias_multiclass_plots import accuracy_bar_plot, frequency_matrix_plot, frequency_plot
@@ -6,6 +6,11 @@ from IPython.display import display
 
 
 def binary_classification_data_exploration(dataset):
+    from io import StringIO
+
+    from IPython.core.display import HTML
+    from ipywidgets import embed  # type: ignore
+
     output = widgets.Output()
 
     def update_plot(change):
@@ -29,12 +34,6 @@ def binary_classification_data_exploration(dataset):
     content = widgets.VBox([dropdown, output])
     display(content)
     update_plot({"new": dropdown.value})
-
-    # Guardar el widget como HTML en una cadena
-    from io import StringIO
-
-    from IPython.core.display import HTML
-    from ipywidgets import embed
 
     html_stream = StringIO()
     embed.embed_minimal_html(html_stream, views=[content], title="Mi widget")
@@ -122,16 +121,16 @@ def clustering_model_exploration(dataset, y_pred):
 
 
 def bias_data_exploration(learning_task, dataset):
-    match learning_task:
-        case "binary_classification":
-            return binary_classification_data_exploration(dataset)
-        case "clustering":
-            return clustering_data_exploration(dataset)
+    if learning_task == "binary_classification":
+        return binary_classification_data_exploration(dataset)
+    if learning_task == "clustering":
+        return clustering_data_exploration(dataset)
+    return None
 
 
 def bias_model_exploration(learning_task, dataset, y_pred):
-    match learning_task:
-        case "binary_classification":
-            return binary_classification_model_exploration(dataset, y_pred)
-        case "clustering":
-            return clustering_model_exploration(dataset, y_pred)
+    if learning_task == "binary_classification":
+        return binary_classification_model_exploration(dataset, y_pred)
+    if learning_task == "clustering":
+        return clustering_model_exploration(dataset, y_pred)
+    return None

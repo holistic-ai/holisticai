@@ -2,7 +2,6 @@
 from .exponentiated_gradient.transformer import ExponentiatedGradientReduction
 from .fair_k_center_clustering.transformer import FairKCenterClustering
 from .fair_k_mediam_clustering.transformer import FairKMedianClustering
-from .fair_scoring_classifier.transformer import FairScoreClassifier
 from .fairlet_clustering.transformer import FairletClustering
 from .grid_search.transformer import GridSearchReduction
 from .matrix_factorization.blind_spot_aware import BlindSpotAwareMF
@@ -26,14 +25,15 @@ __all__ = [
     "DebiasingLearningMF",
     "PopularityPropensityMF",
     "FairRec",
-    "FairScoreClassifier",
 ]
-
-
-import importlib
+import importlib.util
 
 torch_spec = importlib.util.find_spec("torch")
 if torch_spec is not None:
     from .adversarial_debiasing.torch.transformer import AdversarialDebiasing
+    __all__.append("AdversarialDebiasing")
 
-__all__ += ["AdversarialDebiasing"]
+cvxpy_spec = importlib.util.find_spec("cvxpy")
+if cvxpy_spec is not None:
+    from .fair_scoring_classifier.transformer import FairScoreClassifier
+    __all__.append("FairScoreClassifier")

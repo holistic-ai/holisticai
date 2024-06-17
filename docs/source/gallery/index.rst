@@ -7,5 +7,6 @@ This gallery contains a collection of examples that demonstrate the usage of ``h
 .. toctree::
     :maxdepth: 2
     
-    
+    Datasets <tutorials/datasets>
+
     Bias <tutorials/bias>

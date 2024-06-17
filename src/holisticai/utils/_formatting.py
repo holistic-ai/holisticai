@@ -84,7 +84,7 @@ def mat_to_binary(mat, top=None, thresh=0.5):
     # Case 2 : top is not None
     if top is not None:
         # preprocess
-        mat = np.nan_to_num(mat, copy=True, nan=-np.Inf)
+        mat = np.nan_to_num(mat, copy=True, nan=-np.inf)
         n_users, n_items = mat.shape
         top_items = np.argsort(mat, axis=1)
 

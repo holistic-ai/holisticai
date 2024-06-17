@@ -258,50 +258,21 @@ def load_clinical_records_dataset():
     return Dataset(X=x, y=y, group_a=group_a, group_b=group_b)
 
 
-def load_small_clinical_records():
-    df = pd.read_csv(
-        "https://archive.ics.uci.edu/ml/machine-learning-databases/00519/heart_failure_clinical_records_dataset.csv"
-    )
-    protected_attribute = "sex"
-    output_variable = "DEATH_EVENT"
-    drop_columns = ["age", "sex", "DEATH_EVENT"]
-    df = df.dropna().reset_index(drop=True)
-    df = pd.concat(
-        [
-            df[(df[protected_attribute] == 1) & (df[output_variable] == 1)].sample(20).reset_index(drop=True),
-            df[(df[protected_attribute] == 1) & (df[output_variable] == 0)].sample(20).reset_index(drop=True),
-            df[(df[protected_attribute] == 0) & (df[output_variable] == 1)].sample(20).reset_index(drop=True),
-            df[(df[protected_attribute] == 0) & (df[output_variable] == 0)].sample(20).reset_index(drop=True),
-        ],
-        axis=0,
-    )
-    group_a = df[protected_attribute] == 0
-    group_b = df[protected_attribute] == 1
-    # p_attr = pd.concat([group_a, group_b], axis=1)
-    # p_attr.columns = ["group_a", "group_b"]
-    y = df[output_variable]
-    x = df.drop(columns=drop_columns)
-    return Dataset(X=x, y=y, group_a=group_a, group_b=group_b)
-
-
 def load_dataset(dataset_name, **kargs):
-    match dataset_name:
-        case "adult":
-            return load_adult_dataset(**kargs)
-        case "law_school":
-            return load_law_school_dataset(**kargs)
-        case "student_multiclass":
-            return load_student_multiclass_dataset()
-        case "student":
-            return load_student_dataset()
-        case "lastfm":
-            return load_lastfm_dataset()
-        case "us_crime":
-            return load_us_crime_dataset()
-        case "us_crime_multiclass":
-            return load_us_crime_multiclass_dataset()
-        case "clinical_records":
-            return load_clinical_records_dataset()
-        case "small_clinical_records":
-            return load_small_clinical_records()
+    if dataset_name == "adult":
+        return load_adult_dataset(**kargs)
+    if dataset_name == "law_school":
+        return load_law_school_dataset(**kargs)
+    if dataset_name == "student_multiclass":
+        return load_student_multiclass_dataset()
+    if dataset_name == "student":
+        return load_student_dataset()
+    if dataset_name == "lastfm":
+        return load_lastfm_dataset()
+    if dataset_name == "us_crime":
+        return load_us_crime_dataset()
+    if dataset_name == "us_crime_multiclass":
+        return load_us_crime_multiclass_dataset()
+    if dataset_name == "clinical_records":
+        return load_clinical_records_dataset()
     raise NotImplementedError

@@ -1,0 +1,6 @@
+Student,load_student,"Student performance dataset, used to predict students' grades based on various features."
+Adult,load_adult,"Adult dataset, used for income classification tasks based on census data."
+Law School,load_law_school,"Law school admission dataset, used to predict law school admission based on various features."
+Last FM,load_last_fm,"Last FM dataset, used for music recommendation tasks based on user listening history."
+US Crime,load_us_crime,"US Crime dataset, used to analyze and predict crime rates based on various socio-economic factors."
+Heart,load_heart,"Heart failure clinical records dataset, used to predict heart failure events based on clinical features."

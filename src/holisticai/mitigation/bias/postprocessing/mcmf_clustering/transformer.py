@@ -55,7 +55,7 @@ class MCMF(BMPost):
         group_a: np.ndarray,
         group_b: np.ndarray,
         centroids: np.ndarray,
-    ) -> "MCMF":
+    ) -> dict[str,np.ndarray]:
         return self.transform(X, y_pred, group_a, group_b, centroids)
 
     def transform(
@@ -64,15 +64,15 @@ class MCMF(BMPost):
         y_pred: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        centroids: Union[np.ndarray, str],
-    ) -> np.ndarray:
+        centroids: np.ndarray,
+    ) -> dict[str,np.ndarray]:
         """
         Modify y_pred using MCMF algorithm.
-
+    
         Description
         ----------
         Build parameters for the objetive function and call the solver to find the algorithm parameters.
-
+    
         Parameters
         ----------
         X : matrix-like
@@ -83,21 +83,23 @@ class MCMF(BMPost):
             Group membership vector (binary)
         group_b : array-like
             Group membership vector (binary)
-
+        centroids : ndarray
+            Centroids array
+    
         Returns
         -------
         Self
         """
         params = self._load_data(X=X, y_pred=y_pred, group_a=group_a, group_b=group_b)
-
+    
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
         X = params["X"]
         y_pred = params["y_pred"]
-
-        if type(centroids) is str:
+    
+        if isinstance(centroids, str):
             centroids = getattr(self.estimator_hdl.estimator, centroids)
-
+        
         if self.group_mode in ["a", "b"]:
             group = group_a if self.group_mode == "a" else group_b
             new_y_pred = self.algorithm.transform(
@@ -109,5 +111,5 @@ class MCMF(BMPost):
                 new_y_pred = self.algorithm.transform(
                     X=X, y_pred=new_y_pred, group=group, centroids=centroids
                 )
-
+    
         return {"y_pred": new_y_pred}

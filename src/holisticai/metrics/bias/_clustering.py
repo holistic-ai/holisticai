@@ -125,7 +125,7 @@ def min_cluster_ratio(group_a, group_b, y_pred):
 
     # Get clusters
     clusters = np.unique(y_pred)
-    min_ratio = np.Inf
+    min_ratio = np.inf
 
     # Get balance of each cluster
     for c in clusters:
@@ -190,7 +190,7 @@ def _avg_cluster_ratio(group_a, group_b, y_pred):
         n_b = group_b[members].sum()
         # if n_b zero we get infinity for mean
         if n_b == 0:
-            return np.Inf
+            return np.inf
         balances[i] = n_a / n_b
         # Check non zero for b
         balances[i] = n_a / (n_b + 1.0e-32)

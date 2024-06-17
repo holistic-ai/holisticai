@@ -32,3 +32,4 @@ docs/build
 .vscode
 .ruff_cache
 .pytest_cache
+docs/**/*.ipynb

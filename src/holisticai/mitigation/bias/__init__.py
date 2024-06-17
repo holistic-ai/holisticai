@@ -11,7 +11,6 @@ from holisticai.mitigation.bias.inprocessing import (
     FairKMedianClustering,
     FairletClustering,
     FairRec,
-    FairScoreClassifier,
     GridSearchReduction,
     MetaFairClassifier,
     PopularityPropensityMF,
@@ -68,7 +67,6 @@ __all__ = [
     "DebiasingLearningMF",
     "PopularityPropensityMF",
     "FairRec",
-    "FairScoreClassifier",
     "DebiasingExposure",
     "FairTopK",
     "MCMF",
@@ -88,6 +86,11 @@ if networkx_spec is not None:
     from holisticai.mitigation.bias.preprocessing import DisparateImpactRemover
 
 __all__ += ["DisparateImpactRemoverRS", "DisparateImpactRemover"]
+
+cvxpy_spec = importlib.util.find_spec("cvxpy")
+if cvxpy_spec is not None:
+    from holisticai.mitigation.bias.inprocessing.fair_scoring_classifier.transformer import FairScoreClassifier
+__all__ += ["FairScoreClassifier"]
 
 MITIGATOR_NAME= Literal[
     "CorrelationRemover",

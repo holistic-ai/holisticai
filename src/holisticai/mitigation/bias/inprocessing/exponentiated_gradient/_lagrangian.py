@@ -193,7 +193,7 @@ class Lagrangian:
             best_value = values[best_idx]
         else:
             best_idx = -1
-            best_value = np.PINF
+            best_value = np.inf
 
         if h_value < best_value - PRECISION:
             h_idx = len(self.hs)

@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="docs/holistic_ai.png" width="100">
+<img src="docs/source/holistic_ai.png" width="100">
 <br>holisticai: building trustworthy AI systems
 </h1>
 

@@ -10,6 +10,8 @@ from holisticai.utils.obj_rep.datasets import generate_html
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+import numpy as np
+
 
 class DatasetDict(dict):
     def __init__(self, **datasets):
@@ -63,10 +65,10 @@ def apply_fn_to_multilevel_df(df, fn):
     return result_df
 
 
-def sample_n(group, n):
+def sample_n(group, n, random_state=None):
     if len(group) < n:
         return group
-    return group.sample(n=n, replace=False)
+    return group.sample(n=n, replace=False, random_state=random_state)
 
 
 class GroupByDataset:
@@ -75,12 +77,17 @@ class GroupByDataset:
         self.grouped_names = [feature for feature, _ in self.groupby_obj.keys]
         self.features = self.groupby_obj.obj.columns.get_level_values("features").unique().tolist()
         self.ngroups = self.groupby_obj.ngroups
+        self.random_state = np.random.RandomState()
 
     def head(self, k):
         return Dataset(self.groupby_obj.head(k))
 
-    def sample(self, n):
-        return Dataset(self.groupby_obj.apply(lambda x: sample_n(x, n)).reset_index(drop=True))
+    def sample(self, n, random_state=None):
+        if random_state is None:
+            random_state = self.random_state
+        return Dataset(
+            self.groupby_obj.apply(lambda x: sample_n(x, n, random_state=random_state)).reset_index(drop=True)
+        )
 
     def __iter__(self):
         for group_name, groupby_obj_batch in self.groupby_obj:
@@ -134,7 +141,7 @@ def dataframe_to_level_dict_with_series(df, row_index):
     return data
 
 
-class Dataset(dict):
+class Dataset:
     def update_metadata(self):
         self.features = list(self.data.columns.get_level_values(0).unique())
         self.num_rows = len(self.data)
@@ -161,6 +168,7 @@ class Dataset(dict):
         else:
             self.data = data.reset_index(drop=True)
         self.update_metadata()
+        self.random_state = np.random.RandomState()
 
     def rename(self, renames):
         return Dataset(self.data.rename(columns=renames, level=0))
@@ -168,6 +176,11 @@ class Dataset(dict):
     def select(self, indices: Iterable):
         existing_indices = [idx for idx in indices if idx in self.indices]
         return Dataset(self.data.iloc[existing_indices])
+
+    def sample(self, n, random_state=None):
+        if random_state is None:
+            random_state = self.random_state
+        return Dataset(sample_n(self.data, n, random_state=random_state).reset_index(drop=True))
 
     def filter(self, fn):
         def fnw(row):
@@ -181,25 +194,42 @@ class Dataset(dict):
         if isinstance(key, list):
             key = [(key[0], key[0]), (key[1], key[1])]
         elif isinstance(key, str):
-            key = [tuple(key, key)]
+            key = [(key, key)]
         else:
             raise TypeError
         return GroupByDataset(self.data.groupby(key, observed=True))
 
     def map(self, fn, vectorized=True):
-        def fnw(x):
-            ds = {level: x.xs(level, axis=1, level="features") for level in x.columns.levels[0]}
-            return fn(ds)
-
         if vectorized:
+
+            def fnw(x):
+                ds = {level: x.xs(level, axis=1, level="features") for level in x.columns.levels[0]}
+                return fn(ds)
+
             new_data = fnw(self.data)
             updated_data = pd.concat(new_data, axis=1)
             updated_data.columns = pd.MultiIndex.from_tuples(
                 [(key, key) for key, serie in new_data.items()], names=["features", "subfeatures"]
             )
         else:
+
+            def fnw(row):
+                result = {}
+                for upper in row.index.levels[0]:
+                    sub_row = row[upper]
+                    if isinstance(sub_row, pd.Series):
+                        result[upper] = sub_row.to_dict() if len(sub_row) > 1 else sub_row.item()
+                    elif isinstance(sub_row, pd.DataFrame):
+                        sub_row = sub_row.squeeze()
+                        result[upper] = sub_row.to_dict() if len(sub_row) > 1 else sub_row.squeeze().item()
+                return fn(result)
+
             updated_data = self.data.apply(fnw, axis=1, result_type="expand")
             updated_data = pd.DataFrame(updated_data)
+            new_columns = pd.MultiIndex.from_tuples(
+                [(col, col) for col in updated_data.columns], names=["features", "subfeatures"]
+            )
+            updated_data.columns = new_columns
 
         new_data = self.data.combine_first(updated_data)
         return Dataset(new_data)
