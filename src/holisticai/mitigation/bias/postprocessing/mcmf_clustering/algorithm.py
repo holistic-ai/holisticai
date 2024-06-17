@@ -85,7 +85,7 @@ class Algorithm:
         X: np.ndarray,
         y_pred: np.ndarray,
         group: np.ndarray,
-        centroids: np.ndarray | None = None,
+        centroids: np.ndarray,
     ):
 
         params = self.init_parameters(y_pred, group)
