@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "holistic-ai"
+name = "holisticai"
 dynamic = ["version"]
 description = ''
 readme = "README.md"
@@ -55,9 +55,9 @@ dependencies = [
   "dtreeviz"]
 
 [project.urls]
-Documentation = "https://github.com/crismunoz/holistic-ai#readme"
-Issues = "https://github.com/crismunoz/holistic-ai/issues"
-Source = "https://github.com/crismunoz/holistic-ai"
+Documentation = "https://github.com/crismunoz/holisticai#readme"
+Issues = "https://github.com/crismunoz/holisticai/issues"
+Source = "https://github.com/crismunoz/holisticai"
 
 [tool.hatch.version]
 path = "src/holisticai/__about__.py"
