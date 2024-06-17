@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-from holisticai.metrics.bias import average_odds_diff, statistical_parity
+from holisticai.bias.metrics import average_odds_diff, statistical_parity
 from holisticai.utils._validation import _check_same_shape
 from holisticai.utils.trade_off_analysers.utils_fairea import (
     do_line_segments_intersect,

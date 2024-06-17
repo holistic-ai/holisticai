@@ -6,7 +6,7 @@ This page covers all mitigation strategies available in `holisticai.mitigation` 
 
 The following subpackages are public.
 
-- ``holisticai.mitigation.bias``: Functions and classes for bias mitigation.
+- ``holisticai.bias.mitigation``: Functions and classes for bias mitigation.
 
 .. toctree::
    :maxdepth: 2

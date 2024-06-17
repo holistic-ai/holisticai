@@ -96,7 +96,6 @@ dependencies = [
 
 [tool.hatch.envs.sphinx.scripts]
 foo = ["which sphinx-build"]
-foo2 = ["which python"]
 build = ["bash docs/source/build.sh"]
 
 [tool.hatch.envs.testing]
@@ -120,7 +119,6 @@ paths = ["./src"]
 
 [tool.hatch.envs.testing.scripts]
 run = ["python -m pytest tests"]
-cylp = ['python -c "import cylp"']
 foo = ["which python"]
 
 [tool.hatch.envs.default]

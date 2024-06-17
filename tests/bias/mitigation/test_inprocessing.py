@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
 from holisticai.pipeline import Pipeline
-from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics, recommender_bias_metrics
+from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics, recommender_bias_metrics
 from tests.bias.mitigation.utils import (
     check_results,
     categorical_dataset,
@@ -18,19 +18,19 @@ warnings.filterwarnings("ignore")
 
 seed = 42
 
-from holisticai.mitigation.bias import MITIGATOR_NAME
-from holisticai.mitigation.bias import ExponentiatedGradientReduction
-from holisticai.mitigation.bias import GridSearchReduction
-from holisticai.mitigation.bias import MetaFairClassifier
-from holisticai.mitigation.bias import PrejudiceRemover
-from holisticai.mitigation.bias import FairKCenterClustering
-from holisticai.mitigation.bias import FairKMedianClustering
-from holisticai.mitigation.bias import FairletClustering
-from holisticai.mitigation.bias import VariationalFairClustering
-from holisticai.mitigation.bias import PopularityPropensityMF
-from holisticai.mitigation.bias import BlindSpotAwareMF
-from holisticai.mitigation.bias import FairRec
-from holisticai.mitigation.bias import DebiasingLearningMF
+from holisticai.bias.mitigation import MITIGATOR_NAME
+from holisticai.bias.mitigation import ExponentiatedGradientReduction
+from holisticai.bias.mitigation import GridSearchReduction
+from holisticai.bias.mitigation import MetaFairClassifier
+from holisticai.bias.mitigation import PrejudiceRemover
+from holisticai.bias.mitigation import FairKCenterClustering
+from holisticai.bias.mitigation import FairKMedianClustering
+from holisticai.bias.mitigation import FairletClustering
+from holisticai.bias.mitigation import VariationalFairClustering
+from holisticai.bias.mitigation import PopularityPropensityMF
+from holisticai.bias.mitigation import BlindSpotAwareMF
+from holisticai.bias.mitigation import FairRec
+from holisticai.bias.mitigation import DebiasingLearningMF
 
 def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds", parameters: dict = {}):
     if mitigator_name == "ExponentiatedGradientReduction":
@@ -42,7 +42,7 @@ def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds",
     elif mitigator_name == "PrejudiceRemover":
         return PrejudiceRemover(**parameters)
     elif mitigator_name == "FairScoreClassifier":
-        from holisticai.mitigation.bias import FairScoreClassifier
+        from holisticai.bias.mitigation import FairScoreClassifier
         return FairScoreClassifier(**parameters)
     elif mitigator_name == "FairKCenterClustering":
         return FairKCenterClustering(**parameters)

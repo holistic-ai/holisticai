@@ -4,9 +4,9 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.cluster import KMeans
 
 from holisticai.pipeline import Pipeline
-from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
+from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
 from holisticai.datasets.synthetic.recruitment import generate_rankings
-from holisticai.mitigation.bias.postprocessing.debiasing_exposure.algorithm_utils import exposure_metric
+from holisticai.bias.mitigation.postprocessing.debiasing_exposure.algorithm_utils import exposure_metric
 from tests.bias.mitigation.utils import (
     check_results,
     categorical_dataset,
@@ -19,18 +19,18 @@ warnings.filterwarnings("ignore")
 
 seed = 42
 
-from holisticai.mitigation.bias import MITIGATOR_NAME
-from holisticai.mitigation.bias import CalibratedEqualizedOdds
-from holisticai.mitigation.bias import EqualizedOdds
-from holisticai.mitigation.bias import RejectOptionClassification
-from holisticai.mitigation.bias import LPDebiaserBinary
-from holisticai.mitigation.bias import MLDebiaser
-from holisticai.mitigation.bias import LPDebiaserMulticlass
-from holisticai.mitigation.bias import PluginEstimationAndCalibration
-from holisticai.mitigation.bias import WassersteinBarycenter
-from holisticai.mitigation.bias import MCMF
-from holisticai.mitigation.bias import DebiasingExposure
-from holisticai.mitigation.bias import FairTopK
+from holisticai.bias.mitigation import MITIGATOR_NAME
+from holisticai.bias.mitigation import CalibratedEqualizedOdds
+from holisticai.bias.mitigation import EqualizedOdds
+from holisticai.bias.mitigation import RejectOptionClassification
+from holisticai.bias.mitigation import LPDebiaserBinary
+from holisticai.bias.mitigation import MLDebiaser
+from holisticai.bias.mitigation import LPDebiaserMulticlass
+from holisticai.bias.mitigation import PluginEstimationAndCalibration
+from holisticai.bias.mitigation import WassersteinBarycenter
+from holisticai.bias.mitigation import MCMF
+from holisticai.bias.mitigation import DebiasingExposure
+from holisticai.bias.mitigation import FairTopK
 
 def get_postprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds", parameters: dict = {}):
     if mitigator_name == "CalibratedEqualizedOdds":

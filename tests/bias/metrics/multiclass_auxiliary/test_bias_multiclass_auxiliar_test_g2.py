@@ -11,7 +11,7 @@ from utils import (
     unconventional_numeric_config,
 )
 
-from holisticai.metrics.bias import confusion_matrix
+from holisticai.bias.metrics import confusion_matrix
 
 ##################################################################################################################
 # 2 inputs

@@ -5,9 +5,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 
 from holisticai.pipeline import Pipeline
-from holisticai.metrics.bias import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
+from holisticai.bias.metrics import classification_bias_metrics, regression_bias_metrics, multiclass_bias_metrics, clustering_bias_metrics
 from holisticai.datasets.synthetic.recruitment import generate_rankings
-from holisticai.mitigation.bias.postprocessing.debiasing_exposure.algorithm_utils import exposure_metric
+from holisticai.bias.mitigation.postprocessing.debiasing_exposure.algorithm_utils import exposure_metric
 
 from tests.bias.mitigation.utils import (
     check_results,
@@ -22,12 +22,12 @@ warnings.filterwarnings("ignore")
 
 seed = 42
 
-from holisticai.mitigation.bias import MITIGATOR_NAME
-from holisticai.mitigation.bias import CorrelationRemover
-from holisticai.mitigation.bias import Reweighing
-from holisticai.mitigation.bias import LearningFairRepresentation
-from holisticai.mitigation.bias import FairletClusteringPreprocessing
-from holisticai.mitigation.bias import DisparateImpactRemoverRS
+from holisticai.bias.mitigation import MITIGATOR_NAME
+from holisticai.bias.mitigation import CorrelationRemover
+from holisticai.bias.mitigation import Reweighing
+from holisticai.bias.mitigation import LearningFairRepresentation
+from holisticai.bias.mitigation import FairletClusteringPreprocessing
+from holisticai.bias.mitigation import DisparateImpactRemoverRS
 
 def get_preprocessor(mitigator_name : MITIGATOR_NAME = "CorrelationRemover", parameters: dict = {}):
     if mitigator_name == "CorrelationRemover":

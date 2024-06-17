@@ -23,20 +23,15 @@ def load_adult_dataset(protected_attribute: Literal["race", "sex"] | None = None
     drop_columns = [*protected_attributes, output_variable, "education"]
     df = pd.concat([data["data"], data["target"]], axis=1)
     df = df.dropna().reset_index(drop=True)
-    # group_a = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_a")
-    # group_b = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
 
     params = {}
-    if protected_attribute is None:
-        params["p_attr"] = df[protected_attributes]
-    else:
-        if protected_attribute == "race":
-            params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "White"), name="group_a")
-            params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Black"), name="group_b")
+    if protected_attribute == "race":
+        params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "White"), name="group_a")
+        params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Black"), name="group_b")
 
-        if protected_attribute == "sex":
-            params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_a")
-            params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
+    if protected_attribute == "sex":
+        params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_a")
+        params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
 
     # p_attr = pd.concat([group_a, group_b], axis=1)
     y = df[output_variable].map({"<=50K": 0, ">50K": 1})

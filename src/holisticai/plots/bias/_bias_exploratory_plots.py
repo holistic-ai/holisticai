@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from holisticai.metrics.bias import confusion_matrix
+from holisticai.bias.metrics import confusion_matrix
 
 # utils
 from holisticai.utils import get_colors

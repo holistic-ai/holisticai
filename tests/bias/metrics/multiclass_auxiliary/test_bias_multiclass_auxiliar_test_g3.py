@@ -11,7 +11,7 @@ from utils import (
     unconventional_numeric_config,
 )
 
-from holisticai.metrics.bias import (
+from holisticai.bias.metrics import (
     accuracy_matrix,
     confusion_tensor,
     multiclass_average_odds,

@@ -4,7 +4,7 @@ import pandas as pd
 import seaborn as sns
 
 # Import metrics
-from holisticai.metrics.bias import frequency_matrix
+from holisticai.bias.metrics import frequency_matrix
 from holisticai.utils import get_colors
 
 # utils
