@@ -85,7 +85,7 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         self.verbose = verbose
         self.print_interval = print_interval
 
-    def transform_estimator(self, _):
+    def transform_estimator(self, estimator=None):  # noqa: ARG002
         # Regularized Binary Cross Entropy
         loss_ = PRBinaryCrossEntropy(C=self.C, eta=self.eta)
 
