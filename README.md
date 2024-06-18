@@ -39,7 +39,7 @@ pip install holisticai[all]  # Install all packages for bias and explainability
 # imports
 from holisticai.bias.metrics import classification_bias_metrics
 from holisticai.datasets import load_dataset
-from holisticai.plots.bias import bias_metrics_report
+from holisticai.bias.plots import bias_metrics_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 

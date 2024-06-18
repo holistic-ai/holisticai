@@ -1,7 +1,7 @@
 import ipywidgets as widgets  # type: ignore
 import matplotlib.pyplot as plt
-from holisticai.plots.bias._bias_exploratory_plots import group_pie_plot, histogram_plot
-from holisticai.plots.bias._bias_multiclass_plots import accuracy_bar_plot, frequency_matrix_plot, frequency_plot
+from holisticai.bias.plots._bias_exploratory_plots import group_pie_plot, histogram_plot
+from holisticai.bias.plots._bias_multiclass_plots import accuracy_bar_plot, frequency_matrix_plot, frequency_plot
 from IPython.display import display
 
 

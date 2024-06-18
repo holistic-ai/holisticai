@@ -3,7 +3,7 @@
 Bias Plots
 ===============
 
-`holisticai.plots.bias` implements the visualizations for **bias** tasks.
+`holisticai.bias.plots` implements the visualizations for **bias** tasks.
 
 
 .. _classification:
@@ -14,7 +14,7 @@ Binary Classification Plots
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.plots.bias.abroca_plot
+    holisticai.bias.plots.abroca_plot
 
 .. _multiclass:
 
@@ -24,11 +24,11 @@ Multiclass Classification Plots
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.plots.bias.accuracy_bar_plot
-    holisticai.plots.bias.frequency_plot
-    holisticai.plots.bias.disparate_impact_plot
-    holisticai.plots.bias.frequency_matrix_plot
-    holisticai.plots.bias.statistical_parity_plot
+    holisticai.bias.plots.accuracy_bar_plot
+    holisticai.bias.plots.frequency_plot
+    holisticai.bias.plots.disparate_impact_plot
+    holisticai.bias.plots.frequency_matrix_plot
+    holisticai.bias.plots.statistical_parity_plot
 
 .. _regression:
 
@@ -38,12 +38,12 @@ Regression Plots
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.plots.bias.disparate_impact_curve
-    holisticai.plots.bias.mae_bar_plot
-    holisticai.plots.bias.rmse_bar_plot
-    holisticai.plots.bias.statistical_parity_curve
-    holisticai.plots.bias.success_rate_curve
-    holisticai.plots.bias.success_rate_curves
+    holisticai.bias.plots.disparate_impact_curve
+    holisticai.bias.plots.mae_bar_plot
+    holisticai.bias.plots.rmse_bar_plot
+    holisticai.bias.plots.statistical_parity_curve
+    holisticai.bias.plots.success_rate_curve
+    holisticai.bias.plots.success_rate_curves
 
 .. _recommender:
 
@@ -53,9 +53,9 @@ Recommender Plots
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.plots.bias.exposure_diff_plot
-    holisticai.plots.bias.exposure_ratio_plot
-    holisticai.plots.bias.long_tail_plot
+    holisticai.bias.plots.exposure_diff_plot
+    holisticai.bias.plots.exposure_ratio_plot
+    holisticai.bias.plots.long_tail_plot
 
 
 .. _exploratory:
@@ -66,11 +66,11 @@ Report Plots
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.plots.bias.correlation_matrix_plot
-    holisticai.plots.bias.distribution_plot
-    holisticai.plots.bias.group_confusion_matrices
-    holisticai.plots.bias.group_pie_plot
-    holisticai.plots.bias.histogram_plot
+    holisticai.bias.plots.correlation_matrix_plot
+    holisticai.bias.plots.distribution_plot
+    holisticai.bias.plots.group_confusion_matrices
+    holisticai.bias.plots.group_pie_plot
+    holisticai.bias.plots.histogram_plot
 
 .. _report:
 
@@ -80,4 +80,4 @@ Report Plots
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.plots.bias.bias_metrics_report
+    holisticai.bias.plots.bias_metrics_report

@@ -122,7 +122,7 @@
 
 - add bias metrics (holisticai.bias.metrics)
 - add mitigation techniques (holisticai.bias.mitigation)
-- add bias plotting tools (holisticai.plots.bias)
+- add bias plotting tools (holisticai.bias.plots)
 - add tutorials for measuring bias (tutorials/measuring_bias_tutorials)
 - add tutorials for mitigating bias (tutorials/mitigating_bias_tutorials)
 

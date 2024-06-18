@@ -45,7 +45,7 @@ def abroca_plot(group_a, group_b, y_pred, y_true, ax=None, size=None, title=None
     -------
     >>> from sklearn.linear_model import LogisticRegression
     >>> from holisticai.datasets import load_dataset
-    >>> from holisticai.plots.bias import abroca_plot
+    >>> from holisticai.bias.plots import abroca_plot
     >>> X, y = make_classification(n_samples=1000, n_features=20, n_classes=2)
     >>> group_a = np.random.randint(0, 2, 1000)
     >>> group_b = np.random.randint(0, 2, 1000)
