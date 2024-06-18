@@ -550,6 +550,12 @@ class Fairea:
         ax.set_xlim(0, polyline_x[-1]+1)
         ax.set_ylim(0, polyline_y[-1]+1)
 
+        # x-axis label
+        ax.set_xlabel('Normalised Fairness')
+
+        # y-axis label
+        ax.set_ylabel('Normalised Accuracy')
+
         # Place the legend outside the plot
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         return ax
