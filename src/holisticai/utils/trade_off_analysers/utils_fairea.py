@@ -45,8 +45,10 @@ def get_rect_equation(point_1, point_2):
 
     Returns
     -------
-    m : The slope of the line segment.
-    b : The y-intercept of the line segment.
+    m : float
+        The slope of the line segment.
+    b : float
+        The intercept of the line segment.
     """
 
     x1, y1 = point_1
@@ -144,7 +146,69 @@ def do_line_segments_intersect(segment1, segment2):
 
 
 def line(point_1, point_2):
+    """
+    Create a line segment.
+
+    Parameters
+    ----------
+    point_1 : tuple
+        The first point of the line segment.
+    point_2 : tuple
+        The second point of the line segment.
+
+    Returns
+    -------
+    tuple: The line segment.
+    """
     return (point_1, point_2)
+
+
+def find_segments(point, fairness_axis, acc_axis):
+    """
+    Find the segments of the polyline that the point projects onto.
+
+    Parameters
+    ----------
+    point : tuple
+        The point to be compared.
+    fairness_axis : array, shape = (n_samples,)
+        The array of the fairness axis.
+    acc_axis : array, shape = (n_samples,)
+        The array of the accuracy axis.
+
+    Returns
+    -------
+    segment_x : tuple
+        The segment of the polyline based on the x-coordinate.
+    segment_y : tuple
+        The segment of the polyline based on the y-coordinate.
+    """
+    polyline = list(zip(fairness_axis, acc_axis))
+    # Sort the polyline points by x-coordinate
+    polyline.sort(key=lambda p: p[0])
+
+    # Initialize variables to store the segment points based on x and y coordinates
+    segment_x = None, None
+    segment_y = None, None
+
+    # Find the polyline segment that the point projects onto
+    for i in range(len(polyline) - 1):
+        if polyline[i][0] <= point[0] <= polyline[i + 1][0]:
+            # Store the segment points based on x-coordinate
+            segment_x = polyline[i], polyline[i + 1]
+            break
+
+    # Sort the polyline points by y-coordinate for the y segment
+    polyline.sort(key=lambda p: p[1])
+
+    # Find the polyline segment that the point projects onto based on y-coordinate
+    for i in range(len(polyline) - 1):
+        if polyline[i][1] <= point[1] <= polyline[i + 1][1]:
+            # Store the segment points based on y-coordinate
+            segment_y = polyline[i], polyline[i + 1]
+            break
+
+    return segment_x, segment_y
 
 
 def get_baseline_bounds(point, fairness_axis, acc_axis):
@@ -162,8 +226,10 @@ def get_baseline_bounds(point, fairness_axis, acc_axis):
 
     Returns
     -------
-    fair_segment : The segment of the fairness axis.
-    acc_segment : The segment of the accuracy axis.
+    fair_segment : tuple
+        The segment of the fairness axis.
+    acc_segment : tuple
+        The segment of the accuracy axis.
     """
     fair_point, acc_point = point
     pt_1 = get_closer_bounds(fair_point, fairness_axis, acc_axis, "lower")
@@ -192,9 +258,12 @@ def get_indexes(x_segment, y_segment, x_axis, y_axis):
 
     Returns
     -------
-    indexes : The indexes of the fairness and accuracy axis.
-    x_axis : The reversed array of the fairness axis.
-    y_axis : The reversed array of the accuracy axis.
+    indexes : array, shape = (n_samples,)
+        The indexes of the fairness and accuracy axis.
+    x_axis : array, shape = (n_samples,)
+        The reversed array of the fairness axis.
+    y_axis : array, shape = (n_samples,)
+        The reversed array of the accuracy axis.
     """
     x_1 = max(x_segment[0][0], x_segment[1][0])
     x_2 = min(y_segment[0][0], y_segment[1][0])
@@ -226,8 +295,10 @@ def get_points(point, x_segment, y_segment):
 
     Returns
     -------
-    point_a : The first intersection point.
-    point_b : The second intersection point.
+    point_a : tuple
+        The first intersection point.
+    point_b : tuple
+        The second intersection point.
     """
     a, b = get_rect_equation(x_segment[0], x_segment[1])
     c, d = get_rect_equation(y_segment[0], y_segment[1])
@@ -252,7 +323,8 @@ def get_area(point, x_axis, y_axis):
 
     Returns
     -------
-    total_area : The area of the polygon.
+    total_area : float
+        The area of the polygon.
     """
     fair_seg, acc_seg = get_baseline_bounds(point, x_axis, y_axis)
     if fair_seg == acc_seg:
