@@ -6,11 +6,11 @@ Measuring
 
 Here are some tutorials where different systems are assessed using the metrics.
 
-- `Measuring Bias Classification <bias/measuring_bias_tutorials/measuring_bias_classification.ipynb>`_
-- `Measuring Bias Regression <bias/measuring_bias_tutorials/measuring_bias_regression.ipynb>`_
-- `Measuring Bias Recommender <bias/measuring_bias_tutorials/measuring_bias_recommender.ipynb>`_
-- `Measuring Bias Clustering <bias/measuring_bias_tutorials/measuring_bias_clustering.ipynb>`_
-- `Measuring Bias Multiclass <bias/measuring_bias_tutorials/measuring_bias_multiclass.ipynb>`_
+- `Measuring Bias Classification <bias/measuring_bias/measuring_bias_classification.ipynb>`_
+- `Measuring Bias Regression <bias/measuring_bias/measuring_bias_regression.ipynb>`_
+- `Measuring Bias Recommender <bias/measuring_bias/measuring_bias_recommender.ipynb>`_
+- `Measuring Bias Clustering <bias/measuring_bias/measuring_bias_clustering.ipynb>`_
+- `Measuring Bias Multiclass <bias/measuring_bias/measuring_bias_multiclass.ipynb>`_
 
 Mitigation
 ----------
