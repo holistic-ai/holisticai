@@ -97,7 +97,7 @@ dependencies = [
 
 [tool.hatch.envs.sphinx.scripts]
 foo = ["which sphinx-build"]
-build = ["bash docs/source/build.sh"]
+build = ["PYTHONPATH=./src sphinx-build -b html docs/source docs/build"]
 
 [tool.hatch.envs.testing]
 dependencies = [
