@@ -901,8 +901,9 @@ def classification_bias_metrics(
 
     if has_group_parameters:
         out_metrics = [[pf, fn(group_a, group_b, y_pred), ref_vals[pf]] for pf, fn in equal_outcome_metrics.items()]
+        opp_metrics = []
         if y_true is not None:
-            opp_metrics = [
+            opp_metrics += [
                 [pf, fn(group_a, group_b, y_pred, y_true), ref_vals[pf]] for pf, fn in equal_opportunity_metrics.items()
             ]
         if y_score is not None:
