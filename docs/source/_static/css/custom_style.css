@@ -6,7 +6,7 @@ body{
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family:"Space Grotesk";
+  font-family:"Inter";
 }
 
 .btn-primary {
@@ -42,6 +42,13 @@ div.admonition.admonition-youtube .video-container {
 div.admonition.admonition-youtube .video-container iframe {
   width: 100%;
   height: auto;
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
 .intro-card {

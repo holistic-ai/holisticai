@@ -1,4 +1,4 @@
-holisticai documentation
+HolisticAI documentation
 ===================
 
 .. image:: https://img.shields.io/pypi/v/holisticai
@@ -6,9 +6,7 @@ holisticai documentation
 .. image:: https://img.shields.io/github/license/holistic-ai/holisticai
 .. image:: https://readthedocs.org/projects/holisticai/badge/?version=latest
 
-
 Welcome to the Holistic AI library! This is an open-source tool to assess and improve the trustworthiness of AI systems. The current version of the library offers a set of techniques to easily measure and mitigate Bias across a variety of tasks.  
-
 
 .. grid:: 4
     :gutter: 0
@@ -84,7 +82,6 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
     :maxdepth: 3
     :hidden:
     :titlesonly:
-
 
     getting_started/index
     reference/index
