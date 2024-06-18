@@ -16,12 +16,31 @@
 
 import sys
 import os
+import shutil
+
+
 sys.path.insert(0, os.path.abspath(".."))
 work_dir = '/'.join(os.getcwd().split("/")[:-2])
 src_path = os.path.join(work_dir,'src')
 print(src_path)
-
 sys.path.insert(0, src_path)
+
+
+bias_tutorial_path = os.path.join(work_dir, 'tutorials/bias')
+dataset_tutorial_path = os.path.join(work_dir, 'tutorials/datasets')
+
+def copy_folder(origen, destino):
+    try:
+        if not os.path.exists(destino):
+            os.makedirs(destino)
+        shutil.copytree(origen, destino, dirs_exist_ok=True)
+        print(f"Folder copied from {origen} to {destino} sucessfully.")
+    except Exception as e:
+        print(f"Error when trying to copy folder: {e}")
+
+for path in [bias_tutorial_path, dataset_tutorial_path]:
+    dirname = os.path.basename(path)
+    copy_folder(bias_tutorial_path, os.path.join(os.getcwd(), 'gallery', 'tutorials', dirname))
 
 # -- Project information -----------------------------------------------------
 

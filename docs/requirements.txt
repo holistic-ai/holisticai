@@ -6,3 +6,8 @@ sphinx_copybutton
 sphinx_design
 sphinx_togglebutton
 sphinxcontrib.youtube
+jupyter
+pandas
+numpy==1.26
+pybind11>=2.12
+cvxpy
