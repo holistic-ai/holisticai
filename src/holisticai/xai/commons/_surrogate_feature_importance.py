@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import pandas as pd
 from holisticai.xai.commons._definitions import (
@@ -24,7 +24,7 @@ metric_scores = {
 class SurrogateFeatureImportanceCalculator(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     learning_task_settings: LearningTaskXAISettings
-    random_state: RandomState | int = RandomState(42)
+    random_state: Union[RandomState, int] = RandomState(42)
 
     def create_surrogate_model(self, learning_task, x, y):
         if learning_task in ["binary_classification", "multi_classification"]:

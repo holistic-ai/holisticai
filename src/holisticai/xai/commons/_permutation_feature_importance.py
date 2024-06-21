@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 import pandas as pd
@@ -26,7 +26,7 @@ class PermutationFeatureImportanceCalculator(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     learning_task_settings: LearningTaskXAISettings
     n_repeats: int = 10
-    random_state: RandomState | int = RandomState(42)
+    random_state: Union[RandomState, int] = RandomState(42)
 
     def __call__(self, ds: Dataset) -> PermutationFeatureImportance:
         X = ds["X"]  # noqa: N806

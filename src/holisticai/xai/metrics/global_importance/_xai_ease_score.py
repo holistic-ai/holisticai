@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 import pandas as pd
@@ -151,7 +151,7 @@ class XAIEaseScore(BaseModel):
 
     def __call__(
         self,
-        partial_dependence: PartialDependence | list[PartialDependence],
+        partial_dependence: Union[PartialDependence, list[PartialDependence]],
         ranked_feature_importance: FeatureImportance,
     ):
         """
