@@ -247,8 +247,9 @@ def load_clinical_records_dataset():
     x = df.drop(columns=drop_columns)
     return Dataset(X=x, y=y, group_a=group_a, group_b=group_b)
 
+ProcessedDatasets = Literal["adult","law_school","student_multiclass","student","lastfm","us_crime","us_crime_multiclass","clinical_records"]
 
-def load_dataset(dataset_name, **kargs):
+def load_dataset(dataset_name: ProcessedDatasets, **kargs):
     if dataset_name == "adult":
         return load_adult_dataset(**kargs)
     if dataset_name == "law_school":

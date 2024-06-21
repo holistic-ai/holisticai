@@ -115,8 +115,9 @@ dependencies = [
   "shap>=0.42.1",
   "ipykernel>=6.25.2",
   "ruff",
+  "pydantic"
 ]
-paths = ["./src"]
+env-vars = { PYTHONPATH = "src" }
 
 [tool.hatch.envs.testing.scripts]
 run = ["python -m pytest tests"]
@@ -124,6 +125,8 @@ foo = ["which python"]
 
 [tool.hatch.envs.default]
 env-vars = { PYTHONPATH = "src" }
+
+
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/holisticai"]

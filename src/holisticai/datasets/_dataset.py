@@ -230,8 +230,8 @@ class Dataset:
                 [(col, col) for col in updated_data.columns], names=["features", "subfeatures"]
             )
             updated_data.columns = new_columns
-
-        new_data = self.data.combine_first(updated_data)
+        self.data.update(updated_data)
+        new_data = pd.concat([self.data, updated_data[updated_data.columns.difference(self.data.columns)]], axis=1)
         return Dataset(new_data)
 
     def train_test_split(self, test_size=0.3, **kargs):
@@ -258,6 +258,7 @@ class Dataset:
             feature = self.data.xs(key, level="features", axis=1)
             if feature.shape[1] == 1:
                 return feature.iloc[:, 0]
+            feature.columns = list(feature.columns)
             return feature
         if isinstance(key, int):
             return dataframe_to_level_dict_with_series(self.data, key)
