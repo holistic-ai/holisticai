@@ -1,4 +1,5 @@
 import logging
+import sys
 from collections import defaultdict
 
 import matplotlib.pyplot as plt
@@ -11,11 +12,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from holisticai.bias.metrics import average_odds_diff, statistical_parity
-from holisticai.utils._validation import _check_same_shape
 from holisticai.utils.trade_off_analysers.utils_fairea import (
     do_line_segments_intersect,
+    find_segments,
     get_area,
-    get_baseline_bounds,
     line,
 )
 
@@ -33,52 +33,84 @@ class Fairea:
     """
     Fairea class for calculating the trade-off between accuracy and fairness of a binary classification model.
 
-    Fairea uses a model behaviour mutation method to create a baseline that can be used to compare quantitatively
-    the fairness-accuracy trade-off for different bias mitigation algorithms and then evaluate their effectiveness
+    Fairea uses a model behaviour mutation method to create a baseline that can be used to compare quantitatively\
+    the fairness-accuracy trade-off for different bias mitigation algorithms and then evaluate their effectiveness\
     in the given scenario. To perform this analysis, the approach consists of three separate steps:
 
-    - A baseline is created by fitting a model without mitigation and then applying a model behaviour mutation to gradually
-        changes the model outputs..
+    - A baseline is created by fitting a model without mitigation and then applying a model behaviour\
+    mutation to gradually changes the model outputs.
     - Map the given fitted bias mitigation models into five mitigation regions to classify their effectiveness.
     - Assess the effectiveness trade-off by measuring the gap between the mitigators' effectiveness and the baseline.
 
-    References:
-        Max Hort, Jie M. Zhang, Federica Sarro, and Mark Harman. 2021. Fairea: a model behaviour mutation approach to
-        benchmarking bias mitigation methods. In Proceedings of the 29th ACM Joint Meeting on European Software Engineering
-        Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE 2021)
+    Parameters
+    ----------
+    fair_metric: str
+        fairness metric to be used: statistical parity (sp) or average odds difference (aod)
+    acc_metric: str
+        accuracy metric to be used in the baseline creation and trade-off comparison: accuracy (acc) or roc-auc (auc)
+    verbose: bool
+        whether to print the progress or not
+
+    Methods
+    -------
+    create_baseline(x, y, group_a, group_b, test_size, data_splits, repetitions,\
+        odds, options, degrees)
+        Creates the baseline model for the dataset.
+    baseline_metrics()
+        Returns the baseline metrics.
+    add_model_outcomes(model_name, y_true, y_pred, group_a, group_b)
+        Adds the outcomes of a new model to be compared with the baseline model.
+    plot_baseline(ax, figsize, title, normalize)
+        Plots the baseline model.
+    plot_methods(ax, figsize, title, normalize)
+        Plots the baseline with the added models.
+    trade_off_region_classification()
+        Classifies the region of each model.
+    compute_trade_off_area()
+        Determines the area of each model and saves the best method.
+    get_best_model()
+        Returns the best model.
+
+    Attributes
+    ----------
+    verbose: bool
+        whether to print the progress or not
+    acc_fn: function
+        accuracy function to be used
+    fair_fn: function
+        fairness function to be used
+    fair_metric: str
+        fairness metric to be used
+    methods: dict
+        dictionary of the methods added to the class
+    normalized_methods: dict
+        dictionary of the normalized methods added to the class
+    best: str
+        best method added to the class
+    mitigation_regions: dict
+        dictionary of the mitigation regions of the methods added to the class
+    odds: dict
+        dictionary of odds to be used for mutation
+    options: list
+        list of options to be used for mutation
+    degrees: int
+        number of divisions in the range of 0-1 to be used for degrees mutation
+
+
+    References
+    ----------
+    ..  [1] Max Hort, Jie M. Zhang, Federica Sarro, and Mark Harman. 2021. Fairea: a model behaviour\
+        mutation approach to benchmarking bias mitigation methods. In Proceedings of the 29th ACM\
+        Joint Meeting on European Software Engineering Conference and Symposium on the Foundations\
+        of Software Engineering (ESEC/FSE 2021)
     """
 
     def __init__(
         self,
         fair_metric="sp",
         acc_metric="acc",
-        verbose=False,
+        verbose=False,  # noqa: FBT002
     ):
-        """
-        Creates the object for the fairea class. This class is used to calculate
-        the trade-off between accuracy and fairness of a classification model.
-
-        Description
-        -----------
-        This is done by creating a baseline model for the dataset by mutating
-        predictions of the original model and then adding models with mitigation
-        that are compared with the baseline model. Finally, the trade-off is
-        calculated by classifying the region of each model and then
-        determining the area between the baseline model and the
-        best models are placed..
-
-        Parameters
-        ----------
-        fair_metric: string
-                    fairness metric to be used: statistical parity (sp) or
-                    average odds difference (aod)
-        acc_metric: string
-                    accuracy metric to be used in the baseline creation and trade-off comparison: accuracy (acc) or roc-auc (auc)
-
-        verbose: boolean
-                whether to print the progress or not
-
-        """
         self.verbose = verbose
         self.acc_fn = METRICS[acc_metric]
         self.fair_fn = METRICS[fair_metric]
@@ -97,8 +129,8 @@ class Fairea:
         test_size=0.3,
         data_splits=10,
         repetitions=10,
-        odds={"0": [1, 0], "1": [0, 1]},  # noqa: B006
-        options=[0, 1],  # noqa: B006
+        odds=None,
+        options=None,
         degrees=10,
     ):
         """
@@ -111,23 +143,37 @@ class Fairea:
         y: array, shape = (n_samples,)
             target data
         group_a: array, shape = (n_samples,)
-                protected attribute for group a
+            protected attribute for group a
         group_b: array, shape = (n_samples,)
-                protected attribute for group b
+            protected attribute for group b
         test_size: float
             percentage size of the test set (in range 0,1)
         data_splits: int
             number of splits to be used for cross-validation
         repetitions: int
-                    number of repetitions of mutation to be performed
+            number of repetitions of mutation to be performed
         odds: dict
-                dictionary of odds to be used for mutation
+            dictionary of odds to be used for mutation
         options: list
-                list of options to be used for mutation
+            list of options to be used for mutation
         degrees: int
-                number of divisions in the range of 0-1 to be used for degrees mutation
+            number of divisions in the range of 0-1 to be used for degrees mutation
         """
-        _check_same_shape([group_a, group_b, x, y], names="group_a, group_b, x, y")
+        if odds is None:
+            self.odds = {"0": [1, 0], "1": [0, 1]}
+        if options is None:
+            self.options = [0, 1]
+
+        self.degrees = degrees
+
+        # _check_same_shape([group_a, group_b, x, y], names="group_a, group_b, x, y")
+        list_of_arr = [group_a, group_b, x, y]
+        length = list_of_arr[0].shape[0]
+
+        # check if all arrays have the same length
+        if not all(arr.shape[0] == length for arr in list_of_arr):
+            msg = "All arrays must have the same length"
+            raise ValueError(msg)
 
         self.baseline_acc, self.baseline_fairness = self.__create_baseline(
             x,
@@ -137,9 +183,6 @@ class Fairea:
             test_size=test_size,
             data_splits=data_splits,
             repetitions=repetitions,
-            odds=odds,
-            options=options,
-            degrees=degrees,
         )
         self.acc_scaler = MinMaxScaler()
         self.fair_scaler = MinMaxScaler()
@@ -149,6 +192,13 @@ class Fairea:
     def baseline_metrics(self):
         """
         Returns the baseline metrics.
+
+        Returns
+        -------
+        baseline_acc: array, shape = (n_samples,)
+            baseline accuracy
+        baseline_fairness: array, shape = (n_samples,)
+            baseline fairness
         """
         return self.baseline_acc, self.baseline_fairness
 
@@ -171,7 +221,8 @@ class Fairea:
 
         Returns
         -------
-        changed: mutated predictions
+        changed: array, shape = (n_samples,)
+            mutated predictions
         """
         rand = np.random.choice(options, to_mutate, p=odds)
         # Select prediction ids that are being mutated
@@ -187,12 +238,9 @@ class Fairea:
         y,
         group_a,
         group_b,
-        test_size=0.3,
-        data_splits=10,
-        repetitions=10,
-        odds={"0": [1, 0], "1": [0, 1]},  # noqa: B006
-        options=[0, 1],  # noqa: B006
-        degrees=10,
+        test_size,
+        data_splits,
+        repetitions,
     ):
         """
         Creates the baseline model for the dataset by applying the mutations.
@@ -213,17 +261,11 @@ class Fairea:
             number of splits to be used for cross-validation
         repetitions: int
                     number of repetitions of mutation to be performed
-        odds: dict
-                dictionary of odds to be used for mutation
-        options: list
-                list of options to be used for mutation
-        degrees: int
-                number of divisions in the range of 0-1 to be used for degrees mutation
 
         Returns
         -------
-        acc_base: accuracy of the baseline model
-        fair_base: fairness of the baseline model
+        acc_base: array, shape = (n_samples,)
+            baseline accuracy
         """
         n_samples = int(x.shape[0] * test_size)
 
@@ -253,19 +295,19 @@ class Fairea:
             pipe.fit(x_train, y_train)
             pred = pipe.predict(x_test).reshape(-1, 1)
 
-            degrees_ = np.linspace(0, 1, degrees + 1)
+            degrees_ = np.linspace(0, 1, self.degrees + 1)
 
             # Mutate labels for each degree
             for degree in degrees_:
                 # total number of labels to mutate
                 to_mutate = int(n_samples * degree)
 
-                for name, o in odds.items():
+                for name, o in self.odds.items():
                     # Store each mutation attempt
                     hist = []
                     for _ in range(repetitions):
                         # Generate mutated labels
-                        mutated = self.__mutate_preds(pred, to_mutate, ids, o, options)
+                        mutated = self.__mutate_preds(pred, to_mutate, ids, o, self.options)
                         # Determine accuracy and fairness of mutated model
                         acc = self.acc_fn(y_test, mutated)
                         if self.fair_metric == "aod":
@@ -296,10 +338,14 @@ class Fairea:
         group_b: array, shape = (n_samples,)
                 protected attribute for group b
         """
-        _check_same_shape(
-            [group_a, group_b, y_pred, y_true],
-            names="group_a, group_b, y_pred, y_true",
-        )
+        list_of_arr = [group_a, group_b, y_pred, y_true]
+        length = list_of_arr[0].shape[0]
+
+        # check if all arrays have the same length
+        if not all(arr.shape[0] == length for arr in list_of_arr):
+            msg = "All arrays must have the same length"
+            raise ValueError(msg)
+
         acc = self.acc_fn(y_true, y_pred)
         if self.fair_metric == "aod":
             fair = abs(self.fair_fn(group_a, group_b, y_pred, y_true))
@@ -307,11 +353,11 @@ class Fairea:
             fair = abs(self.fair_fn(group_a, group_b, y_pred))
         self.methods[model_name] = (fair, acc)
         self.normalized_methods[model_name] = (
-            self.fair_scaler.transform(fair.reshape(-1, 1)).reshape(-1)[0],
-            self.acc_scaler.transform(acc.reshape(-1, 1)).reshape(-1)[0],
+            self.fair_scaler.transform(np.array([fair]).reshape(1, -1)).reshape(-1)[0],
+            self.acc_scaler.transform(np.array([acc]).reshape(1, -1)).reshape(-1)[0],
         )
 
-    def plot_baseline(self, cmap="YlGnBu", ax=None, figsize=None, title=None, normalize=False):
+    def plot_baseline(self, ax=None, figsize=None, title=None, normalize=False):  # noqa: FBT002
         """
         Plots the baseline model.
 
@@ -357,7 +403,7 @@ class Fairea:
         ax.legend(loc="best")
         return ax
 
-    def plot_methods(self, cmap="YlGnBu", ax=None, figsize=None, title=None, normalize=False):
+    def plot_methods(self, ax=None, figsize=None, title=None, normalize=False):  # noqa: FBT002
         """
         Plots the baseline with the added models.
 
@@ -412,6 +458,7 @@ class Fairea:
         ax.legend(loc="best")
         return ax
 
+
     def determine_region(self, p, fairness_norm, acc_norm):
         """
         Determines the region of the model.
@@ -427,40 +474,38 @@ class Fairea:
 
         Returns
         -------
-        region: region of the model
+        region: str
+            region of the model
         """
-        fair_segment, acc_segment = get_baseline_bounds(p, fairness_norm, acc_norm)
+        fair_segment, acc_segment = find_segments(p, fairness_norm, acc_norm)
         # Extend bias mitigation point towards four directions (left,right,up,down)
         line_down = line([p[0], p[1]], [p[0], 0])
         line_right = line([p[0], p[1]], [2, p[1]])
-        line_up = line([p[0], p[1]], [p[0], 2])
-        line_left = line([p[0], p[1]], [0, p[1]])
         # Determine bias mitigation region based on intersection with baseline
         if p[0] > 1 and p[1] > 1:
             return "inverted"
-        elif p[0] > 1 and p[1] < 1:
+        if p[0] > 1 and p[1] < 1:
             return "lose-lose"
-        elif p[0] < 1 and p[1] > 1:
+        if p[0] < 1 and p[1] > 1:
             return "win-win"
-        elif p[0] >= 0 and p[0] <= 1 and p[1] >= 0 and p[1] <= 1:
+        if p[0] >= 0 and p[0] <= 1 and p[1] >= 0 and p[1] <= 1:
             if do_line_segments_intersect(line_down, fair_segment) and do_line_segments_intersect(
                 line_right, acc_segment
             ):
                 return "good trade-off"
-            else:
-                return "bad trade-off"
-        elif p[0] < 0:
+            return "bad trade-off"
+        if p[0] < 0:
             return "lose-lose"
-        else:
-            return "inverted"
+        return "inverted"
 
-    def trade_off_region_classification(self):
+    def trade_off_region_classification(self, plot=False):  # noqa: FBT002
         """
         Classifies the region of each model.
 
         Returns
         -------
-        df: dataframe that contains the region of each model of the class
+        df : DataFrame
+            dataframe that contains the region of each model of the class
         """
         for k, (fair, acc) in self.normalized_methods.items():
             # define a point for each bias mitigation method
@@ -469,7 +514,51 @@ class Fairea:
         # create a dataframe for the region of each method
         df = pd.DataFrame.from_dict(self.mitigation_regions, orient="index", columns=["Region"])
         df.style.set_properties(**{"font-weight": "bold"})
+        if plot:
+            ax = self.plot_regions(list(zip(self.fairness_norm, self.acc_norm)))
+            for name, (fair, acc) in self.normalized_methods.items():
+                ax.scatter(fair, acc, color="red")
+                ax.annotate(name, (fair, acc))
+            return ax
         return df
+
+    def plot_regions(self, polyline):
+        # Sort the polyline points by x-coordinate
+        polyline.sort(key=lambda p: p[0])
+
+        # Create a figure and a set of subplots
+        fig, ax = plt.subplots()
+
+        # Plot the polyline
+        polyline_x, polyline_y = zip(*polyline)
+        ax.plot(polyline_x, polyline_y, color='black', label='Baseline')
+
+        # Fill the regions
+        ax.fill_between(polyline_x, polyline_y, polyline_y[-1], where=[y <= polyline_y[-1] for y in polyline_y],
+                        color='green', alpha=0.2, hatch='//', label='Good trade-off')
+        ax.fill_between(polyline_x, polyline_y, 0, where=[y >= 0 for y in polyline_y], color='red', alpha=0.2,
+                        hatch='\\\\', label='Bad trade-off')
+        ax.fill_between(polyline_x, polyline_y[-1], polyline_y[-1]+1, color='blue', alpha=0.2, hatch='--',
+                        label='Win-win')
+        ax.fill_between(np.arange(polyline_x[-1], polyline_x[-1] + 1, 0.01), 0, polyline_y[-1], color='orange',
+                        alpha=0.2, hatch='++', label='Lose-lose')
+        ax.fill_between(np.arange(polyline_x[-1], polyline_x[-1]+1, 0.01), polyline_y[-1], polyline_y[-1]+1,
+                        color='purple', alpha=0.2, hatch='**', label='Inverted')
+
+
+        # Set the x and y limits
+        ax.set_xlim(0, polyline_x[-1]+1)
+        ax.set_ylim(0, polyline_y[-1]+1)
+
+        # x-axis label
+        ax.set_xlabel('Normalised Fairness')
+
+        # y-axis label
+        ax.set_ylabel('Normalised Accuracy')
+
+        # Place the legend outside the plot
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        return ax
 
     def compute_trade_off_area(self):
         """
@@ -477,21 +566,22 @@ class Fairea:
 
         Returns
         -------
-        df: dataframe that contains the area of each model of the class
+        df : DataFrame
+            dataframe that contains the area of each model of the class
         """
         good = {k for k, v in self.mitigation_regions.items() if v == "good trade-off"}
         if not good:
-            print("No good trade-off methods")
+            # sys.stdout.write("There are not good methods, consider using a different fairness metric")
             methods = [v for _, v in self.mitigation_regions.items() if v == "win-win"]
-            if all([method == "win-win" for method in methods]):
-                print("You can choose one of the win-win methods")
+            if all(method == "win-win" for method in methods):
+                sys.stdout.write("You can choose one of the win-win methods")
             else:
-                print("Consider using a different fairness metric")
+                sys.stdout.write("There are not good methods, consider using a different fairness metric")
             return
-        area_methods = dict()
+        area_methods = {}
         for item in good:
-            mit = self.normalized_methods[item]
-            area = get_area(mit, self.fairness_norm, self.acc_norm)
+            mitigator_point = self.normalized_methods[item]
+            area = get_area(mitigator_point, self.fairness_norm, self.acc_norm)
             area_methods[item] = area
         # create a dataframe for the area of each method
         df = pd.DataFrame.from_dict(area_methods, orient="index", columns=["Area"])
@@ -505,6 +595,11 @@ class Fairea:
     def get_best_model(self):
         """
         Returns the best model.
+
+        Returns
+        -------
+        best: str
+            best method added to the class
         """
         if self.best is None:
             methods = [v for _, v in self.mitigation_regions.items() if v == "win-win"]
