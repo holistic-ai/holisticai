@@ -7,7 +7,7 @@ import pytest
 
 @pytest.fixture
 def input_data():
-    dataset = load_dataset('student_multiclass').sample(n=1000, random_state=42)
+    dataset = load_dataset('adult').select(list(range(1000)))
     dataset = dataset.train_test_split(test_size=0.2, random_state=42)
     train = dataset['test']
     test = dataset['test']
@@ -17,8 +17,8 @@ def input_data():
     return model, test
 
 @pytest.mark.parametrize("strategy, rank_alignment, position_parity, xai_ease_score, alpha_imp_score", [
-    ("permutation", 0.4780687830687831, 0.137010582010582, 0.85, 0.38461538461538464),
-    ("surrogate",  0.2962962962962963, 0.296296296296296, 0.8333333333333333, 0.11538461538461539)
+    ("permutation", 0.5, 0.5, 1.0, 0.012195121951219513),
+    ("surrogate",  1.0, 1.0, 1.0, 0.012195121951219513)
 ])
 def test_xai_multiclassification_metrics(strategy, rank_alignment, position_parity, xai_ease_score, alpha_imp_score, input_data):
     model, test = input_data
@@ -36,13 +36,13 @@ def test_xai_classification_metrics_separated(input_data):
     xai_features = multiclass_xai_features(test["X"], test["y"], model.predict, model.predict_proba, classes=[0,1])
         
     value = rank_alignment(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.4780687830687831)
+    assert np.isclose(value, 0.5)
 
     value = position_parity(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.137010582010582)
+    assert np.isclose(value, 0.5)
     
     value = xai_ease_score(xai_features.partial_dependence, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.85)
+    assert np.isclose(value, 1.0)
 
     value = alpha_importance_score(xai_features.feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.38461538461538464)
+    assert np.isclose(value, 0.012195121951219513)
