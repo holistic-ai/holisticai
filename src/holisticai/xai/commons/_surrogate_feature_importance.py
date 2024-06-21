@@ -15,18 +15,18 @@ if TYPE_CHECKING:
     from holisticai.datasets import Dataset
 
 metric_scores = {
-        "binary_classification": accuracy_score,
-        "regression": mean_squared_error,
-        "multi_classification": accuracy_score
+    "binary_classification": accuracy_score,
+    "regression": mean_squared_error,
+    "multi_classification": accuracy_score,
 }
+
 
 class SurrogateFeatureImportanceCalculator(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     learning_task_settings: LearningTaskXAISettings
-    random_state : RandomState|int = RandomState(42)
+    random_state: RandomState | int = RandomState(42)
 
     def create_surrogate_model(self, learning_task, x, y):
-
         if learning_task in ["binary_classification", "multi_classification"]:
             from sklearn.tree import DecisionTreeClassifier
 
@@ -39,9 +39,7 @@ class SurrogateFeatureImportanceCalculator(BaseModel):
             dt = DecisionTreeRegressor(max_depth=3, random_state=self.random_state)
             return dt.fit(x, y)
 
-        raise ValueError(
-            "model_type must be either 'binary_classification', 'multi_classification' or 'regression'"
-        )
+        raise ValueError("model_type must be either 'binary_classification', 'multi_classification' or 'regression'")
 
     def __call__(self, ds: Dataset) -> SurrogateFeatureImportance:
         """
@@ -55,10 +53,12 @@ class SurrogateFeatureImportanceCalculator(BaseModel):
         Returns:
             holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
         """
-        X = ds['X']  # noqa: N806
+        X = ds["X"]  # noqa: N806
         y_pred = self.learning_task_settings.predict_fn(X)
         surrogate = self.create_surrogate_model(self.learning_task_settings.learning_task, X, y_pred)
         feature_names = X.columns
         importances = surrogate.feature_importances_
-        feature_importances = pd.DataFrame.from_dict({'Variable':feature_names , 'Importance':importances}).sort_values('Importance', ascending=False)
+        feature_importances = pd.DataFrame.from_dict(
+            {"Variable": feature_names, "Importance": importances}
+        ).sort_values("Importance", ascending=False)
         return SurrogateFeatureImportance(feature_importances=feature_importances, surrogate=surrogate)

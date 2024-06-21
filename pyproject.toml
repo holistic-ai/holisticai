@@ -75,7 +75,7 @@ config-path = "ruff_default.toml"
 
 [tool.ruff]
 extend = "ruff_default.toml"
-exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/mitigation/**", "src/holisticai/utils/trade_off_analysers/**"]
+exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/bias/mitigation/**", "src/holisticai/utils/trade_off_analysers/**"]
 
 [tool.hatch.envs.sphinx]
 inherit = ["all"]

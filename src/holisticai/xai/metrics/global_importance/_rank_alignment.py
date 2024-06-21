@@ -11,9 +11,11 @@ if TYPE_CHECKING:
 
 class RankAlignment(BaseModel):
     name: str = "Rank Alignment"
-    reference : float = 1.0
+    reference: float = 1.0
 
-    def __call__(self, conditional_feature_importance: ConditionalFeatureImportance, feature_importance: FeatureImportance):
+    def __call__(
+        self, conditional_feature_importance: ConditionalFeatureImportance, feature_importance: FeatureImportance
+    ):
         feature_names = feature_importance.feature_names
         conditional_position_parity = {}
         for group_name, cond_features in conditional_feature_importance.conditional_feature_importance.items():

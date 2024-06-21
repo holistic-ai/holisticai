@@ -1,4 +1,3 @@
-from typing import Union
 
 import numpy as np
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
@@ -91,15 +90,15 @@ class MCMF(BMPost):
         Self
         """
         params = self._load_data(X=X, y_pred=y_pred, group_a=group_a, group_b=group_b)
-    
+
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
         X = params["X"]
         y_pred = params["y_pred"]
-    
+
         if isinstance(centroids, str):
             centroids = getattr(self.estimator_hdl.estimator, centroids)
-        
+
         if self.group_mode in ["a", "b"]:
             group = group_a if self.group_mode == "a" else group_b
             new_y_pred = self.algorithm.transform(
@@ -111,5 +110,5 @@ class MCMF(BMPost):
                 new_y_pred = self.algorithm.transform(
                     X=X, y_pred=new_y_pred, group=group, centroids=centroids
                 )
-    
+
         return {"y_pred": new_y_pred}

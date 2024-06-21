@@ -16,20 +16,21 @@ if TYPE_CHECKING:
     from holisticai.datasets import Dataset
 
 metric_scores = {
-        "binary_classification": accuracy_score,
-        "regression": mean_squared_error,
-        "multi_classification": accuracy_score
+    "binary_classification": accuracy_score,
+    "regression": mean_squared_error,
+    "multi_classification": accuracy_score,
 }
+
 
 class PermutationFeatureImportanceCalculator(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     learning_task_settings: LearningTaskXAISettings
-    n_repeats: int=10
-    random_state: RandomState|int = RandomState(42)
+    n_repeats: int = 10
+    random_state: RandomState | int = RandomState(42)
 
     def __call__(self, ds: Dataset) -> PermutationFeatureImportance:
-        X = ds['X']  # noqa: N806
-        y = ds['y']
+        X = ds["X"]  # noqa: N806
+        y = ds["y"]
         metric = metric_scores[self.learning_task_settings.learning_task]
         baseline_score = metric(y, self.learning_task_settings.predict_fn(X))
         feature_importances = []
@@ -43,6 +44,8 @@ class PermutationFeatureImportanceCalculator(BaseModel):
             feature_importances.append(np.mean(scores))
 
         features = list(X.columns)
-        feature_importance = pd.DataFrame({'Variable': features, 'Importance': feature_importances})
-        feature_importance['Importance'] = feature_importance['Importance'] / feature_importance['Importance'].sum()
-        return PermutationFeatureImportance(feature_importances=feature_importance.sort_values('Importance', ascending=False))
+        feature_importance = pd.DataFrame({"Variable": features, "Importance": feature_importances})
+        feature_importance["Importance"] = feature_importance["Importance"] / feature_importance["Importance"].sum()
+        return PermutationFeatureImportance(
+            feature_importances=feature_importance.sort_values("Importance", ascending=False)
+        )

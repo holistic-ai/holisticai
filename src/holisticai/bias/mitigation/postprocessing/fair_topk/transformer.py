@@ -189,19 +189,17 @@ class FairTopK(BMPost):
                 result.append(protected_candidates.iloc[idxProtected])
                 idxProtected += 1
                 countProtected += 1
+            elif (
+                protected_candidates.iloc[idxProtected][self.score_col]
+                >= non_protected_candidates.iloc[idxNonProtected][self.score_col]
+            ):
+                # the best is a protected one
+                result.append(protected_candidates.iloc[idxProtected])
+                idxProtected += 1
+                countProtected += 1
             else:
-                # find the best candidate available
-                if (
-                    protected_candidates.iloc[idxProtected][self.score_col]
-                    >= non_protected_candidates.iloc[idxNonProtected][self.score_col]
-                ):
-                    # the best is a protected one
-                    result.append(protected_candidates.iloc[idxProtected])
-                    idxProtected += 1
-                    countProtected += 1
-                else:
-                    # the best is a non-protected one
-                    result.append(non_protected_candidates.iloc[idxNonProtected])
-                    idxNonProtected += 1
+                # the best is a non-protected one
+                result.append(non_protected_candidates.iloc[idxNonProtected])
+                idxNonProtected += 1
 
         return result
