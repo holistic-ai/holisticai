@@ -1,5 +1,5 @@
 from holisticai.datasets import load_dataset
-from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
 from holisticai.xai.metrics import classification_xai_metrics, classification_xai_features
 from holisticai.xai.metrics.global_importance import alpha_importance_score, rank_alignment, position_parity, xai_ease_score
 import numpy as np
@@ -11,14 +11,13 @@ def input_data():
     dataset = dataset.train_test_split(test_size=0.2, random_state=42)
     train = dataset['test']
     test = dataset['test']
-    
-    model = LogisticRegression(random_state=42)
+    model = GaussianNB()
     model.fit(train['X'], train['y'])
     return model, test
 
 
 @pytest.mark.parametrize("strategy, rank_alignment, position_parity, xai_ease_score, alpha_imp_score", [
-    ("permutation", 0.25, 0.0, 1.0, 0.024390243902439025),
+    ("permutation", 0.0, 0.0, 1.0, 0.012195121951219513),
     ("surrogate",  0.0, 0.0, 1.0, 0.012195121951219513)
 ])
 def test_xai_classification_metrics(strategy, rank_alignment, position_parity, xai_ease_score, alpha_imp_score, input_data):
@@ -36,7 +35,7 @@ def test_xai_classification_metrics_separated(input_data):
     xai_features = classification_xai_features(test["X"], test["y"], model.predict, model.predict_proba, classes=[0,1])
         
     value = rank_alignment(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.25)
+    assert np.isclose(value, 0.0)
 
     value = position_parity(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
     assert np.isclose(value, 0.0)
@@ -45,4 +44,4 @@ def test_xai_classification_metrics_separated(input_data):
     assert np.isclose(value, 1.0)
 
     value = alpha_importance_score(xai_features.feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.024390243902439025)
+    assert np.isclose(value, 0.012195121951219513)
