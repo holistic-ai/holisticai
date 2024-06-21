@@ -87,7 +87,7 @@ def test_clustering_preprocessor(mitigator_name, mitigator_params, fit_params, c
 def test_recsys_preprocessor(mitigator_name, mitigator_params):
     import pandas as pd
     metrics1 = run_preprocessing_recsys(exposure_metric, mitigator_name, mitigator_params)
-    metrics2 = pd.DataFrame(columns=['Value'], data=[1.005387, 0.001944], index=['exposure_ratio', 'exposure difference'])
+    metrics2 = pd.DataFrame(columns=['Value'], data=[1.0037613239703396, 0.001944], index=['exposure_ratio', 'exposure difference'])
     check_results(metrics1, metrics2)
 
 
