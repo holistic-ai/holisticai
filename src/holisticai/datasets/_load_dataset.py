@@ -138,8 +138,8 @@ def load_lastfm_dataset():
     item_column = "artist"
 
     from holisticai.utils import recommender_formatter
-
-    df["score"] = np.random.randint(1, 5, len(df))
+    random_state = np.random.RandomState(42)
+    df["score"] = random_state.randint(1, 5, len(df))
     df[protected_attribute] = df[protected_attribute] == "m"
     df = df.drop_duplicates()
     df_pivot, p_attr = recommender_formatter(

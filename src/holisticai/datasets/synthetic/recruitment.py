@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 
+import numpy as np
 import pandas as pd
 
 
@@ -27,11 +28,11 @@ def generate_rankings(M: int | None, k: int | None, p: float | None, return_p_at
     DataFrame, Tuple
         DataFrame or Tuple of DataFrames
     """
-    random.seed(seed)
+    random_state = np.random.RandomState(seed)
     rankings = []
     for m in range(M):
         for i in range(k):
-            is_protected = random.random() <= p  # noqa: S311
+            is_protected = random_state.random() <= p
             rankings.append({"X": m, "Y": k - i, "score": k - i, "protected": is_protected})
 
     df = pd.DataFrame(rankings)

@@ -1,13 +1,19 @@
+from __future__ import annotations
+
+from typing import Union
+
 import numpy as np
 from holisticai.utils.models.cluster._utils import distance
+from numpy.random import RandomState
 
 
 class KCenters:
-    def __init__(self, n_clusters=5):
+    def __init__(self, n_clusters=5, random_state: Union[RandomState, int]=42):
         """
         k (int) : Number of centers to be identified
         """
         self.k = n_clusters
+        self.random_state = RandomState(random_state)
 
     def fit(self, data):
         """
@@ -16,11 +22,9 @@ class KCenters:
         Args:
                 data (list) : Points in the dataset
         """
-        # Randomly choosing an initial center
-        # random.seed(42)
 
         self.data = data
-        self.centers = [int(np.random.randint(0, len(self.data), 1))]
+        self.centers = [int(self.random_state.randint(0, len(self.data), 1))]
         self.costs = []
 
         while True:
