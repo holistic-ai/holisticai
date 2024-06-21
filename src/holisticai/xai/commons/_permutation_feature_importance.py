@@ -29,16 +29,20 @@ class PermutationFeatureImportanceCalculator(BaseModel):
     random_state: Union[RandomState, int] = RandomState(42)
 
     def __call__(self, ds: Dataset) -> PermutationFeatureImportance:
+        # Ensure the random state is consistent
+        rng = np.random.RandomState(self.random_state) if isinstance(self.random_state, int) else self.random_state
+
         X = ds["X"]  # noqa: N806
         y = ds["y"]
         metric = metric_scores[self.learning_task_settings.learning_task]
         baseline_score = metric(y, self.learning_task_settings.predict_fn(X))
         feature_importances = []
+
         for col in range(X.shape[1]):
             scores = np.zeros(self.n_repeats)
             for i in range(self.n_repeats):
                 X_permuted = X.copy()  # noqa: N806
-                X_permuted.iloc[:, col] = self.random_state.permutation(X_permuted.iloc[:, col])
+                X_permuted.iloc[:, col] = rng.permutation(X_permuted.iloc[:, col])
                 permuted_score = metric(y, self.learning_task_settings.predict_fn(X_permuted))
                 scores[i] = baseline_score - permuted_score
             feature_importances.append(np.mean(scores))
@@ -46,6 +50,7 @@ class PermutationFeatureImportanceCalculator(BaseModel):
         features = list(X.columns)
         feature_importance = pd.DataFrame({"Variable": features, "Importance": feature_importances})
         feature_importance["Importance"] = feature_importance["Importance"] / feature_importance["Importance"].sum()
+
         return PermutationFeatureImportance(
             feature_importances=feature_importance.sort_values("Importance", ascending=False)
         )
