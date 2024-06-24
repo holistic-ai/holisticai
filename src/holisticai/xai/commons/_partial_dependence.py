@@ -125,7 +125,7 @@ def wrap_sklearn_binary_model(classes: list, predict: callable, predict_proba: c
     )
 
 
-def wrap_sklearn_multi_classification_model(classes: list, predict: callable, predict_proba: callable|None = None):
+def wrap_sklearn_multi_classification_model(classes: list, predict: callable, predict_proba: callable | None = None):
     def fit(x, y):  # noqa: ARG001
         pass
 
@@ -167,19 +167,28 @@ def wrap_sklearn_regression_model(predict: callable):
 def wrap_sklearn_model(learning_task_settings: LearningTaskXAISettings):
     learning_task = learning_task_settings.learning_task
     if learning_task == "binary_classification":
-        return wrap_sklearn_binary_model(classes=learning_task_settings.classes, predict=learning_task_settings.predict_fn, predict_proba=learning_task_settings.predict_proba_fn)
+        return wrap_sklearn_binary_model(
+            classes=learning_task_settings.classes,
+            predict=learning_task_settings.predict_fn,
+            predict_proba=learning_task_settings.predict_proba_fn,
+        )
     if learning_task == "regression":
         return wrap_sklearn_regression_model(predict=learning_task_settings.predict_fn)
     if learning_task == "multi_classification":
-        return wrap_sklearn_multi_classification_model(classes=learning_task_settings.classes, predict=learning_task_settings.predict_fn, predict_proba=learning_task_settings.predict_proba_fn)
+        return wrap_sklearn_multi_classification_model(
+            classes=learning_task_settings.classes,
+            predict=learning_task_settings.predict_fn,
+            predict_proba=learning_task_settings.predict_proba_fn,
+        )
     return None
-
 
 
 def compute_partial_dependence(x: pd.DataFrame, features: list[str], learning_task_settings: LearningTaskXAISettings):
     supported_learning_tasks = ["binary_classification", "regression", "multi_classification"]
     if learning_task_settings.learning_task not in supported_learning_tasks:
-        raise ValueError(f"Learning task {learning_task_settings.learning_task} is not supported for partial dependence computation")
+        raise ValueError(
+            f"Learning task {learning_task_settings.learning_task} is not supported for partial dependence computation"
+        )
 
     model = wrap_sklearn_model(learning_task_settings)
     feature_names = np.array(x.columns)
@@ -187,7 +196,7 @@ def compute_partial_dependence(x: pd.DataFrame, features: list[str], learning_ta
     response_method = "auto"
     grid_resolution = 50
     feature_index = [np.where(feature_names == f)[0][0] for f in features]
-    percentiles = (0.05,0.95) if learning_task_settings.learning_task=="regression" else (0,1)
+    percentiles = (0.05, 0.95) if learning_task_settings.learning_task == "regression" else (0, 1)
     partial_dependence = get_partial_dependence(
         model,  # type: ignore
         x,

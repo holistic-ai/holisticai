@@ -43,7 +43,7 @@ def load_adult_dataset(protected_attribute: Literal["race", "sex"] | None = None
     return Dataset(X=x, y=y, **params)
 
 
-def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] = 'race1'):
+def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] = "race1"):
     bunch = load_law_school()
     protected_attributes = ["race1", "gender"]
     output_variable = "bar"
@@ -65,7 +65,7 @@ def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] = 'r
     return Dataset(X=x, y=y, **params)
 
 
-def load_student_multiclass_dataset(protected_attribute: Literal["sex", "address"]="sex"):
+def load_student_multiclass_dataset(protected_attribute: Literal["sex", "address"] = "sex"):
     output_column = "G3"
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
     bunch = load_student()
@@ -90,7 +90,9 @@ def load_student_multiclass_dataset(protected_attribute: Literal["sex", "address
     return Dataset(X=x, y=y, p_attr=p_attr)
 
 
-def load_student_dataset(target: Literal["G1", "G2", "G3"] = "G3", protected_attribute: Literal["sex", "address", "Mjob", "Fjob"]="sex"):
+def load_student_dataset(
+    target: Literal["G1", "G2", "G3"] = "G3", protected_attribute: Literal["sex", "address", "Mjob", "Fjob"] = "sex"
+):
     # outputs = ["G1", "G2", "G3"]
     # protected_attributes = ["sex", "address", "Mjob", "Fjob"]
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
@@ -137,7 +139,8 @@ def load_lastfm_dataset():
 
     from holisticai.utils import recommender_formatter
 
-    df["score"] = np.random.randint(1, 5, len(df))
+    random_state = np.random.RandomState(42)
+    df["score"] = random_state.randint(1, 5, len(df))
     df[protected_attribute] = df[protected_attribute] == "m"
     df = df.drop_duplicates()
     df_pivot, p_attr = recommender_formatter(
@@ -247,7 +250,18 @@ def load_clinical_records_dataset():
     x = df.drop(columns=drop_columns)
     return Dataset(X=x, y=y, group_a=group_a, group_b=group_b)
 
-ProcessedDatasets = Literal["adult","law_school","student_multiclass","student","lastfm","us_crime","us_crime_multiclass","clinical_records"]
+
+ProcessedDatasets = Literal[
+    "adult",
+    "law_school",
+    "student_multiclass",
+    "student",
+    "lastfm",
+    "us_crime",
+    "us_crime_multiclass",
+    "clinical_records",
+]
+
 
 def load_dataset(dataset_name: ProcessedDatasets, **kargs):
     if dataset_name == "adult":

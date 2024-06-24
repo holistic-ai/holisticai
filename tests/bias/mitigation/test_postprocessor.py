@@ -105,7 +105,7 @@ def test_recsys_fairtopk():
     mitigator_params = {'top_n': 20, 'p': 0.9, 'alpha': 0.15, 'query_col':'X',
                     'score_col': 'score', 'group_col': 'protected', 'doc_col': 'Y'}
     metrics1 = run_postprocessing_fairtopk(exposure_metric, mitigator_name, mitigator_params)
-    metrics2 = pd.DataFrame(columns=['Value'], data=[2.272748, 0.001944], index=['exposure_ratio', 'exposure difference'])
+    metrics2 = pd.DataFrame(columns=['Value'], data=[30.34618386900864, 0.001944], index=['exposure_ratio', 'exposure difference'])
     check_results(metrics1, metrics2)
 
 

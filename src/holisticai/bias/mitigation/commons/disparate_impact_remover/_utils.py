@@ -340,11 +340,10 @@ def get_median(values, kdd):
 
     if kdd:
         return sorted_values[len(values) // 2]
+    elif len(values) % 2 == 0:
+        return sorted_values[len(values) // 2 - 1]
     else:
-        if len(values) % 2 == 0:
-            return sorted_values[len(values) // 2 - 1]
-        else:
-            return sorted_values[len(values) // 2]
+        return sorted_values[len(values) // 2]
 
 
 def get_group_data(all_stratified_groups, stratified_group_data, col_id):
