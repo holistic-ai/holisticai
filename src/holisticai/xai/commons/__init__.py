@@ -13,13 +13,15 @@ from holisticai.xai.commons._utils import (
     select_feature_importance_strategy,
 )
 
-__all__ = [ "BinaryClassificationXAISettings",
-            "RegressionClassificationXAISettings",
-            "MultiClassificationXAISettings",
-            "PermutationFeatureImportanceCalculator",
-            "SurrogateFeatureImportanceCalculator",
-            "SurrogateFeatureImportance",
-            "PermutationFeatureImportance",
-            "FeatureImportance",
-            "compute_xai_features",
-            "select_feature_importance_strategy"]
+__all__ = [
+    "BinaryClassificationXAISettings",
+    "RegressionClassificationXAISettings",
+    "MultiClassificationXAISettings",
+    "PermutationFeatureImportanceCalculator",
+    "SurrogateFeatureImportanceCalculator",
+    "SurrogateFeatureImportance",
+    "PermutationFeatureImportance",
+    "FeatureImportance",
+    "compute_xai_features",
+    "select_feature_importance_strategy",
+]

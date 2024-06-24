@@ -4,8 +4,8 @@ import itertools
 import sys
 from typing import Literal
 
-import numpy as np
 import holisticai.bias.metrics as bias_metrics
+import numpy as np
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from sklearn.metrics import balanced_accuracy_score
 

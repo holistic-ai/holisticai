@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 import pandas as pd
@@ -29,12 +29,14 @@ def calculate_discrete_derivative(y_values):
     dx = np.ones_like(dy)  # Assuming x values are equally spaced with a difference of 1
     return dy / dx
 
+
 def cosine_similarity(v1, v2):
     """Calculate the cosine similarity between two vectors."""
     dot_product = np.dot(v1, v2)
     norm_v1 = np.linalg.norm(v1)
     norm_v2 = np.linalg.norm(v2)
     return dot_product / (norm_v1 * norm_v2)
+
 
 def compare_tangents(points):
     num_sections = 3
@@ -43,13 +45,13 @@ def compare_tangents(points):
     tol = 1e-5
     if n < num_sections:
         few_points = True
-        return (1,1), few_points
+        return (1, 1), few_points
 
     cut1 = n // 3
     cut2 = 2 * n // 3
 
-    section1 = points[:cut1 + 1]
-    section2 = points[cut1:cut2 + 1]
+    section1 = points[: cut1 + 1]
+    section2 = points[cut1 : cut2 + 1]
     section3 = points[cut2:]
 
     sections = [section1, section2, section3]
@@ -66,7 +68,7 @@ def compare_tangents(points):
     for i in range(len(slopes) - 1):
         similarity = cosine_similarity([slopes[i]], [slopes[i + 1]])
         similarities.append(similarity)
-    return similarities,few_points
+    return similarities, few_points
 
 
 class XAIEaseScore(BaseModel):
@@ -106,14 +108,9 @@ class XAIEaseScore(BaseModel):
         Returns:
             score_data (DataFrame): The computed score data.
         """
-        data = {
-            feat: compare_tangents(df)
-            for feat, df in partial_dependence.items()
-        }
+        data = {feat: compare_tangents(df) for feat, df in partial_dependence.items()}
         score_data = compute_feature_scores(data, self.threshold)
-        score_data["scores"] = score_data.apply(
-            lambda x: self.levels[x["scores"]], axis=1
-        )
+        score_data["scores"] = score_data.apply(lambda x: self.levels[x["scores"]], axis=1)
         return score_data
 
     def compute_xai_ease_score(self, score_data):
@@ -127,7 +124,9 @@ class XAIEaseScore(BaseModel):
             xai_ease_score (float): The computed XAI Ease Score.
         """
         max_score = 2
-        score_dict = pd.DataFrame(score_data.groupby("scores").count()["feature"] / score_data.groupby("scores").count()["feature"].sum()).to_dict()["feature"]
+        score_dict = pd.DataFrame(
+            score_data.groupby("scores").count()["feature"] / score_data.groupby("scores").count()["feature"].sum()
+        ).to_dict()["feature"]
 
         values = []
         full_score = {c: 0 for c in self.levels}
@@ -135,7 +134,7 @@ class XAIEaseScore(BaseModel):
             full_score[c] = v
             values.append(self.levels.index(c) * full_score[c])
 
-        return sum(values)/max_score
+        return sum(values) / max_score
 
     def xai_feature_ease_score(self, partial_dependence) -> float:
         """
@@ -150,7 +149,11 @@ class XAIEaseScore(BaseModel):
         score_data = self.compute_xai_ease_score_data(partial_dependence)
         return self.compute_xai_ease_score(score_data)
 
-    def __call__(self, partial_dependence: PartialDependence|list[PartialDependence], ranked_feature_importance: FeatureImportance):
+    def __call__(
+        self,
+        partial_dependence: Union[PartialDependence, list[PartialDependence]],
+        ranked_feature_importance: FeatureImportance,
+    ):
         """
         Computes the XAI Ease Score for a set of partial dependence plots.
 
@@ -161,8 +164,11 @@ class XAIEaseScore(BaseModel):
         Returns:
             xai_ease_score (float): The computed XAI Ease Score.
         """
+
         def compute_metric(pdep, rfi):
-            partial_dependence_formatted = {f:pdep.partial_dependence[i]["average"][0] for i, f in enumerate(rfi.feature_names)}
+            partial_dependence_formatted = {
+                f: pdep.partial_dependence[i]["average"][0] for i, f in enumerate(rfi.feature_names)
+            }
             return self.xai_feature_ease_score(partial_dependence_formatted)
 
         if isinstance(partial_dependence, list):
