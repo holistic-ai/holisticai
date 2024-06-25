@@ -65,18 +65,9 @@ Here are some tutorials where different systems are fitting using the mitigators
         - `Mitigating Bias using ML Debiaser <bias/mitigating_bias/multi_classification/postprocessing/ml_debiaser.ipynb>`_
         
 - Recommender Systems
-    - Preprocessing
-        - `Mitigating Bias using Disparate Impact Remover <mitigating_bias/recommender_systems/preprocessing/disparate_impact_remover.ipynb>`_
-
-    - Inprocessing
-        - `Mitigating Bias using Blind Spot Aware <bias/mitigating_bias/recommender_systems/inprocessing/blind_spot_aware.ipynb>`_
-        - `Mitigating Bias using Debiasing Learning <bias/mitigating_bias/recommender_systems/inprocessing/debiasing_learning.ipynb>`_
-        - `Mitigating Bias using Popularity Propensity <bias/mitigating_bias/recommender_systems/inprocessing/popularity_propensity.ipynb>`_
-        - `Mitigating Bias using Two Side Fairness <bias/mitigating_bias/recommender_systems/inprocessing/two_sided_fairness.ipynb>`_
-
-    - Postprocessing
-        - `Mitigating Bias using Debiasing Exposure <bias/mitigating_bias/recommender_systems/postprocessing/debiasing_exposure.ipynb>`_
-        - `Mitigating Bias using Fair Top-K <bias/mitigating_bias/recommender_systems/postprocessing/fair_top_k.ipynb>`_
+    - `Case study: Mitigating Bias in "LastFM" dataset <bias/mitigating_bias/recommmender_systems/examples/example_lastfm.ipynb>`_
+    - `Inprocessing demos <bias/mitigating_bias/recommmender_systems/demos/inprocessing.ipynb>`_
+    - `Postprocessing demos <bias/mitigating_bias/recommmender_systems/demos/postprocessing.ipynb>`_
         
 - Clustering
     - Preprocessing
