@@ -39,17 +39,10 @@ Here are some tutorials where different systems are fitting using the mitigators
         - `Mitigating Bias using Reject Option Classification <bias/mitigating_bias/binary_classification/postprocessing/reject_option_classification.ipynb>`_
 
 - Regression
-    - Preprocessing
-        - `Mitigating Bias using Correlation Remover <bias/mitigating_bias/regression/preprocessing/correlation_remover.ipynb>`_
-        - `Mitigating Bias using Disparate Impact <bias/mitigating_bias/regression/preprocessing/disparate_impact_remover.ipynb>`_
-
-    - Inprocessing
-        - `Mitigating Bias using Exponientiated Gradient <bias/mitigating_bias/regression/inprocessing/exponientiated_gradient.ipynb>`_
-        - `Mitigating Bias using Grid Search Reduction <bias/mitigating_bias/regression/inprocessing/grid_search_reduction.ipynb>`_
-
-    - Postprocessing
-        - `Mitigating Bias using Plugin Estimator and Calibrator <bias/mitigating_bias/regression/postprocessing/plugin_estimator_and_calibrator.ipynb>`_
-        - `Mitigating Bias using Wasserstein Barycenters <bias/mitigating_bias/regression/postprocessing/wasserstein_barycenters.ipynb>`_
+    - `Case study: Mitigating Bias in "Communities and Crime" dataset <bias/mitigating_bias/regression/examples/example_us_crime.ipynb>`
+    - `Preprocessing demos <bias/mitigating_bias/regression/demos/preprocessing.ipynb>`
+    - `Inprocessing demos <bias/mitigating_bias/regression/demos/inprocessing.ipynb>`
+    - `Postprocessing demos <bias/mitigating_bias/regression/demos/postprocessing.ipynb>`
 
 - Multiclass Classification
     - Preprocessing
