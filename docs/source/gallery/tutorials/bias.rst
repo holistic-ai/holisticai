@@ -65,9 +65,11 @@ Here are some tutorials where different systems are fitting using the mitigators
         - `Mitigating Bias using ML Debiaser <bias/mitigating_bias/multi_classification/postprocessing/ml_debiaser.ipynb>`_
         
 - Recommender Systems
-    - `Case study: Mitigating Bias in "LastFM" dataset <bias/mitigating_bias/recommmender_systems/examples/example_lastfm.ipynb>`_
-    - `Inprocessing demos <bias/mitigating_bias/recommmender_systems/demos/inprocessing.ipynb>`_
-    - `Postprocessing demos <bias/mitigating_bias/recommmender_systems/demos/postprocessing.ipynb>`_
+    - Examples
+        - `Case study: Mitigating Bias in "LastFM" dataset <bias/mitigating_bias/recommender_systems/examples/example_lastfm.ipynb>`_
+    - Demos
+        - `Inprocessing <bias/mitigating_bias/recommender_systems/demos/inprocessing.ipynb>`_
+        - `Postprocessing <bias/mitigating_bias/recommender_systems/demos/postprocessing.ipynb>`_
         
 - Clustering
     - Preprocessing
