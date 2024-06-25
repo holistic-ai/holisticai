@@ -39,10 +39,12 @@ Here are some tutorials where different systems are fitting using the mitigators
         - `Mitigating Bias using Reject Option Classification <bias/mitigating_bias/binary_classification/postprocessing/reject_option_classification.ipynb>`_
 
 - Regression
-    - `Case study: Mitigating Bias in "Communities and Crime" dataset <bias/mitigating_bias/regression/examples/example_us_crime.ipynb>`
-    - `Preprocessing demos <bias/mitigating_bias/regression/demos/preprocessing.ipynb>`
-    - `Inprocessing demos <bias/mitigating_bias/regression/demos/inprocessing.ipynb>`
-    - `Postprocessing demos <bias/mitigating_bias/regression/demos/postprocessing.ipynb>`
+    - Examples
+        - `Case study: Mitigating Bias in "Communities and Crime" dataset <bias/mitigating_bias/regression/examples/example_us_crime.ipynb>`_
+    - Demos
+        - `Preprocessing <bias/mitigating_bias/regression/demos/preprocessing.ipynb>`_
+        - `Inprocessing <bias/mitigating_bias/regression/demos/inprocessing.ipynb>`_
+        - `Postprocessing <bias/mitigating_bias/regression/demos/postprocessing.ipynb>`_
 
 - Multiclass Classification
     - Preprocessing
