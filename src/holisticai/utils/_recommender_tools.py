@@ -202,7 +202,7 @@ def entropy(p, q=None):
 
     Description
     ----------
-    We compute the entropy of a probabvility or relative
+    We compute the entropy of a probability or relative
     entropy of two probabilities
 
     Parameters
