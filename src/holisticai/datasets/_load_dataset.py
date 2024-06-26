@@ -30,8 +30,8 @@ def load_adult_dataset(protected_attribute: Literal["race", "sex"] | None = None
         params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Black"), name="group_b")
 
     if protected_attribute == "sex":
-        params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_a")
-        params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
+        params["group_a"] = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_a")
+        params["group_b"] = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_b")
 
     # p_attr = pd.concat([group_a, group_b], axis=1)
     y = df[output_variable].map({"<=50K": 0, ">50K": 1})
@@ -215,11 +215,12 @@ def load_us_crime_multiclass_dataset():
     threshold = 0.5
     group_a = pd.Series(df[protected_attribute] > threshold, name="group_a")
     group_b = pd.Series(~group_a, name="group_b")
+    p_attr = pd.Series([1 if i else 0 for i in group_a])
     y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3))
     remove_columns = [protected_attribute, output_column]
     x = df.drop(columns=remove_columns)
     numeric_features = x.select_dtypes(include=[np.number]).columns
-    return Dataset(X=x[numeric_features], y=y_cat, group_a=group_a, group_b=group_b)
+    return Dataset(X=x[numeric_features], y=y_cat, group_a=group_a, group_b=group_b, p_attr=p_attr)
 
 
 def load_clinical_records_dataset():
