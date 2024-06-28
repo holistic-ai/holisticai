@@ -18,75 +18,40 @@ Mitigation
 Here are some tutorials where different systems are fitting using the mitigators.
 
 - Binary Classification
-    - Preprocessing
-        - `Mitigating Bias using Correlation Remover <bias/mitigating_bias/binary_classification/preprocessing/correlation_remover.ipynb>`_
-        - `Mitigating Bias using Disparate Impact <bias/mitigating_bias/binary_classification/preprocessing/disparate_impact.ipynb>`_
-        - `Mitigating Bias using Learning Fair Representation <bias/mitigating_bias/binary_classification/preprocessing/learning_fair_representation.ipynb>`_
-        - `Mitigating Bias using Reweighing <bias/mitigating_bias/binary_classification/preprocessing/reweighing.ipynb>`_
-
-    - Inprocessing
-        - `Mitigating Bias using Adversarial Debiasing <bias/mitigating_bias/binary_classification/inprocessing/adversarial_debiasing.ipynb>`_
-        - `Mitigating Bias using Exponentiated Gradient <bias/mitigating_bias/binary_classification/inprocessing/exponentiated_gradient.ipynb>`_
-        - `Mitigating Bias using Grid Search Reduction <bias/mitigating_bias/binary_classification/inprocessing/grid_search_reduction.ipynb>`_
-        - `Mitigating Bias using Meta Fair Classifier <bias/mitigating_bias/binary_classification/inprocessing/meta_fair_classifier.ipynb>`_
-        - `Mitigating Bias using Prejudice Remover <bias/mitigating_bias/binary_classification/inprocessing/prejudice_remover.ipynb>`_
-
-    - Postprocessing
-        - `Mitigating Bias using Calibrated Equalize Odds Debiasing <bias/mitigating_bias/binary_classification/postprocessing/calibrated_equalized_odds.ipynb>`_
-        - `Mitigating Bias using Equaliized Odds <bias/mitigating_bias/binary_classification/postprocessing/equalized_odds.ipynb>`_
-        - `Mitigating Bias using LP Debiaser <bias/mitigating_bias/binary_classification/postprocessing/lp_debiaser.ipynb>`_
-        - `Mitigating Bias using ML Debiaser <bias/mitigating_bias/binary_classification/postprocessing/ml_debiaser.ipynb>`_
-        - `Mitigating Bias using Reject Option Classification <bias/mitigating_bias/binary_classification/postprocessing/reject_option_classification.ipynb>`_
+    - Demos
+        - `Preprocessing Bias Mitigation <bias/mitigating_bias/binary_classification/demos/preprocessing.ipynb>`_
+        - `Inprocessing Bias Mitigation <bias/mitigating_bias/binary_classification/demos/preprocessing.ipynb>`_
+        - `Postprocessing Bias Mitigation <bias/mitigating_bias/binary_classification/demos/preprocessing.ipynb>`_
+    - Examples
+        - `Census Data Analysis <bias/mitigating_bias/binary_classification/examples/example_census_data.ipynb>`_
 
 - Regression
-    - Preprocessing
-        - `Mitigating Bias using Correlation Remover <bias/mitigating_bias/regression/preprocessing/correlation_remover.ipynb>`_
-        - `Mitigating Bias using Disparate Impact <bias/mitigating_bias/regression/preprocessing/disparate_impact_remover.ipynb>`_
-
-    - Inprocessing
-        - `Mitigating Bias using Exponientiated Gradient <bias/mitigating_bias/regression/inprocessing/exponientiated_gradient.ipynb>`_
-        - `Mitigating Bias using Grid Search Reduction <bias/mitigating_bias/regression/inprocessing/grid_search_reduction.ipynb>`_
-
-    - Postprocessing
-        - `Mitigating Bias using Plugin Estimator and Calibrator <bias/mitigating_bias/regression/postprocessing/plugin_estimator_and_calibrator.ipynb>`_
-        - `Mitigating Bias using Wasserstein Barycenters <bias/mitigating_bias/regression/postprocessing/wasserstein_barycenters.ipynb>`_
+    - Examples
+        - `Case study: Mitigating Bias in "Communities and Crime" dataset <bias/mitigating_bias/regression/examples/example_us_crime.ipynb>`_
+    - Demos
+        - `Preprocessing <bias/mitigating_bias/regression/demos/preprocessing.ipynb>`_
+        - `Inprocessing <bias/mitigating_bias/regression/demos/inprocessing.ipynb>`_
+        - `Postprocessing <bias/mitigating_bias/regression/demos/postprocessing.ipynb>`_
 
 - Multiclass Classification
-    - Preprocessing
-        - `Mitigating Bias using Correlation Remover <bias/mitigating_bias/multi_classification/preprocessing/correlation_remover.ipynb>`_
-        - `Mitigating Bias using Disparate Impact <bias/mitigating_bias/multi_classification/preprocessing/disparate_impact.ipynb>`_
-        - `Mitigating Bias using Reweighing <bias/mitigating_bias/multi_classification/preprocessing/reweighing.ipynb>`_
+    - Demos
+        - `Preprocessing Bias Mitigation <bias/mitigating_bias/multi_classification/demos/preprocessing.ipynb>`_
+        - `Inprocessing Bias Mitigation <bias/mitigating_bias/multi_classification/demos/preprocessing.ipynb>`_
+        - `Postprocessing Bias Mitigation <bias/mitigating_bias/multi_classification/demos/preprocessing.ipynb>`_
+    - Examples
+        - `Bias Mitigation in US Crime Data <bias/mitigating_bias/multi_classification/examples/example_multiclassification.ipynb>`_
 
-    - Inprocessing
-        - `Mitigating Bias using Fair Scoring Classifier <bias/mitigating_bias/multi_classification/inprocessing/fair_scoring_classifier.ipynb>`_
-
-    - Postprocessing
-        - `Mitigating Bias using LP Debiaser <bias/mitigating_bias/multi_classification/postprocessing/lp_debiaser.ipynb>`_
-        - `Mitigating Bias using ML Debiaser <bias/mitigating_bias/multi_classification/postprocessing/ml_debiaser.ipynb>`_
-        
 - Recommender Systems
-    - Preprocessing
-        - `Mitigating Bias using Disparate Impact Remover <mitigating_bias/recommender_systems/preprocessing/disparate_impact_remover.ipynb>`_
-
-    - Inprocessing
-        - `Mitigating Bias using Blind Spot Aware <bias/mitigating_bias/recommender_systems/inprocessing/blind_spot_aware.ipynb>`_
-        - `Mitigating Bias using Debiasing Learning <bias/mitigating_bias/recommender_systems/inprocessing/debiasing_learning.ipynb>`_
-        - `Mitigating Bias using Popularity Propensity <bias/mitigating_bias/recommender_systems/inprocessing/popularity_propensity.ipynb>`_
-        - `Mitigating Bias using Two Side Fairness <bias/mitigating_bias/recommender_systems/inprocessing/two_sided_fairness.ipynb>`_
-
-    - Postprocessing
-        - `Mitigating Bias using Debiasing Exposure <bias/mitigating_bias/recommender_systems/postprocessing/debiasing_exposure.ipynb>`_
-        - `Mitigating Bias using Fair Top-K <bias/mitigating_bias/recommender_systems/postprocessing/fair_top_k.ipynb>`_
+    - Examples
+        - `Case study: Mitigating Bias in "LastFM" dataset <bias/mitigating_bias/recommender_systems/examples/example_lastfm.ipynb>`_
+    - Demos
+        - `Inprocessing <bias/mitigating_bias/recommender_systems/demos/inprocessing.ipynb>`_
+        - `Postprocessing <bias/mitigating_bias/recommender_systems/demos/postprocessing.ipynb>`_
         
 - Clustering
-    - Preprocessing
-        - `Mitigating Bias using Fairlet Clustering <bias/mitigating_bias/clustering/preprocessing/fairlet_clustering_preprocessing.ipynb>`_
-
-    - Inprocessing
-        - `Mitigating Bias using Fair-K Center Clustering <bias/mitigating_bias/clustering/inprocessing/fair_k_center_clustering.ipynb>`_
-        - `Mitigating Bias using Fair-K Mediam Clustering <bias/mitigating_bias/clustering/inprocessing/fair_k_median_clustering.ipynb>`_
-        - `Mitigating Bias using Fairlet Clustering <bias/mitigating_bias/clustering/inprocessing/fairlet_clustering.ipynb>`_
-        - `Mitigating Bias using Variational Fair Clustering <bias/mitigating_bias/clustering/inprocessing/variational_fair_clustering.ipynb>`_
-
-    - Postprocessing
-        - `Mitigating Bias using MCMF Clustering <bias/mitigating_bias/clustering/postprocessing/mcmf_clustering.ipynb>`_
+    - Demos
+        - `Preprocessing Bias Mitigation <bias/mitigating_bias/clustering/demos/preprocessing.ipynb>`_
+        - `Inprocessing Bias Mitigation <bias/mitigating_bias/clustering/demos/preprocessing.ipynb>`_
+        - `Postprocessing Bias Mitigation <bias/mitigating_bias/clustering/demos/preprocessing.ipynb>`_
+    - Examples
+        - `Bias Mitigation in Clinical Records <bias/mitigating_bias/clustering/examples/example_clustering.ipynb>`_

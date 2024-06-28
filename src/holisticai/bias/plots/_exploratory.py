@@ -303,12 +303,12 @@ def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu", ax
         cm,
         cbar=False,
         annot=True,
-        square=True,
         fmt=".2f",
         annot_kws={"size": 10},
         yticklabels=cols.values,
         xticklabels=cols.values,
         cmap=cmap,
+        ax=ax,
     )
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 
