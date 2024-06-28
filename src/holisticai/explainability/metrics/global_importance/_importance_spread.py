@@ -11,8 +11,9 @@ class ImportanceSpread:
         divergence: bool
             if True calculate divergence instead of ratio
         """
-        feature_importances = np.array(feature_importance.feature_importances.values[:,1], dtype=float)
-        if len(feature_importances) == 0 or sum(feature_importances) < 1e-8:
+        tol = 1e-8
+        feature_importances = np.array(feature_importance.feature_importances.values[:, 1], dtype=float)
+        if len(feature_importances) == 0 or sum(feature_importances) < tol:
             return 0 if self.divergence else 1
 
         importance = feature_importances
@@ -29,14 +30,16 @@ class ImportanceSpread:
 
 
 class SpreadDivergence(ImportanceSpread):
-    name : str = "Spread Divergence"
+    name: str = "Spread Divergence"
     reference = np.inf
     divergence = True
 
+
 class SpreadRatio(ImportanceSpread):
-    name : str = "Spread Ratio"
+    name: str = "Spread Ratio"
     reference = 0
     divergence = False
+
 
 def spread_ratio(feature_importance):
     metric = SpreadRatio()

@@ -14,7 +14,12 @@ if TYPE_CHECKING:
 
 
 def multiclass_explainability_features(
-    X, y, predict_fn, predict_proba_fn, classes, strategy: Union[Literal["permutation", "surrogate"],callable] = "permutation"
+    X,
+    y,
+    predict_fn,
+    predict_proba_fn,
+    classes,
+    strategy: Union[Literal["permutation", "surrogate"], callable] = "permutation",
 ):
     dataset = Dataset(X=X, y=y)
     learning_task_settings = MultiClassificationXAISettings(

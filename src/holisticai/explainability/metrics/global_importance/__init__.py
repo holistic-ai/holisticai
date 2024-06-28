@@ -17,5 +17,5 @@ __all__ = [
     "xai_ease_score",
     "position_parity",
     "rank_alignment",
-    "spread_ratio"
+    "spread_ratio",
 ]

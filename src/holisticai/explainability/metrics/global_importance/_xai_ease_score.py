@@ -85,7 +85,10 @@ class XAIEaseAnnotator(BaseModel):
         Returns:
             score_data (DataFrame): The computed score data.
         """
-        partial_dependence_formatted = {f: partial_dependence.partial_dependence[i]["average"][0] for i, f in enumerate(ranked_feature_importance.feature_names)}
+        partial_dependence_formatted = {
+            f: partial_dependence.partial_dependence[i]["average"][0]
+            for i, f in enumerate(ranked_feature_importance.feature_names)
+        }
         data = {feat: compare_tangents(df) for feat, df in partial_dependence_formatted.items()}
         score_data = compute_feature_scores(data, self.threshold)
         score_data["scores"] = score_data.apply(lambda x: self.levels[x["scores"]], axis=1)
@@ -110,7 +113,6 @@ class XAIEaseScore(BaseModel):
         __call__: Computes the XAI Ease Score for a set of partial dependence plots.
         __xai_feature_ease_score: Computes the XAI Ease Score for a single partial dependence plot.
     """
-
 
     reference: float = 1.0
     name: str = "XAI Ease Score"

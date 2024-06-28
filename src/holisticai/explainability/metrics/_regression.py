@@ -10,7 +10,9 @@ from holisticai.explainability.commons import (
 from holisticai.explainability.metrics._utils import compute_explainability_metrics_from_features
 
 
-def regression_explainability_features(X, y, predict_fn, strategy: Union[Literal["permutation", "surrogate"], callable] = "permutation"):
+def regression_explainability_features(
+    X, y, predict_fn, strategy: Union[Literal["permutation", "surrogate"], callable] = "permutation"
+):
     dataset = Dataset(X=X, y=y)
 
     learning_task_settings = RegressionClassificationXAISettings(predict_fn=predict_fn)

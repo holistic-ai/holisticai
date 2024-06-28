@@ -90,6 +90,7 @@ class LocalConditionalFeatureImportance(BaseModel):
             name: self.feature_importances.Variable.tolist() for name in self.conditional_feature_importance.items()
         }
 
+
 class PartialDependence(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     partial_dependence: list[dict]

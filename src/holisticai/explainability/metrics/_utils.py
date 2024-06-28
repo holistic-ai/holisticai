@@ -1,5 +1,11 @@
 import pandas as pd
-from holisticai.explainability.metrics.global_importance import AlphaImportanceScore, PositionParity, RankAlignment, XAIEaseScore, SpreadRatio
+from holisticai.explainability.metrics.global_importance import (
+    AlphaImportanceScore,
+    PositionParity,
+    RankAlignment,
+    SpreadRatio,
+    XAIEaseScore,
+)
 from holisticai.explainability.metrics.local_importance import DataStability, FeatureStability
 
 
@@ -28,7 +34,7 @@ def compute_global_explainability_metrics_from_features(xai_features):
 
 
 def compute_local_explainability_metrics_from_features(xai_features):
-    results= []
+    results = []
     metric = FeatureStability()
     value = metric(xai_features.local_feature_importance)
     results.append({"metric": metric.name, "value": value, "reference": metric.reference})
@@ -40,15 +46,15 @@ def compute_local_explainability_metrics_from_features(xai_features):
 
 
 def compute_explainability_metrics_from_features(xai_features, metric_type="global"):
-    if metric_type=="global":
+    if metric_type == "global":
         return compute_global_explainability_metrics_from_features(xai_features)
 
-    if metric_type=="local":
+    if metric_type == "local":
         if xai_features.local_feature_importance is None:
             raise ValueError("Local feature importance can't be none for local metrics.")
         return compute_local_explainability_metrics_from_features(xai_features)
 
-    if metric_type=="both":
+    if metric_type == "both":
         if xai_features.local_feature_importance is None:
             raise ValueError("Local feature importance can't be none for local metrics.")
         global_metrics = compute_global_explainability_metrics_from_features(xai_features)

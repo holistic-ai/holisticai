@@ -25,5 +25,5 @@ __all__ = [
     "FeatureImportance",
     "compute_explainability_features",
     "select_feature_importance_strategy",
-    "Importances"
+    "Importances",
 ]

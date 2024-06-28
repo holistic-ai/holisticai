@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Literal, Union
 
-import pandas as pd
 from holisticai.datasets import Dataset
 from holisticai.explainability.commons import (
     BinaryClassificationXAISettings,
@@ -14,7 +13,12 @@ from holisticai.explainability.metrics._utils import (
 
 
 def classification_explainability_features(
-    X, y, predict_fn, predict_proba_fn, classes, strategy: Union[Literal["permutation", "surrogate"],callable] = "permutation"
+    X,
+    y,
+    predict_fn,
+    predict_proba_fn,
+    classes,
+    strategy: Union[Literal["permutation", "surrogate"], callable] = "permutation",
 ):
     dataset = Dataset(X=X, y=y)
 
@@ -22,9 +26,7 @@ def classification_explainability_features(
         predict_fn=predict_fn, predict_proba_fn=predict_proba_fn, classes=classes
     )
 
-    return compute_explainability_features(
-        dataset, learning_task_settings=learning_task_settings, strategy=strategy
-    )
+    return compute_explainability_features(dataset, learning_task_settings=learning_task_settings, strategy=strategy)
 
 
 def classification_explainability_metrics(

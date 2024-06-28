@@ -215,7 +215,7 @@ def compute_partial_dependence(x: pd.DataFrame, features: list[str], learning_ta
         for c in range(nb_classes):
             part_dep_feat = []
             for p in partial_dependence:
-                assert nb_classes==len(p["individual"])
+                assert nb_classes == len(p["individual"])
                 newp = p.copy()
                 newp["individual"] = p["individual"][c][np.newaxis]
                 newp["average"] = p["average"][c][np.newaxis]

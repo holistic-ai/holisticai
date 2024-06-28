@@ -45,17 +45,17 @@ def filter_feature_importance(feature_importance, alpha=None) -> pd.DataFrame:
 
 def compute_conditional_feature_importance(
     learning_task, ds: Dataset, feature_importance_calculator: callable
-) -> Union[ConditionalFeatureImportance,LocalConditionalFeatureImportance]:
+) -> Union[ConditionalFeatureImportance, LocalConditionalFeatureImportance]:
     ds = create_output_groups(ds, learning_task)
 
     if feature_importance_calculator.importance_type == "global":
-        conditional_feature_importance = {group_name[0]: feature_importance_calculator(ds=group_ds)
-        for group_name, group_ds in ds.groupby("group")
+        conditional_feature_importance = {
+            group_name[0]: feature_importance_calculator(ds=group_ds) for group_name, group_ds in ds.groupby("group")
         }
         return ConditionalFeatureImportance(conditional_feature_importance=conditional_feature_importance)
     conditional_feature_importance = {
-    group_name[0]: LocalImportances(feature_importances=feature_importance_calculator(ds=group_ds))
-    for group_name, group_ds in ds.groupby("group")
+        group_name[0]: LocalImportances(feature_importances=feature_importance_calculator(ds=group_ds))
+        for group_name, group_ds in ds.groupby("group")
     }
     return LocalConditionalFeatureImportance(conditional_feature_importance=conditional_feature_importance)
 
