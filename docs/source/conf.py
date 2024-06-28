@@ -26,6 +26,7 @@ sys.path.insert(0, src_path)
 
 bias_tutorial_path = os.path.join(work_dir, 'tutorials/bias')
 dataset_tutorial_path = os.path.join(work_dir, 'tutorials/datasets')
+xai_tutorial_path = os.path.join(work_dir, 'tutorials/explainability')
 
 def copy_folder(origen, destino):
     try:
@@ -36,7 +37,7 @@ def copy_folder(origen, destino):
     except Exception as e:
         print(f"Error when trying to copy folder: {e}")
 
-for path in [bias_tutorial_path, dataset_tutorial_path]:
+for path in [bias_tutorial_path, dataset_tutorial_path, xai_tutorial_path]:
     dirname = os.path.basename(path)
     copy_folder(path, os.path.join(os.getcwd(), 'gallery', 'tutorials', dirname))
 
@@ -64,6 +65,7 @@ extensions = [
     "sphinx_design",
     "sphinx_togglebutton",
     "sphinxcontrib.youtube",
+    'sphinx.ext.mathjax',
 ]
 
 nbsphinx_allow_errors = True  # Permitir errores en los notebooks
