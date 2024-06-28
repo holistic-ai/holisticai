@@ -166,7 +166,7 @@ class AdversarialDebiasing(BMImp):
     def fit(
         self,
         X: np.ndarray,
-        y_true: np.ndarray,
+        y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
     ):
@@ -196,8 +196,8 @@ class AdversarialDebiasing(BMImp):
         -------
         the same object
         """
-        params = self._load_data(y_true=y_true, group_a=group_a, group_b=group_b)
-        y_true = params["y_true"]
+        params = self._load_data(y=y, group_a=group_a, group_b=group_b)
+        y = params["y"]
         group_a = params["group_a"]
         group_b = params["group_b"]
         self.classes_ = params["classes_"]
@@ -206,7 +206,7 @@ class AdversarialDebiasing(BMImp):
         if self.seed is not None:
             torch.manual_seed(self.seed)
 
-        dataset = self._create_dataset(X, y_true, sensitive_features)
+        dataset = self._create_dataset(X, y, sensitive_features)
         self.trainer = self._build_trainer(dataset)
 
         self.trainer.train()
