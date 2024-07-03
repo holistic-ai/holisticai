@@ -14,6 +14,9 @@ from holisticai.explainability.commons._utils import (
     select_feature_importance_strategy,
 )
 
+from ._lime import LIMEImportanceCalculator
+from ._shap import SHAPImportanceCalculator
+
 __all__ = [
     "BinaryClassificationXAISettings",
     "RegressionClassificationXAISettings",
@@ -26,4 +29,6 @@ __all__ = [
     "compute_explainability_features",
     "select_feature_importance_strategy",
     "Importances",
+    "LIMEImportanceCalculator",
+    "SHAPImportanceCalculator",
 ]
