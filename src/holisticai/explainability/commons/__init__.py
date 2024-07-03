@@ -7,7 +7,9 @@ from holisticai.explainability.commons._definitions import (
     RegressionClassificationXAISettings,
     SurrogateFeatureImportance,
 )
+from holisticai.explainability.commons._lime import LIMEImportanceCalculator
 from holisticai.explainability.commons._permutation_feature_importance import PermutationFeatureImportanceCalculator
+from holisticai.explainability.commons._shap import SHAPImportanceCalculator
 from holisticai.explainability.commons._surrogate_feature_importance import SurrogateFeatureImportanceCalculator
 from holisticai.explainability.commons._utils import (
     compute_explainability_features,
@@ -26,4 +28,6 @@ __all__ = [
     "compute_explainability_features",
     "select_feature_importance_strategy",
     "Importances",
+    "LIMEImportanceCalculator",
+    "SHAPImportanceCalculator",
 ]
