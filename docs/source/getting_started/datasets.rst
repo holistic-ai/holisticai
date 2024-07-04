@@ -18,6 +18,8 @@ Raw datasets are the initial data collected from the original sources. These dat
     :file: raw_datasets.csv
     :widths: 7, 7, 15
 
+.. _processed_datasets:
+
 Processed Datasets
 ~~~~~~~~~~~~~~~~~~
 

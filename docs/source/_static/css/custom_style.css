@@ -3,6 +3,8 @@
 
 body{
   font-family:"Inter";
+  margin-left: 10px;  /* Adjust this value as needed */
+  margin-right: 10px; /* Adjust this value as needed */
 }
 
 h1, h2, h3, h4, h5, h6 {
