@@ -264,7 +264,26 @@ ProcessedDatasets = Literal[
 ]
 
 
-def load_dataset(dataset_name: ProcessedDatasets, **kargs):
+def load_dataset(dataset_name: ProcessedDatasets, **kargs) -> Dataset:
+    """
+    Load a specific dataset based on the given dataset name.
+
+    Parameters
+    ----------
+    dataset_name: ProcessedDatasets
+        The name of the dataset to load. The list of supported datasets are here: :ref:`processed_datasets`.
+    **kargs:
+        Additional keyword arguments to pass to the dataset loading functions.
+
+    Returns
+    -------
+    Dataset: The loaded dataset.
+
+    Raises
+    ------
+    NotImplementedError:
+        If the specified dataset name is not supported.
+    """
     if dataset_name == "adult":
         return load_adult_dataset(**kargs)
     if dataset_name == "law_school":
