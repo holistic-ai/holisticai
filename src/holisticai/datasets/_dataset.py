@@ -29,7 +29,6 @@ class DatasetDict(dict):
         Returns a Dataset object corresponding to the given key.
     """
 
-
     def __init__(self, **datasets):
         self.datasets = datasets
 
@@ -49,6 +48,7 @@ class DatasetDict(dict):
 
         datasetdict_info = {"DatasetDict": dataset_info}
         return generate_html(datasetdict_info)
+
 
 class GroupByDataset:
     """
@@ -208,6 +208,7 @@ class Dataset:
 
     def filter(self, fn):
         """Returns a new dataset with rows filtered based on the given function."""
+
         def fnw(row):
             new_row = {k[0] if k[0] == k[1] else k: v for k, v in row.to_dict().items()}
             return fn(new_row)
@@ -271,7 +272,7 @@ class Dataset:
         return Dataset(new_data)
 
     def train_test_split(self, test_size=0.3, **kargs):
-        """ Splits the dataset into train and test datasets."""
+        """Splits the dataset into train and test datasets."""
         train_df, test_df = train_test_split(self.data, test_size=test_size, **kargs)
         train = Dataset(train_df)
         test = Dataset(test_df)
@@ -302,8 +303,6 @@ class Dataset:
         if isinstance(key, int):
             return dataframe_to_level_dict_with_series(self.data, key)
         raise NotImplementedError
-
-
 
 
 def concatenate_datasets(part_datasets: list[Dataset]):
