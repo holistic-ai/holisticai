@@ -1,9 +1,10 @@
 import copy
 
 import numpy as np
-
-from ..randomized_threshold.algorithm import RandomizedThresholdAlgorithm
-from .algorithm_utils import RBLogger
+from holisticai.bias.mitigation.postprocessing.ml_debiaser.randomized_threshold.algorithm import (
+    RandomizedThresholdAlgorithm,
+)
+from holisticai.bias.mitigation.postprocessing.ml_debiaser.reduce2binary.algorithm_utils import RBLogger
 
 
 class Reduce2BinaryAlgorithm:
@@ -156,9 +157,7 @@ class Reduce2BinaryAlgorithm:
                 s = np.linalg.norm(z_mat - old_z)
                 r = np.linalg.norm(z_mat - h_mat)
 
-            self.logger.update(
-                iteration=iteration + 1, primal_residual=r, dual_residual=s
-            )
+            self.logger.update(iteration=iteration + 1, primal_residual=r, dual_residual=s)
 
         z_mat = np.maximum(z_mat, 0)
         z_mat = z_mat / np.sum(z_mat, axis=1, keepdims=True)

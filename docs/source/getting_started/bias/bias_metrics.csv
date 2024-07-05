@@ -1,0 +1,36 @@
+Equality of Outcomes, Binary Classification,Disparate Impact,1,"[0.8, 1.2]",ratio of success rates
+Equality of Outcomes, Binary Classification,Statistical Parity,0,"[-0.1, 0.1]",difference between success rates
+Equality of Outcomes, Binary Classification,Cohen's D,0,"[-0.1, 0.1]",effect size of the difference between success rates
+Equality of Outcomes, Binary Classification,2SD-Rule,0,"[-0.1, 0.1]",difference between success rates in terms of standard deviations
+Equality of Outcomes, Binary Classification,Four-Fifths Rule,1,"[0.8, 1.2]",ratio of success rates
+Equality of Opportunity, Binary Classification,Equality of Opportunity Difference,0,"[-0.1, 0.1]",difference between true positive rates
+Equality of Opportunity, Binary Classification,False Positive Rate Difference,0,"[-0.1, 0.1]",difference between false positive rates
+Equality of Opportunity, Binary Classification,Average Odds Difference,0,"[-0.1, 0.1]",average of the difference between true positive rates and false positive rates
+Equality of Opportunity, Binary Classification,Accuracy Difference,0,"[-0.1, 0.1]",difference between accuracy rates
+Equality of Outcomes, Multi-Class Classification,Multiclass Statistical Parity,0,"[0, 0.1]",mean absolute deviation of success rate vectors
+Equality of Opportunity, Multi-Class Classification,Multiclass Equality of Opportunity,0,"[0, 0.1]",mean absolute deviation of error rate matrices
+Equality of Opportunity, Multi-Class Classification,Multiclass Average Odds,0,"[0, 0.1]",mean absolute deviation of average odds
+Equality of Opportunity, Multi-Class Classification,Multiclass True Positive Difference,0,"[0, 0.1]",mean absolute deviation of true positive rates
+Equality of Outcomes, Regression,q-Disparate Impact,1,"[0.8, 1.2]",ratio of success rates for quantile
+Equality of Outcomes, Regression,No Disparate Impact Level,1,"[0.8, 1.2]",minimum quantile where disparate impact falls within acceptable range
+Equality of Outcomes, Regression,Average Score Difference,0,"[-0.1, 0.1]",difference between average scores
+Equality of Outcomes, Regression,Average Score Ratio,1,"[0.8, 1.25]",ratio of average scores
+Equality of Outcomes, Regression,Z Score Difference,0,"[-0.1, 0.1]",difference in average scores divided by pooled standard deviation
+Equality of Outcomes, Regression,Max Statistical Parity,0,"[-0.1, 0.1]",maximum absolute statistical parity over all thresholds
+Equality of Outcomes, Regression,Statistical Parity AUC,0,"[0, 0.075]",area under the statistical parity vs threshold curve
+Equality of Opportunity, Regression,RMSE Ratio,1,"[0.8, 1.2]",ratio of RMSE for groups
+Equality of Opportunity, Regression,MAE Ratio,1,"[0.8, 1.2]",ratio of MAE for groups
+Equality of Opportunity, Regression,Correlation Difference,0,"[-0.1, 0.1]",difference in correlation between predictions and targets
+Equality of Outcomes, Recommender Systems,Mean Absolute Deviation,0,"[-0.1, 0.1]",difference in average scores
+Equality of Outcomes, Recommender Systems,Exposure Total Variation,0,"[0, 1]",total variation norm between exposure distributions
+Equality of Outcomes, Recommender Systems,Exposure KL Divergence,0,"[0, ∞]",KL divergence between exposure distributions
+Equality of Opportunity, Recommender Systems,Average Precision Ratio,1,"[0.8, 1.2]",ratio of average precision
+Equality of Opportunity, Recommender Systems,Average Recall Ratio,1,"[0.8, 1.2]",ratio of average recall
+Equality of Opportunity, Recommender Systems,Average F1 Ratio,1,"[0.8, 1.2]",ratio of average F1
+Item Metrics, Recommender Systems,Aggregate Diversity,1,"[0, 1]",proportion of recommended items out of all possible items
+Item Metrics, Recommender Systems,GINI index,0,"[0, 1]",inequality in frequency distribution of recommended items
+Item Metrics, Recommender Systems,Exposure Distribution Entropy,0,"[0, ∞]",entropy of the item exposure distribution
+Item Metrics, Recommender Systems,Average Recommendation Popularity,0,"[0, ∞]",average number of times an item is recommended
+Equality of Outcomes, Clustering,Social Fairness Ratio,1,"[0.8, 1.2]",ratio of average distance to the nearest centroid
+Equality of Outcomes, Clustering,Silhouette Difference,0,"[-1, 1]",difference in mean silhouette scores
+Equality of Opportunity, Clustering,Cluster Balance,1,"[0, 1]",minimum balance over all groups and clusters

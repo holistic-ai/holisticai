@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
 import scipy
+from holisticai.bias.mitigation.inprocessing.matrix_factorization.debiasing_learning.algorithm import (
+    DebiasingLearningAlgorithm,
+)
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-
-from .algorithm import DebiasingLearningAlgorithm
 
 
 class DebiasingLearningMF(BMImp, RecommenderSystemBase):
@@ -106,9 +109,7 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
         invP = None
         if propensities is not None:
             invP = np.reciprocal(propensities)
-            invP = np.ma.array(
-                invP, copy=False, mask=np.ma.getmask(X), fill_value=0, hard_mask=True
-            )
+            invP = np.ma.array(invP, copy=False, mask=np.ma.getmask(X), fill_value=0, hard_mask=True)
 
         # Get starting params by SVD
         params0 = self._init_parameters(X)
@@ -119,9 +120,7 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
 
     def _init_parameters(self, partial_observations):
         averageObservedRating = np.ma.mean(partial_observations)
-        completeRatings = np.ma.filled(
-            partial_observations.astype(float), averageObservedRating
-        )
+        completeRatings = np.ma.filled(partial_observations.astype(float), averageObservedRating)
         numUsers, numItems = np.shape(partial_observations)
         numUsers = completeRatings.shape[0]
         ncv = (min(numUsers, numItems) + self.K) // 2

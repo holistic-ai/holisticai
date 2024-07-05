@@ -19,7 +19,7 @@ def convert_float_to_categorical(target, nb_classes, numeric_classes=True):
     pandas.Series
         The converted target variable
     """
-    eps = np.finfo(float).eps
+    eps = 10 * np.finfo(float).eps
     labels = list(range(nb_classes)) if numeric_classes else [f"Q{c}-Q{c + 1}" for c in range(nb_classes)]
     labels_values = np.linspace(0, 1, nb_classes + 1)
     v = np.array(target.quantile(labels_values)).squeeze()

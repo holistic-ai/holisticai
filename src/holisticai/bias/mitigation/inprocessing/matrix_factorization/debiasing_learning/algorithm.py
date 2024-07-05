@@ -1,7 +1,6 @@
 import numpy as np
 import scipy
-
-from .algorithm_utils import (
+from holisticai.bias.mitigation.inprocessing.matrix_factorization.debiasing_learning.algorithm_utils import (
     ParameterSerializer,
     Problem,
     get_bias_configuration,
@@ -14,9 +13,7 @@ from .algorithm_utils import (
 
 
 class DebiasingLearningAlgorithm:
-    def __init__(
-        self, K, normalization, lamda, metric, bias_mode, clip_val=-1, verbose=0
-    ):
+    def __init__(self, K, normalization, lamda, metric, bias_mode, clip_val=-1, verbose=0):
         self.normalization = normalization
         self.metric = metric
         self.K = K
@@ -34,26 +31,19 @@ class DebiasingLearningAlgorithm:
         if inv_propensities is not None:
             tempInvPropensities = (4.0 / 3.0) * inv_propensities
             if self.clip_val >= 0:
-                tempInvPropensities = np.clip(
-                    tempInvPropensities, a_min=0, a_max=self.clip_val
-                )
+                tempInvPropensities = np.clip(tempInvPropensities, a_min=0, a_max=self.clip_val)
 
         parameters = self.optimize_debiasing_parameters(
             train_observations, tempInvPropensities, self.lamda, start_vec=start_vector
         )
         return parameters
 
-    def optimize_debiasing_parameters(
-        self, observed_ratings, inverse_propensities, l2_regularization, start_vec=None
-    ):
-
+    def optimize_debiasing_parameters(self, observed_ratings, inverse_propensities, l2_regularization, start_vec=None):
         metricMode = get_metric_mode(self.metric)
         numUsers, numItems = np.shape(observed_ratings)
         scale = numUsers * numItems
         useBias, regularizeBias = get_bias_configuration(self.bias_mode)
-        serializer = ParameterSerializer(
-            numUsers=numUsers, numItems=numItems, num_dimensions=self.K
-        )
+        serializer = ParameterSerializer(numUsers=numUsers, numItems=numItems, num_dimensions=self.K)
         config = {
             "numUsers": numUsers,
             "numItems": numItems,
@@ -66,9 +56,7 @@ class DebiasingLearningAlgorithm:
             "serializer": serializer,
         }
 
-        inversePropensities = process_propensities(
-            observed_ratings, inverse_propensities
-        )
+        inversePropensities = process_propensities(observed_ratings, inverse_propensities)
         normalized_propensities = normalize_propensities(
             inversePropensities, self.normalization, scale, numItems, numUsers
         )
@@ -90,7 +78,6 @@ class DebiasingLearningAlgorithm:
             "gtol": 1e-5,
             "ftol": 1e-5,
             "maxcor": 50,
-            "disp": False,
         }
 
         result = scipy.optimize.minimize(

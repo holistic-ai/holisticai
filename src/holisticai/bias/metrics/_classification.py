@@ -1126,7 +1126,7 @@ def consistency_score(X: np.ndarray, y_pred: np.ndarray, n_neighbors: int = 5) -
     float
         The consistency score.
     """
-    X = _matrix_like_to_numpy(X)  # noqa: N806
+    X = _matrix_like_to_numpy(X)
     y_pred = _array_like_to_numpy(y_pred)
     _check_binary(y_pred)
 

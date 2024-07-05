@@ -90,6 +90,7 @@ class CalibratedEqualizedOdds(BMPost):
 
     def _build_cost_variables(self, y, y_score, sample_weight):
         base_rate = y.mean()
+
         def build_cost(score):
             return self._build_cost(y=y, y_score=score, base_rate=base_rate, sample_weight=sample_weight)
 

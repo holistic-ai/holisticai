@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
 import scipy
-
-from . import algorithm_utils as tools
+from holisticai.bias.mitigation.postprocessing.lp_debiaser.multiclass_balancer import algorithm_utils as tools
 
 
 class MulticlassBalancerAlgorithm:
@@ -45,12 +44,7 @@ class MulticlassBalancerAlgorithm:
         # Getting the group-specific P(Y), P(Y- | Y), and constraint matrices
         p_vecs = np.array([tools.p_vec(y_true[ids]) for ids in group_ids])
         p_vecs = p_a.reshape(-1, 1) * p_vecs
-        cp_mats = np.array(
-            [
-                tools.cp_mat(y_true[ids], y_pred[ids], self.n_classes)
-                for ids in group_ids
-            ]
-        )
+        cp_mats = np.array([tools.cp_mat(y_true[ids], y_pred[ids], self.n_classes) for ids in group_ids])
         cp_mats_t = np.zeros((self.n_classes, self.n_classes, self.n_groups))
 
         for a in range(self.n_groups):
@@ -64,17 +58,13 @@ class MulticlassBalancerAlgorithm:
         self.obj = self.objective(cp_mats)
 
         # Running the optimization
-        opt = scipy.optimize.linprog(
-            c=self.obj, bounds=[0, 1], A_eq=con, b_eq=con_bounds, method="highs"
-        )
+        opt = scipy.optimize.linprog(c=self.obj, bounds=[0, 1], A_eq=con, b_eq=con_bounds, method="highs")
 
         # Getting the Y~ matrices
         m = tools.pars_to_cpmat(opt, n_groups=self.n_groups, n_classes=self.n_classes)
 
         # Getting the new cp matrices
-        self.new_cp_mats = np.array(
-            [np.dot(cp_mats[i], m[i]) for i in range(self.n_groups)]
-        )
+        self.new_cp_mats = np.array([np.dot(cp_mats[i], m[i]) for i in range(self.n_groups)])
 
     def predict(self, y_pred, p_attr, seed=2021):
         """Generates bias-adjusted predictions on new data.
@@ -102,7 +92,5 @@ class MulticlassBalancerAlgorithm:
             for c in range(self.n_classes):
                 y_ids = np.where((p_attr == g) & (y_pred == c))[0]
                 np.random.seed(seeds[g])
-                y_tilde[y_ids] = np.random.choice(
-                    a=self.n_classes, p=self.new_cp_mats[g][c], size=len(y_ids)
-                )
+                y_tilde[y_ids] = np.random.choice(a=self.n_classes, p=self.new_cp_mats[g][c], size=len(y_ids))
         return y_tilde

@@ -1,8 +1,14 @@
 import numpy as np
 import pandas as pd
-
-from .._conventions import _ALL, _EVENT, _GROUP_ID, _LABEL, _LOSS, _PREDICTION
-from .._moments_utils import BaseMoment, format_data
+from holisticai.bias.mitigation.inprocessing.commons._conventions import (
+    _ALL,
+    _EVENT,
+    _GROUP_ID,
+    _LABEL,
+    _LOSS,
+    _PREDICTION,
+)
+from holisticai.bias.mitigation.inprocessing.commons._moments_utils import BaseMoment, format_data
 
 
 class RegressionConstraint(BaseMoment):
@@ -78,9 +84,7 @@ class RegressionConstraint(BaseMoment):
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
         self.tags[_PREDICTION] = predictor(self.X)
-        self.tags[_LOSS] = self.reduction_loss.eval(
-            self.tags[_LABEL], self.tags[_PREDICTION]
-        )
+        self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         tags = self.tags.set_index([_GROUP_ID, _EVENT])
         expect_attr = tags.groupby(_GROUP_ID).mean()
         return expect_attr[_LOSS]
@@ -102,10 +106,7 @@ class RegressionConstraint(BaseMoment):
 
     def signed_weights(self, lambda_vec=None):
         """Return the signed weights."""
-        if lambda_vec is None:
-            adjust = pd.Series(1.0, index=self.index)
-        else:
-            adjust = lambda_vec / self.group_prob
+        adjust = pd.Series(1.0, index=self.index) if lambda_vec is None else lambda_vec / self.group_prob
         return self.tags.apply(lambda row: adjust[row[_GROUP_ID]], axis=1)
 
 

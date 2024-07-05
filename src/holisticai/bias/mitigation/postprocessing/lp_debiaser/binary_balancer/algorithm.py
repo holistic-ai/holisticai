@@ -1,8 +1,7 @@
 import numpy as np
 import scipy as sp
+from holisticai.bias.mitigation.postprocessing.lp_debiaser.binary_balancer import algorithm_utils as tools
 from sklearn.metrics import roc_curve
-
-from ..binary_balancer import algorithm_utils as tools
 
 
 class BinaryBalancerAlgorithm:
@@ -13,10 +12,7 @@ class BinaryBalancerAlgorithm:
         self.binom = binom
 
     def fit(self, y_true, p_attr, y_pred=None, y_proba=None):
-
-        assert not (
-            (y_pred is None) and (y_proba is None)
-        ), "y_pred or y_proba must be passed"
+        assert not ((y_pred is None) and (y_proba is None)), "y_pred or y_proba must be passed"
 
         # Getting the group info
         self.groups = np.unique(p_attr)
@@ -27,12 +23,11 @@ class BinaryBalancerAlgorithm:
             probs = y_proba[:, 1]
             self.rocs = [roc_curve(y_true[ids], probs[ids]) for ids in group_ids]
             self.__roc_stats = [
-                tools.loss_from_roc(y_true[ids], probs[ids], self.rocs[i])
-                for i, ids in enumerate(group_ids)
+                tools.loss_from_roc(y_true[ids], probs[ids], self.rocs[i]) for i, ids in enumerate(group_ids)
             ]
             if self.thr_obj == "j":
                 cut_ids = [np.argmax(rs["js"]) for rs in self.__roc_stats]
-                self.cuts = [self.rocs[i][2][id] for i, id in enumerate(cut_ids)]
+                self.cuts = [self.rocs[i][2][idx] for i, idx in enumerate(cut_ids)]
                 for g, cut in enumerate(self.cuts):
                     probs[group_ids[g]] = tools.threshold(probs[group_ids[g]], cut)
                 y_pred = probs.astype(np.uint8)
@@ -54,16 +49,12 @@ class BinaryBalancerAlgorithm:
         con, con_bounds = self.constraint.get_conditions(self.group_rates, self.groups)
 
         # Running the optimization
-        self.opt = sp.optimize.linprog(
-            c=obj_coefs, bounds=[(0, 1)], A_eq=con, b_eq=con_bounds, method="highs"
-        )
+        self.opt = sp.optimize.linprog(c=obj_coefs, bounds=[(0, 1)], A_eq=con, b_eq=con_bounds, method="highs")
 
         self.pya = self.opt.x.reshape(len(self.groups), 2)
 
         # Setting the adjusted predictions
-        self.y_adj = tools.pred_from_pya(
-            y_pred=y_pred, p_attr=p_attr, pya=self.pya, binom=self.binom
-        )
+        self.y_adj = tools.pred_from_pya(y_pred=y_pred, p_attr=p_attr, pya=self.pya, binom=self.binom)
 
     def predict(self, p_attr, y_pred=None, y_proba=None, binom=False):
         """Generates bias-adjusted predictions on new data.

@@ -64,7 +64,7 @@ class DisparateImpactRemoverRS(BMPos):
 
     def _filter_invalid_examples(self, rankings):
         new_rankings = []
-        for q, ranking in rankings.groupby(self.query_col):
+        for _, ranking in rankings.groupby(self.query_col):
             if (ranking[self.group_col].sum() > 0).any():
                 new_rankings.append(ranking)
         new_rankings = pd.concat(new_rankings, axis=0).reset_index(drop=True)
@@ -113,8 +113,8 @@ class DisparateImpactRemoverRS(BMPos):
             Self
         """
         data = np.c_[ranking[self.score_col].to_numpy()].tolist()
-        group_a = ranking[self.group_col] == True
-        group_b = ranking[self.group_col] == False
+        group_a = ranking[self.group_col]
+        group_b = ~ranking[self.group_col]
 
         new_data_matrix = self.dir.fit_transform(data, group_a, group_b)
         new_ranking = ranking.copy()

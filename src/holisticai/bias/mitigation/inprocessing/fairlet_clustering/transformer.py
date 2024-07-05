@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional, Union
 
 import numpy as np
@@ -68,8 +70,8 @@ class FairletClustering(BaseEstimator, BMImp):
     def __init__(
         self,
         n_clusters: Optional[int],
-        decomposition: Union["str", "DecompositionMixin"] = "Vanilla",
-        clustering_model: Optional["str"] = "KCenters",
+        decomposition: Union[str, DecompositionMixin] = "Vanilla",
+        clustering_model: Optional[str] = "KCenters",
         p: Optional[str] = 1,
         q: Optional[float] = 3,
         seed: Optional[int] = None,

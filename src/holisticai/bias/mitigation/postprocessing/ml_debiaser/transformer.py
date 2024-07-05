@@ -1,9 +1,10 @@
 import numpy as np
+from holisticai.bias.mitigation.postprocessing.ml_debiaser.randomized_threshold.algorithm import (
+    RandomizedThresholdAlgorithm,
+)
+from holisticai.bias.mitigation.postprocessing.ml_debiaser.reduce2binary.algorithm import Reduce2BinaryAlgorithm
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from holisticai.utils.transformers.bias import SensitiveGroups
-
-from .randomized_threshold.algorithm import RandomizedThresholdAlgorithm
-from .reduce2binary.algorithm import Reduce2BinaryAlgorithm
 
 
 class MLDebiaser(BMPost):
@@ -128,26 +129,22 @@ class MLDebiaser(BMPost):
         sensitive_features = np.stack([group_a, group_b], axis=1)
         p_attr = self.sens_groups.transform(sensitive_features, convert_numeric=True)
 
+        # Multiclass classification
         if type(self.algorithm) is Reduce2BinaryAlgorithm:
-            # Multiclass classification
             new_y_prob = self.algorithm.predict(y_proba, p_attr)
             new_y_pred = new_y_prob.argmax(axis=-1)
             return {"y_pred": new_y_pred, "y_proba": new_y_prob}
-        else:
-            # Binary classification
-            pred = y_proba[:, 1]  # .argmax(axis=-1)
-            pred = (
-                2 * pred - 1
-            )  # follow author implementation (use prediction and not logit)
-            self.algorithm.fit(pred, p_attr)
 
-            new_y_score = self.algorithm.predict(pred, p_attr)
-            new_y_pred = np.where(new_y_score > 0.5, 1, 0)
-            return {"y_pred": new_y_pred, "y_score": new_y_score}
+        # Binary classification
+        pred = y_proba[:, 1]
+        pred = 2 * pred - 1  # follow author implementation (use prediction and not logit)
+        self.algorithm.fit(pred, p_attr)
 
-    def fit_transform(
-        self, y_proba: np.ndarray, group_a: np.ndarray, group_b: np.ndarray
-    ):
+        new_y_score = self.algorithm.predict(pred, p_attr)
+        new_y_pred = np.where(new_y_score > 0.5, 1, 0)
+        return {"y_pred": new_y_pred, "y_score": new_y_score}
+
+    def fit_transform(self, y_proba: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
         Fit and transform
 

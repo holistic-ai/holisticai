@@ -6,7 +6,7 @@ import pandas as pd
 
 def filter_invalid_examples(rankings, query_col, group_col):
     new_rankings = []
-    for q, ranking in rankings.groupby(query_col):
+    for _, ranking in rankings.groupby(query_col):
         if (ranking[group_col].sum() > 0).any():
             new_rankings.append(ranking)
     new_rankings = pd.concat(new_rankings, axis=0).reset_index(drop=True)
@@ -14,27 +14,18 @@ def filter_invalid_examples(rankings, query_col, group_col):
 
 
 def exposure_metric(rankings, group_col: str, query_col: str, score_col: str):
-
-    rankings = filter_invalid_examples(
-        rankings, query_col=query_col, group_col=group_col
-    )
+    rankings = filter_invalid_examples(rankings, query_col=query_col, group_col=group_col)
 
     exp_diff = np.mean(
-        [
-            exposure_diff(ranking[score_col], ranking[group_col])
-            for q, ranking in rankings.groupby(query_col)
-        ]
+        [exposure_diff(ranking[score_col], ranking[group_col]) for q, ranking in rankings.groupby(query_col)]
     )
 
     metric_values = [
-        exposure_ratio(ranking[score_col], ranking[group_col])
-        for q, ranking in rankings.groupby(query_col)
+        exposure_ratio(ranking[score_col], ranking[group_col]) for q, ranking in rankings.groupby(query_col)
     ]
     exp_ratio = np.mean([m for m in metric_values if not math.isnan(m)])
 
-    df = pd.DataFrame(
-        [{"exposure_ratio": exp_ratio, "exposure difference": exp_diff}]
-    ).T
+    df = pd.DataFrame([{"exposure_ratio": exp_ratio, "exposure difference": exp_diff}]).T
     df.columns = ["Value"]
     return df
 
@@ -64,9 +55,7 @@ def exposure_diff(data_per_query, prot_idx_per_query):
     ) = find_items_per_group_per_query(data_per_query, prot_idx_per_query)
 
     exposure_prot = normalized_exposure(protected_items_per_query, judgments_per_query)
-    exposure_nprot = normalized_exposure(
-        nonprotected_items_per_query, judgments_per_query
-    )
+    exposure_nprot = normalized_exposure(nonprotected_items_per_query, judgments_per_query)
     exposure_diff = np.maximum(0, (exposure_nprot - exposure_prot))
 
     return exposure_diff
@@ -97,9 +86,7 @@ def exposure_ratio(data_per_query, prot_idx_per_query):
     ) = find_items_per_group_per_query(data_per_query, prot_idx_per_query)
 
     exposure_prot = normalized_exposure(protected_items_per_query, judgments_per_query)
-    exposure_nprot = normalized_exposure(
-        nonprotected_items_per_query, judgments_per_query
-    )
+    exposure_nprot = normalized_exposure(nonprotected_items_per_query, judgments_per_query)
     exposure_diff = exposure_nprot / exposure_prot
 
     return exposure_diff
@@ -108,14 +95,12 @@ def exposure_ratio(data_per_query, prot_idx_per_query):
 def find_items_per_group_per_query(data, protected_feature):
     data_per_query = np.array(data).astype(np.float32)
     if np.any(np.isnan(data_per_query)):
-        raise Exception(
-            "data has NaN values!!, fix your data or normalize it before training."
-        )
+        raise ValueError("data has NaN values!!, fix your data or normalize it before training.")
     if len(data_per_query.shape) == 1:
         data_per_query = data_per_query[:, None]
     protected_feature = np.array(protected_feature)
-    protected_items_per_query = data_per_query[protected_feature == True]
-    nonprotected_items_per_query = data_per_query[protected_feature == False]
+    protected_items_per_query = data_per_query[protected_feature]
+    nonprotected_items_per_query = data_per_query[~protected_feature]
     return data_per_query, protected_items_per_query, nonprotected_items_per_query
 
 
@@ -140,9 +125,7 @@ def normalized_exposure(group_data, all_data):
     return (np.sum(topp_prot(group_data, all_data) / np.log(2))) / group_data.size
 
 
-def normalized_topp_prot_deriv_per_group(
-    group_features, all_features, group_predictions, all_predictions
-):
+def normalized_topp_prot_deriv_per_group(group_features, all_features, group_predictions, all_predictions):
     """
     Description
     -----------
@@ -165,9 +148,7 @@ def normalized_topp_prot_deriv_per_group(
     Return
     numpy array of float values.
     """
-    derivative = topp_prot_first_derivative(
-        group_features, all_features, group_predictions, all_predictions
-    )
+    derivative = topp_prot_first_derivative(group_features, all_features, group_predictions, all_predictions)
     result = (np.sum(derivative / np.log(2), axis=0)) / group_predictions.size
     return result
 
@@ -193,9 +174,7 @@ def topp_prot(group_items, all_items):
     return np.exp(group_items) / np.sum(np.exp(all_items))
 
 
-def topp_prot_first_derivative(
-    group_features, all_features, group_predictions, all_predictions
-):
+def topp_prot_first_derivative(group_features, all_features, group_predictions, all_predictions):
     """
     Description
     -----------
@@ -225,9 +204,7 @@ def topp_prot_first_derivative(
     numerator3 = np.sum(np.dot(np.transpose(np.exp(all_predictions)), all_features))
     denominator = np.sum(np.exp(all_predictions)) ** 2
 
-    result = (
-        numerator1 * numerator2 - np.exp(group_predictions) * numerator3
-    ) / denominator
+    result = (numerator1 * numerator2 - np.exp(group_predictions) * numerator3) / denominator
 
     # return result as flat numpy array instead of matrix
     return np.asarray(result)

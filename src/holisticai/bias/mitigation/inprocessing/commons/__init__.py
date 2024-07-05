@@ -1,3 +1,3 @@
-from ._logger import Logging
+from holisticai.bias.mitigation.inprocessing.commons._logger import Logging
 
 __all__ = ["Logging", "GroupUtils"]

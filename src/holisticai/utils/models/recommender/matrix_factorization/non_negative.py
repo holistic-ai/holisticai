@@ -40,8 +40,8 @@ class NonNegativeMF(RecommenderSystemBase):
             rating matrix, 0 means non-raked cases.
         """
         model = NMF(n_components=self.K, init="random", max_iter=200)
-        P = model.fit_transform(X)  # noqa: N806
-        Q = model.components_  # noqa: N806
+        P = model.fit_transform(X)
+        Q = model.components_
         self.pred = np.dot(P, Q)
         self.invP = None
         return self

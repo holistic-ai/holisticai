@@ -18,21 +18,14 @@ def normalize_2(S_in):
 
 
 def bound_energy(S, S_in, a_term, b_term):
-    E = np.nansum(
-
-            S * np.log(np.maximum(S, 1e-15))
-            - S * np.log(np.maximum(S_in, 1e-15))
-            + a_term * S
-            + b_term * S
-
-    )
+    E = np.nansum(S * np.log(np.maximum(S, 1e-15)) - S * np.log(np.maximum(S_in, 1e-15)) + a_term * S + b_term * S)
     return E
 
 
-def get_S_discrete(l, N, K):
+def get_S_discrete(L, N, K):  # noqa: N802
     x = range(N)
     temp = np.zeros((N, K), dtype=float)
-    temp[(x, l)] = 1
+    temp[(x, L)] = 1
     return temp
 
 
@@ -63,7 +56,6 @@ class BoundUpdate:
         F_a = group_prob.values[None, :] * groups_ids.values
 
         for i in range(self.bound_iteration):
-
             b = compute_b(S, groups_ids, group_prob, F_a)
             b_term = self.bound_lambda * b
             terms = (a_term - b_term) / self.L
@@ -79,10 +71,9 @@ class BoundUpdate:
             if i > 1 and (abs(E - oldE) <= 1e-5 * abs(oldE)):
                 break
 
-            else:
-                oldE = E
-                report_E = E
+            oldE = E
+            report_E = E
 
-        l = np.argmax(S, axis=1)
+        L = np.argmax(S, axis=1)
 
-        return l, S, report_E
+        return L, S, report_E

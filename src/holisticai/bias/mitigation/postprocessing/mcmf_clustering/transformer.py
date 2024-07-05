@@ -1,8 +1,12 @@
+from __future__ import annotations
 
-import numpy as np
+from typing import TYPE_CHECKING
+
+from holisticai.bias.mitigation.postprocessing.mcmf_clustering.algorithm import Algorithm
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
-from .algorithm import Algorithm
+if TYPE_CHECKING:
+    import numpy as np
 
 
 class MCMF(BMPost):
@@ -15,9 +19,7 @@ class MCMF(BMPost):
         Proceedings of the AAAI Conference on Artificial Intelligence. Vol. 34. No. 04. 2020.
     """
 
-    def __init__(
-        self, metric: str = "L1", solver: str = "highs", group_mode="a", verbose=0
-    ):
+    def __init__(self, metric: str = "L1", solver: str = "highs", group_mode="a", verbose=0):
         """
         Create a Equalized Odds Post-processing instance.
 
@@ -54,7 +56,7 @@ class MCMF(BMPost):
         group_a: np.ndarray,
         group_b: np.ndarray,
         centroids: np.ndarray,
-    ) -> dict[str,np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         return self.transform(X, y_pred, group_a, group_b, centroids)
 
     def transform(
@@ -64,14 +66,14 @@ class MCMF(BMPost):
         group_a: np.ndarray,
         group_b: np.ndarray,
         centroids: np.ndarray,
-    ) -> dict[str,np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Modify y_pred using MCMF algorithm.
-    
+
         Description
         ----------
         Build parameters for the objetive function and call the solver to find the algorithm parameters.
-    
+
         Parameters
         ----------
         X : matrix-like
@@ -84,7 +86,7 @@ class MCMF(BMPost):
             Group membership vector (binary)
         centroids : ndarray
             Centroids array
-    
+
         Returns
         -------
         Self
@@ -101,14 +103,10 @@ class MCMF(BMPost):
 
         if self.group_mode in ["a", "b"]:
             group = group_a if self.group_mode == "a" else group_b
-            new_y_pred = self.algorithm.transform(
-                X=X, y_pred=y_pred, group=group, centroids=centroids
-            )
+            new_y_pred = self.algorithm.transform(X=X, y_pred=y_pred, group=group, centroids=centroids)
         elif self.group_mode == "ab":
             new_y_pred = y_pred.copy()
             for group in [group_a, group_b]:
-                new_y_pred = self.algorithm.transform(
-                    X=X, y_pred=new_y_pred, group=group, centroids=centroids
-                )
+                new_y_pred = self.algorithm.transform(X=X, y_pred=new_y_pred, group=group, centroids=centroids)
 
         return {"y_pred": new_y_pred}

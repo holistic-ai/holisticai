@@ -28,19 +28,14 @@ class KMediamClusteringAlgorithm:
         centers = np.array(centers, dtype=np.int32)
         group_costs = []
         for gid in self.group_ids:
-            group_costs.append(
-                np.mean(
-                    np.amin(self.distances[np.ix_(self.p_attr == gid, centers)], axis=1)
-                )
-            )
+            group_cost = np.mean(np.amin(self.distances[np.ix_(self.p_attr == gid, centers)], axis=1))
+            group_costs.append(group_cost)
         cost = np.max(group_costs)
         return cost
 
     def _compute_new_assigment(self, centers):
         centers = np.array(centers, dtype=np.int32)
-        assignment = centers[
-            np.argmin(self.distances[np.ix_(np.arange(self.n), centers)], axis=1)
-        ]
+        assignment = centers[np.argmin(self.distances[np.ix_(np.arange(self.n), centers)], axis=1)]
         return assignment
 
     def fit(self, X, p_attr):
@@ -58,7 +53,6 @@ class KMediamClusteringAlgorithm:
             self._genetic_algorithm(X)
 
     def _linear_search(self, X):
-
         if self.init_centers == "KMedoids":
             from holisticai.utils.models.cluster import KMedoids
 
@@ -90,9 +84,7 @@ class KMediamClusteringAlgorithm:
                         # set new center
                         centers[i] = c
                         # do new assignment calculate new cost
-                        assignment, curr_cost = self._compute_new_assigment_and_cost(
-                            centers
-                        )
+                        assignment, curr_cost = self._compute_new_assigment_and_cost(centers)
                         # change variables if new cost is better
                         if curr_cost < min_cost:
                             min_cost = curr_cost
@@ -109,7 +101,8 @@ class KMediamClusteringAlgorithm:
         self.centers = np.array(chosen_centers)
 
     def _genetic_algorithm(self, X):
-        optimization_function = lambda x: self._compute_cost(x)
+        def optimization_function(x):
+            return self._compute_cost(x)
 
         from holisticai.utils.optimizers import GAHiperparameters, GeneticAlgorithm
 

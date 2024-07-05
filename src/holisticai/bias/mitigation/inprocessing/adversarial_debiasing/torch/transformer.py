@@ -1,13 +1,15 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
-import torch
+from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.dataset import ADDataset
+from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.models import ADModel, ClassifierModel
+from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.trainer import TrainArgs, Trainer
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
 
-from .dataset import ADDataset
-from .models import ADModel, ClassifierModel
-from .trainer import TrainArgs, Trainer
+import torch
 
 
 class AdversarialDebiasing(BMImp):
@@ -83,7 +85,7 @@ class AdversarialDebiasing(BMImp):
 
     def __init__(
         self,
-        features_dim: int = None,
+        features_dim: Optional[int] = None,
         keep_prob: Optional[float] = 0.1,
         hidden_size: Optional[int] = 128,
         batch_size: Optional[int] = 32,
@@ -122,9 +124,7 @@ class AdversarialDebiasing(BMImp):
 
     def transform_estimator(self, estimator=None):
         if estimator is None:
-            self.estimator = ClassifierModel(
-                self.features_dim, self.hidden_size, self.keep_prob
-            )
+            self.estimator = ClassifierModel(self.features_dim, self.hidden_size, self.keep_prob)
         else:
             self.estimator = estimator
         return self
@@ -133,9 +133,7 @@ class AdversarialDebiasing(BMImp):
         """
         Organize data for pytorch environment.
         """
-        groups_num = np.array(
-            self.sens_groups.fit_transform(sensitive_features, convert_numeric=True)
-        )
+        groups_num = np.array(self.sens_groups.fit_transform(sensitive_features, convert_numeric=True))
         dataset = ADDataset(X, y, groups_num, device=self.device)
         return dataset
 

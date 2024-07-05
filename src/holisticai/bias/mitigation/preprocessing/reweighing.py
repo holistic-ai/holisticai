@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
@@ -66,9 +68,7 @@ class Reweighing(BMPre):
         Self
         """
 
-        params = self._load_data(
-            y=y, sample_weight=sample_weight, group_a=group_a, group_b=group_b
-        )
+        params = self._load_data(y=y, sample_weight=sample_weight, group_a=group_a, group_b=group_b)
         y = params["y"]
         sample_weight = params["sample_weight"]
         group_a = params["group_a"]
@@ -104,9 +104,9 @@ class Reweighing(BMPre):
 
         self.sample_weight = np.ones_like(y, dtype=np.float32)
         for g in self.sens_groups.group_names:
-            for l in classes:
-                mask = df[f"{g}-{l}"]
-                self.sample_weight[mask] = df_group_values_weights.at[g, l]
+            for c in classes:
+                mask = df[f"{g}-{c}"]
+                self.sample_weight[mask] = df_group_values_weights.at[g, c]
 
         self.update_estimator_param("sample_weight", self.sample_weight)
 

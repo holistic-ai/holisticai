@@ -10,7 +10,7 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from sklearn.metrics import balanced_accuracy_score
 
 
-def statistical_parity(group_a, group_b, y_pred, y_true):
+def statistical_parity(group_a, group_b, y_pred, _):
     return bias_metrics.statistical_parity(group_a, group_b, y_pred)
 
 

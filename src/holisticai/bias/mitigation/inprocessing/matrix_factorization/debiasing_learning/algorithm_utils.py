@@ -1,6 +1,9 @@
+import logging
 import sys
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 def process_propensities(observed_ratings, inverse_propensities):
@@ -9,13 +12,9 @@ def process_propensities(observed_ratings, inverse_propensities):
     scale = numUsers * numItems
     inversePropensities = None
     if inverse_propensities is None:
-        inversePropensities = (
-            np.ones((numUsers, numItems), dtype=np.longdouble) * scale / numObservations
-        )
+        inversePropensities = np.ones((numUsers, numItems), dtype=np.longdouble) * scale / numObservations
     else:
-        inversePropensities = np.array(
-            inverse_propensities, dtype=np.longdouble, copy=True
-        )
+        inversePropensities = np.array(inverse_propensities, dtype=np.longdouble, copy=True)
 
     inversePropensities = np.ma.array(
         inversePropensities,
@@ -28,22 +27,15 @@ def process_propensities(observed_ratings, inverse_propensities):
     return inversePropensities
 
 
-def predict_scores(
-    user_vectors, item_vectors, user_biases, item_biases, global_bias, use_bias=True
-):
+def predict_scores(user_vectors, item_vectors, user_biases, item_biases, global_bias, use_bias=True):
     rawScores = np.dot(user_vectors, item_vectors.T)
     if use_bias:
-        biasedScores = (
-            rawScores + user_biases[:, None] + item_biases[None, :] + global_bias
-        )
+        biasedScores = rawScores + user_biases[:, None] + item_biases[None, :] + global_bias
         return biasedScores
-    else:
-        return rawScores
+    return rawScores
 
 
-def normalize_propensities(
-    inversePropensities, normalization, scale, numItems, numUsers
-):
+def normalize_propensities(inversePropensities, normalization, scale, numItems, numUsers):
     perUserNormalizer = np.ma.sum(inversePropensities, axis=1, dtype=np.longdouble)
     perUserNormalizer = np.ma.masked_less_equal(perUserNormalizer, 0.0, copy=False)
 
@@ -56,19 +48,13 @@ def normalize_propensities(
     if normalization == "Vanilla":
         normalizedPropensities = inversePropensities
     elif normalization == "SelfNormalized":
-        normalizedPropensities = scale * np.ma.divide(
-            inversePropensities, globalNormalizer
-        )
+        normalizedPropensities = scale * np.ma.divide(inversePropensities, globalNormalizer)
     elif normalization == "UserNormalized":
-        normalizedPropensities = numItems * np.ma.divide(
-            inversePropensities, perUserNormalizer[:, None]
-        )
+        normalizedPropensities = numItems * np.ma.divide(inversePropensities, perUserNormalizer[:, None])
     elif normalization == "ItemNormalized":
-        normalizedPropensities = numUsers * np.ma.divide(
-            inversePropensities, perItemNormalizer[None, :]
-        )
+        normalizedPropensities = numUsers * np.ma.divide(inversePropensities, perItemNormalizer[None, :])
     else:
-        print("MF.GENERATE_MATRIX: [ERR]\t Normalization not supported:", normalization)
+        logger.info(f"MF.GENERATE_MATRIX: [ERR]\t Normalization not supported: {normalization}")
         sys.exit(0)
     return normalizedPropensities
 
@@ -86,7 +72,7 @@ def get_bias_configuration(bias_mode):
         useBias = True
         regularizeBias = False
     else:
-        print("MF.GENERATE_MATRIX: [ERR]\t Bias mode not supported:", bias_mode)
+        logger.info(f"MF.GENERATE_MATRIX: [ERR]\t Bias mode not supported: {bias_mode}")
         sys.exit(0)
     return useBias, regularizeBias
 
@@ -98,7 +84,7 @@ def get_metric_mode(mode):
     elif mode == "mae":
         metricMode = 2
     else:
-        print("MF.GENERATE_MATRIX: [ERR]\t Metric not supported:", mode)
+        logger.info("MF.GENERATE_MATRIX: [ERR]\t Metric not supported: {mode}")
         sys.exit(0)
     return metricMode
 
@@ -133,25 +119,19 @@ class ParameterSerializer:
         self.numItems = numItems
         self.num_dimensions = num_dimensions
 
-    def serialize(
-        self, user_vectors, item_vectors, user_biases, item_biases, global_bias
-    ):
+    def serialize(self, user_vectors, item_vectors, user_biases, item_biases, global_bias):
         allUserParams = np.concatenate((user_vectors, user_biases[:, None]), axis=1)
         allItemParams = np.concatenate((item_vectors, item_biases[:, None]), axis=1)
 
         allParams = np.concatenate((allUserParams, allItemParams), axis=0)
-        paramVector = np.reshape(
-            allParams, (self.numUsers + self.numItems) * (self.num_dimensions + 1)
-        )
+        paramVector = np.reshape(allParams, (self.numUsers + self.numItems) * (self.num_dimensions + 1))
         paramVector = np.concatenate((paramVector, [global_bias]))
         return paramVector.astype(float)
 
     def deserialize(self, paramVector):
         globalBias = paramVector[-1]
         remainingParams = paramVector[:-1]
-        allParams = np.reshape(
-            remainingParams, (self.numUsers + self.numItems, self.num_dimensions + 1)
-        )
+        allParams = np.reshape(remainingParams, (self.numUsers + self.numItems, self.num_dimensions + 1))
         allUserParams = allParams[0 : self.numUsers, :]
         allItemParams = allParams[self.numUsers :, :]
 
@@ -193,9 +173,7 @@ class Problem:
         weightedLoss = loss * self.normalized_propensities
         objective = np.sum(weightedLoss)
 
-        gradientMultiplier = get_gradient_multiplier(
-            self.config["metricMode"], self.normalized_propensities, delta
-        )
+        gradientMultiplier = get_gradient_multiplier(self.config["metricMode"], self.normalized_propensities, delta)
 
         userVGradient = np.dot(gradientMultiplier, itemVectors)
         itemVGradient = np.dot(gradientMultiplier.T, userVectors)
@@ -251,12 +229,8 @@ def init_random_parameters(config, start_vec=None):
     itemBiasesInit = None
     globalBiasInit = None
     if start_vec is None:
-        userVectorsInit = np.random.standard_normal(
-            (config["numUsers"], config["num_dimensions"])
-        )
-        itemVectorsInit = np.random.standard_normal(
-            (config["numItems"], config["num_dimensions"])
-        )
+        userVectorsInit = np.random.standard_normal((config["numUsers"], config["num_dimensions"]))
+        itemVectorsInit = np.random.standard_normal((config["numItems"], config["num_dimensions"]))
         userBiasesInit = np.zeros(config["numUsers"], dtype=float)
         itemBiasesInit = np.zeros(config["numItems"], dtype=float)
         globalBiasInit = 0

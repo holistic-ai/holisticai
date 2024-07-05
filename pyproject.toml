@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
 keywords = []
-authors = [{ name = "crismunoz", email = "cristian.munoz@holisticai.com" }]
+authors = [{ name = "research", email = "research@holisticai.com" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
@@ -28,31 +28,20 @@ dependencies = [
   "matplotlib",
   "networkx>=3.1",
   "seaborn",
-  "tqdm",
   "numpy>=1.25",
   "pybind11>=2.12",
   ]
 
 [project.optional-dependencies]
-bias = [
-  "seaborn>=0.11.2",
-  "networkx>=3.1",
-]
-explainability = ["lime>=0.2.0.1", "shap>=0.42.1", "pydotplus", "dtreeviz"]
-
-[tool.hatch.envs.all]
-dependencies = [  
-  "seaborn>=0.11.2",
-  "networkx>=3.1",
-  "lime>=0.2.0.1",
-  "shap>=0.42.1",
-  "pydotplus",
-  "dtreeviz"]
+bias_metrics = ["scikit-learn>=1.0.2", "pandas>=1.1.5", "numpy>=1.19.5"]
+bias_mitigation = ["networkx>=3.1", "pandas>=1.1.5", "numpy>=1.19.5","pygad==3.3.1",]
+xai_metrics = ["lime>=0.2.0.1", "shap>=0.42.1"]
+all = ["scikit-learn>=1.0.2", "pandas>=1.1.5", "numpy>=1.19.5", "networkx>=3.1", "pygad==3.3.1", "lime>=0.2.0.1", "shap>=0.42.1"]
 
 [project.urls]
-Documentation = "https://github.com/crismunoz/holisticai#readme"
-Issues = "https://github.com/crismunoz/holisticai/issues"
-Source = "https://github.com/crismunoz/holisticai"
+Documentation = "https://github.com/holistic-ai/holisticai#readme"
+Issues = "https://github.com/holistic-ai/holisticai/issues"
+Source = "https://github.com/holistic-ai/holisticai"
 
 [tool.hatch.version]
 path = "src/holisticai/__about__.py"
@@ -75,7 +64,7 @@ config-path = "ruff_default.toml"
 
 [tool.ruff]
 extend = "ruff_default.toml"
-exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/bias/mitigation/**", "src/holisticai/utils/trade_off_analysers/**"]
+exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/utils/trade_off_analysers/**"]
 
 [tool.hatch.envs.sphinx]
 inherit = ["all"]
@@ -92,7 +81,8 @@ dependencies = [
   "sphinxcontrib.youtube",
   "pandas",
   "numpy==1.26",
-  "pybind11>=2.12"
+  "pybind11>=2.12",
+  "pydantic"
 ]
 
 [tool.hatch.envs.sphinx.scripts]
@@ -101,12 +91,13 @@ build = ["PYTHONPATH=./src sphinx-build -b html docs/source docs/build"]
 
 [tool.hatch.envs.testing]
 dependencies = [
+  "scikit-learn>=1.0.2", 
+  "pandas>=1.1.5", 
+  "numpy>=1.19.5",
   "seaborn>=0.11.2",
   "networkx>=3.1",
   "lime>=0.2.0.1",
   "shap>=0.42.1",
-  "pydotplus",
-  "dtreeviz",
   "flake8>=5.0.4",
   "pre-commit>=2.20.0",
   "pytest>=7.1.3",
@@ -125,7 +116,6 @@ foo = ["which python"]
 
 [tool.hatch.envs.default]
 env-vars = { PYTHONPATH = "src" }
-
 
 
 [tool.hatch.build.targets.wheel]

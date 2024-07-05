@@ -44,19 +44,18 @@ class CorrelationRemover(BMPre):
         Self
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
-        X = params["X"]
+        x = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1).astype(np.int32)
         self.sensitive_mean_ = sensitive_features.mean()
         sensitive_features_center = sensitive_features - self.sensitive_mean_
-        self.beta_, _, _, _ = np.linalg.lstsq(sensitive_features_center, X, rcond=None)
-        self.X_shape_ = X.shape
+        self.beta_, _, _, _ = np.linalg.lstsq(sensitive_features_center, x, rcond=None)
+        self.x_shape_ = x.shape
         return self
 
     def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
-
         """
         Transform X by applying the correlation remover.
 
@@ -74,16 +73,16 @@ class CorrelationRemover(BMPre):
         """
 
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
-        X = params["X"]
+        x = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
         sensitive_features = np.stack([group_a, group_b], axis=1).astype(np.int32)
         self.sensitive_mean_ = sensitive_features.mean()
         sensitive_features_center = sensitive_features - self.sensitive_mean_
-        X_filtered = X - sensitive_features_center.dot(self.beta_)
-        X = np.atleast_2d(X)
-        X_filtered = np.atleast_2d(X_filtered)
-        return self.alpha * X_filtered + (1 - self.alpha) * X
+        x_filtered = x - sensitive_features_center.dot(self.beta_)
+        x = np.atleast_2d(x)
+        x_filtered = np.atleast_2d(x_filtered)
+        return self.alpha * x_filtered + (1 - self.alpha) * X
 
     def fit_transform(
         self,

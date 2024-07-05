@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import copy
 import sys
 from typing import Optional
 
-from ._grid_generator import GridGenerator
+from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
 
 
 class GridSearchAlgorithm:
@@ -113,12 +115,14 @@ class GridSearchAlgorithm:
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
-                y_reduction = self.constraint._y_as_series
+                y_reduction = self.constraint.y_as_series
 
             current_estimator = copy.deepcopy(self.estimator)
             current_estimator.fit(X, y_reduction, sample_weight=weights)
 
-            predict_fn = lambda X: current_estimator.predict(X)
+            def predict_fn(X):
+                return current_estimator.predict(X)
+
             objective_ = self.objective.gamma(predict_fn)[0]
             gamma_ = self.constraint.gamma(predict_fn)
 
@@ -155,7 +159,6 @@ class Monitor:
         return self.objective_weight * objective + self.constraint_weight * gamma.max()
 
     def save(self, lambda_vec, current_estimator, objective, gamma):
-
         self.predictors_.append(current_estimator)
         self.losses.append(self.loss_fct(objective, gamma))
         self.objectives_.append(objective)
@@ -168,7 +171,5 @@ class Monitor:
     def log_progress(self):
         self.step += 1
         if self.verbose:
-            sys.stdout.write(
-                f"\r{self.step}/{self.total_steps}\tloss (best):{min(self.losses):.4f}"
-            )
+            sys.stdout.write(f"\r{self.step}/{self.total_steps}\tloss (best):{min(self.losses):.4f}")
             sys.stdout.flush()

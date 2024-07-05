@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
 import pandas as pd
+from holisticai.bias.mitigation.inprocessing.two_sided_fairness.algorithm import FairRecAlg
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-
-from .algorithm import FairRecAlg
 
 
 class FairRec(BMImp):
@@ -36,9 +37,7 @@ class FairRec(BMImp):
         recommendations in two-sided platforms." Proceedings of The Web Conference 2020. 2020.
     """
 
-    def __init__(
-        self, rec_size: Optional[int] = 10, MMS_fraction: Optional[float] = 0.5
-    ):
+    def __init__(self, rec_size: Optional[int] = 10, MMS_fraction: Optional[float] = 0.5):
         self.rec_size = rec_size
         self.MMS_fraction = MMS_fraction
 
@@ -62,9 +61,7 @@ class FairRec(BMImp):
             A dictionary of recommendations for each user.
         """
         if top_n is None:
-            algorithm = FairRecAlg(
-                rec_size=self.rec_size, MMS_fraction=self.MMS_fraction
-            )
+            algorithm = FairRecAlg(rec_size=self.rec_size, MMS_fraction=self.MMS_fraction)
             self.recommendation = algorithm.rank(X)
 
         dfs = []
