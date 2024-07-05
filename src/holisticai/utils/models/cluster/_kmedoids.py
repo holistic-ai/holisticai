@@ -120,14 +120,14 @@ class KMedoids:
         random_state_ = check_random_state(self.random_state)
 
         self._check_init_args()
-        X = check_array(X, accept_sparse=["csr", "csc"])  # noqa: N806
+        X = check_array(X, accept_sparse=["csr", "csc"])
         if self.n_clusters > X.shape[0]:
             raise ValueError(
                 "The number of medoids (%d) must be less "
                 "than the number of samples %d." % (self.n_clusters, X.shape[0])
             )
 
-        D = pairwise_distances(X, metric=self.metric)  # noqa: N806
+        D = pairwise_distances(X, metric=self.metric)
         medoid_idxs = self._initialize_medoids(D, self.n_clusters, random_state_)
         labels = None
 
@@ -222,14 +222,14 @@ class KMedoids:
         X_new : {array-like, sparse matrix}, shape=(n_query, n_clusters)
             X transformed in the new space of distances to cluster centers.
         """
-        X = check_array(X, accept_sparse=["csr", "csc"])  # noqa: N806
+        X = check_array(X, accept_sparse=["csr", "csc"])
 
         if self.metric == "precomputed":
             check_is_fitted(self, "medoid_indices_")
             return X[:, self.medoid_indices_]
         check_is_fitted(self, "cluster_centers_")
 
-        Y = self.cluster_centers_  # noqa: N806
+        Y = self.cluster_centers_
         return pairwise_distances(X, Y=Y, metric=self.metric)
 
     def predict(self, X):
@@ -246,7 +246,7 @@ class KMedoids:
         labels : array, shape = (n_query,)
             Index of the cluster each sample belongs to.
         """
-        X = check_array(X, accept_sparse=["csr", "csc"])  # noqa: N806
+        X = check_array(X, accept_sparse=["csr", "csc"])
 
         if self.metric == "precomputed":
             check_is_fitted(self, "medoid_indices_")

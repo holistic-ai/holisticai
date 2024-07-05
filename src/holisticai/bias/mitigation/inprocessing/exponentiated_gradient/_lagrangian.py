@@ -1,24 +1,15 @@
-
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
+from holisticai.bias.mitigation.inprocessing.commons._conventions import PRECISION
 from sklearn import clone
-
-from ..commons._conventions import PRECISION
 
 
 class Lagrangian:
     """Operations related to the Lagrangian"""
 
     def __init__(
-        self,
-        X: np.ndarray,
-        y: np.ndarray,
-        estimator,
-        constraints,
-        B: float,
-        opt_lambda: bool = True,
-        **kwargs
+        self, X: np.ndarray, y: np.ndarray, estimator, constraints, B: float, opt_lambda: bool = True, **kwargs
     ):
         """
         Initialize Lagrangian object.
@@ -94,10 +85,7 @@ class Lagrangian:
             L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
         max_constraint = (gamma - self.constraints.bound()).max()
-        if max_constraint <= 0:
-            L_high = error
-        else:
-            L_high = error + self.B * max_constraint
+        L_high = error if max_constraint <= 0 else error + self.B * max_constraint
         return L, L_high, gamma, error
 
     def eval_gap(self, Q, lambda_hat, nu):
@@ -129,33 +117,24 @@ class Lagrangian:
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        result = opt.linprog(
-            c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="simplex"
-        )
+        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="simplex")
         Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
-        dual_bounds = [
-            (None, None) if i == n_constraints else (0, None)
-            for i in range(n_constraints + 1)
-        ]
-        result_dual = opt.linprog(
-            dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds, method="simplex"
-        )
+        dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)]
+        result_dual = opt.linprog(dual_c, A_ub=dual_A_ub, b_ub=dual_b_ub, bounds=dual_bounds, method="simplex")
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
         self.last_linprog_result = (Q, lambda_vec, self.eval_gap(Q, lambda_vec, nu))
         return self.last_linprog_result
 
     def _call_oracle(self, lambda_vec):
-        signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(
-            lambda_vec
-        )
+        signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
         if self.constraints.PROBLEM_TYPE == "classification":
             y = 1 * (signed_weights > 0)
         else:
-            y = self.constraints._y_as_series
+            y = self.constraints.y_as_series
 
         w = signed_weights.abs()
         sample_weight = self.constraints.total_samples * w / w.sum()

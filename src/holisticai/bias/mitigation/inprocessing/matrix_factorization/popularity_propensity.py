@@ -1,12 +1,17 @@
+from __future__ import annotations
+
+import logging
 from typing import Optional
 
 import numpy as np
+from holisticai.bias.mitigation.inprocessing.matrix_factorization.common_utils.propensity_utils import (
+    popularity_model_propensity,
+)
+from holisticai.bias.mitigation.inprocessing.matrix_factorization.common_utils.utils import updateP, updateQ
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-from tqdm import tqdm
 
-from .common_utils.propensity_utils import popularity_model_propensity
-from .common_utils.utils import updateP, updateQ
+logger = logging.getLogger(__name__)
 
 
 class PopularityPropensityMF(BMImp, RecommenderSystemBase):
@@ -89,7 +94,9 @@ class PopularityPropensityMF(BMImp, RecommenderSystemBase):
         invprop = 1 / propensity
         u_rated_items = [np.where(R[u, :] > 0)[0] for u in range(N)]
         i_rated_users = [np.where(R[:, i] > 0)[0] for i in range(M)]
-        for _ in tqdm(range(self.steps), leave=self.verbose > 0):
+
+        logger.info("Coordinate Descent Matrix Factorization Algorithm")
+        for _ in range(self.steps):
             P = updateP(P, b, R, Q, u_rated_items, invprop)
             Q = updateQ(P, b, R, Q, i_rated_users, invprop)
         return P, Q

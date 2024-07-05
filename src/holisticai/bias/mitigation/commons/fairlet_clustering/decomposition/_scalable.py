@@ -1,8 +1,7 @@
-### The MATLAB module does not work with python 3.7.0. Use 3.6.0 release or older.
-
 from collections import defaultdict
 
 import numpy as np
+from holisticai.bias.mitigation.commons.fairlet_clustering.decomposition._vanilla import VanillaFairletDecomposition
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 EPSILON = 0.0001
@@ -32,6 +31,7 @@ class TreeNode:
     populate_colors(colors)
         Populates the red and blue points for each node.
     """
+
     def __init__(self):
         self.children = []
 
@@ -83,9 +83,6 @@ class TreeNode:
                 self.blues.extend(child.blues)
 
 
-from ._vanilla import VanillaFairletDecomposition
-
-
 class ScalableFairletDecomposition(VanillaFairletDecomposition):
     """
     A scalable version of the fairlet decomposition algorithm
@@ -119,6 +116,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
     balanced(p, q, reds, blues)
         Checks if the dataset is balanced.
     """
+
     def __init__(self, p, q):
         self.fairlets = []
         self.fairlet_centers = []
@@ -154,9 +152,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         if len(node.children) == 0:
             node.reds = [i for i in node.reds if donelist[i] == 0]
             node.blues = [i for i in node.blues if donelist[i] == 0]
-            assert self.balanced(
-                p, q, len(node.reds), len(node.blues)
-            ), "Reached unbalanced leaf"
+            assert self.balanced(p, q, len(node.reds), len(node.blues)), "Reached unbalanced leaf"
             return super().decompose(node.blues, node.reds, dataset)
 
         # Preprocess children nodes to get rid of points that have already been clustered
@@ -168,9 +164,8 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         B = [len(child.blues) for child in node.children]
 
         if sum(R) == 0 or sum(B) == 0:
-            assert (
-                sum(R) == 0 and sum(B) == 0
-            ), "One color class became empty for this node while the other did not"
+            if sum(R) == 0 and sum(B) == 0:
+                raise ValueError("One color class became empty for this node while the other did not")
             return 0
 
         NR = 0
@@ -230,7 +225,8 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
             B[i] -= excess_blue
             NB += excess_blue
 
-        assert self.balanced(p, q, NR, NB), "Constructed node sets are unbalanced"
+        if self.balanced(p, q, NR, NB):
+            raise ValueError("Constructed node sets are unbalanced")
 
         reds = []
         blues = []
@@ -242,12 +238,11 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
                 blues.append(j)
                 donelist[j] = 1
 
-        assert len(reds) == NR and len(blues) == NB, "Something went horribly wrong"
+        if len(reds) == NR and len(blues) == NB:
+            raise ValueError("Something went horribly wrong")
+
         return super().decompose(blues, reds, dataset) + sum(
-            [
-                self.decompose(child, dataset, donelist, depth + 1)
-                for child in node.children
-            ]
+            [self.decompose(child, dataset, donelist, depth + 1) for child in node.children]
         )
 
     def fit_transform(self, dataset, group_a, group_b):
@@ -279,9 +274,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         p = self.p
         q = self.q
         root.populate_colors(colors)
-        assert self.balanced(
-            p, q, len(root.reds), len(root.blues)
-        ), "Dataset is unbalanced"
+        assert self.balanced(p, q, len(root.reds), len(root.blues)), "Dataset is unbalanced"
         root.populate_colors(colors)
         donelist = [0] * dataset.shape[0]
         cost = self.decompose(root, dataset, donelist, 0)
@@ -321,9 +314,7 @@ def build_quadtree(dataset, max_levels=0, random_shift=True):
             shift[d] = np.random.uniform(0, spread)
             upper[d] += spread
 
-    return build_quadtree_aux(
-        dataset, range(dataset.shape[0]), lower, upper, max_levels, shift
-    )
+    return build_quadtree_aux(dataset, range(dataset.shape[0]), lower, upper, max_levels, shift)
 
 
 def build_quadtree_aux(dataset, cluster, lower, upper, max_levels, shift):
@@ -367,9 +358,7 @@ def build_quadtree_aux(dataset, cluster, lower, upper, max_levels, shift):
     midpoint = 0.5 * (lower + upper)
     subclusters = defaultdict(list)
     for i in cluster:
-        subclusters[
-            tuple([dataset[i, d] + shift[d] <= midpoint[d] for d in range(dimension)])
-        ].append(i)
+        subclusters[tuple([dataset[i, d] + shift[d] <= midpoint[d] for d in range(dimension)])].append(i)
     for edge, subcluster in subclusters.items():
         sub_lower = np.zeros(dimension)
         sub_upper = np.zeros(dimension)
@@ -380,9 +369,5 @@ def build_quadtree_aux(dataset, cluster, lower, upper, max_levels, shift):
             else:
                 sub_lower[d] = midpoint[d]
                 sub_upper[d] = upper[d]
-        node.add_child(
-            build_quadtree_aux(
-                dataset, subcluster, sub_lower, sub_upper, max_levels - 1, shift
-            )
-        )
+        node.add_child(build_quadtree_aux(dataset, subcluster, sub_lower, sub_upper, max_levels - 1, shift))
     return node

@@ -1,4 +1,5 @@
 import errno
+import logging
 import os
 import os.path as osp
 import timeit
@@ -7,6 +8,8 @@ import numpy as np
 import scipy.io as sio
 from scipy import sparse
 from sklearn.neighbors import NearestNeighbors
+
+logger = logging.getLogger(__name__)
 
 
 def mkdir_if_missing(directory):
@@ -27,20 +30,18 @@ def normalizefea(X):
     return X_out
 
 
-def get_V_jl(x, l, N, K):
+def get_V_jl(x, L, N, K):  # noqa: N802
     x = x.squeeze()
     temp = np.zeros((N, K))
-    index_cluster = l[x]
+    index_cluster = L[x]
     temp[(x, index_cluster)] = 1
     temp = temp.sum(0)
     return temp
 
 
-def get_fair_accuracy(group_prob, groups_ids, l, K):
+def get_fair_accuracy(group_prob, groups_ids, L, K):
     N = len(groups_ids)
-    V_j_list = np.array(
-        [get_V_jl(groups_ids[f"{g}"], l, N, K) for g in group_prob.index]
-    )
+    V_j_list = np.array([get_V_jl(groups_ids[f"{g}"], L, N, K) for g in group_prob.index])
 
     balance = np.zeros(K)
     J = len(group_prob)
@@ -55,18 +56,14 @@ def get_fair_accuracy(group_prob, groups_ids, l, K):
     return balance.min(), balance.mean()
 
 
-def get_fair_accuracy_proportional(group_prob, groups_ids, l, K):
+def get_fair_accuracy_proportional(group_prob, groups_ids, L, K):
     N = len(groups_ids)
-    V_j_list = np.array(
-        [get_V_jl(groups_ids[f"{g}"], l, N, K) for g in group_prob.index]
-    )
+    V_j_list = np.array([get_V_jl(groups_ids[f"{g}"], L, N, K) for g in group_prob.index])
     clustered_uV = V_j_list / sum(V_j_list)
     fairness_error = np.zeros(K)
     u_V = np.array(group_prob)
     for k in range(K):
-        fairness_error[k] = (
-            -u_V * np.log(np.maximum(clustered_uV[:, k], 1e-20)) + u_V * np.log(u_V)
-        ).sum()
+        fairness_error[k] = (-u_V * np.log(np.maximum(clustered_uV[:, k], 1e-20)) + u_V * np.log(u_V)).sum()
     return fairness_error.sum()
 
 
@@ -78,8 +75,7 @@ def create_affinity(X, knn, scale=None, savepath=None, W_path=None):
         elif W_path.endswith(".npz"):
             W = sparse.load_npz(W_path)
     else:
-
-        print("Compute Affinity ")
+        logger.info("Compute Affinity ")
         start_time = timeit.default_timer()
 
         nbrs = NearestNeighbors(n_neighbors=knn).fit(X)
@@ -91,14 +87,14 @@ def create_affinity(X, knn, scale=None, savepath=None, W_path=None):
             data = np.ones(X.shape[0] * (knn - 1))
         elif scale is True:
             scale = np.median(dist[:, 1:])
-            data = np.exp((-dist[:, 1:] ** 2) / (2 * scale**2)).flatten()
+            data = np.exp((-(dist[:, 1:] ** 2)) / (2 * scale**2)).flatten()
         else:
-            data = np.exp((-dist[:, 1:] ** 2) / (2 * scale**2)).flatten()
+            data = np.exp((-(dist[:, 1:] ** 2)) / (2 * scale**2)).flatten()
 
         W = sparse.csc_matrix((data, (row, col)), shape=(N, N), dtype=float)
         W = (W + W.transpose(copy=True)) / 2
         elapsed = timeit.default_timer() - start_time
-        print(elapsed)
+        logger.info(elapsed)
 
         if isinstance(savepath, str):
             if savepath.endswith(".npz"):

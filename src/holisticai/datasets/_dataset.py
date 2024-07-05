@@ -292,7 +292,7 @@ class Dataset:
         dataset_info = self.__repr_info()
         return generate_html(dataset_info)
 
-    def __getitem__(self, key: str | int):
+    def __getitem__(self, key: str | int | list):
         """Returns a subset of the dataset based on the given key."""
         if isinstance(key, str):
             feature = self.data.xs(key, level="features", axis=1)
@@ -300,8 +300,15 @@ class Dataset:
                 return feature.iloc[:, 0]
             feature.columns = list(feature.columns)
             return feature
+
         if isinstance(key, int):
             return dataframe_to_level_dict_with_series(self.data, key)
+
+        if isinstance(key, list) and all(isinstance(k, str) for k in key):
+            subset = self.data.loc[:, key]
+            subset.columns = subset.columns.droplevel("features")
+            return subset
+
         raise NotImplementedError
 
 

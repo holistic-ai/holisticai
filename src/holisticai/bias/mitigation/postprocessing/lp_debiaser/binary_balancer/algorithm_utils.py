@@ -1,10 +1,9 @@
-
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix
 
 
 class CLFRates:
-    def __init__(self, y_true, y_pred, round=4):
+    def __init__(self, y_true, y_pred, round=4):  # noqa: A002
         self.tab = confusion_matrix(y_true, y_pred)
         tn = self.tab[0, 0]
         fn = self.tab[1, 0]
@@ -19,7 +18,7 @@ class CLFRates:
         self.acc = (tn + tp) / len(y_true)
 
 
-def from_top(roc_point, round=4):
+def from_top(roc_point, round=4):  # noqa: A002, ARG001
     d = np.sqrt(roc_point[0] ** 2 + (roc_point[1] - 1) ** 2)
     return d
 
@@ -50,12 +49,8 @@ def pred_from_pya(y_pred, p_attr, pya, binom=False):
 
         if not binom:
             # Randomly picking the positive predictions
-            pos_samp = np.random.choice(
-                a=np.flatnonzero(pos), size=int(p[1] * pos.sum()), replace=False
-            )
-            neg_samp = np.random.choice(
-                a=np.flatnonzero(neg), size=int(p[0] * neg.sum()), replace=False
-            )
+            pos_samp = np.random.choice(a=np.flatnonzero(pos), size=int(p[1] * pos.sum()), replace=False)
+            neg_samp = np.random.choice(a=np.flatnonzero(neg), size=int(p[0] * neg.sum()), replace=False)
             samp = np.concatenate((pos_samp, neg_samp)).flatten()
             out[samp] = 1
             out[group_ids & ~np.isin(np.arange(len(y_pred)), samp)] = 0

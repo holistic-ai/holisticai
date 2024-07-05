@@ -1,17 +1,16 @@
+from __future__ import annotations
+
 import math
 import random
 from copy import deepcopy
 from typing import Union
 
 import numpy as np
+from holisticai.bias.mitigation.commons.disparate_impact_remover._categorical_feature import CategoricalFeature
+from holisticai.bias.mitigation.commons.disparate_impact_remover._sparse_list import SparseList
 
-from ._categorical_feature import CategoricalFeature
-from ._sparse_list import SparseList
 
-
-def get_categories_count_norm(
-    categories, all_stratified_groups, count_dict, group_features
-):
+def get_categories_count_norm(categories, all_stratified_groups, count_dict, group_features):
     """
     Get the normalized count for each category , where normalized count is count divided by
     the number of people in that group.
@@ -36,9 +35,7 @@ def get_categories_count_norm(
     norm = {
         cat: SparseList(
             data=(
-                count_dict[cat][i] * (1.0 / len(group_features[group].data))
-                if group_features[group].data
-                else 0.0
+                count_dict[cat][i] * (1.0 / len(group_features[group].data)) if group_features[group].data else 0.0
                 for i, group in enumerate(all_stratified_groups)
             )
         )
@@ -47,9 +44,7 @@ def get_categories_count_norm(
     return norm
 
 
-def gen_desired_dist(
-    group_index, cat, col_id, median, repair_level, norm_counts, feature_to_remove, mode
-):
+def gen_desired_dist(group_index, cat, col_id, median, repair_level, norm_counts, feature_to_remove, mode):
     """
     Generate the desired distribution for each category in a group.
 
@@ -79,15 +74,10 @@ def gen_desired_dist(
     """
     if feature_to_remove == col_id:
         return 1 if cat == mode else (1 - repair_level) * norm_counts[cat][group_index]
-    else:
-        return (1 - repair_level) * norm_counts[cat][group_index] + (
-            repair_level * median[cat]
-        )
+    return (1 - repair_level) * norm_counts[cat][group_index] + (repair_level * median[cat])
 
 
-def assign_overflow(
-    all_stratified_groups, categories, overflow, group_features, repair_generator
-):
+def assign_overflow(all_stratified_groups, categories, overflow, group_features, repair_generator):
     """
     Assign the overflow to the desired categories based on the group's desired distribution.
 
@@ -118,7 +108,9 @@ def assign_overflow(
     desired_dict_list = {}
     for group_index, group in enumerate(all_stratified_groups):
         # Calculate the category proportions.
-        dist_generator = lambda cat: repair_generator(group_index, cat)
+        def dist_generator(cat):
+            return repair_generator(group_index, cat)
+
         cat_props = list(map(dist_generator, categories))
 
         if all(elem == 0 for elem in cat_props):  # TODO: Check that this is correct!
@@ -169,9 +161,7 @@ def get_categories_count(categories, all_stratified_groups, group_feature):
     count_dict = {
         cat: SparseList(
             data=(
-                group_feature[group].category_count[cat]
-                if cat in group_feature[group].category_count
-                else 0
+                group_feature[group].category_count[cat] if cat in group_feature[group].category_count else 0
                 for group in all_stratified_groups
             )
         )
@@ -181,9 +171,7 @@ def get_categories_count(categories, all_stratified_groups, group_feature):
     return count_dict
 
 
-def gen_desired_count(
-    group_index, group, category, median, group_features, repair_level, categories_count
-):
+def gen_desired_count(group_index, group, category, median, group_features, repair_level, categories_count):
     """
     Generate the desired count for each category in a group.
 
@@ -241,7 +229,10 @@ def flow_on_group_features(all_stratified_groups, group_features, repair_generat
     dict2 = {}
     for i, group in enumerate(all_stratified_groups):
         feature = group_features[group]
-        count_generator = lambda category: repair_generator(i, group, category)
+
+        def count_generator(category):
+            return repair_generator(i, group, category)
+
         DG = feature.create_graph(count_generator)
         new_feature, overflow = feature.repair(DG)
         dict2[group] = overflow
@@ -268,8 +259,7 @@ def get_count(cat, group_feature_category_count):
     """
     if cat in group_feature_category_count:
         return group_feature_category_count[cat]
-    else:
-        return 0
+    return 0
 
 
 def get_count_norm(count, group_feature_data):
@@ -290,8 +280,7 @@ def get_count_norm(count, group_feature_data):
     """
     if group_feature_data:
         return count * (1.0 / len(group_feature_data))
-    else:
-        return 0.0
+    return 0.0
 
 
 def get_column_type(values: Union[list, np.ndarray]):
@@ -310,10 +299,10 @@ def get_column_type(values: Union[list, np.ndarray]):
     """
     if all(isinstance(value, float) for value in values):
         return float
-    elif all(isinstance(value, int) for value in values):
+
+    if all(isinstance(value, int) for value in values):
         return int
-    else:
-        return str
+    return str
 
 
 def get_median(values, kdd):
@@ -333,17 +322,18 @@ def get_median(values, kdd):
         The median of the list of values.
     """
     if not values:
-        raise Exception("Cannot calculate median of list with no values!")
+        raise ValueError("Cannot calculate median of list with no values!")
 
     sorted_values = deepcopy(values)
     sorted_values.sort()  # Not calling `sorted` b/c `sorted_values` may not be list.
 
     if kdd:
         return sorted_values[len(values) // 2]
-    elif len(values) % 2 == 0:
+
+    if len(values) % 2 == 0:
         return sorted_values[len(values) // 2 - 1]
-    else:
-        return sorted_values[len(values) // 2]
+
+    return sorted_values[len(values) // 2]
 
 
 def get_group_data(all_stratified_groups, stratified_group_data, col_id):
@@ -366,11 +356,7 @@ def get_group_data(all_stratified_groups, stratified_group_data, col_id):
     """
     group_features = {}
     for group in all_stratified_groups:
-        points = [
-            (i, val)
-            for indices, val in stratified_group_data[group][col_id]
-            for i in indices
-        ]
+        points = [(i, val) for indices, val in stratified_group_data[group][col_id] for i in indices]
         points = sorted(points, key=lambda x: x[0])  # Sort by index
         values = [value for _, value in points]
 
@@ -469,7 +455,7 @@ def make_histogram_bins(bin_size_calculator, data, col_id):
     return index_bins
 
 
-def FreedmanDiaconisBinSize(feature_values):
+def freedman_diaconis_bin_size(feature_values):
     """
     Calculate the bin size using the Freedman-Diaconis rule.
 

@@ -1,36 +1,29 @@
 .. _api:
 
 =============
-API reference
+API Reference
 =============
 
-This page gives an overview of all public ``holisticai`` objects, functions and
-methods. All classes and functions exposed in ``holisticai.*`` namespace are public.
+This page provides an overview of all public ``holisticai`` objects, functions, and methods. All classes and functions exposed in the ``holisticai.*`` namespace are public.
 
-Following is the list of modules in ``holisticai``:
+Below is a list of modules in ``holisticai``:
 
 .. grid:: 3 3 3 3
     :gutter: 4
     :padding: 2 2 0 0
     :class-container: sd-text-center
 
-    .. grid-item-card:: Metrics
-        :link: metrics/index.html
+    .. grid-item-card:: Bias
+        :link: bias/index.html
         :shadow: md
 
-        Implement metrics for bias, explainability, efficacy, security, and robustness.
+        Metrics, mitigation strategies and many visualization tools for bias in various learning tasks.
 
-    .. grid-item-card:: Mitigation
-        :link: mitigation/index.html
+    .. grid-item-card:: Explainability
+        :link: explainability/index.html
         :shadow: md
 
-        Implement bias mitigation strategies.
-    
-    .. grid-item-card:: Plots
-        :link: plots/index.html
-        :shadow: md
-
-        Implement plots and visualizations for bias, explainability, efficacy, security, and robustness.
+        Metrics and many visualization tools for bias in various learning tasks.
 
     .. grid-item-card:: Pipeline
         :link: pipeline.html
@@ -50,8 +43,7 @@ Following is the list of modules in ``holisticai``:
 .. toctree::
    :hidden:
 
-   metrics/index
-   mitigation/index
-   plots/index
+   bias/index
+   explainability/index
    pipeline
    datasets

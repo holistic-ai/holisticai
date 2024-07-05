@@ -92,7 +92,7 @@ if cvxpy_spec is not None:
     from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.transformer import FairScoreClassifier
 __all__ += ["FairScoreClassifier"]
 
-MITIGATOR_NAME= Literal[
+MITIGATOR_NAME = Literal[
     "CorrelationRemover",
     "Reweighing",
     "LearningFairRepresentation",
@@ -123,5 +123,5 @@ MITIGATOR_NAME= Literal[
     "MCMF",
     "AdversarialDebiasing",
     "DisparateImpactRemoverRS",
-    "DisparateImpactRemover"
+    "DisparateImpactRemover",
 ]

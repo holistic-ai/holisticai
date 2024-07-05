@@ -1,4 +1,3 @@
-
 import numpy as np
 from holisticai.bias.mitigation.commons.fairlet_clustering._utils import distance
 
@@ -34,6 +33,7 @@ class KCenters:
     assign()
         Assigns every point in the dataset to the closest center.
     """
+
     def __init__(self, n_clusters=5):
         self.k = n_clusters
 

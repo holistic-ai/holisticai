@@ -54,7 +54,7 @@ class SurrogateFeatureImportanceCalculator(BaseModel):
         Returns:
             holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
         """
-        X = ds["X"]  # noqa: N806
+        X = ds["X"]
         y_pred = self.learning_task_settings.predict_fn(X)
         surrogate = self.create_surrogate_model(self.learning_task_settings.learning_task, X, y_pred)
         feature_names = X.columns

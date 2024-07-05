@@ -1,10 +1,11 @@
 from typing import Literal
 
 import numpy as np
+from holisticai.bias.mitigation.postprocessing.lp_debiaser.multiclass_balancer.algorithm import (
+    MulticlassBalancerAlgorithm,
+)
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from holisticai.utils.transformers.bias import SensitiveGroups
-
-from .algorithm import MulticlassBalancerAlgorithm
 
 
 class LPDebiaserMulticlass(BMPost):
@@ -75,9 +76,7 @@ class LPDebiaserMulticlass(BMPost):
         -------
         Self
         """
-        params = self._load_data(
-            y=y, y_pred=y_pred, group_a=group_a, group_b=group_b
-        )
+        params = self._load_data(y=y, y_pred=y_pred, group_a=group_a, group_b=group_b)
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
@@ -85,9 +84,7 @@ class LPDebiaserMulticlass(BMPost):
         y_pred = params["y_pred"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        p_attr = self.sens_groups.fit_transform(
-            sensitive_features, convert_numeric=True
-        )
+        p_attr = self.sens_groups.fit_transform(sensitive_features, convert_numeric=True)
 
         constraints_catalog, objective_catalog = self._get_catalogs()
 
@@ -95,9 +92,7 @@ class LPDebiaserMulticlass(BMPost):
 
         objective = objective_catalog[self.loss]()
 
-        self.algorithm = MulticlassBalancerAlgorithm(
-            constraint=constraint, objective=objective
-        )
+        self.algorithm = MulticlassBalancerAlgorithm(constraint=constraint, objective=objective)
 
         self.algorithm.fit(y_true=y, y_pred=y_pred, p_attr=p_attr)
         return self
@@ -169,7 +164,7 @@ class LPDebiaserMulticlass(BMPost):
         ).transform(y_pred=y_pred, group_a=group_a, group_b=group_b)
 
     def _get_catalogs(self):
-        from .constraints import (
+        from holisticai.bias.mitigation.postprocessing.lp_debiaser.multiclass_balancer.constraints import (
             EqualizedOdds,
             EqualizedOpportunity,
             MacroLosses,

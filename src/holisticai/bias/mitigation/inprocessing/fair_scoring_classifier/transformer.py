@@ -1,4 +1,6 @@
-from typing import Literal
+from __future__ import annotations
+
+from typing import Literal, Optional
 
 import numpy as np
 import pandas as pd
@@ -48,14 +50,14 @@ class FairScoreClassifier(BaseEstimator, BMImp):
 
     def __init__(
         self,
-        objectives: Literal['a','ab'],
-        constraints: dict = {},
+        objectives: Literal["a", "ab"],
+        constraints: Optional[dict] = None,
         lambda_bound: int = 9,
         time_limit: int = 100,
-        verbose: int = 0
+        verbose: int = 0,
     ):
         self.objectives = objectives
-        self.constraints = constraints
+        self.constraints = {} if constraints is None else constraints
         self.lambda_bound = lambda_bound
         self.time_limit = time_limit
         self.verbose = verbose
@@ -87,10 +89,8 @@ class FairScoreClassifier(BaseEstimator, BMImp):
         the same object
         """
         self.sensgroup = SensitiveGroups()
-        groups = np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1).reshape([-1,2])
-        p_attr = self.sensgroup.fit_transform(
-            groups, convert_numeric=True
-        )
+        groups = np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1).reshape([-1, 2])
+        p_attr = self.sensgroup.fit_transform(groups, convert_numeric=True)
         Xtrain = np.hstack([np.ones((X.shape[0], 1)), X, p_attr.values.reshape(-1, 1)])
         fairness_groups = [Xtrain.shape[1] - 1]
         y_oh = pd.get_dummies(np.squeeze(y))
@@ -103,7 +103,7 @@ class FairScoreClassifier(BaseEstimator, BMImp):
             self.constraints,
             self.lambda_bound,
             self.time_limit,
-            self.verbose
+            self.verbose,
         )
         self.model_.fit(Xtrain, np.array(y_oh))
         return self

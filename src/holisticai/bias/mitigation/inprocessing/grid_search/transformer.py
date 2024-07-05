@@ -1,13 +1,14 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Literal, Optional
 
 import numpy as np
+from holisticai.bias.mitigation.inprocessing.commons.classification import _constraints as cc
+from holisticai.bias.mitigation.inprocessing.commons.regression import _constraints as rc
+from holisticai.bias.mitigation.inprocessing.commons.regression import _losses as rl
+from holisticai.bias.mitigation.inprocessing.grid_search.algorithm import GridSearchAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from sklearn.base import BaseEstimator, clone
-
-from ..commons.classification import _constraints as cc
-from ..commons.regression import _constraints as rc
-from ..commons.regression import _losses as rl
-from .algorithm import GridSearchAlgorithm
 
 
 class GridSearchReduction(BaseEstimator, BMImp):
@@ -76,7 +77,7 @@ class GridSearchReduction(BaseEstimator, BMImp):
         International Conference on Machine Learning. PMLR, 2019.
     """
 
-    CONSTRAINTS = [
+    CONSTRAINTS = Literal[
         "DemographicParity",
         "EqualizedOdds",
         "TruePositiveRateParity",
@@ -90,8 +91,8 @@ class GridSearchReduction(BaseEstimator, BMImp):
         constraints: str = "EqualizedOdds",
         constraint_weight: Optional[float] = 0.5,
         loss: str = "ZeroOne",
-        min_val: float = None,
-        max_val: float = None,
+        min_val: Optional[float] = None,
+        max_val: Optional[float] = None,
         grid_size: Optional[int] = 10,
         grid_limit: Optional[float] = 2.0,
         verbose: Optional[int] = 0.0,

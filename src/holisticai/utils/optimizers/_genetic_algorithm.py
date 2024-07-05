@@ -3,7 +3,6 @@ import sys
 import time
 
 import numpy as np
-from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -119,9 +118,7 @@ class GeneticAlgorithm:
                 raise ValueError("variable_boundaries must have a length equal to dimension.")
 
             for i in variable_boundaries:
-                assert (
-                    len(i) == 2  # noqa: PLR2004
-                ), "\n boundary for each variable must be a tuple of length two."
+                assert len(i) == 2, "\n boundary for each variable must be a tuple of length two."
                 assert i[0] <= i[1], "\n lower_boundaries must be smaller than upper_boundaries [lower,upper]"
             self.var_bound = variable_boundaries
         else:
@@ -137,7 +134,7 @@ class GeneticAlgorithm:
 
         self.par_s = int(self.param["parents_portion"] * self.pop_s)
         trl = self.pop_s - self.par_s
-        if trl % 2 != 0 and trl != 2:  # noqa: PLR2004
+        if trl % 2 != 0 and trl != 2:
             self.par_s += 1
 
         self.prob_mut = self.param["mutation_probability"]
@@ -216,96 +213,92 @@ class GeneticAlgorithm:
 
         t = 1
         counter = 0
-        with tqdm(total=self.iterate) as pbar:
-            while t <= self.iterate:
-                if self.verbose is True:
-                    pbar.update(1)
+        while t <= self.iterate:
+            if self.verbose is True:
+                logger.info(f"Generation {t}/{self.iterate}")
 
-                # Sort
-                pop = pop[pop[:, self.dim].argsort()]
+            # Sort
+            pop = pop[pop[:, self.dim].argsort()]
 
-                if pop[0, self.dim] < self.best_function:
-                    counter = 0
-                    self.best_function = pop[0, self.dim].copy()
-                    self.best_variable = pop[0, : self.dim].copy()
-                    pbar.set_description(f"Cost: {self.best_function:.4f}")
-                    pbar.refresh()
-                else:
-                    counter += 1
-                # Report
-                self.report.append(pop[0, self.dim])
+            if pop[0, self.dim] < self.best_function:
+                counter = 0
+                self.best_function = pop[0, self.dim].copy()
+                self.best_variable = pop[0, : self.dim].copy()
+                logger.info(f"Cost: {self.best_function:.4f}")
+            else:
+                counter += 1
+            # Report
+            self.report.append(pop[0, self.dim])
 
-                # Normalizing objective function
-                normobj = np.zeros(self.pop_s)
+            # Normalizing objective function
+            normobj = np.zeros(self.pop_s)
 
-                minobj = pop[0, self.dim]
-                normobj = pop[:, self.dim] + abs(minobj) if minobj < 0 else pop[:, self.dim].copy()
+            minobj = pop[0, self.dim]
+            normobj = pop[:, self.dim] + abs(minobj) if minobj < 0 else pop[:, self.dim].copy()
 
-                maxnorm = np.amax(normobj)
-                normobj = maxnorm - normobj + 1
+            maxnorm = np.amax(normobj)
+            normobj = maxnorm - normobj + 1
 
-                # Calculate probability
-                sum_normobj = np.sum(normobj)
-                prob = np.zeros(self.pop_s)
-                prob = normobj / sum_normobj
-                cumprob = np.cumsum(prob)
+            # Calculate probability
+            sum_normobj = np.sum(normobj)
+            prob = np.zeros(self.pop_s)
+            prob = normobj / sum_normobj
+            cumprob = np.cumsum(prob)
 
-                # Select parents
-                par = np.array([np.zeros(self.dim + 1)] * self.par_s)
+            # Select parents
+            par = np.array([np.zeros(self.dim + 1)] * self.par_s)
 
-                for k in range(self.num_elit):
-                    par[k] = pop[k].copy()
-                for k in range(self.num_elit, self.par_s):
-                    index = np.searchsorted(cumprob, np.random.random())
-                    par[k] = pop[index].copy()
+            for k in range(self.num_elit):
+                par[k] = pop[k].copy()
+            for k in range(self.num_elit, self.par_s):
+                index = np.searchsorted(cumprob, np.random.random())
+                par[k] = pop[index].copy()
 
-                ef_par_list = np.array([False] * self.par_s)
-                par_count = 0
-                while par_count == 0:
-                    for k in range(self.par_s):
-                        if np.random.random() <= self.prob_cross:
-                            ef_par_list[k] = True
-                            par_count += 1
-
-                ef_par = par[ef_par_list].copy()
-
-                # New generation
-                pop = np.array([np.zeros(self.dim + 1)] * self.pop_s)
-
+            ef_par_list = np.array([False] * self.par_s)
+            par_count = 0
+            while par_count == 0:
                 for k in range(self.par_s):
-                    pop[k] = par[k].copy()
+                    if np.random.random() <= self.prob_cross:
+                        ef_par_list[k] = True
+                        par_count += 1
 
-                for k in range(self.par_s, self.pop_s, 2):
-                    r1 = np.random.randint(0, par_count)
-                    r2 = np.random.randint(0, par_count)
-                    pvar1 = ef_par[r1, : self.dim].copy()
-                    pvar2 = ef_par[r2, : self.dim].copy()
+            ef_par = par[ef_par_list].copy()
 
-                    ch = self.cross(pvar1, pvar2, self.c_type)
-                    ch1 = ch[0].copy()
-                    ch2 = ch[1].copy()
+            # New generation
+            pop = np.array([np.zeros(self.dim + 1)] * self.pop_s)
 
-                    ch1 = self.mut(ch1)
-                    ch2 = self.mutmidle(ch2, pvar1, pvar2)
-                    solo[: self.dim] = ch1.copy()
-                    obj = self.sim(ch1)
-                    solo[self.dim] = obj
-                    pop[k] = solo.copy()
-                    solo[: self.dim] = ch2.copy()
-                    obj = self.sim(ch2)
-                    solo[self.dim] = obj
-                    pop[k + 1] = solo.copy()
+            for k in range(self.par_s):
+                pop[k] = par[k].copy()
 
-                t += 1
-                if counter > self.mniwi:
-                    pop = pop[pop[:, self.dim].argsort()]
-                    if pop[0, self.dim] >= self.best_function:
-                        t = self.iterate
-                        if self.verbose is True:
-                            pbar.update(t - pbar.n)
-                        time.sleep(2)
-                        t += 1
-                        self.stop_mniwi = True
+            for k in range(self.par_s, self.pop_s, 2):
+                r1 = np.random.randint(0, par_count)
+                r2 = np.random.randint(0, par_count)
+                pvar1 = ef_par[r1, : self.dim].copy()
+                pvar2 = ef_par[r2, : self.dim].copy()
+
+                ch = self.cross(pvar1, pvar2, self.c_type)
+                ch1 = ch[0].copy()
+                ch2 = ch[1].copy()
+
+                ch1 = self.mut(ch1)
+                ch2 = self.mutmidle(ch2, pvar1, pvar2)
+                solo[: self.dim] = ch1.copy()
+                obj = self.sim(ch1)
+                solo[self.dim] = obj
+                pop[k] = solo.copy()
+                solo[: self.dim] = ch2.copy()
+                obj = self.sim(ch2)
+                solo[self.dim] = obj
+                pop[k + 1] = solo.copy()
+
+            t += 1
+            if counter > self.mniwi:
+                pop = pop[pop[:, self.dim].argsort()]
+                if pop[0, self.dim] >= self.best_function:
+                    t = self.iterate
+                    time.sleep(2)
+                    t += 1
+                    self.stop_mniwi = True
 
         # Sort
         pop = pop[pop[:, self.dim].argsort()]
@@ -313,8 +306,7 @@ class GeneticAlgorithm:
         if pop[0, self.dim] < self.best_function:
             self.best_function = pop[0, self.dim].copy()
             self.best_variable = pop[0, : self.dim].copy()
-            pbar.set_description(f"Cost: {self.best_function:.4f}")
-            pbar.refresh()
+            logger.info(f"Cost: {self.best_function:.4f}")
 
         # Report
         self.report.append(pop[0, self.dim])

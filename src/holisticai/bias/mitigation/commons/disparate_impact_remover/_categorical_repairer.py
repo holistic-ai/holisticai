@@ -1,8 +1,8 @@
 from collections import defaultdict
 from itertools import product
 
-from ._categorical_feature import CategoricalFeature
-from ._utils import (
+from holisticai.bias.mitigation.commons.disparate_impact_remover._categorical_feature import CategoricalFeature
+from holisticai.bias.mitigation.commons.disparate_impact_remover._utils import (
     assign_overflow,
     flow_on_group_features,
     gen_desired_count,
@@ -55,13 +55,12 @@ class CategoricalRepairer:
     numeric_repair(col, data_dict, col_id, unique_col_vals, index_lookup, all_stratified_groups, stratified_group_data, val_sets)
         Repairs the numeric feature in the dataset.
     """
-    def __init__(
-        self, feature_to_repair, repair_level, kdd=False, features_to_ignore=[]
-    ):
+
+    def __init__(self, feature_to_repair, repair_level, kdd=False, features_to_ignore=None):
         self.feature_to_repair = feature_to_repair
         self.repair_level = repair_level
         self.kdd = kdd
-        self.features_to_ignore = features_to_ignore
+        self.features_to_ignore = [] if features_to_ignore is None else features_to_ignore
 
     def repair(self, data_to_repair):
         """
@@ -121,10 +120,7 @@ class CategoricalRepairer:
 
         repaired_data = []
         for i, orig_row in enumerate(data_to_repair):
-            new_row = [
-                orig_row[j] if j not in cols_to_repair else data_dict[j][i]
-                for j in col_ids
-            ]
+            new_row = [orig_row[j] if j not in cols_to_repair else data_dict[j][i] for j in col_ids]
             repaired_data.append(new_row)
 
         return repaired_data
@@ -148,17 +144,10 @@ class CategoricalRepairer:
 
         # Get column type information
         col_types = [
-            "Y"
-            if i not in self.features_to_ignore
-            else "I"
-            if i != self.feature_to_repair
-            else "X"
-            for i in col_ids
+            "Y" if i not in self.features_to_ignore else "I" if i != self.feature_to_repair else "X" for i in col_ids
         ]
 
-        col_type_dict = {
-            col_id: col_type for col_id, col_type in zip(col_ids, col_types)
-        }
+        col_type_dict = dict(zip(col_ids, col_types))
 
         not_I_col_ids = [x for x in col_ids if col_type_dict[x] != "I"]
 
@@ -228,9 +217,7 @@ class CategoricalRepairer:
             stratified_group_data,
         )
 
-    def compute_stratified_group_data(
-        self, data_dict, stratified_group_indices, all_stratified_groups
-    ):
+    def compute_stratified_group_data(self, data_dict, stratified_group_indices, all_stratified_groups):
         """
         Compute the stratified group data for the given dataset.
 
@@ -255,9 +242,7 @@ class CategoricalRepairer:
                 for i in stratified_group_indices[group]:
                     value = col_dict[i]
                     indices[value].append(i)
-                stratified_col_values = sorted(
-                    (occurs, val) for val, occurs in indices.items()
-                )
+                stratified_col_values = sorted((occurs, val) for val, occurs in indices.items())
                 stratified_col_values.sort(key=lambda tup: tup[1])
                 stratified_group_data[group][col_id] = stratified_col_values
         return stratified_group_data
@@ -295,13 +280,9 @@ class CategoricalRepairer:
         feature = CategoricalFeature(col)
         categories = list(feature.bin_index_dict.keys())
 
-        group_features = get_group_data(
-            all_stratified_groups, stratified_group_data, col_id
-        )
+        group_features = get_group_data(all_stratified_groups, stratified_group_data, col_id)
 
-        categories_count = get_categories_count(
-            categories, all_stratified_groups, group_features
-        )
+        categories_count = get_categories_count(categories, all_stratified_groups, group_features)
 
         categories_count_norm = get_categories_count_norm(
             categories, all_stratified_groups, categories_count, group_features
@@ -310,30 +291,24 @@ class CategoricalRepairer:
         median = get_median_per_category(categories, categories_count_norm)
 
         # Partially fill-out the generator functions to simplify later calls.
-        dist_generator = lambda group_index, category: gen_desired_dist(
-            group_index,
-            category,
-            col_id,
-            median,
-            self.repair_level,
-            categories_count_norm,
-            self.feature_to_repair,
-            mode_feature_to_repair,
-        )
+        def dist_generator(group_index, category):
+            return gen_desired_dist(
+                group_index,
+                category,
+                col_id,
+                median,
+                self.repair_level,
+                categories_count_norm,
+                self.feature_to_repair,
+                mode_feature_to_repair,
+            )
 
-        count_generator = lambda group_index, group, category: gen_desired_count(
-            group_index,
-            group,
-            category,
-            median,
-            group_features,
-            self.repair_level,
-            categories_count,
-        )
+        def count_generator(group_index, group, category):
+            return gen_desired_count(
+                group_index, group, category, median, group_features, self.repair_level, categories_count
+            )
 
-        group_features, overflow = flow_on_group_features(
-            all_stratified_groups, group_features, count_generator
-        )
+        group_features, overflow = flow_on_group_features(all_stratified_groups, group_features, count_generator)
 
         group_features, assigned_overflow, distribution = assign_overflow(
             all_stratified_groups,
@@ -383,12 +358,10 @@ class CategoricalRepairer:
         val_sets : dict
             The dictionary containing the value sets.
         """
-        num_quantiles = min(
-            len(val_sets[group][col_id]) for group in all_stratified_groups
-        )
+        num_quantiles = min(len(val_sets[group][col_id]) for group in all_stratified_groups)
         quantile_unit = 1.0 / num_quantiles
         group_offsets = {group: 0 for group in all_stratified_groups}
-        for quantile in range(num_quantiles):
+        for _ in range(num_quantiles):
             median_at_quantiles = []
             indices_per_group = {}
 
@@ -397,17 +370,12 @@ class CategoricalRepairer:
                 num_vals = len(group_data_at_col)
                 group_offset_times_num_vals = group_offsets[group] * num_vals
                 offset = int(round(group_offset_times_num_vals))
-                number_to_get = (
-                    int(round(group_offset_times_num_vals + quantile_unit * num_vals))
-                    - offset
-                )
+                number_to_get = int(round(group_offset_times_num_vals + quantile_unit * num_vals)) - offset
                 group_offsets[group] += quantile_unit
 
                 if number_to_get > 0:
                     offset_data = group_data_at_col[offset : offset + number_to_get]
-                    indices_per_group[group] = [
-                        i for val_indices, _ in offset_data for i in val_indices
-                    ]
+                    indices_per_group[group] = [i for val_indices, _ in offset_data for i in val_indices]
                     values = sorted(float(val) for _, val in offset_data)
 
                     # Find this group's median value at this quantile
@@ -419,23 +387,14 @@ class CategoricalRepairer:
 
             # Update values to repair the dataset.
             for group in all_stratified_groups:
-                indices_to_repair = [index for index in indices_per_group[group]]
+                indices_to_repair = list(indices_per_group[group])
                 original_values = [col[index] for index in indices_to_repair]
-                current_val_positions = [
-                    index_lookup[col_id][value] for value in original_values
-                ]
-                distances = [
-                    median_val_pos - position for position in current_val_positions
-                ]
-                distances_to_repair = [
-                    int(round(distance * self.repair_level)) for distance in distances
-                ]
+                current_val_positions = [index_lookup[col_id][value] for value in original_values]
+                distances = [median_val_pos - position for position in current_val_positions]
+                distances_to_repair = [int(round(distance * self.repair_level)) for distance in distances]
                 indices_of_repair_values = [
-                    current_val_positions[i] + distances_to_repair[i]
-                    for i in range(len(indices_to_repair))
+                    current_val_positions[i] + distances_to_repair[i] for i in range(len(indices_to_repair))
                 ]
-                repaired_values = [
-                    unique_col_vals[col_id][index] for index in indices_of_repair_values
-                ]
+                repaired_values = [unique_col_vals[col_id][index] for index in indices_of_repair_values]
                 for i in range(len(indices_to_repair)):
                     data_dict[col_id][indices_to_repair[i]] = repaired_values[i]

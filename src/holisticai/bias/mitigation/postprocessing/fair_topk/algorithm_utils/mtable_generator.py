@@ -1,5 +1,9 @@
+import logging
+
 import pandas as pd
 from scipy import stats
+
+logger = logging.getLogger(__name__)
 
 
 class MTableGenerator:
@@ -19,7 +23,8 @@ class MTableGenerator:
     def m(self, k):
         if k < 1:
             raise ValueError("Parameter k must be at least 1")
-        elif k > self.k:
+
+        if k > self.k:
             raise ValueError(f"Parameter k must be at most {self.k}")
 
         result = stats.binom.ppf(self.alpha, k, self.p)
@@ -32,7 +37,7 @@ class MTableGenerator:
         mtable = pd.DataFrame(columns=["m"])
         for i in range(1, self.k + 1):
             if i % 2000 == 0:
-                print(f"Computing m: {i:.0f} of {self.k:.0f}")
+                logger.info(f"Computing m: {i:.0f} of {self.k:.0f}")
             mtable.loc[i] = [self.m(i)]
         return mtable
 
@@ -49,7 +54,7 @@ def compute_aux_mtable(mtable):
     last_position = 0
     for position in range(1, len(mtable)):
         if position % 2000 == 0:
-            print(f"Computing m inverse: {position:.0f} of {len(mtable):.0f}")
+            logger.info(f"Computing m inverse: {position:.0f} of {len(mtable):.0f}")
         if mtable.at[position, "m"] == last_m_seen + 1:
             last_m_seen += 1
             aux_mtable.loc[position] = [position, position - last_position]

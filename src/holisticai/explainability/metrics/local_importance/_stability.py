@@ -21,6 +21,11 @@ class DataStability:
         return np.mean(niqr_row)
 
 
+def data_stability(local_feature_importance):
+    metric = DataStability()
+    return metric(local_feature_importance)
+
+
 class FeatureStability:
     reference: int = 0
     name: str = "Feature Stability"
@@ -39,3 +44,8 @@ class FeatureStability:
 
         # Calculate the mean of the nIQR to obtain a global measure of Feature Stability
         return np.mean(niqr)
+
+
+def feature_stability(local_feature_importance):
+    metric = FeatureStability()
+    return metric(local_feature_importance)

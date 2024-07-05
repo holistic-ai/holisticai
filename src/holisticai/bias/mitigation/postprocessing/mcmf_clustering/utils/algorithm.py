@@ -1,9 +1,8 @@
 import numpy as np
+from holisticai.bias.mitigation.postprocessing.mcmf_clustering.utils.algorithm_utils import Utils
 
-from .algorithm_utils import Utils
 
-
-class OPT_Modification:
+class OPTModification:
     def __init__(self, k, verbose=0):
         self.k = k
         self.verbose = verbose
@@ -13,12 +12,9 @@ class OPT_Modification:
 
     def run(self, y_pred, p_attr):
         Nx, q, r, lower_bound, upper_bound, Cj = self.init_parameters(y_pred, p_attr)
-        self.utils = Utils(
-            upper_bound=upper_bound, lower_bound=lower_bound, Nx=Nx, k=self.k
-        )
+        self.utils = Utils(upper_bound=upper_bound, lower_bound=lower_bound, Nx=Nx, k=self.k)
 
         if r == 0:
-            print("Case 1")
             gt, gp = [], []
             for j in range(self.k):
                 if Cj[j]["beta"] > Nx // self.k:
@@ -41,37 +37,31 @@ class OPT_Modification:
 
             t = len(g1)
             p = len(g1 + g2)
-            m = len(g1 + g2 + g3)
+            # m = len(g1 + g2 + g3)
 
             gs = g1 + g2 + g3 + g4
-            print("Case 2")
+
             if p < r:
-                print("Case 2.1")
                 T, Cj = self.utils.select_items(g1, Cj, mode="upper")
                 rp = r - p
                 g = g3 + g4
                 T, Cj = self.utils.choose_items(g[:rp], Cj, T, mode="upper")
                 T, Cj = self.utils.choose_items(g[rp:], Cj, T, mode="lower")
             elif p == r:
-                print("Case 2.2")
                 T, Cj = self.utils.select_items(g1, Cj, mode="upper")
                 T, Cj = self.utils.choose_items(g4, Cj, T, mode="lower")
             elif p > r:
-                print("Case 2.3")
                 if t > r:
-                    print("Case 2.3.1")
                     T, Cj = self.utils.select_items(g1, Cj, mode="upper")
                     T, Cj = self.utils.select_items(gs[r:p], Cj, mode="lower")
                     T, Cj = self.utils.choose_items(g4, Cj, T, mode="lower")
 
                 elif t == r:
-                    print("Case 2.3.2")
                     T, Cj = self.utils.select_items(g1, Cj, mode="upper")
                     T, Cj = self.utils.select_items(g2, Cj, mode="lower")
                     T, Cj = self.utils.choose_items(g4, Cj, T, mode="lower")
 
                 elif t < r:
-                    print("Case 2.3.3")
                     T, Cj = self.utils.select_items(g1, Cj, mode="upper")
                     start = r - t
                     end = p
@@ -82,10 +72,6 @@ class OPT_Modification:
             jr = Cj[js]["jr"]
             index = Cj[js]["index"]
             y_pred[index] = jr
-
-        if self.verbose > 0:
-            for js in range(self.k):
-                print(Cj[js]["beta"])
 
         return y_pred, T
 
@@ -107,9 +93,7 @@ class OPT_Modification:
             cluster_info.append((j, beta_j, c_index))
 
         Cj = {}
-        for js, (jr, beta, index) in enumerate(
-            sorted(cluster_info, key=lambda x: x[1], reverse=True)
-        ):
+        for js, (jr, beta, index) in enumerate(sorted(cluster_info, key=lambda x: x[1], reverse=True)):
             Cj[js] = {"jr": jr, "beta": beta, "index": list(index)}
 
         return Nx, q, r, lower_bound, upper_bound, Cj

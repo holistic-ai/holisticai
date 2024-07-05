@@ -1,6 +1,5 @@
+from holisticai.bias.mitigation.postprocessing.fair_topk.algorithm_utils import mtable_generator
 from scipy.stats import binom
-
-from . import mtable_generator
 
 EPS = 0.0000000000000001
 
@@ -24,10 +23,7 @@ class RecursiveNumericFailProbabilityCalculator:
         maxb = self._compute_boundary(a_max)
         midb = self._compute_boundary(a_mid)
 
-        while (
-            minb.mass_of_mtable() < maxb.mass_of_mtable()
-            and midb.fail_prob != self.alpha
-        ):
+        while minb.mass_of_mtable() < maxb.mass_of_mtable() and midb.fail_prob != self.alpha:
             if midb.fail_prob < self.alpha:
                 a_min = a_mid
                 minb = self._compute_boundary(a_min)
@@ -48,8 +44,7 @@ class RecursiveNumericFailProbabilityCalculator:
 
                 if min_diff <= max_diff:
                     return minb
-                else:
-                    return maxb
+                return maxb
 
             if max_mass - mid_mass == 1 and mid_mass - min_mass == 1:
                 min_diff = abs(minb.fail_prob - self.alpha)
@@ -60,8 +55,7 @@ class RecursiveNumericFailProbabilityCalculator:
                     return midb
                 if min_diff <= mid_diff and min_diff <= max_diff:
                     return minb
-                else:
-                    return maxb
+                return maxb
 
         return midb
 
@@ -85,9 +79,7 @@ class RecursiveNumericFailProbabilityCalculator:
         """
         Returns a tuple of (k, p, alpha, fail_prob, mtable)
         """
-        mtable = mtable_generator.MTableGenerator(
-            self.k, self.p, alpha
-        ).mtable_as_dataframe()
+        mtable = mtable_generator.MTableGenerator(self.k, self.p, alpha).mtable_as_dataframe()
         fail_prob = self.calculate_fail_probability(mtable)
         return MTableFailProbPair(self.k, self.p, alpha, fail_prob, mtable)
 
@@ -112,9 +104,7 @@ class RecursiveNumericFailProbabilityCalculator:
 
         assignments = 0
         new_remaining_block_sizes = block_sizes[1:]
-        for items_this_block in range(
-            min_needed_this_block, max_possible_this_block + 1
-        ):
+        for items_this_block in range(min_needed_this_block, max_possible_this_block + 1):
             new_remaining_candidates = number_of_candidates - items_this_block
 
             suffixes = self._calculate_legal_assignments_aux(
@@ -124,10 +114,7 @@ class RecursiveNumericFailProbabilityCalculator:
                 candidates_assigned_so_far + items_this_block,
             )
 
-            assignments += (
-                self.get_from_pmf_cache(max_possible_this_block, items_this_block)
-                * suffixes
-            )
+            assignments += self.get_from_pmf_cache(max_possible_this_block, items_this_block) * suffixes
 
         return assignments
 
@@ -146,9 +133,7 @@ class RecursiveNumericFailProbabilityCalculator:
         )
 
         if key.__hash__ not in self.legal_assignment_cache:
-            self.legal_assignment_cache[
-                key.__hash__
-            ] = self._find_legal_assignments_aux(
+            self.legal_assignment_cache[key.__hash__] = self._find_legal_assignments_aux(
                 remaining_candidates,
                 remaining_block_sizes,
                 current_block_number,
@@ -180,9 +165,7 @@ class LegalAssignmentKey:
             return False
         if self.candidates_assigned_so_far != other.candidates_assigned_so_far:
             return False
-        if self.remaining_block_sizes != other.remaining_block_sizes:
-            return False
-        return True
+        return not self.remaining_block_sizes != other.remaining_block_sizes
 
     def __hash__(self):
         return (

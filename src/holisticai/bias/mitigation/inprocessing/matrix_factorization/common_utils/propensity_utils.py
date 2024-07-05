@@ -1,15 +1,12 @@
 import numpy as np
-
-from .utils import calculate_popularity_model
+from holisticai.bias.mitigation.inprocessing.matrix_factorization.common_utils.utils import calculate_popularity_model
 
 
 def constant_propensity(rmat, numItems):
     numObservations = np.ma.count(rmat)
     numUsers, numItems = np.shape(rmat)
     scale = numUsers * numItems
-    inversePropensities = (
-        np.ones((numUsers, numItems), dtype=np.longdouble) * scale / numObservations
-    )
+    inversePropensities = np.ones((numUsers, numItems), dtype=np.longdouble) * scale / numObservations
     return inversePropensities
 
 

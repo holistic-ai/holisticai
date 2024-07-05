@@ -16,19 +16,17 @@ class FairRecAlg:
         P = list(range(self.n))
         A = {u: [] for u in U}
         F = {u: P[:] for u in U}
-        l = int(self.MMS_fraction * self.m * self.rec_size / (self.n + 0.0))
-        R = int(math.ceil((l * self.n) / (self.m + 0.0)))
-        T = l * self.n
-        [B, F1] = self._greedy_round_robin(R, l, T, X, U[:], F.copy())
+        L = int(self.MMS_fraction * self.m * self.rec_size / (self.n + 0.0))
+        R = int(math.ceil((L * self.n) / (self.m + 0.0)))
+        T = L * self.n
+        [B, F1] = self._greedy_round_robin(R, L, T, X, U[:], F.copy())
 
         F = F1.copy()
 
         for u in U:
             A[u] = A[u][:] + B[u][:]
-        u_less = []
-        for u in A:
-            if len(A[u]) < self.rec_size:
-                u_less.append(u)
+        u_less = [u for u in A if len(A[u]) < self.rec_size]
+
         for u in u_less:
             scores = X[u, :]
             new = scores.argsort()[-(self.rec_size + self.rec_size) :][::-1]
@@ -40,7 +38,7 @@ class FairRecAlg:
 
         return A
 
-    def _greedy_round_robin(self, R, l, T, V, U, F):
+    def _greedy_round_robin(self, R, L, T, V, U, F):
         """
         Description
         -----------
@@ -53,8 +51,8 @@ class FairRecAlg:
         Z = {}
         P = list(range(self.n))
         for p in P:
-            Z[p] = l
-        for t in range(1, R + 1):
+            Z[p] = L
+        for _ in range(1, R + 1):
             for i in range(self.m):
                 if T == 0:
                     return B, F

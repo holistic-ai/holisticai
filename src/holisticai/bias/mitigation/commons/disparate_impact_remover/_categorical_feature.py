@@ -59,17 +59,13 @@ class CategoricalFeature:
             if obs in d2:
                 pass  # if obs (i.e. category) is alreay a KEY in bin_index_data then don't do anything
             else:
-                d2[
-                    obs
-                ] = count  # bin_index_dict inits the KEY: category, with VALUE: count
+                d2[obs] = count  # bin_index_dict inits the KEY: category, with VALUE: count
                 d4[count] = obs  # bin_index_dict_reverse does the opposite
                 count += 1
             bin_idx = d2[obs]
             d1[bin_idx] += 1  # add 1 to the obs category idex in bin_data
             d5[obs] += 1  # add 1 to the obs category NAME in category_count
-            d3[bin_idx].append(
-                i
-            )  # add obs to the list of obs with that category in bin_fulldata
+            d3[bin_idx].append(i)  # add obs to the list of obs with that category in bin_fulldata
 
         self.bin_data = d1
         self.category_count = d5
@@ -98,18 +94,14 @@ class CategoricalFeature:
         bin_index_dict_reverse = self.bin_index_dict_reverse
         k = self.num_bins
         total_items = 0
-        for i, amt in bin_list:
+        for _, amt in bin_list:
             total_items += amt
         DG.add_node("s")
         DG.add_node("t")
-        for i in range(
-            k
-        ):  # lefthand side nodes have capacity = number of observations in category i
+        for i in range(k):  # lefthand side nodes have capacity = number of observations in category i
             DG.add_node(i)
             DG.add_edge("s", i, capacity=bin_list[i][1], weight=0)
-        for i in range(
-            k, 2 * k
-        ):  # righthand side nodes have capacity = DESIRED number of observations in category i
+        for i in range(k, 2 * k):  # righthand side nodes have capacity = DESIRED number of observations in category i
             DG.add_node(i)
             cat = bin_index_dict_reverse[i - k]
             desired_count = count_generator(cat)
@@ -118,12 +110,8 @@ class CategoricalFeature:
         DG.add_node(2 * k)
         DG.add_edge(2 * k, "t", capacity=total_items, weight=0)
         for i in range(k):
-            for j in range(
-                k, 2 * k
-            ):  # for each edge from a lefthand side node to a righhand side node:
-                if (
-                    i + k
-                ) == j:  # IF they represent the same category, the edge weight is 0
+            for j in range(k, 2 * k):  # for each edge from a lefthand side node to a righhand side node:
+                if (i + k) == j:  # IF they represent the same category, the edge weight is 0
                     DG.add_edge(i, j, weight=0)
                 else:  # IF they represent different categories, the edge weight is 1
                     DG.add_edge(i, j, weight=1)
@@ -154,9 +142,9 @@ class CategoricalFeature:
         index_dict = self.bin_index_dict_reverse
         size_data = len(self.data)
         repair_bin_dict = {}
-        repair_data = [
-            0
-        ] * size_data  # initialize repaired data to be 0. If there are zero's after we fill it in the those observations belong in the overflow, "no category"
+        repair_data = (
+            [0] * size_data
+        )  # initialize repaired data to be 0. If there are zero's after we fill it in the those observations belong in the overflow, "no category"
         k = self.num_bins
         overflow = 0
         for i in range(k):  # for each lefthand side node i
@@ -169,12 +157,8 @@ class CategoricalFeature:
                     bin_dict[i], int(edgeflow)
                 )  # randomly sample x (edgeflow) unique elements from the list of observations in that category.
                 q = j - k  # q is the category index for a righhand side node
-                for (
-                    elem
-                ) in group:  # for each element in the randomly selected group list
-                    bin_dict[i].remove(
-                        elem
-                    )  # remove the element from the list of observation in that category
+                for elem in group:  # for each element in the randomly selected group list
+                    bin_dict[i].remove(elem)  # remove the element from the list of observation in that category
                     repair_data[elem] = index_dict[
                         q
                     ]  # Mutate repair data at the index of the observation (elem) with its new category (it was 0) which is the category index for the righthand side node it flows to
@@ -183,11 +167,9 @@ class CategoricalFeature:
                         group
                     )  # extend the list of observations with a new list of observations in that category
                 else:
-                    repair_bin_dict[
-                        q
-                    ] = group  # otherwise key that category index and set it's value as the group list in that category
-        new_feature = CategoricalFeature(
-            repair_data
-        )  # initialize our new_feature (repaired feature)
+                    repair_bin_dict[q] = (
+                        group  # otherwise key that category index and set it's value as the group list in that category
+                    )
+        new_feature = CategoricalFeature(repair_data)  # initialize our new_feature (repaired feature)
         new_feature.bin_fulldata = repair_bin_dict
         return new_feature, overflow

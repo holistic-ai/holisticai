@@ -1,8 +1,9 @@
 from statistics import mean
 
 import numpy as np
-import torch
 from holisticai.bias.mitigation.inprocessing.commons import Logging
+
+import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 
@@ -84,10 +85,7 @@ class Trainer:
         self.scheduler_adv = torch.optim.lr_scheduler.LinearLR(self.optimizer_adv, start_factor=0.99, total_iters=20)
 
     def train(self):
-        if self.use_debias:
-            train_step = self._train_step_with_debias
-        else:
-            train_step = self._train_step_without_debias
+        train_step = self._train_step_with_debias if self.use_debias else self._train_step_without_debias
 
         """Traditional one epoch"""
         for epoch in range(self.train_args.epochs):
@@ -147,15 +145,18 @@ class Trainer:
 
     def _update_gradients(self, classifier_params, dloss_cls, dloss_adv):
         """update classifier gradients with adversarial model"""
-        normalize = lambda x: x / (torch.norm(x) + np.finfo(np.float32).tiny)
+
+        def normalize(x):
+            return x / (torch.norm(x) + np.finfo(np.float32).tiny)
+
         for param, grad, grad_adv in zip(classifier_params, dloss_cls, dloss_adv):
             unit_adversary_grad = normalize(grad_adv)
-            grad -= torch.sum(grad * unit_adversary_grad) * unit_adversary_grad
-            grad -= self.train_args.adversary_loss_weight * grad_adv
+            grad -= torch.sum(grad * unit_adversary_grad) * unit_adversary_grad  # noqa: PLW2901
+            grad -= self.train_args.adversary_loss_weight * grad_adv  # noqa: PLW2901
             param.grad = grad
 
     def _logging_progress(self, epoch, it, cls_loss, adv_loss):
         iteration = epoch * self.steps_per_epoch + it
-        if self.train_args.verbose > 0:
+        if self.train_args.verbose > 0:  # noqa: SIM102
             if (iteration % self.train_args.print_interval) == 0 or (iteration % self.total_iterations) == 0:
                 self.logger.update(iteration, cls_loss, adv_loss)
