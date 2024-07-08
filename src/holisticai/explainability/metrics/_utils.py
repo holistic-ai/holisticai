@@ -4,6 +4,7 @@ from holisticai.explainability.metrics.global_importance import (
     PositionParity,
     RankAlignment,
     SpreadRatio,
+    SpreadDivergence,
     XAIEaseScore,
 )
 from holisticai.explainability.metrics.local_importance import DataStability, FeatureStability
@@ -30,6 +31,11 @@ def compute_global_explainability_metrics_from_features(xai_features):
     metric = SpreadRatio()
     value = metric(xai_features.feature_importance)
     results.append({"metric": metric.name, "value": value, "reference": metric.reference})
+
+    metric = SpreadDivergence()
+    value = metric(xai_features.feature_importance)
+    results.append({"metric": metric.name, "value": value, "reference": metric.reference})
+    
     return pd.DataFrame(results).set_index("metric")
 
 

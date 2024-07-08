@@ -9,7 +9,7 @@ class ImportanceSpread:
         feature_importance: np.array
             array with raw feature importance
         divergence: bool
-            if True calculate divergence instead of ratio
+            if True calculate the inverse Jensen-Shannon divergence, otherwise the ratio
         """
         tol = 1e-8
         feature_importances = np.array(feature_importance.feature_importances.values[:, 1], dtype=float)
@@ -18,28 +18,30 @@ class ImportanceSpread:
 
         importance = feature_importances
         from scipy.stats import entropy
+        from scipy.spatial.distance import jensenshannon
 
         feature_weight = importance / sum(importance)
         feature_equal_weight = np.array([1.0 / len(importance)] * len(importance))
 
-        # entropy or divergence
-        if self.divergence is False:
-            return entropy(feature_weight) / entropy(feature_equal_weight)  # ratio
+        if self.divergence is True:
+            return 1-jensenshannon(feature_weight, feature_equal_weight, base=2)
         else:  # noqa: RET505
-            return entropy(feature_weight, feature_equal_weight)  # divergence
+            return entropy(feature_weight)/entropy(feature_equal_weight)
 
 
 class SpreadDivergence(ImportanceSpread):
     name: str = "Spread Divergence"
-    reference = np.inf
+    reference = 0
     divergence = True
 
+def spread_divergence(feature_importance):
+    metric = SpreadDivergence()
+    return metric(feature_importance)
 
 class SpreadRatio(ImportanceSpread):
     name: str = "Spread Ratio"
     reference = 0
     divergence = False
-
 
 def spread_ratio(feature_importance):
     metric = SpreadRatio()
