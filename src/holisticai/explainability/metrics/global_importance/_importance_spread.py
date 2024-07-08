@@ -23,9 +23,9 @@ class ImportanceSpread:
         feature_equal_weight = np.array([1.0 / len(importance)] * len(importance))
 
         if self.divergence is True:
-            return 1-jensenshannon(feature_weight, feature_equal_weight, base=2)
+            return 1 - jensenshannon(feature_weight, feature_equal_weight, base=2)
         else:  # noqa: RET505
-            return entropy(feature_weight)/entropy(feature_equal_weight)
+            return entropy(feature_weight) / entropy(feature_equal_weight)
 
 
 class SpreadDivergence(ImportanceSpread):
