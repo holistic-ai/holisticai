@@ -2,26 +2,21 @@ import logging
 
 import numpy as np
 import pandas as pd
-
-from .algorithm_utils._fair_clustering import FairClustering
-from .algorithm_utils._utils import (
-    get_fair_accuracy,
-    get_fair_accuracy_proportional,
+from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm_utils._fair_clustering import (
+    FairClustering,
+)
+from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm_utils._utils import (
     normalizefea,
 )
 
 
 class FairClusteringAlgorithm:
-    def __init__(
-        self, K, L, lmbda, method="kmeans", normalize_input=True, verbose=True
-    ):
+    def __init__(self, K, L, lmbda, method="kmeans", normalize_input=True, verbose=True):
         self.lmbda = lmbda
         self.K = K
         self.L = L
         self.normalize_input = normalize_input
-        self.fair_clustering = FairClustering(
-            K, L, lmbda, method=method, verbose=verbose
-        )
+        self.fair_clustering = FairClustering(K, L, lmbda, method=method, verbose=verbose)
 
     def fit_transform_normalize(self, X):
         self.meanX = np.nanmean(X, axis=0)
@@ -47,7 +42,6 @@ class FairClusteringAlgorithm:
         return group_prob, groups_ids
 
     def fit(self, X, p_attr, random_state):
-
         group_prob, groups_ids = self._preprocess_data(p_attr)
         # Scale and Normalize Features
         if self.normalize_input:
@@ -55,13 +49,6 @@ class FairClusteringAlgorithm:
             X = normalizefea(X)
 
         self.fair_clustering.fit(X, group_prob, groups_ids, random_state)
-
-        min_balance, avg_balance = get_fair_accuracy(
-            group_prob, groups_ids, self.fair_clustering.l, self.K
-        )
-        fairness_error = get_fair_accuracy_proportional(
-            group_prob, groups_ids, self.fair_clustering.l, self.K
-        )
 
         return self
 

@@ -6,12 +6,7 @@ from numpy.linalg import inv
 
 
 def calculate_popularity_model(ratings):
-    propensity_score = []
-    for i in range(ratings.shape[1]):
-        propensity_score.append(
-            float(np.count_nonzero(ratings[:, i])) / ratings.shape[0]
-        )
-
+    propensity_score = [float(np.count_nonzero(ratings[:, i])) / ratings.shape[0] for i in range(ratings.shape[1])]
     temp = np.array(propensity_score)
     temp = temp.reshape((1, len(temp)))
     return temp
@@ -48,21 +43,17 @@ def update_emb(b, R_, E_, invprop_):
     return np.dot(inv(mat_temp + b), vect_temp)
 
 
-def updateP(P, b, R, Q, u_rated_items, invprop):
+def updateP(P, b, R, Q, u_rated_items, invprop):  # noqa: N802
     P = Parallel(n_jobs=-1, verbose=0)(
-        delayed(update_emb)(
-            b, R[u, rated_items], Q[:, rated_items].T, invprop[u, rated_items]
-        )
+        delayed(update_emb)(b, R[u, rated_items], Q[:, rated_items].T, invprop[u, rated_items])
         for u, rated_items in enumerate(u_rated_items)
     )
     return np.stack(P, axis=0)
 
 
-def updateQ(P, b, R, Q, i_rated_users, invprop):
+def updateQ(P, b, R, Q, i_rated_users, invprop):  # noqa: N802
     Q = Parallel(n_jobs=-1, verbose=0)(
-        delayed(update_emb)(
-            b, R[rated_users, i], P[rated_users, :], invprop[rated_users, i]
-        )
+        delayed(update_emb)(b, R[rated_users, i], P[rated_users, :], invprop[rated_users, i])
         for i, rated_users in enumerate(i_rated_users)
     )
     return np.stack(Q, axis=1)

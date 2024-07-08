@@ -1,8 +1,12 @@
-from typing import List
+from __future__ import annotations
 
-from ._categorical_repairer import CategoricalRepairer
-from ._utils import FreedmanDiaconisBinSize as bin_calculator
-from ._utils import get_median, make_histogram_bins
+from typing import Optional
+
+from holisticai.bias.mitigation.commons.disparate_impact_remover._categorical_repairer import CategoricalRepairer
+from holisticai.bias.mitigation.commons.disparate_impact_remover._utils import (
+    freedman_diaconis_bin_size as bin_calculator,
+)
+from holisticai.bias.mitigation.commons.disparate_impact_remover._utils import get_median, make_histogram_bins
 
 
 class NumericalRepairer:
@@ -42,16 +46,16 @@ class NumericalRepairer:
         feature_to_repair: int,
         repair_level: float,
         kdd: bool = False,
-        features_to_ignore: List[str] = [],
+        features_to_ignore: Optional[list[str]] = None,
     ):
+        if features_to_ignore is None:
+            features_to_ignore = []
         self.feature_to_repair = feature_to_repair
         self.repair_level = repair_level
         self.kdd = kdd
         self.features_to_ignore = features_to_ignore
 
-    def _calculate_category_medians(
-        self, index_bins: List[List[int]], data_to_repair: List[List[float]]
-    ) -> dict:
+    def _calculate_category_medians(self, index_bins: list[list[int]], data_to_repair: list[list[float]]) -> dict:
         """
         Calculates the median value for each bin in the input dataset.
 
@@ -68,13 +72,11 @@ class NumericalRepairer:
             A dictionary containing the median value for each bin in the dataset.
         """
         return {
-            f"BIN_{i}": get_median(
-                [data_to_repair[j][self.feature_to_repair] for j in index_bin], self.kdd
-            )
+            f"BIN_{i}": get_median([data_to_repair[j][self.feature_to_repair] for j in index_bin], self.kdd)
             for i, index_bin in enumerate(index_bins)
         }
 
-    def repair(self, data_to_repair: List[List[float]]) -> List[List[float]]:
+    def repair(self, data_to_repair: list[list[float]]) -> list[list[float]]:
         """
         Repairs the numerical feature in the input dataset to mitigate disparate impact.
 
@@ -90,9 +92,7 @@ class NumericalRepairer:
         """
 
         binned_data = [row[:] for row in data_to_repair]
-        index_bins = make_histogram_bins(
-            bin_calculator, data_to_repair, self.feature_to_repair
-        )
+        index_bins = make_histogram_bins(bin_calculator, data_to_repair, self.feature_to_repair)
 
         category_medians = self._calculate_category_medians(index_bins, data_to_repair)
 

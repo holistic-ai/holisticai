@@ -1,11 +1,12 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
+from holisticai.bias.mitigation.inprocessing.fair_k_mediam_clustering.algorithm import KMediamClusteringAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
 from sklearn.base import BaseEstimator
-
-from .algorithm import KMediamClusteringAlgorithm
 
 
 class FairKMedianClustering(BaseEstimator, BMImp):
@@ -53,7 +54,7 @@ class FairKMedianClustering(BaseEstimator, BMImp):
         self,
         n_clusters: int = 2,
         max_iter: int = 1000,
-        seed: int = None,
+        seed: Optional[int] = None,
         strategy: Optional[str] = "LS",
         verbose: Optional[int] = 0,
     ):
@@ -92,9 +93,7 @@ class FairKMedianClustering(BaseEstimator, BMImp):
         group_b = params["group_b"]
 
         sensitive_groups = np.c_[group_a, group_b]
-        p_attr = np.array(
-            self.sensgroup.fit_transform(sensitive_groups, convert_numeric=True)
-        )
+        p_attr = np.array(self.sensgroup.fit_transform(sensitive_groups, convert_numeric=True))
 
         self.algorithm.fit(X, p_attr)
         return self

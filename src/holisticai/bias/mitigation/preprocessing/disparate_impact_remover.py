@@ -89,8 +89,8 @@ class DisparateImpactRemover(BMPre):
         data = np.c_[p_attr, X].tolist()
 
         # Apply numerical repair to the first column of the combined matrix
-        dir = NumericalRepairer(feature_to_repair=0, repair_level=self.repair_level, kdd=False)
-        new_data_matrix_np = dir.repair(data)
+        repairer = NumericalRepairer(feature_to_repair=0, repair_level=self.repair_level, kdd=False)
+        new_data_matrix_np = repairer.repair(data)
 
         # Return only the repaired input data matrix (without the sensitive feature column)
         return np.array([np.array(row[1:]) for row in new_data_matrix_np])
@@ -115,11 +115,11 @@ class DisparateImpactRemover(BMPre):
             Self
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
-        X = params["X"]
+        x = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
 
-        return self.repair_data(X, group_a, group_b)
+        return self.repair_data(x, group_a, group_b)
 
     def fit(self):
         """

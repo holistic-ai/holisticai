@@ -1,6 +1,9 @@
 import numpy as np
-
-from .algorithm_utils import FullGDDebiaser, RTLogger, SGDDebiaser
+from holisticai.bias.mitigation.postprocessing.ml_debiaser.randomized_threshold.algorithm_utils import (
+    FullGDDebiaser,
+    RTLogger,
+    SGDDebiaser,
+)
 
 
 class RandomizedThresholdAlgorithm:
@@ -123,9 +126,7 @@ class RandomizedThresholdAlgorithm:
                 mu_final += optimizer.mu_k / self.sgd_steps
 
             # Step 2: Full gradient descent
-            optimizer = FullGDDebiaser(
-                y=y_score[group_k], lambda_0=lambda_final, mu_0=mu_final, **kargs
-            )
+            optimizer = FullGDDebiaser(y=y_score[group_k], lambda_0=lambda_final, mu_0=mu_final, **kargs)
             for _ in range(self.full_gradient_epochs):
                 optimizer.update_step()
 

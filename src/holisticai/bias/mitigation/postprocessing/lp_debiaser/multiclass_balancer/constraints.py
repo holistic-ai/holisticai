@@ -6,30 +6,16 @@ import numpy as np
 
 class MacroLosses:
     def __call__(self, cp_mats):
-        off_loss = [
-            [np.delete(a, i, 0).sum(0) for i in range(self.n_classes)] for a in cp_mats
-        ]
+        off_loss = [[np.delete(a, i, 0).sum(0) for i in range(self.n_classes)] for a in cp_mats]
         obj = np.array(off_loss).flatten()
         return obj
 
 
 class MicroLosses:
     def __call__(self, cp_mats):
-        u = np.array(
-            [[np.delete(a, i, 0) for i in range(self.n_classes)] for a in cp_mats]
-        )
-        p = np.array(
-            [
-                [np.delete(a, i).reshape(-1, 1) for i in range(self.n_classes)]
-                for a in self.p_vecs
-            ]
-        )
-        w = np.array(
-            [
-                [p[i, j] * u[i, j] for j in range(self.n_classes)]
-                for i in range(self.n_groups)
-            ]
-        )
+        u = np.array([[np.delete(a, i, 0) for i in range(self.n_classes)] for a in cp_mats])
+        p = np.array([[np.delete(a, i).reshape(-1, 1) for i in range(self.n_classes)] for a in self.p_vecs])
+        w = np.array([[p[i, j] * u[i, j] for j in range(self.n_classes)] for i in range(self.n_groups)])
         obj = w.sum(2).flatten()
         return obj
 
@@ -41,15 +27,12 @@ class ConstraintBase:
 
     def _constraint_weights(self, p_vecs, p_a, cp_mats):
         # Getting the costraint weights
-        constraints_by_group = [
-            self.__get_constraints(p_vecs[i], p_a[i], cp_mats[i])
-            for i in range(self.n_groups)
-        ]
+        constraints_by_group = [self.__get_constraints(p_vecs[i], p_a[i], cp_mats[i]) for i in range(self.n_groups)]
 
         # Arranging the constraint weights by group comparisons
         return self.__pair_constraints(constraints_by_group, cp_mats)
 
-    def __get_constraints(self, p_vec, p_a, cp_mat):
+    def __get_constraints(self, p_vec, p_a, cp_mat):  # noqa: ARG002
         """Calculates TPR and FPR weights for the constraint matrix"""
         # Shortening the vars to keep things clean
         p = p_vec
@@ -95,10 +78,7 @@ class ConstraintBase:
         n_params = tprs.shape[2]
         n_classes = tprs.shape[1]
         n_groups = self.n_groups
-        if n_groups > 2:
-            group_combos = list(combinations(range(n_groups), 2))[:-1]
-        else:
-            group_combos = [(0, 1)]
+        group_combos = list(combinations(range(n_groups), 2))[:-1] if n_groups > 2 else [(0, 1)]
 
         n_pairs = len(group_combos)
 
@@ -144,9 +124,7 @@ class ConstraintBase:
 
 class EqualizedOdds(ConstraintBase):
     def get_conditions(self, p_vecs, p_a, cp_mats):
-        tpr_cons, fpr_cons, strict_cons, norm_cons = self._constraint_weights(
-            p_vecs, p_a, cp_mats
-        )
+        tpr_cons, fpr_cons, strict_cons, norm_cons = self._constraint_weights(p_vecs, p_a, cp_mats)
         norm_bounds = np.repeat(1, norm_cons.shape[0])
         con = np.concatenate([tpr_cons, fpr_cons, norm_cons])
         eo_bounds = np.repeat(0, tpr_cons.shape[0] * 2)
@@ -156,9 +134,7 @@ class EqualizedOdds(ConstraintBase):
 
 class EqualizedOpportunity(ConstraintBase):
     def get_conditions(self, p_vecs, p_a, cp_mats):
-        tpr_cons, fpr_cons, strict_cons, norm_cons = self._constraint_weights(
-            p_vecs, p_a, cp_mats
-        )
+        tpr_cons, fpr_cons, strict_cons, norm_cons = self._constraint_weights(p_vecs, p_a, cp_mats)
         norm_bounds = np.repeat(1, norm_cons.shape[0])
         con = np.concatenate([tpr_cons, norm_cons])
         tpr_bounds = np.repeat(0, tpr_cons.shape[0])
@@ -168,9 +144,7 @@ class EqualizedOpportunity(ConstraintBase):
 
 class Strict(ConstraintBase):
     def get_conditions(self, p_vecs, p_a, cp_mats):
-        tpr_cons, fpr_cons, strict_cons, norm_cons = self._constraint_weights(
-            p_vecs, p_a, cp_mats
-        )
+        tpr_cons, fpr_cons, strict_cons, norm_cons = self._constraint_weights(p_vecs, p_a, cp_mats)
         norm_bounds = np.repeat(1, norm_cons.shape[0])
         con = np.concatenate([strict_cons, norm_cons])
         strict_bounds = np.repeat(0, strict_cons.shape[0])

@@ -1,6 +1,5 @@
 import numpy as np
-
-from ._base import DecompositionMixin
+from holisticai.bias.mitigation.commons.fairlet_clustering.decompositions._base import DecompositionMixin
 
 
 class VanillaFairletDecomposition(DecompositionMixin):
@@ -36,6 +35,7 @@ class VanillaFairletDecomposition(DecompositionMixin):
     decompose(blues, reds, dataset)
         Decomposes the input sets into fairlets.
     """
+
     def __init__(self, p, q):
         self.fairlets = []
         self.fairlet_centers = []
@@ -85,10 +85,7 @@ class VanillaFairletDecomposition(DecompositionMixin):
             The median cost of the fairlet.
         """
         self.fairlets.append(points)
-        cost_list = [
-            sum([np.linalg.norm(dataset[center] - dataset[point]) for point in points])
-            for center in points
-        ]
+        cost_list = [sum([np.linalg.norm(dataset[center] - dataset[point]) for point in points]) for center in points]
         cost, center = min((cost, center) for (center, cost) in enumerate(cost_list))
         self.fairlet_centers.append(points[center])
         return cost
@@ -147,9 +144,7 @@ class VanillaFairletDecomposition(DecompositionMixin):
             reds = temp
         R = len(reds)
         B = len(blues)
-        assert self.balanced(p, q, R, B), (
-            "Input sets are unbalanced: " + str(R) + "," + str(B)
-        )
+        assert self.balanced(p, q, R, B), "Input sets are unbalanced: " + str(R) + "," + str(B)
 
         if R == 0 and B == 0:
             return 0
@@ -166,9 +161,7 @@ class VanillaFairletDecomposition(DecompositionMixin):
             r0 = R
             b0 = B
         elif R - r0 != B - b0 and B - b0 >= p:
-            cost += self.make_fairlet(
-                reds[r0 : r0 + (R - r0) - (B - b0) + p] + blues[b0 : b0 + p], dataset
-            )
+            cost += self.make_fairlet(reds[r0 : r0 + (R - r0) - (B - b0) + p] + blues[b0 : b0 + p], dataset)
             r0 += (R - r0) - (B - b0) + p
             b0 += p
         assert R - r0 == B - b0, "Error in computing fairlet decomposition"

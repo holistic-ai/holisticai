@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import pandas as pd
+from holisticai.bias.mitigation.postprocessing.fair_topk.algorithm_utils.fail_prob import (
+    RecursiveNumericFailProbabilityCalculator,
+)
+from holisticai.bias.mitigation.postprocessing.fair_topk.algorithm_utils.valitation_utils import (
+    check_ranking,
+    validate_basic_parameters,
+)
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
-
-from .algorithm_utils.fail_prob import RecursiveNumericFailProbabilityCalculator
-from .algorithm_utils.valitation_utils import check_ranking, validate_basic_parameters
 
 
 class FairTopK(BMPost):
@@ -30,7 +36,6 @@ class FairTopK(BMPost):
         group_col: Optional[str] = "group_id",
         score_col: Optional[str] = "score",
     ):
-
         # check the parameters first
         validate_basic_parameters(top_n, p, alpha)
         self.query_col = query_col
@@ -59,21 +64,15 @@ class FairTopK(BMPost):
         if p_attr is None:
             if self.group_col not in rankings.columns:
                 raise ValueError("protected groups must be provided")
-            else:
-                new_rankings = rankings
+            new_rankings = rankings
         else:
             if self.group_col in rankings.columns:
                 del rankings[self.group_col]
 
-            new_rankings = pd.merge(
-                rankings, p_attr, on=[self.query_col, self.doc_col], how="left"
-            )
+            new_rankings = pd.merge(rankings, p_attr, on=[self.query_col, self.doc_col], how="left")
 
         query_result_by_group = new_rankings.groupby(self.query_col)
-        re_rankings = [
-            df if self.is_fair(df) else self.transform_ranking(df)
-            for _, df in query_result_by_group
-        ]
+        re_rankings = [df if self.is_fair(df) else self.transform_ranking(df) for _, df in query_result_by_group]
         return pd.concat(re_rankings).reset_index(drop=True)
 
     def transform_ranking(self, ranking):
@@ -91,12 +90,10 @@ class FairTopK(BMPost):
         ------
         :return:
         """
-        protected = ranking[ranking[self.group_col] == True]
-        non_protected = ranking[ranking[self.group_col] == False]
+        protected = ranking[ranking[self.group_col]]
+        non_protected = ranking[~ranking[self.group_col]]
         mtable = self._create_adjusted_mtable()
-        return pd.DataFrame(
-            self._fair_top_k(protected, non_protected, mtable)
-        ).reset_index(drop=True)
+        return pd.DataFrame(self._fair_top_k(protected, non_protected, mtable)).reset_index(drop=True)
 
     def _create_adjusted_mtable(self):
         """
@@ -112,9 +109,7 @@ class FairTopK(BMPost):
 
         if (self.top_n, self.p, self.alpha) not in self._cache:
             # create the mtable
-            fail_prob_pair = RecursiveNumericFailProbabilityCalculator(
-                self.top_n, self.p, self.alpha
-            ).adjust_alpha()
+            fail_prob_pair = RecursiveNumericFailProbabilityCalculator(self.top_n, self.p, self.alpha).adjust_alpha()
             mtable = [int(i) for i in fail_prob_pair.mtable.m.tolist()]
             # store as list
             self._cache[(self.top_n, self.p, self.alpha)] = mtable
@@ -169,9 +164,7 @@ class FairTopK(BMPost):
         idxNonProtected = 0
 
         for i in range(self.top_n):
-            if idxProtected >= len(protected_candidates) and idxNonProtected >= len(
-                non_protected_candidates
-            ):
+            if idxProtected >= len(protected_candidates) and idxNonProtected >= len(non_protected_candidates):
                 # no more candidates available, return list shorter than k
                 return result
             if idxProtected >= len(protected_candidates):

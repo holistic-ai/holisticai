@@ -1,11 +1,6 @@
-import os
-import sys
-
-sys.path.append(os.getcwd())
 import numpy as np
+from holisticai.bias.mitigation.postprocessing.plugin_estimator_and_recalibration.algorithm_utils import f_lambda
 from holisticai.utils.transformers.bias import SensitiveGroups
-
-from .algorithm_utils import f_lambda
 
 
 class PluginEstimationAndCalibrationAlgorithm:
@@ -62,9 +57,7 @@ class PluginEstimationAndCalibrationAlgorithm:
 
     def fit(self, y_pred: np.ndarray, sensitive_features: np.ndarray):
         # Fit and transform the sensitive features
-        transformed_sensitive_features = self.sensitive_groups.fit_transform(
-            sensitive_features, convert_numeric=True
-        )
+        transformed_sensitive_features = self.sensitive_groups.fit_transform(sensitive_features, convert_numeric=True)
 
         # Calculate the adjusted predictions
         adjusted_predictions = y_pred * 2 - 1
@@ -87,21 +80,15 @@ class PluginEstimationAndCalibrationAlgorithm:
         )
 
     def transform(self, y_pred: np.ndarray, sensitive_features: np.ndarray):
-        transformed_sensitive_features = self.sensitive_groups.transform(
-            sensitive_features, convert_numeric=True
-        )
+        transformed_sensitive_features = self.sensitive_groups.transform(sensitive_features, convert_numeric=True)
         adjusted_predictions = y_pred * 2 - 1
         index_range = np.arange(-self.length, self.length + 1, 1)
 
         transformed_sensitive_features = transformed_sensitive_features.to_list()
         minimizing_values = (
             np.expand_dims(self.probabilities[transformed_sensitive_features], axis=1)
-            * np.square(
-                np.expand_dims(adjusted_predictions, axis=1)
-                - index_range * self.multiplier / self.length
-            )
-            + (1 - 2 * np.expand_dims(transformed_sensitive_features, axis=1))
-            * self.lambda_values
+            * np.square(np.expand_dims(adjusted_predictions, axis=1) - index_range * self.multiplier / self.length)
+            + (1 - 2 * np.expand_dims(transformed_sensitive_features, axis=1)) * self.lambda_values
         )
         min_indices = np.argmin(minimizing_values, axis=1)
         output_predictions = index_range[min_indices] * self.multiplier / self.length

@@ -82,8 +82,7 @@ class SparseList(list):
         """
         if index in self.vals:
             return self.vals[index]
-        else:
-            return self.default
+        return self.default
 
     def __repr__(self):
         """

@@ -5,16 +5,14 @@ from time import gmtime, strftime
 
 
 class Logging:
-    def __init__(
-        self, log_params, total_iterations=None, epochs=None, logger_format="iteration"
-    ):
+    def __init__(self, log_params, total_iterations=None, epochs=None, logger_format="iteration"):
         self.epochs = epochs
         self.total_iterations = total_iterations
         self.logger_format = logger_format
         self.log_params = log_params
         self.time_start = time.time()
 
-    def update(self, *args, **kargs):
+    def update(self, *args, **kargs):  # noqa: ARG002
         init = False
         finish = False
         params = OrderedDict()

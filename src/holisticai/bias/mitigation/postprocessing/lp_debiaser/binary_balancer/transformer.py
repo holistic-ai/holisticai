@@ -1,10 +1,11 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import Literal, Optional
 
 import numpy as np
+from holisticai.bias.mitigation.postprocessing.lp_debiaser.binary_balancer.algorithm import BinaryBalancerAlgorithm
 from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from holisticai.utils.transformers.bias import SensitiveGroups
-
-from .algorithm import BinaryBalancerAlgorithm
 
 
 class LPDebiaserBinary(BMPost):
@@ -16,12 +17,12 @@ class LPDebiaserBinary(BMPost):
         Advances in neural information processing systems 29 (2016).
     """
 
-    CONSTRAINT = ["EqualizedOdds", "EqualizedOpportunity"]
-    OBJ_FUN = ["macro", "micro"]
+    CONSTRAINT = Literal["EqualizedOdds", "EqualizedOpportunity"]
+    OBJ_FUN = Literal["macro", "micro"]
 
     def __init__(
         self,
-        constraint: Optional["CONSTRAINT"] = "EqualizedOdds",
+        constraint: Optional[CONSTRAINT] = "EqualizedOdds",
     ):
         """
         Parameters
@@ -84,9 +85,7 @@ class LPDebiaserBinary(BMPost):
         y_proba = params.get("y_proba", None)
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        p_attr = self.sens_groups.fit_transform(
-            sensitive_features, convert_numeric=True
-        )
+        p_attr = self.sens_groups.fit_transform(sensitive_features, convert_numeric=True)
 
         constraints_catalog, objective_catalog = self._get_catalogs()
 
@@ -94,9 +93,7 @@ class LPDebiaserBinary(BMPost):
 
         objective = objective_catalog["losses"]()
 
-        self.algorithm = BinaryBalancerAlgorithm(
-            constraint=constraint, objective=objective
-        )
+        self.algorithm = BinaryBalancerAlgorithm(constraint=constraint, objective=objective)
 
         self.algorithm.fit(y_true=y, y_pred=y_pred, y_proba=y_proba, p_attr=p_attr)
 
@@ -130,9 +127,7 @@ class LPDebiaserBinary(BMPost):
         dictionnary with new predictions
         """
 
-        params = self._load_data(
-            y_pred=y_pred, y_proba=y_proba, group_a=group_a, group_b=group_b
-        )
+        params = self._load_data(y_pred=y_pred, y_proba=y_proba, group_a=group_a, group_b=group_b)
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
@@ -142,9 +137,7 @@ class LPDebiaserBinary(BMPost):
 
         y_proba = params.get("y_proba", None)
         y_pred = params.get("y_pred", None)
-        new_y_pred = self.algorithm.predict(
-            y_pred=y_pred, y_proba=y_proba, p_attr=p_attr
-        )
+        new_y_pred = self.algorithm.predict(y_pred=y_pred, y_proba=y_proba, p_attr=p_attr)
         return {"y_pred": new_y_pred}
 
     def fit_transform(
@@ -186,7 +179,11 @@ class LPDebiaserBinary(BMPost):
         ).transform(y_proba=y_proba, y_pred=y_pred, group_a=group_a, group_b=group_b)
 
     def _get_catalogs(self):
-        from .constraints import EqualizedOdds, EqualizedOpportunity, Losses
+        from holisticai.bias.mitigation.postprocessing.lp_debiaser.binary_balancer.constraints import (
+            EqualizedOdds,
+            EqualizedOpportunity,
+            Losses,
+        )
 
         cons_cat = {
             "EqualizedOdds": EqualizedOdds,

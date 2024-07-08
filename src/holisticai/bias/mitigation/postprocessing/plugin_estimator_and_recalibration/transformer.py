@@ -92,9 +92,7 @@ class PluginEstimationAndCalibration(BMPost):
 
         return {"y_pred": new_y_pred}
 
-    def fit_transform(
-        self, y_pred: np.ndarray, group_a: np.ndarray, group_b: np.ndarray
-    ):
+    def fit_transform(self, y_pred: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
         Fit and transform
 

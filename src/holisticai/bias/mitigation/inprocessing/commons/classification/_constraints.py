@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
 import pandas as pd
-
-from .._conventions import (
+from holisticai.bias.mitigation.inprocessing.commons._conventions import (
     _ALL,
     _EVENT,
     _GROUP_ID,
@@ -13,8 +14,8 @@ from .._conventions import (
     _SIGNED,
     _UPPER_BOUND_DIFF,
 )
-from .._moments_utils import BaseMoment, format_data
-from ._objectives import ErrorRate
+from holisticai.bias.mitigation.inprocessing.commons._moments_utils import BaseMoment, format_data
+from holisticai.bias.mitigation.inprocessing.commons.classification._objectives import ErrorRate
 
 
 class ClassificationConstraint(BaseMoment):
@@ -84,8 +85,7 @@ class ClassificationConstraint(BaseMoment):
         # Groups and Events
         self.group_values = np.sort(self.tags[_GROUP_ID].unique())
         self.group_event_prob = (
-            self.tags.dropna(subset=[_EVENT]).groupby([_EVENT, _GROUP_ID]).count()
-            / len(self.tags)
+            self.tags.dropna(subset=[_EVENT]).groupby([_EVENT, _GROUP_ID]).count() / len(self.tags)
         ).iloc[:, 0]
 
         self.index = self._get_index_format()
@@ -111,21 +111,16 @@ class ClassificationConstraint(BaseMoment):
             The vector of Lagrange multipliers indexed by `index`
         """
 
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).groupby(
-            level=_EVENT
-        ).sum() / self.event_prob
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).groupby(level=_EVENT).sum() / self.event_prob
 
-        lambda_group_event = (
-            self.ratio * lambda_vec["+"] - lambda_vec["-"]
-        ) / self.group_event_prob
+        lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / self.group_event_prob
 
         adjust = lambda_event - lambda_group_event
 
         def get_signed_weight(row):
             if pd.isna(row[_EVENT]):
                 return 0
-            else:
-                return adjust[row[_EVENT], row[_GROUP_ID]]
+            return adjust[row[_EVENT], row[_GROUP_ID]]
 
         signed_weights = self.tags.apply(get_signed_weight, axis=1)
         utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
@@ -149,12 +144,8 @@ class ClassificationConstraint(BaseMoment):
         tags = self.tags.set_index([_GROUP_ID, _EVENT])
         expect_event = tags.groupby(level=_EVENT).mean()
         expect_group_event = tags.groupby(level=[_EVENT, _GROUP_ID]).mean()
-        expect_group_event[_UPPER_BOUND_DIFF] = (
-            self.ratio * expect_group_event[_PRED] - expect_event[_PRED]
-        )
-        expect_group_event[_LOWER_BOUND_DIFF] = (
-            -expect_group_event[_PRED] + self.ratio * expect_event[_PRED]
-        )
+        expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * expect_group_event[_PRED] - expect_event[_PRED]
+        expect_group_event[_LOWER_BOUND_DIFF] = -expect_group_event[_PRED] + self.ratio * expect_event[_PRED]
         gamma_signed = pd.concat(
             [
                 expect_group_event[_UPPER_BOUND_DIFF],

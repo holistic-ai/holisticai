@@ -12,17 +12,16 @@ def check_version(version_str):
 SKLEARN_CURRENT_VERSION = sklearn.__version__
 
 
-def reduce_func(D_chunk, start):
+def reduce_func(D_chunk, start):  # noqa: ARG001
     J = np.mean(D_chunk, axis=1)
     return J
 
 
-def NormalizedCutEnergy(A, S, clustering):
+def NormalizedCutEnergy(A, S, clustering):  # noqa: N802
     if isinstance(A, np.ndarray):
         d = np.sum(A, axis=1)
 
     elif isinstance(A, sparse.csc_matrix):
-
         d = A.sum(axis=1)
 
     maxclusterid = np.max(clustering)
@@ -35,25 +34,20 @@ def NormalizedCutEnergy(A, S, clustering):
             continue  # skip empty cluster
         num_cluster = num_cluster + 1
         if isinstance(A, np.ndarray):
-            nassoc_e = nassoc_e + np.dot(np.dot(np.transpose(S_k), A), S_k) / np.dot(
-                np.transpose(d), S_k
-            )
+            nassoc_e = nassoc_e + np.dot(np.dot(np.transpose(S_k), A), S_k) / np.dot(np.transpose(d), S_k)
         elif isinstance(A, sparse.csc_matrix):
-            nassoc_e = nassoc_e + np.dot(np.transpose(S_k), A.dot(S_k)) / np.dot(
-                np.transpose(d), S_k
-            )
+            nassoc_e = nassoc_e + np.dot(np.transpose(S_k), A.dot(S_k)) / np.dot(np.transpose(d), S_k)
             nassoc_e = nassoc_e[0, 0]
     ncut_e = num_cluster - nassoc_e
 
     return ncut_e
 
 
-def NormalizedCutEnergy_discrete(A, clustering):
+def NormalizedCutEnergy_discrete(A, clustering):  # noqa: N802
     if isinstance(A, np.ndarray):
         d = np.sum(A, axis=1)
 
     elif isinstance(A, sparse.csc_matrix):
-
         d = A.sum(axis=1)
 
     maxclusterid = np.max(clustering)
@@ -66,20 +60,16 @@ def NormalizedCutEnergy_discrete(A, clustering):
             continue  # skip empty cluster
         num_cluster = num_cluster + 1
         if isinstance(A, np.ndarray):
-            nassoc_e = nassoc_e + np.dot(np.dot(np.transpose(S_k), A), S_k) / np.dot(
-                np.transpose(d), S_k
-            )
+            nassoc_e = nassoc_e + np.dot(np.dot(np.transpose(S_k), A), S_k) / np.dot(np.transpose(d), S_k)
         elif isinstance(A, sparse.csc_matrix):
-            nassoc_e = nassoc_e + np.dot(np.transpose(S_k), A.dot(S_k)) / np.dot(
-                np.transpose(d), S_k
-            )
+            nassoc_e = nassoc_e + np.dot(np.transpose(S_k), A.dot(S_k)) / np.dot(np.transpose(d), S_k)
             nassoc_e = nassoc_e[0, 0]
     ncut_e = num_cluster - nassoc_e
 
     return ncut_e
 
 
-def KernelBound_k(A, d, S_k, N):
+def KernelBound_k(A, d, S_k, N):  # noqa: N802
     # S_k = S[:,k]
     volume_s_k = np.dot(np.transpose(d), S_k)
     volume_s_k = volume_s_k[0, 0]
@@ -91,19 +81,18 @@ def KernelBound_k(A, d, S_k, N):
 
 
 def km_le(X, M):
-
     """
     Discretize the assignments based on center
 
     """
     e_dist = ecdist(X, M)
-    l = e_dist.argmin(axis=1)
+    L = e_dist.argmin(axis=1)
 
-    return l
+    return L
 
 
 # Fairness term calculation
-def fairness_term_V_j(u_j, S, V_j):
+def fairness_term_V_j(u_j, S, V_j):  # noqa: N802
     V_j = V_j.astype("float")
     S_term = np.maximum(np.dot(V_j, S), 1e-20)
     S_sum = np.maximum(S.sum(0), 1e-20)
@@ -111,8 +100,8 @@ def fairness_term_V_j(u_j, S, V_j):
     return S_term
 
 
-def km_discrete_energy(e_dist, l, k):
-    tmp = np.asarray(np.where(l == k)).squeeze()
+def km_discrete_energy(e_dist, L, k):
+    tmp = np.asarray(np.where(k == L)).squeeze()
     return np.sum(e_dist[tmp, k])
 
 
@@ -120,10 +109,7 @@ def compute_fairness_energy(group_prob, groups_ids, S, bound_lambda):
     """
     compute fair clustering energy
     """
-    fairness_E = [
-        fairness_term_V_j(group_prob.loc[g], S, groups_ids[f"{g}"])
-        for g in group_prob.index
-    ]
+    fairness_E = [fairness_term_V_j(group_prob.loc[g], S, groups_ids[f"{g}"]) for g in group_prob.index]
     fairness_E = (bound_lambda * sum(fairness_E)).sum()
     return fairness_E
 
@@ -139,9 +125,13 @@ def _is_arraylike_not_scalar(array):
 
 
 def _init_centroids(
-    X, n_clusters, init, random_state=np.random.RandomState(42), init_size=None
+    X,
+    n_clusters,
+    init,
+    random_state=None,
+    init_size=None,
 ):
-
+    random_state = random_state or np.random.RandomState(42)
     from sklearn.cluster._kmeans import _kmeans_plusplus
     from sklearn.utils.validation import check_array
 

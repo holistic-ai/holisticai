@@ -48,13 +48,9 @@ class PrejudiceRemoverAlgorithm:
             Matrix where each columns is a sensitive feature e.g. [col_1=group_a, col_2=group_b]
         """
 
-        groups_num = self.sens_groups.fit_transform(
-            sensitive_features, convert_numeric=True
-        )
+        groups_num = self.sens_groups.fit_transform(sensitive_features, convert_numeric=True)
         self.estimator.init_params(X, y, groups_num)
-        self.logger.set_log_fn(
-            loss=lambda coef: self.objective_fn.loss(coef, X, y, groups_num), type=float
-        )
+        self.logger.set_log_fn(loss=lambda coef: self.objective_fn.loss(coef, X, y, groups_num), htype=float)
 
         self.coef = fmin_cg(
             self.objective_fn.loss,

@@ -9,7 +9,7 @@ This section will guide you through the installation of the `holisticai` open-so
 
    install
    quickstart.ipynb
-   bias
+   bias/index
    datasets
    explainability
 

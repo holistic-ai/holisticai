@@ -60,9 +60,7 @@ class EqualizedOdds(BMPost):
         flip_labels = 1 - labels
         base_rate = np.mean(labels)
 
-        tnr, fpr, fnr, tpr = confusion_matrix(
-            labels, predictions, normalize="true"
-        ).ravel()
+        tnr, fpr, fnr, tpr = confusion_matrix(labels, predictions, normalize="true").ravel()
 
         m_tn = np.logical_and(flip_predictions, flip_labels)
         m_fn = np.logical_and(flip_predictions, labels)
@@ -73,16 +71,10 @@ class EqualizedOdds(BMPost):
 
         true_positive = (np.mean(prev * m_tp) - np.mean(flip_prev * m_tp)) / base_rate
         false_negative = (np.mean(flip_prev * m_fn) - np.mean(prev * m_fn)) / base_rate
-        false_positive = (np.mean(prev * m_fp) - np.mean(flip_prev * m_fp)) / (
-            1 - base_rate
-        )
-        true_negative = (np.mean(flip_prev * m_tn) - np.mean(prev * m_tn)) / (
-            1 - base_rate
-        )
+        false_positive = (np.mean(prev * m_fp) - np.mean(flip_prev * m_fp)) / (1 - base_rate)
+        true_negative = (np.mean(flip_prev * m_tn) - np.mean(prev * m_tn)) / (1 - base_rate)
 
-        A_eq = np.array(
-            [[true_positive, false_negative], [false_positive, true_negative]]
-        )
+        A_eq = np.array([[true_positive, false_negative], [false_positive, true_negative]])
 
         b_tp_fn = (np.mean(flip_prev * m_tp) + np.mean(prev * m_fn)) / base_rate
         b_fp_tn = (np.mean(flip_prev * m_fp) + np.mean(prev * m_tn)) / (1 - base_rate)
@@ -190,24 +182,16 @@ class EqualizedOdds(BMPost):
         if self.seed is not None:
             np.random.seed(self.seed)
 
-        params = self._load_data(
-            y=y, y_pred=y_pred, group_a=group_a, group_b=group_b
-        )
+        params = self._load_data(y=y, y_pred=y_pred, group_a=group_a, group_b=group_b)
 
         group_a = params["group_a"] == 1
         group_b = params["group_b"] == 1
         y = params["y"]
         y_pred = params["y_pred"]
 
-        parameters_group_a = self._objective_function_parameters_by_group(
-            y, y_pred, group_a
-        )
-        parameters_group_b = self._objective_function_parameters_by_group(
-            y, y_pred, group_b
-        )
-        A_eq, b_eq, C = self._build_objective_function(
-            parameters_group_a, parameters_group_b
-        )
+        parameters_group_a = self._objective_function_parameters_by_group(y, y_pred, group_a)
+        parameters_group_b = self._objective_function_parameters_by_group(y, y_pred, group_b)
+        A_eq, b_eq, C = self._build_objective_function(parameters_group_a, parameters_group_b)
 
         A_ub = np.array(
             [
@@ -226,9 +210,7 @@ class EqualizedOdds(BMPost):
         b_ub = np.array([1, 0, 1, 0, 1, 0, 1, 0], dtype=np.float64)
 
         # Linear program
-        self.model_params = linprog(
-            C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method=self.solver
-        )
+        self.model_params = linprog(C, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method=self.solver)
 
         return self
 
@@ -268,12 +250,8 @@ class EqualizedOdds(BMPost):
         likelihoods_b = likelihoods[group_b]
 
         # Randomly flip labels according to the probabilities in model_params
-        fair_predictions_a, fair_likelihoods_a = self._adjust_fairness(
-            predictions_a, likelihoods_a, sn2p, sp2p
-        )
-        fair_predictions_b, fair_likelihoods_b = self._adjust_fairness(
-            predictions_b, likelihoods_b, on2p, op2p
-        )
+        fair_predictions_a, fair_likelihoods_a = self._adjust_fairness(predictions_a, likelihoods_a, sn2p, sp2p)
+        fair_predictions_b, fair_likelihoods_b = self._adjust_fairness(predictions_b, likelihoods_b, on2p, op2p)
 
         # Mutated, fairer dataset with new labels4
         new_y_pred = y_pred.copy()

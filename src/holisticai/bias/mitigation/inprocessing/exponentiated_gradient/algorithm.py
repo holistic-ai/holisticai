@@ -1,12 +1,21 @@
+from __future__ import annotations
+
 import sys
 from typing import Optional
 
 import numpy as np
 import pandas as pd
+from holisticai.bias.mitigation.inprocessing.commons._conventions import (
+    ACCURACY_MUL,
+    MIN_ITER,
+    PRECISION,
+    REGRET_CHECK_INCREASE_T,
+    REGRET_CHECK_START_T,
+    SHRINK_ETA,
+    SHRINK_REGRET,
+)
+from holisticai.bias.mitigation.inprocessing.exponentiated_gradient._lagrangian import Lagrangian
 from sklearn.utils import check_random_state
-
-from ..commons._conventions import *
-from ._lagrangian import Lagrangian
 
 
 class ExponentiatedGradientAlgorithm:
@@ -94,12 +103,8 @@ class ExponentiatedGradientAlgorithm:
         theta = pd.Series(0, lagrangian.constraints.index)
 
         def compute_default_nu(h):
-            absolute_error = (h(X) - self.constraints._y_as_series).abs()
-            nu = (
-                ACCURACY_MUL
-                * absolute_error.std()
-                / np.sqrt(self.constraints.total_samples)
-            )
+            absolute_error = (h(X) - self.constraints.y_as_series).abs()
+            nu = ACCURACY_MUL * absolute_error.std() / np.sqrt(self.constraints.total_samples)
             return nu
 
         eta = self.eta0 / B
@@ -110,19 +115,16 @@ class ExponentiatedGradientAlgorithm:
         last_gap = np.inf
         self.monitor.max_iter = self.max_iter
         for t in range(self.max_iter):
-
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
             h, h_idx = lagrangian.best_h(lambda_vec)
             nu = compute_default_nu(h) if (t == 0 and nu is None) else nu
-            Q_EG, result_EG = self.eg_helper.compute_EG(
-                t, h_idx, lambda_vec, lagrangian, nu
-            )
+            Q_EG, result_EG = self.eg_helper.compute_eg(t, h_idx, lambda_vec, lagrangian, nu)
             gap_EG = result_EG.gap()
             gamma = lagrangian.gammas[h_idx]
 
             if t > 0:
-                Q_LP, result_LP = self.eg_helper.compute_LP(t, lagrangian, nu)
+                Q_LP, result_LP = self.eg_helper.compute_lp(t, lagrangian, nu)
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
@@ -179,14 +181,12 @@ class ExponentiatedGradientAlgorithm:
         if self.constraints.PROBLEM_TYPE == "classification":
             positive_probs = self.predict_proba(X)[:, 1]
             return (positive_probs >= random_state.rand(len(positive_probs))) * 1
-        else:
-            pred = self._forward(X)
-            randomized_pred = np.zeros(pred.shape[0])
-            for i in range(pred.shape[0]):
-                randomized_pred[i] = random_state.choice(
-                    pred.iloc[i, :], p=self.weights_
-                )
-            return randomized_pred
+
+        pred = self._forward(X)
+        randomized_pred = np.zeros(pred.shape[0])
+        for i in range(pred.shape[0]):
+            randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=self.weights_)
+        return randomized_pred
 
     def predict_proba(self, X):
         """
@@ -231,20 +231,20 @@ class Helper:
         self.lambda_vecs_EG_ = pd.DataFrame()
         self.lambda_vecs_LP_ = pd.DataFrame()
 
-    def update_Qsum(self, h_idx):
+    def update_qsum(self, h_idx):
         if h_idx not in self.Qsum.index:
             self.Qsum.at[h_idx] = 0.0
         self.Qsum[h_idx] += 1.0
 
-    def compute_EG(self, t, h_idx, lambda_vec, lagrangian, nu):
+    def compute_eg(self, t, h_idx, lambda_vec, lagrangian, nu):
         self.lambda_vecs_EG_[t] = lambda_vec
         lambda_EG = self.lambda_vecs_EG_.mean(axis=1)
-        self.update_Qsum(h_idx)
+        self.update_qsum(h_idx)
         Q_EG = self.Qsum / self.Qsum.sum()
         result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, nu)
         return Q_EG, result_EG
 
-    def compute_LP(self, t, lagrangian, nu):
+    def compute_lp(self, t, lagrangian, nu):
         Q_LP, lambda_LP, result_LP = lagrangian.solve_linprog(nu)
         self.lambda_vecs_LP_[t] = lambda_LP
         return Q_LP, result_LP

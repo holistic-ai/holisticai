@@ -14,17 +14,15 @@ class PRLogiticRegression:
 
     def init_params(self, X, y, groups):
         # set instance variables
-        X = self._preprocessing_data(X)
+        X = self.preprocessing_data(X)
         self.nb_features = X.shape[1]
         self.nb_group_values = len(np.unique(groups))
-        self.coef = self.initializer.initialize(
-            X, y, groups, self.nb_group_values, self.nb_features
-        )
+        self.coef = self.initializer.initialize(X, y, groups, self.nb_group_values, self.nb_features)
 
     def set_params(self, coef):
         self.coef = np.reshape(coef, [self.nb_group_values, self.nb_features])
 
-    def _preprocessing_data(self, X):
+    def preprocessing_data(self, X):
         if self.fit_intercept:
             X = np.concatenate([X, np.ones((X.shape[0], 1))], axis=1)
         return X
@@ -33,14 +31,14 @@ class PRLogiticRegression:
         return np.argmax(self.predict_proba(X, groups), 1)
 
     def predict_proba(self, X, groups):
-        X = self._preprocessing_data(X)
+        X = self.preprocessing_data(X)
         proba = np.empty((X.shape[0], self.nb_clases))
         proba[:, 1] = self.sigmoid(X=X, groups=groups)
         proba[:, 0] = 1.0 - proba[:, 1]
         return proba
 
     def predict_score(self, X, groups, coef=None):
-        X = self._preprocessing_data(X)
+        X = self.preprocessing_data(X)
         return self.sigmoid(X=X, groups=groups, coef=coef)
 
     def sigmoid(self, X, groups, coef=None):
@@ -93,9 +91,7 @@ class PRParamInitializer:
             coef = np.empty(nb_group_values * nb_features, dtype=float)
             coef = coef.reshape(nb_group_values, nb_features)
 
-            clr = LogisticRegression(
-                C=self.C, penalty=self.penalty, fit_intercept=self.fit_intercept
-            )
+            clr = LogisticRegression(C=self.C, penalty=self.penalty, fit_intercept=self.fit_intercept)
             clr.fit(X, y)
 
             coef[:, :] = clr.coef_
@@ -106,9 +102,7 @@ class PRParamInitializer:
             coef = coef.reshape(nb_group_values, nb_features)
 
             for i in range(nb_group_values):
-                clr = LogisticRegression(
-                    C=self.C, penalty=self.penalty, fit_intercept=self.fit_intercept
-                )
+                clr = LogisticRegression(C=self.C, penalty=self.penalty, fit_intercept=self.fit_intercept)
                 clr.fit(X[groups == i, :], y[groups == i])
                 coef[i, :] = clr.coef_
         else:
