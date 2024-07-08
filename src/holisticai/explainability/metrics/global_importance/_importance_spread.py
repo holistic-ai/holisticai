@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.spatial.distance import jensenshannon
+from scipy.stats import entropy
 
 
 class ImportanceSpread:
@@ -17,9 +19,6 @@ class ImportanceSpread:
             return 0 if self.divergence else 1
 
         importance = feature_importances
-        from scipy.stats import entropy
-        from scipy.spatial.distance import jensenshannon
-
         feature_weight = importance / sum(importance)
         feature_equal_weight = np.array([1.0 / len(importance)] * len(importance))
 

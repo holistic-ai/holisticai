@@ -2,8 +2,12 @@ from holisticai.explainability.metrics.global_importance._alpha_importance_score
     AlphaImportanceScore,
     alpha_importance_score,
 )
-from holisticai.explainability.metrics.global_importance._importance_spread import SpreadRatio, spread_ratio
-from holisticai.explainability.metrics.global_importance._importance_spread import SpreadDivergence, spread_divergence
+from holisticai.explainability.metrics.global_importance._importance_spread import (
+    SpreadDivergence,
+    SpreadRatio,
+    spread_divergence,
+    spread_ratio,
+)
 from holisticai.explainability.metrics.global_importance._position_parity import PositionParity, position_parity
 from holisticai.explainability.metrics.global_importance._rank_alignment import RankAlignment, rank_alignment
 from holisticai.explainability.metrics.global_importance._xai_ease_score import XAIEaseScore, xai_ease_score
