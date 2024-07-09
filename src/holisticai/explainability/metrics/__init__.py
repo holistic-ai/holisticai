@@ -15,6 +15,17 @@ from holisticai.explainability.metrics._utils import (
     compute_global_explainability_metrics_from_features,
     compute_local_explainability_metrics_from_features,
 )
+from holisticai.explainability.metrics.global_importance import (
+    alpha_importance_score,
+    position_parity,
+    rank_alignment,
+    spread_ratio,
+    xai_ease_score,
+)
+from holisticai.explainability.metrics.local_importance import (
+    data_stability,
+    feature_stability,
+)
 
 __all__ = [
     "classification_explainability_metrics",
@@ -26,4 +37,11 @@ __all__ = [
     "compute_global_explainability_metrics_from_features",
     "compute_local_explainability_metrics_from_features",
     "compute_explainability_metrics_from_features",
+    "alpha_importance_score",
+    "position_parity",
+    "rank_alignment",
+    "spread_ratio",
+    "xai_ease_score",
+    "data_stability",
+    "feature_stability",
 ]

@@ -1,15 +1,16 @@
-Bias Mitigation
+Mitigation
 ==========
 
 `holisticai.bias.mitigation` is a python module mitigating *bias* in algorithms. Our classes cover *pre-processing*, *in-processing* and *post-processing*.
 
-.. _preprocessing:
+.. _bias_preprocessing:
 
 Pre-processing
 --------------
 
 .. autosummary:: 
     :toctree: .generated/
+    :nosignatures:
 
     holisticai.bias.mitigation.Reweighing
     holisticai.bias.mitigation.LearningFairRepresentation
@@ -17,13 +18,14 @@ Pre-processing
     holisticai.bias.mitigation.FairletClusteringPreprocessing
     holisticai.bias.mitigation.DisparateImpactRemover
 
-.. _inprocessing:
+.. _bias_inprocessing:
 
 In-processing
 --------------
 
 .. autosummary:: 
     :toctree: .generated/
+    :nosignatures:
 
     holisticai.bias.mitigation.ExponentiatedGradientReduction
     holisticai.bias.mitigation.GridSearchReduction
@@ -38,13 +40,14 @@ In-processing
     holisticai.bias.mitigation.PopularityPropensityMF
     holisticai.bias.mitigation.FairRec
 
-.. _postprocessing:
+.. _bias_postprocessing:
 
 Post-processing
 ---------------
 
 .. autosummary:: 
     :toctree: .generated/
+    :nosignatures:
     
     holisticai.bias.mitigation.CalibratedEqualizedOdds
     holisticai.bias.mitigation.EqualizedOdds

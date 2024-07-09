@@ -3,100 +3,65 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
+import jax
+import jax.numpy as jnp
 import numpy as np
-import scipy.optimize as optim
 from holisticai.utils.transformers.bias import BMPreprocessing
-from scipy.spatial.distance import cdist
-from scipy.special import softmax
+from jax.nn import softmax
+from scipy.optimize import minimize
 
 logger = logging.getLogger(__name__)
 
 
 def get_x_hat_y_hat(prototypes, w, x):
-    """
-    Get x_hat and y_hat
-
-    Parameters
-    ----------
-    prototypes : array-like
-        Prototypes
-    w : array-like
-        Weights
-    x : array-like
-        Input data
-
-    Returns
-    -------
-    array-like
-        M
-    array-like
-        x_hat
-    array-like
-        y_hat
-    """
-    m = softmax(-cdist(x, prototypes), axis=1)
-    x_hat = np.matmul(m, prototypes)
-    y_hat = np.maximum(np.minimum(np.matmul(m, w.reshape((-1, 1))), 1.0), np.finfo(float).eps)
+    m = softmax(-jnp.linalg.norm(x[:, None] - prototypes, axis=2), axis=1)
+    x_hat = jnp.dot(m, prototypes)
+    y_hat = jnp.clip(jnp.dot(m, w.reshape((-1, 1))), jnp.finfo(float).eps, 1.0)
     return m, x_hat, y_hat
 
 
 class ObjectiveFunction:
-    """
-    Objective function for optimization
+    def __init__(self, features_dim, verbose, x, y, m_a, m_b, k=10, A_x=0.01, A_y=0.1, A_z=0.5):
+        """
+        Objective function for optimization
 
-    Parameters
-    ----------
-    features_dim : int
-        Number of features
-    verbose : int
-        If zero, then no output
-    x : array-like
-        Input data
-    y : array-like
-        Target vector
-    m_a : array-like
-        Mask vector
-    m_b : array-like
-        Mask vector
-    k : int, optional
-        Number of prototypes. Default is 10
-    A_x : float, optional
-        Input recontruction quality term weight. Default is 0.01
-    A_y : float, optional
-        Output prediction error. Default is 0.1
-    A_z : float, optional
-        Fairness constraint term weight. Default is 0.5
+        Parameters
+        ----------
+        features_dim : int
+            Number of features
+        verbose : int
+            If zero, then no output
+        x : array-like
+            Input data
+        y : array-like
+            Target vector
+        m_a : array-like
+            Mask vector
+        m_b : array-like
+            Mask vector
+        k : int, optional
+            Number of prototypes. Default is 10
+        A_x : float, optional
+            Input reconstruction quality term weight. Default is 0.01
+        A_y : float, optional
+            Output prediction error. Default is 0.1
+        A_z : float, optional
+            Fairness constraint term weight. Default is 0.5
 
-    Attributes
-    ----------
-    verbose : int
-        If zero, then no output
-    x : array-like
-        Input data
-    y : array-like
-        Target vector
+        Attributes
+        ----------
+        verbose : int
+            If zero, then no output
+        x : array-like
+            Input data
+        y : array-like
+            Target vector
 
-    Methods
-    -------
-    __call__(parameters)
-        Call the objective function
-    log_progress(total_loss, L_x, L_y, L_z)
-        Log the progress
-    """
-
-    def __init__(
-        self,
-        features_dim,
-        verbose,
-        x,
-        y,
-        m_a,
-        m_b,
-        k=10,
-        A_x=0.01,
-        A_y=0.1,
-        A_z=0.5,
-    ):
+        Methods
+        -------
+        __call__(parameters)
+            Call the objective function
+        """
         self.verbose = verbose
         self.x = x
         self.y = y
@@ -104,42 +69,25 @@ class ObjectiveFunction:
         self.m_a = m_a
         self.m_b = m_b
         self.k = k
-        self.A = np.array([A_x, A_y, A_z])
+        self.A = jnp.array([A_x, A_y, A_z])
         self.prototypes_shape = (self.k, features_dim)
 
     def __call__(self, parameters):
-        """
-        Call the objective function
-
-        Parameters
-        ----------
-        parameters : array-like
-            Parameters
-
-        Returns
-        -------
-        float
-            Total loss
-        """
         w = parameters[: self.k]
         prototypes = parameters[self.k :].reshape(self.prototypes_shape)
 
         m, x_hat, y_hat = get_x_hat_y_hat(prototypes, w, self.x)
 
         dx2 = (x_hat - self.x) ** 2
-        loss_x = np.mean(dx2[self.m_b]) + np.mean(dx2[self.m_a])
+        loss_x = jnp.mean(dx2[self.m_b]) + jnp.mean(dx2[self.m_a])
 
-        loss_z = np.mean(np.abs(np.mean(m[self.m_b], axis=0) - np.mean(m[self.m_a], axis=0)))
+        loss_z = jnp.mean(jnp.abs(jnp.mean(m[self.m_b], axis=0) - jnp.mean(m[self.m_a], axis=0)))
 
-        loss_y = -np.mean(self.y * np.log(y_hat) + self.one_minus_y * np.log(1.0 - y_hat))
+        loss_y = -jnp.mean(self.y * jnp.log(y_hat) + self.one_minus_y * jnp.log(1.0 - y_hat))
 
-        loss = np.array([loss_x, loss_y, loss_z])
+        loss = jnp.array([loss_x, loss_y, loss_z])
 
-        total_loss = np.dot(self.A, loss)
-
-        if self.verbose > 0:
-            message = f"loss: {total_loss:.3f} L_x: {loss_x:.3f} L_y: {loss_y:.3f} L_z: {loss_z:.3f}"
-            logger.info(message)
+        total_loss = jnp.dot(self.A, loss)
 
         return total_loss
 
@@ -291,6 +239,19 @@ class LearningFairRepresentation(BMPreprocessing):
 
         obj_fun = ObjectiveFunction(features_dim, self.verbose, *args)
 
+        @jax.jit
+        def objective(params):
+            return obj_fun(params)
+
+        result = minimize(
+            objective,
+            parameters_initialization,
+            method="L-BFGS-B",
+            bounds=parameters_bounds,
+            options={"maxiter": self.maxiter, "disp": 0},
+        )
+        self.learned_model = result.x
+        """
         self.learned_model = optim.fmin_l_bfgs_b(
             obj_fun,
             x0=parameters_initialization,
@@ -301,7 +262,7 @@ class LearningFairRepresentation(BMPreprocessing):
             maxiter=self.maxiter,
             disp=0,
         )[0]
-
+        """
         self.w = self.learned_model[: self.k]
         self.prototypes = self.learned_model[self.k :].reshape((self.k, features_dim))
         return self
@@ -331,8 +292,8 @@ class LearningFairRepresentation(BMPreprocessing):
         group_a = params["group_a"]
         group_b = params["group_b"]
 
-        _, x_hat_b, _ = get_x_hat_y_hat(self.prototypes, self.w, X[group_b == 1])
-        _, x_hat_a, _ = get_x_hat_y_hat(self.prototypes, self.w, X[group_a == 1])
+        _, x_hat_b, _ = get_x_hat_y_hat(self.prototypes, self.w, x[group_b == 1])
+        _, x_hat_a, _ = get_x_hat_y_hat(self.prototypes, self.w, x[group_a == 1])
 
         new_x = x.copy()
         new_x[group_b == 1] = x_hat_b
