@@ -1,6 +1,9 @@
 Fairlet Decomposition Method
 ------------------------------
 
+.. note::
+    **Learning tasks:** Clustering.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 The Fairlet Decomposition method is a scalable algorithm designed to partition a set of points into fairlets, which are small clusters that maintain a specified balance between two types of points (e.g., red and blue points). This method is particularly useful in fair clustering tasks where the goal is to ensure that each cluster has a balanced representation of different types of points.

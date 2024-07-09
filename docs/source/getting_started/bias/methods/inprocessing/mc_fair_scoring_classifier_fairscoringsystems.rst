@@ -1,6 +1,9 @@
 FAIRScoringSystems
 ------------------
 
+.. note::
+    **Learning tasks:** Multiclassification.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 FAIRScoringSystems is a Mixed Integer Linear Programming (MILP) framework designed to generate optimal scoring systems for multi-class classification tasks. The method ensures that the resulting models are interpretable, fair, and sparse. It incorporates fairness constraints to mitigate biases against protected groups and sparsity constraints to enhance model interpretability.

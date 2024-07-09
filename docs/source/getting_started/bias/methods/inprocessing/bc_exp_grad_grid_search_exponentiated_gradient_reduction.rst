@@ -1,6 +1,9 @@
 Exponentiated Gradient Reduction Method
 -------------------------------------------
 
+.. note::
+    **Learning tasks:** Binary classification, regression.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 The Exponentiated Gradient (EG) reduction method is a technique used to achieve fairness in binary classification tasks. It is designed to optimize the tradeoff between accuracy and fairness by incorporating fairness constraints into the learning process. This method is particularly useful for ensuring that classifiers do not exhibit bias against protected attributes such as race or gender.

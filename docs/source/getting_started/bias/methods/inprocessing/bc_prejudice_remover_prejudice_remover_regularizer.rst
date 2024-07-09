@@ -1,6 +1,9 @@
 Prejudice Remover Regularizer
 -----------------------------
 
+.. note::
+    **Learning tasks:** Binary classification.
+
 Introduction
 ~~~~~~~~~~~~
 The Prejudice Remover Regularizer is a method designed to enforce fairness in classification tasks by reducing indirect prejudice. This method is integrated into logistic regression models and aims to ensure that the predictions are not unfairly influenced by sensitive features. The regularizer is designed to be computationally efficient and easy to implement, making it a practical solution for fairness-aware machine learning.

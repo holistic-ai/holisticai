@@ -1,6 +1,9 @@
 ρ-Fair Method
 -----------------
 
+.. note::
+    **Learning tasks:** Binary classification.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 The ρ-Fair method is designed to address fairness in machine learning classification tasks. It aims to ensure that the classifier's performance is equitable across different groups defined by sensitive attributes. This method is significant as it provides a structured approach to mitigate biases and ensure fairness in predictive models.

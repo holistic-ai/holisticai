@@ -1,6 +1,9 @@
 Grid Search
 ---------------
 
+.. note::
+    **Learning tasks:** Binary classification, regression.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 Grid search is a method used to select a deterministic classifier from a set of candidate classifiers obtained from the saddle point of a Lagrangian function. This method is particularly useful when the number of constraints is small, such as in demographic parity or equalized odds with a binary protected attribute. The goal is to find a classifier that balances the tradeoff between accuracy and fairness.

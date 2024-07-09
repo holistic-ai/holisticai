@@ -1,6 +1,9 @@
 Propensity-Scored Recommendations
 ---------------------
 
+.. note::
+    **Learning tasks:** Recommendation systems.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 Propensity-scored recommendations are a method designed to handle selection biases in the evaluation and training of recommender systems. This approach leverages techniques from causal inference to provide unbiased performance estimators and improve prediction accuracy, even when the data is Missing Not At Random (MNAR).

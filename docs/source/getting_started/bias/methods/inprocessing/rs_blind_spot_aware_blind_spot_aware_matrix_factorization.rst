@@ -1,6 +1,9 @@
 Blind Spot Aware Matrix Factorization
 ----------------------
 
+.. note::
+    **Learning tasks:** Recommendation systems.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 Blind Spot Aware Matrix Factorization (BSAMF) is a novel approach designed to address the limitations of conventional matrix factorization methods in recommender systems. The primary goal of BSAMF is to reduce the "blind spot" for users, which refers to the set of items that are predicted to have low ratings and thus are less likely to be recommended. By minimizing the blind spot, BSAMF aims to enhance the diversity of recommendations and improve user satisfaction.

@@ -1,6 +1,9 @@
 Fair k-Center Clustering Method
 ----------------
 
+.. note::
+    **Learning tasks:** Clustering.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 The Fair k-Center Clustering method addresses the problem of centroid-based clustering, such as k-center, in a way that ensures fair representation of different demographic groups. This method is particularly relevant in scenarios where the data set comprises multiple demographic groups, and there is a need to select a fixed number of representatives (centers) from each group to form a summary. The method extends the traditional k-center clustering problem by incorporating fairness constraints, ensuring that each group is fairly represented in the selected centers.

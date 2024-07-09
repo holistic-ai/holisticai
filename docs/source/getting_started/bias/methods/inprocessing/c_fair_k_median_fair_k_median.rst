@@ -1,6 +1,9 @@
 Fair k-Median Method
 --------------------
 
+.. note::
+    **Learning tasks:** Clustering.
+
 Introduction
 ~~~~~~~~~~~~~~~~
 The fair k-median method aims to address the issue of fairness in clustering by ensuring that the clustering solution does not disproportionately favor any particular group. This method is particularly relevant in scenarios where data points belong to different demographic groups, and it is crucial to provide equitable representation and minimize bias in the clustering process.
