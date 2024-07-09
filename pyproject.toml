@@ -69,6 +69,7 @@ exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/utils/trade_of
 [tool.hatch.envs.sphinx]
 inherit = ["all"]
 dependencies = [
+  "scikit-learn>=1.0.2", 
   "cvxpy",
   "sphinx",
   "pydata-sphinx-theme",

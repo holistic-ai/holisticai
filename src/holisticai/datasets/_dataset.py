@@ -19,7 +19,7 @@ class DatasetDict(dict):
 
     Parameters:
     -----------
-    **datasets : dict
+    datasets : dict
         A dictionary containing the datasets, where the keys are the names of the datasets and the values are the datasets themselves.
 
     Methods:

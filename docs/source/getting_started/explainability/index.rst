@@ -42,4 +42,3 @@ Measuring and Mitigation
     :maxdepth: 2
 
     metrics
-    mitigation

@@ -95,7 +95,7 @@ class ObjectiveFunction:
 class LearningFairRepresentation(BMPreprocessing):
     """
     Learning fair representations finds a latent representation which encodes the data well\
-    while obfuscates information about protected attributes.
+    while obfuscates information about protected attributes [1].
 
     Parameters
     ----------
@@ -251,26 +251,12 @@ class LearningFairRepresentation(BMPreprocessing):
             options={"maxiter": self.maxiter, "disp": 0},
         )
         self.learned_model = result.x
-        """
-        self.learned_model = optim.fmin_l_bfgs_b(
-            obj_fun,
-            x0=parameters_initialization,
-            epsilon=1e-5,
-            bounds=parameters_bounds,
-            approx_grad=True,
-            maxfun=self.maxfun,
-            maxiter=self.maxiter,
-            disp=0,
-        )[0]
-        """
         self.w = self.learned_model[: self.k]
         self.prototypes = self.learned_model[self.k :].reshape((self.k, features_dim))
         return self
 
     def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
-        Transform data
-        -----------
         Transform data to a fair representation
 
         Parameters
