@@ -91,7 +91,8 @@ def load_student_multiclass_dataset(protected_attribute: Literal["sex", "address
 
 
 def load_student_dataset(
-    target: Literal["G1", "G2", "G3"] = "G3", protected_attribute: Literal["sex", "address", "Mjob", "Fjob", "all"] = "sex"
+    target: Literal["G1", "G2", "G3"] = "G3",
+    protected_attribute: Literal["sex", "address", "Mjob", "Fjob", "all"] = "sex",
 ):
     if protected_attribute not in ["sex", "address", "Mjob", "Fjob", "all"]:
         raise ValueError(f"Unknown protected attribute: {protected_attribute}")
@@ -107,14 +108,14 @@ def load_student_dataset(
     y = df[target]
 
     if protected_attribute == "all":
-        p_attr = df[['sex','address',"Mjob", "Fjob"]]
+        p_attr = df[["sex", "address", "Mjob", "Fjob"]]
     else:
         p_attr = pd.Series(df[protected_attribute], name="p_attr")
-    group_cols = {'p_attr':p_attr}
-    if protected_attribute=='sex':
-        group_a = pd.Series(df[protected_attribute]=="'F'", name="group_a")
+    group_cols = {"p_attr": p_attr}
+    if protected_attribute == "sex":
+        group_a = pd.Series(df[protected_attribute] == "'F'", name="group_a")
         group_b = ~group_a
-        group_cols.update({'group_a':group_a, 'group_b':group_b})
+        group_cols.update({"group_a": group_a, "group_b": group_b})
 
     for col in df.select_dtypes(include=["object"]):
         df[col] = pd.factorize(df[col])[0]

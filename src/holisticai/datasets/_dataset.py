@@ -46,18 +46,11 @@ class DatasetDict(dict):
                 {
                     "dtype": "Dataset",
                     "name": name,
-                    "attributes": {
-                        "Number of Rows": dataset.num_rows,
-                        "Features": dataset.features
-                    },
+                    "attributes": {"Number of Rows": dataset.num_rows, "Features": dataset.features},
                 }
             )
         # Example usage
-        obj = {
-            "dtype": "DatasetDict",
-            "attributes": {},
-            "nested_objects": nested_objs
-        }
+        obj = {"dtype": "DatasetDict", "attributes": {}, "nested_objects": nested_objs}
         return generate_html_for_generic_object(obj, feature_columns=5)
 
 
@@ -110,11 +103,10 @@ class GroupByDataset:
     def count(self):
         dss = []
         for group_name, groupby_obj_batch in self.groupby_obj:
-            data = dict(zip(self.grouped_names,group_name))
-            data['group_size'] = len(groupby_obj_batch)
+            data = dict(zip(self.grouped_names, group_name))
+            data["group_size"] = len(groupby_obj_batch)
             dss.append(data)
         return pd.DataFrame(dss)
-
 
     def __repr__(self):
         """Returns a string representation of the GroupByDataset."""
@@ -130,11 +122,11 @@ class GroupByDataset:
         """Returns an HTML representation of the GroupByDataset."""
         obj = {
             "dtype": "GroupByDataset",
-                    "attributes": {
-                        "count": self.ngroups,
-                        "grouped_names": self.grouped_names,
-                        "Features": [" , ".join(self.features)]
-                    },
+            "attributes": {
+                "count": self.ngroups,
+                "grouped_names": self.grouped_names,
+                "Features": [" , ".join(self.features)],
+            },
         }
         return generate_html_for_generic_object(obj, feature_columns=5)
 
@@ -312,10 +304,7 @@ class Dataset:
     def _repr_html_(self):
         obj = {
             "dtype": "Dataset",
-                    "attributes": {
-                        "Number of Rows": self.num_rows,
-                        "Features": [" , ".join(self.features)]
-                    },
+            "attributes": {"Number of Rows": self.num_rows, "Features": [" , ".join(self.features)]},
         }
         return generate_html_for_generic_object(obj, feature_columns=5)
 

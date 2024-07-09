@@ -2,13 +2,12 @@ import os
 
 
 def generate_html_for_generic_object(obj, feature_columns=5):
-
-    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'object_repr.css')
+    css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "object_repr.css")
 
     with open(css_path) as f:
         css_template = f.read()
 
-    html_template = '''
+    html_template = """
     <style>
         {css_template}
     </style>
@@ -21,7 +20,7 @@ def generate_html_for_generic_object(obj, feature_columns=5):
             </div>
         </div>
     </div>
-    '''
+    """
 
     # Extract generic object information
     name = obj.get("name", "N/A")
@@ -30,24 +29,21 @@ def generate_html_for_generic_object(obj, feature_columns=5):
     nested_objects = obj.get("nested_objects", [])
 
     # Generate HTML for attributes
-    attributes_html = ''
+    attributes_html = ""
     for key, value in attributes.items():
         if isinstance(value, list):
-            value = ', '.join(map(str, value))  # noqa: PLW2901
+            value = ", ".join(map(str, value))  # noqa: PLW2901
         attributes_html += f'<div class="attribute-list">- {key}: {value}</div>'
 
     # Generate HTML for nested objects
-    nested_objects_html = ''
+    nested_objects_html = ""
     for nested_obj in nested_objects:
         nested_objects_html += generate_html_for_generic_object(nested_obj, feature_columns)
 
     # Fill the main HTML template with attributes and nested objects
     header = f"{obj_type}" if name in ("N/A", "") else f"{name} : {obj_type}"
     html_output = html_template.format(
-        header=header,
-        attributes=attributes_html,
-        nested_objects=nested_objects_html,
-        css_template=css_template
+        header=header, attributes=attributes_html, nested_objects=nested_objects_html, css_template=css_template
     )
 
     return html_output
@@ -62,22 +58,16 @@ if __name__ == "__main__":
             {
                 "dtype": "Dataset",
                 "name": "train",
-                "attributes": {
-                    "Number of Rows": 2480,
-                    "Features": ["x", "y", "group_a", "group_b"]
-                },
-                "nested_objects": []
+                "attributes": {"Number of Rows": 2480, "Features": ["x", "y", "group_a", "group_b"]},
+                "nested_objects": [],
             },
             {
                 "dtype": "Dataset",
                 "name": "test",
-                "attributes": {
-                    "Number of Rows": 2480,
-                    "Features": ["x", "y", "group_a", "group_b"]
-                },
-                "nested_objects": []
-            }
-        ]
+                "attributes": {"Number of Rows": 2480, "Features": ["x", "y", "group_a", "group_b"]},
+                "nested_objects": [],
+            },
+        ],
     }
 
     # Generate HTML representation for the generic object

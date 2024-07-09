@@ -24,7 +24,7 @@ class CategoricalRepairer:
         Parameters
         ----------
 
-        feature_to_repair: str 
+        feature_to_repair: str
             The name of the feature to repair.
         repair_level: float
             The desired repair level, ranging from 0 to 1.
@@ -72,12 +72,25 @@ class CategoricalRepairer:
 
             if repair_type in {int, float}:
                 NumericRepairer(self.repair_level, self.kdd).repair(
-                    col, data_dict, col_id, unique_col_vals, index_lookup, all_stratified_groups, stratified_group_data, val_sets
+                    col,
+                    data_dict,
+                    col_id,
+                    unique_col_vals,
+                    index_lookup,
+                    all_stratified_groups,
+                    stratified_group_data,
+                    val_sets,
                 )
 
             elif repair_type in {str}:
                 StringRepairer(self.feature_to_repair, self.repair_level).repair(
-                    col, data_dict, col_id, all_stratified_groups, stratified_group_indices, stratified_group_data, mode_feature_to_repair
+                    col,
+                    data_dict,
+                    col_id,
+                    all_stratified_groups,
+                    stratified_group_indices,
+                    stratified_group_data,
+                    mode_feature_to_repair,
                 )
 
         repaired_data = []
@@ -125,7 +138,11 @@ class DataPreprocessor:
         col_type_dict = dict(zip(col_ids, col_types))
         not_I_col_ids = [x for x in col_ids if col_type_dict[x] != "I"]
 
-        cols_to_repair = [x for x in col_ids if col_type_dict[x] in "YX"] if not self.kdd else [x for x in col_ids if col_type_dict[x] == "Y"]
+        cols_to_repair = (
+            [x for x in col_ids if col_type_dict[x] in "YX"]
+            if not self.kdd
+            else [x for x in col_ids if col_type_dict[x] == "Y"]
+        )
 
         safe_stratify_cols = [self.feature_to_repair]
 
@@ -229,7 +246,16 @@ class StringRepairer:
         self.feature_to_repair = feature_to_repair
         self.repair_level = repair_level
 
-    def repair(self, col, data_dict, col_id, all_stratified_groups, stratified_group_indices, stratified_group_data, mode_feature_to_repair):
+    def repair(
+        self,
+        col,
+        data_dict,
+        col_id,
+        all_stratified_groups,
+        stratified_group_indices,
+        stratified_group_data,
+        mode_feature_to_repair,
+    ):
         """
         Repairs the categorical feature values in the given column based on the provided data.
 
@@ -256,33 +282,40 @@ class StringRepairer:
 
         group_features = get_group_data(all_stratified_groups, stratified_group_data, col_id)
         categories_count = get_categories_count(categories, all_stratified_groups, group_features)
-        categories_count_norm = get_categories_count_norm(categories, all_stratified_groups, categories_count, group_features)
+        categories_count_norm = get_categories_count_norm(
+            categories, all_stratified_groups, categories_count, group_features
+        )
         median = get_median_per_category(categories, categories_count_norm)
 
         def dist_generator(group_index, category):
             return gen_desired_dist(
-                group_index, category, col_id, median, self.repair_level, categories_count_norm, self.feature_to_repair, mode_feature_to_repair
+                group_index,
+                category,
+                col_id,
+                median,
+                self.repair_level,
+                categories_count_norm,
+                self.feature_to_repair,
+                mode_feature_to_repair,
             )
 
         def count_generator(group_index, group, category):
-            return gen_desired_count(group_index, group, category, median, group_features, self.repair_level, categories_count)
+            return gen_desired_count(
+                group_index, group, category, median, group_features, self.repair_level, categories_count
+            )
 
         group_features, overflow = flow_on_group_features(all_stratified_groups, group_features, count_generator)
         group_features, _, _ = assign_overflow(
             all_stratified_groups, categories, overflow, group_features, dist_generator
         )
 
-        repaired_values = {
-            group: group_features[group].data
-            for group in all_stratified_groups
-        }
+        repaired_values = {group: group_features[group].data for group in all_stratified_groups}
 
         for group in all_stratified_groups:
             indices = stratified_group_indices[group]
             group_repaired_values = repaired_values[group]
             for i, index in enumerate(indices):
                 data_dict[col_id][index] = group_repaired_values[i]
-
 
 
 class NumericRepairer:
@@ -301,7 +334,17 @@ class NumericRepairer:
         self.repair_level = repair_level
         self.kdd = kdd
 
-    def repair(self, col, data_dict, col_id, unique_col_vals, index_lookup, all_stratified_groups, stratified_group_data, val_sets):
+    def repair(
+        self,
+        col,
+        data_dict,
+        col_id,
+        unique_col_vals,
+        index_lookup,
+        all_stratified_groups,
+        stratified_group_data,
+        val_sets,
+    ):
         """
         Repairs the categorical column values based on the provided parameters.
 
@@ -365,8 +408,12 @@ class NumericRepairer:
 
                 original_values = [col[index] for index in indices_to_repair]
                 current_val_positions = [index_lookup[col_id][value] for value in original_values]
-                distances_to_repair = [int(round((median_pos - position) * self.repair_level)) for position in current_val_positions]
-                indices_of_repair_values = [current_val_positions[i] + distances_to_repair[i] for i in range(len(indices_to_repair))]
+                distances_to_repair = [
+                    int(round((median_pos - position) * self.repair_level)) for position in current_val_positions
+                ]
+                indices_of_repair_values = [
+                    current_val_positions[i] + distances_to_repair[i] for i in range(len(indices_to_repair))
+                ]
                 repaired_values = [unique_col_vals[col_id][index] for index in indices_of_repair_values]
 
                 for i in range(len(indices_to_repair)):

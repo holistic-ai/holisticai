@@ -9,11 +9,13 @@ def _fit(X, sensitive_features, sensitive_mean):
     beta = jnp.linalg.lstsq(sensitive_features_center, X, rcond=None)[0]
     return beta
 
+
 @jit
 def _transform(X, sensitive_features, beta, alpha, sensitive_mean):
     sensitive_features_center = sensitive_features - sensitive_mean
     x_filtered = X - jnp.dot(sensitive_features_center, beta)
     return alpha * x_filtered + (1 - alpha) * X
+
 
 class CorrelationRemover(BMPre):
     """

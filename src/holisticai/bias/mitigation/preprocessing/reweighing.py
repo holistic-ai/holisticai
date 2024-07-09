@@ -9,7 +9,6 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 
 class Reweighing(BMPre):
-
     def __init__(self):
         """
         Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before\
@@ -128,4 +127,3 @@ class Reweighing(BMPre):
         self
         """
         return self.fit(y, group_a, group_b, sample_weight).transform(X)
-

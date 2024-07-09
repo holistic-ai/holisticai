@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import sys
 from typing import Optional
 
 import jax
@@ -239,11 +238,18 @@ class LearningFairRepresentation(BMPreprocessing):
         )
 
         obj_fun = ObjectiveFunction(features_dim, self.verbose, *args)
+
         @jax.jit
         def objective(params):
             return obj_fun(params)
 
-        result = minimize(objective, parameters_initialization, method='L-BFGS-B', bounds=parameters_bounds, options={'maxiter': self.maxiter, "disp":0})
+        result = minimize(
+            objective,
+            parameters_initialization,
+            method="L-BFGS-B",
+            bounds=parameters_bounds,
+            options={"maxiter": self.maxiter, "disp": 0},
+        )
         self.learned_model = result.x
         """
         self.learned_model = optim.fmin_l_bfgs_b(

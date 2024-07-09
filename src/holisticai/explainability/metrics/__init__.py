@@ -43,5 +43,5 @@ __all__ = [
     "spread_ratio",
     "xai_ease_score",
     "data_stability",
-    "feature_stability"
+    "feature_stability",
 ]
