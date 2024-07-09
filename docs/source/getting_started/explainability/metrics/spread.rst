@@ -96,5 +96,7 @@ and
 Interpretation
 ~~~~~~~~~~~~~~
 
-- **Low Score**: Indicates that the distribution of feature importance is close to uniform, suggesting that the model relies on a broader set of features. This implies lower interpretability.
-- **High Score**: Indicates that the distribution of feature importance is far from uniform, suggesting that the model relies on fewer, more significant features. This implies higher interpretability.
+We use the inverse of the Jensen–Shannon Divergence as the Spread Divergence Metric.
+
+- **High Score**: Indicates that the distribution of feature importance is close to uniform, suggesting that the model relies on a broader set of features. This implies lower interpretability.
+- **Low Score**: Indicates that the distribution of feature importance is far from uniform, suggesting that the model relies on fewer, more significant features. This implies higher interpretability.
