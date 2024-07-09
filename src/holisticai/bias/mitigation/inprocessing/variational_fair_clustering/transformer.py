@@ -1,11 +1,12 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
+from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm import FairClusteringAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
 from sklearn.base import BaseEstimator
-
-from .algorithm import FairClusteringAlgorithm
 
 
 class VariationalFairClustering(BaseEstimator, BMImp):
@@ -117,12 +118,8 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         X = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
-        p_attr = self.sens_group.fit_transform(
-            np.c_[group_a, group_b], convert_numeric=True
-        )
-        self.algorithm.fit(
-            X=X, p_attr=p_attr, random_state=np.random.RandomState(self.seed)
-        )
+        p_attr = self.sens_group.fit_transform(np.c_[group_a, group_b], convert_numeric=True)
+        self.algorithm.fit(X=X, p_attr=p_attr, random_state=np.random.RandomState(self.seed))
         return self
 
     @property
@@ -162,9 +159,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         X = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
-        p_attr = self.sens_group.transform(
-            np.c_[group_a, group_b], convert_numeric=True
-        )
+        p_attr = self.sens_group.transform(np.c_[group_a, group_b], convert_numeric=True)
         return self.algorithm.predict(X, p_attr)
 
     def fit_predict(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):

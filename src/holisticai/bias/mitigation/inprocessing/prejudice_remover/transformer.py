@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
@@ -98,9 +100,7 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         )
 
         # Model
-        self.estimator = PRLogiticRegression(
-            initializer=initializer_, loss=loss_, fit_intercept=self.fit_intercept
-        )
+        self.estimator = PRLogiticRegression(initializer=initializer_, loss=loss_, fit_intercept=self.fit_intercept)
         return self
 
     def _build_algorithm(self):
@@ -112,9 +112,7 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         )
 
         # Support class for objective Function
-        objective_fn_ = ObjectiveFunction(
-            estimator=self.estimator, loss_fn=self.estimator.loss
-        )
+        objective_fn_ = ObjectiveFunction(estimator=self.estimator, loss_fn=self.estimator.loss)
 
         # Algorithm class
         return PrejudiceRemoverAlgorithm(
@@ -123,7 +121,6 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
             objective_fn=objective_fn_,
             maxiter=self.maxiter,
         )
-
 
     def fit(
         self,

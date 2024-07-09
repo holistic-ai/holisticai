@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
@@ -7,36 +9,17 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 
 class Reweighing(BMPre):
-    """
-    Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before\
-    classification.
-
-    Parameters
-    ----------
-    None
-
-    Attributes
-    ----------
-    sens_groups : SensitiveGroups
-        SensitiveGroups object
-
-    Methods
-    -------
-    fit(y_true, group_a, group_b, sample_weight)
-        Fit the model
-    transform(X)
-        Transform data
-    fit_transform(X, y_true, group_a, group_b, sample_weight)
-        Fit the model and transform data
-
-    References
-    ----------
-    .. [1] Kamiran, Faisal, and Toon Calders. "Data preprocessing techniques for classification\
-        without discrimination." Knowledge and information systems 33.1 (2012): 1-33.
-    """
-
     def __init__(self):
-        self.sens_groups = SensitiveGroups()
+        """
+        Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before\
+        classification.
+
+        References
+        ----------
+        .. [1] Kamiran, Faisal, and Toon Calders. "Data preprocessing techniques for classification\
+            without discrimination." Knowledge and information systems 33.1 (2012): 1-33.
+        """
+        self.__sens_groups = SensitiveGroups()
 
     def fit(
         self,
@@ -46,9 +29,8 @@ class Reweighing(BMPre):
         sample_weight: Optional[np.ndarray] = None,
     ):
         """
-        Fit
-        ----------
-        Fit the model. Access fitted sample_weight param with self.estimator_params["sample_weight"].
+        Fit the Reweighing model to the data. This method calculates the sample weights to ensure that the \
+        data is fair with respect to the specified sensitive groups before classification.
 
         Parameters
         ----------
@@ -66,15 +48,13 @@ class Reweighing(BMPre):
         Self
         """
 
-        params = self._load_data(
-            y=y, sample_weight=sample_weight, group_a=group_a, group_b=group_b
-        )
+        params = self._load_data(y=y, sample_weight=sample_weight, group_a=group_a, group_b=group_b)
         y = params["y"]
         sample_weight = params["sample_weight"]
         group_a = params["group_a"]
         group_b = params["group_b"]
 
-        group_lbs = self.sens_groups.fit_transform(np.stack([group_a, group_b], axis=1))
+        group_lbs = self.__sens_groups.fit_transform(np.stack([group_a, group_b], axis=1))
 
         classes = np.unique(y)
 
@@ -86,7 +66,7 @@ class Reweighing(BMPre):
 
         df["COUNT"] = 1
 
-        for g in self.sens_groups.group_names:
+        for g in self.__sens_groups.group_names:
             for c in classes:
                 df[f"{g}-{c}"] = (df["GROUP_ID"] == g) & (df["LABEL"] == c)
 
@@ -103,10 +83,10 @@ class Reweighing(BMPre):
         df_group_values_weights = df_values_prob / df_group_values_prob
 
         self.sample_weight = np.ones_like(y, dtype=np.float32)
-        for g in self.sens_groups.group_names:
-            for l in classes:
-                mask = df[f"{g}-{l}"]
-                self.sample_weight[mask] = df_group_values_weights.at[g, l]
+        for g in self.__sens_groups.group_names:
+            for c in classes:
+                mask = df[f"{g}-{c}"]
+                self.sample_weight[mask] = df_group_values_weights.at[g, c]
 
         self.update_estimator_param("sample_weight", self.sample_weight)
 
@@ -125,10 +105,9 @@ class Reweighing(BMPre):
         sample_weight: Optional[np.ndarray] = None,
     ):
         """
-        Fit transform
-        ----------
-        Access fitted sample_weight param with self.estimator_params["sample_weight"].
-        The transform returns the same object inputed.
+        Fit the Reweighing model to the data. This method calculates the sample weights to ensure that the \
+        data is fair with respect to the specified sensitive groups before classification.
+        The transform function returns the same object inputed.
 
         Parameters
         ----------

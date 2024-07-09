@@ -70,7 +70,7 @@ class MetaFairClassifier(BMImp):
         )
         self.seed = seed
 
-    def transform_estimator(self,_):
+    def transform_estimator(self, _):
         return self
 
     def fit(
@@ -113,9 +113,7 @@ class MetaFairClassifier(BMImp):
         sensitive_features = np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1)
         self.classes_ = params["classes_"]
 
-        self.algorithm.fit(
-            X=X, y=y, sensitive_features=sensitive_features, random_state=self.seed
-        )
+        self.algorithm.fit(X=X, y=y, sensitive_features=sensitive_features, random_state=self.seed)
         return self
 
     def predict(self, X: np.ndarray):

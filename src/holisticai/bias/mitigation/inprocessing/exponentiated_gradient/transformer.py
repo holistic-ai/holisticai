@@ -1,13 +1,14 @@
+from __future__ import annotations
+
 from typing import Literal, Optional
 
 import numpy as np
+from holisticai.bias.mitigation.inprocessing.commons.classification import _constraints as cc
+from holisticai.bias.mitigation.inprocessing.commons.regression import _constraints as rc
+from holisticai.bias.mitigation.inprocessing.commons.regression import _losses as rl
+from holisticai.bias.mitigation.inprocessing.exponentiated_gradient.algorithm import ExponentiatedGradientAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from sklearn.base import BaseEstimator, ClassifierMixin, clone
-
-from ..commons.classification import _constraints as cc
-from ..commons.regression import _constraints as rc
-from ..commons.regression import _losses as rl
-from .algorithm import ExponentiatedGradientAlgorithm
 
 
 class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
@@ -78,7 +79,6 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         "ErrorRateParity",
     ]
 
-
     def __init__(
         self,
         constraints: str = "EqualizedOdds",
@@ -87,14 +87,13 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         nu: Optional[float] = None,
         eta0: Optional[float] = 2.0,
         loss: str = "ZeroOne",
-        min_val: float = None,
-        max_val: float = None,
+        min_val: Optional[float] = None,
+        max_val: Optional[float] = None,
         upper_bound: float = 0.01,
         verbose: Optional[int] = 0,
         estimator=None,
-        seed: int=0
+        seed: int = 0,
     ):
-
         self.constraints = constraints
         self.eps = eps
         self.max_iter = max_iter
@@ -109,7 +108,6 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         self.seed = seed
 
     def transform_estimator(self, estimator):
-
         """
         This method is deprecated but retained for backwards-compatibility. You should pass the estimator object directly in the constructor.
         """
@@ -173,7 +171,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
             nu=self.nu,
             eta0=self.eta0,
             verbose=self.verbose,
-            seed=self.seed
+            seed=self.seed,
         )
 
         self.model_.fit(X, y, sensitive_features=sensitive_features)

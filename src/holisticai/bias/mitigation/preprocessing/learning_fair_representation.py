@@ -1,102 +1,67 @@
+from __future__ import annotations
+
+import logging
 from typing import Optional
 
+import jax
+import jax.numpy as jnp
 import numpy as np
-import scipy.optimize as optim
 from holisticai.utils.transformers.bias import BMPreprocessing
-from scipy.spatial.distance import cdist
-from scipy.special import softmax
-from tqdm import tqdm
+from jax.nn import softmax
+from scipy.optimize import minimize
+
+logger = logging.getLogger(__name__)
 
 
 def get_x_hat_y_hat(prototypes, w, x):
-    """
-    Get x_hat and y_hat
-
-    Parameters
-    ----------
-    prototypes : array-like
-        Prototypes
-    w : array-like
-        Weights
-    x : array-like
-        Input data
-
-    Returns
-    -------
-    array-like
-        M
-    array-like
-        x_hat
-    array-like
-        y_hat
-    """
-    M = softmax(-cdist(x, prototypes), axis=1)
-    x_hat = np.matmul(M, prototypes)
-    y_hat = np.maximum(
-        np.minimum(np.matmul(M, w.reshape((-1, 1))), 1.0), np.finfo(float).eps
-    )
-    return M, x_hat, y_hat
+    m = softmax(-jnp.linalg.norm(x[:, None] - prototypes, axis=2), axis=1)
+    x_hat = jnp.dot(m, prototypes)
+    y_hat = jnp.clip(jnp.dot(m, w.reshape((-1, 1))), jnp.finfo(float).eps, 1.0)
+    return m, x_hat, y_hat
 
 
 class ObjectiveFunction:
-    """
-    Objective function for optimization
+    def __init__(self, features_dim, verbose, x, y, m_a, m_b, k=10, A_x=0.01, A_y=0.1, A_z=0.5):
+        """
+        Objective function for optimization
 
-    Parameters
-    ----------
-    maxiter : int
-        Maximum number of iterations
-    features_dim : int
-        Number of features
-    verbose : int
-        If zero, then no output
-    x : array-like
-        Input data
-    y : array-like
-        Target vector
-    m_a : array-like
-        Mask vector
-    m_b : array-like
-        Mask vector
-    k : int, optional
-        Number of prototypes. Default is 10
-    A_x : float, optional
-        Input recontruction quality term weight. Default is 0.01
-    A_y : float, optional
-        Output prediction error. Default is 0.1
-    A_z : float, optional
-        Fairness constraint term weight. Default is 0.5
+        Parameters
+        ----------
+        features_dim : int
+            Number of features
+        verbose : int
+            If zero, then no output
+        x : array-like
+            Input data
+        y : array-like
+            Target vector
+        m_a : array-like
+            Mask vector
+        m_b : array-like
+            Mask vector
+        k : int, optional
+            Number of prototypes. Default is 10
+        A_x : float, optional
+            Input reconstruction quality term weight. Default is 0.01
+        A_y : float, optional
+            Output prediction error. Default is 0.1
+        A_z : float, optional
+            Fairness constraint term weight. Default is 0.5
 
-    Attributes
-    ----------
-    verbose : int
-        If zero, then no output
-    x : array-like
-        Input data
-    y : array-like
-        Target vector
+        Attributes
+        ----------
+        verbose : int
+            If zero, then no output
+        x : array-like
+            Input data
+        y : array-like
+            Target vector
 
-    Methods
-    -------
-    __call__(parameters)
-        Call the objective function
-    log_progress(total_loss, L_x, L_y, L_z)
-        Log the progress
-    """
-    def __init__(
-        self,
-        maxiter,
-        features_dim,
-        verbose,
-        x,
-        y,
-        m_a,
-        m_b,
-        k=10,
-        A_x=0.01,
-        A_y=0.1,
-        A_z=0.5,
-    ):
+        Methods
+        -------
+        __call__(parameters)
+            Call the objective function
+        """
         self.verbose = verbose
         self.x = x
         self.y = y
@@ -104,66 +69,27 @@ class ObjectiveFunction:
         self.m_a = m_a
         self.m_b = m_b
         self.k = k
-        self.A = np.array([A_x, A_y, A_z])
+        self.A = jnp.array([A_x, A_y, A_z])
         self.prototypes_shape = (self.k, features_dim)
-        self.progress_bar = tqdm(total=maxiter, desc="Optimization Progress")
 
     def __call__(self, parameters):
-        """
-        Call the objective function
-
-        Parameters
-        ----------
-        parameters : array-like
-            Parameters
-
-        Returns
-        -------
-        float
-            Total loss
-        """
         w = parameters[: self.k]
         prototypes = parameters[self.k :].reshape(self.prototypes_shape)
 
-        M, x_hat, y_hat = get_x_hat_y_hat(prototypes, w, self.x)
+        m, x_hat, y_hat = get_x_hat_y_hat(prototypes, w, self.x)
 
         dx2 = (x_hat - self.x) ** 2
-        L_x = np.mean(dx2[self.m_b]) + np.mean(dx2[self.m_a])
+        loss_x = jnp.mean(dx2[self.m_b]) + jnp.mean(dx2[self.m_a])
 
-        L_z = np.mean(
-            np.abs(np.mean(M[self.m_b], axis=0) - np.mean(M[self.m_a], axis=0))
-        )
+        loss_z = jnp.mean(jnp.abs(jnp.mean(m[self.m_b], axis=0) - jnp.mean(m[self.m_a], axis=0)))
 
-        L_y = -np.mean(self.y * np.log(y_hat) + self.one_minus_y * np.log(1.0 - y_hat))
+        loss_y = -jnp.mean(self.y * jnp.log(y_hat) + self.one_minus_y * jnp.log(1.0 - y_hat))
 
-        L = np.array([L_x, L_y, L_z])
+        loss = jnp.array([loss_x, loss_y, loss_z])
 
-        total_loss = np.dot(self.A, L)
-
-        if self.verbose > 0:
-            self.log_progress(total_loss, L_x, L_y, L_z)
+        total_loss = jnp.dot(self.A, loss)
 
         return total_loss
-
-    def log_progress(self, total_loss, L_x, L_y, L_z):
-        """
-        Log the progress
-
-        Parameters
-        ----------
-        total_loss : float
-            Total loss
-        L_x : float
-            L_x
-        L_y : float
-            L_y
-        L_z : float
-            L_z
-        """
-        self.progress_bar.update()
-        self.progress_bar.set_postfix_str(
-            f"loss: {total_loss:.3f} L_x: {L_x:.3f} L_y: {L_y:.3f} L_z: {L_z:.3f}"
-        )
 
 
 class LearningFairRepresentation(BMPreprocessing):
@@ -294,16 +220,14 @@ class LearningFairRepresentation(BMPreprocessing):
         y = params["y"].reshape([-1, 1])
         group_a = params["group_a"]
         group_b = params["group_b"]
-        X = params["X"]
+        x = params["X"]
 
-        features_dim = np.shape(X)[1]
+        features_dim = np.shape(x)[1]
 
-        parameters_initialization = np.random.uniform(
-            size=self.k + features_dim * self.k
-        )
+        parameters_initialization = np.random.uniform(size=self.k + features_dim * self.k)
         parameters_bounds = [(0, 1)] * self.k + [(None, None)] * features_dim * self.k
         args = (
-            X,
+            x,
             y,
             group_a == 1,
             group_b == 1,
@@ -313,8 +237,21 @@ class LearningFairRepresentation(BMPreprocessing):
             self.Az,
         )
 
-        obj_fun = ObjectiveFunction(self.maxiter, features_dim, self.verbose, *args)
+        obj_fun = ObjectiveFunction(features_dim, self.verbose, *args)
 
+        @jax.jit
+        def objective(params):
+            return obj_fun(params)
+
+        result = minimize(
+            objective,
+            parameters_initialization,
+            method="L-BFGS-B",
+            bounds=parameters_bounds,
+            options={"maxiter": self.maxiter, "disp": 0},
+        )
+        self.learned_model = result.x
+        """
         self.learned_model = optim.fmin_l_bfgs_b(
             obj_fun,
             x0=parameters_initialization,
@@ -325,7 +262,7 @@ class LearningFairRepresentation(BMPreprocessing):
             maxiter=self.maxiter,
             disp=0,
         )[0]
-
+        """
         self.w = self.learned_model[: self.k]
         self.prototypes = self.learned_model[self.k :].reshape((self.k, features_dim))
         return self
@@ -351,18 +288,18 @@ class LearningFairRepresentation(BMPreprocessing):
             Transformed data
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
-        X = params["X"]
+        x = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
 
-        _, x_hat_b, _ = get_x_hat_y_hat(self.prototypes, self.w, X[group_b == 1])
-        _, x_hat_a, _ = get_x_hat_y_hat(self.prototypes, self.w, X[group_a == 1])
+        _, x_hat_b, _ = get_x_hat_y_hat(self.prototypes, self.w, x[group_b == 1])
+        _, x_hat_a, _ = get_x_hat_y_hat(self.prototypes, self.w, x[group_a == 1])
 
-        new_X = X.copy()
-        new_X[group_b == 1] = x_hat_b
-        new_X[group_a == 1] = x_hat_a
+        new_x = x.copy()
+        new_x[group_b == 1] = x_hat_b
+        new_x[group_a == 1] = x_hat_a
 
-        return new_X
+        return new_x
 
     def fit_transform(
         self,

@@ -193,7 +193,7 @@ class PipelineHelper:
         Xt : ndarray of shape (n_samples, n_transformed_features)
             Transformed data.
         """
-        Xt = X  # noqa: N806
+        Xt = X
         for _, _, transform in self._iter(with_final=False):
-            Xt = transform.transform(Xt)  # noqa: N806
+            Xt = transform.transform(Xt)
         return Xt

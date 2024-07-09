@@ -1,13 +1,12 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
-
-from ._conventions import _EVENT, _GROUP_ID, _LABEL, _SIGNED
+from holisticai.bias.mitigation.inprocessing.commons._conventions import _EVENT, _GROUP_ID, _LABEL, _SIGNED
 
 
 def merge_columns(feature_columns):
-    return pd.DataFrame(feature_columns).apply(
-        lambda row: ",".join([str(r) for r in row.values]), axis=1
-    )
+    return pd.DataFrame(feature_columns).apply(lambda row: ",".join([str(r) for r in row.values]), axis=1)
 
 
 def format_data(y=None):
@@ -24,7 +23,7 @@ class BaseMoment:
     - Fairness Constraints
     """
 
-    params = ["X", "y", "sensitive_features", "control_features"]
+    params: list[str] = ["X", "y", "sensitive_features", "control_features"]
 
     def save_params(self, *args):
         for name, value in zip(self.params, args):
@@ -42,7 +41,7 @@ class BaseMoment:
         return self.X.shape[0]
 
     @property
-    def _y_as_series(self):
+    def y_as_series(self):
         """Return the y array as a :class:`~pandas.Series`."""
         return self.y
 

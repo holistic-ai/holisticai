@@ -8,8 +8,6 @@ from holisticai.bias.metrics import confusion_matrix
 # utils
 from holisticai.utils import get_colors
 from holisticai.utils._validation import (
-    _check_columns,
-    _check_numerical_dataframe,
     _regression_checks,
 )
 
@@ -45,7 +43,7 @@ def group_pie_plot(y_feat, ax=None, size=None, title=None):
         raise TypeError("input is not a numpy array or pandas series")
 
     # calculations
-    n_b = np.sum(value_counts / np.sum(value_counts) > 0.02)  # noqa: PLR2004
+    n_b = np.sum(value_counts / np.sum(value_counts) > 0.02)
     n_nb = len(value_counts) - n_b
     if n_nb > 0 and n_b > 0:
         labels = [*list(labels[:n_b]), "Others"]
@@ -59,6 +57,10 @@ def group_pie_plot(y_feat, ax=None, size=None, title=None):
             fig.suptitle(title)
         else:
             fig.suptitle("Group proportions")
+    elif title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Group proportions")
 
     # chart
     colors = get_colors(len(value_counts), extended_colors=True)
@@ -222,22 +224,17 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     matplotlib ax
     """
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Histogram Plot")
 
-    colors = get_colors(len(np.unique(p_attr)))
-    hai_palette = sns.color_palette(colors)
-
-    if p_attr is None:
-        hai_color = hai_palette[0]
-        hai_palette = None
-    else:
+    if p_attr is not None:
+        colors = get_colors(len(np.unique(p_attr)))
+        hai_palette = sns.color_palette(colors)
         hai_color = None
+    else:
+        hai_palette = None
+        hai_color = sns.color_palette("husl", 1)[0]
 
     # charting
     sns.histplot(
@@ -250,64 +247,14 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
         common_norm=False,
         ax=ax,
     )
-    _, labels = plt.xticks()
-    plt.setp(labels, rotation=45)
 
-    # return
-    return ax
+    # Set x-ticks to be the indices of the classes
+    ax.set_xticks(range(len(np.unique(y_feat))))
+    ax.set_xticklabels(np.unique(y_feat), rotation=45)
 
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Histogram Plot")
 
-def correlation_matrix_plot(df, target_feature, n_features=10, cmap="YlGnBu", ax=None, size=None, title=None):
-    """Plot the correlation matrix of a given dataframe with respect to
-    a given target and a certain number of features.
-
-    Obs. The dataframe must contain only numerical features.
-
-    Parameters
-    ----------
-    df : (DataFrame)
-        Pandas dataframe of the data
-    target_feature : (str)
-        Column name of the target feature
-    n_features (optional) : (int)
-        Number of features to plot with the closest correlation to the target
-    cmap (optional) : (str)
-        Color map to use
-    ax (optional) : matplotlib axes
-        Pre-existing axes for the plot
-    size (optional) : (int, int)
-        Size of the figure
-    title (optional) : (str)
-        Title of the figure
-
-    Returns
-    -------
-    matplotlib ax
-    """
-    """Prints the correlation matrix """
-    df = _check_numerical_dataframe(df)
-    _check_columns(df, target_feature)
-
-    sns.set(font_scale=1.25)
-    if ax is None:
-        fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Correlation matrix")
-    corrmat = df.corr()
-    cols = corrmat.nlargest(n_features, target_feature)[target_feature].index
-    cm = np.corrcoef(df[cols].values.T)
-    sns.heatmap(
-        cm,
-        cbar=False,
-        annot=True,
-        square=True,
-        fmt=".2f",
-        annot_kws={"size": 10},
-        yticklabels=cols.values,
-        xticklabels=cols.values,
-        cmap=cmap,
-    )
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
     return ax

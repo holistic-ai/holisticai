@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Optional, Union
 
 import numpy as np
@@ -69,7 +71,7 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
 
     def __init__(
         self,
-        decomposition: Union["str", "DecompositionMixin"] = "Vanilla",
+        decomposition: Union[str, DecompositionMixin] = "Vanilla",
         p: Optional[str] = 1,
         q: Optional[float] = 3,
         seed: Optional[int] = None,
@@ -110,26 +112,26 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
             Transformed matrix
         """
         params = self._load_data(X=X, sample_weight=sample_weight, group_a=group_a, group_b=group_b)
-        X = params["X"]
+        x = params["X"]
         sample_weight = params["sample_weight"]
         group_a = params["group_a"].astype("int32")
         group_b = params["group_b"].astype("int32")
         np.random.seed(self.seed)
-        fairlets, fairlet_centers, fairlet_costs = self.decomposition.fit_transform(X, group_a, group_b)
-        Xt = np.zeros_like(X)
-        mapping = np.zeros(len(X), dtype="int32")
-        centers = np.array([X[fairlet_center] for fairlet_center in fairlet_centers])
+        fairlets, fairlet_centers, fairlet_costs = self.decomposition.fit_transform(x, group_a, group_b)
+        xt = np.zeros_like(x)
+        mapping = np.zeros(len(x), dtype="int32")
+        centers = np.array([x[fairlet_center] for fairlet_center in fairlet_centers])
         for i, fairlet in enumerate(fairlets):
-            Xt[fairlet] = X[fairlet_centers[i]]
+            xt[fairlet] = x[fairlet_centers[i]]
             mapping[fairlet] = i
-            sample_weight[fairlet] = len(fairlet) / len(X)
+            sample_weight[fairlet] = len(fairlet) / len(x)
 
         self.update_estimator_param("sample_weight", sample_weight)
         self.sample_weight = sample_weight
-        self.X = X
+        self.X = x
         self.mapping = mapping
         self.centers = centers
-        return Xt
+        return xt
 
     def transform(self, X):
         """

@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from typing import Optional
 
 import numpy as np
 import pandas as pd
 
-from ..commons._conventions import *
+# from holisticai.bias.mitigation.inprocessing.commons._conventions import *
 
 
 class GridGenerator:
@@ -43,20 +45,13 @@ class GridGenerator:
         self.dim = len(constraint.basis["+"].columns)
         coefs = self._generate_coefs()
         # Convert the grid of basis coefficients into a grid of lambda vectors
-        grid = constraint.basis["+"].dot(coefs["+"]) + constraint.basis["-"].dot(
-            coefs["-"]
-        )
+        grid = constraint.basis["+"].dot(coefs["+"]) + constraint.basis["-"].dot(coefs["-"])
         return grid
 
     def _get_true_dim(self):
-        if self.force_L1_norm:
-            true_dim = self.dim - 1
-        else:
-            true_dim = self.dim
+        true_dim = self.dim - 1 if self.force_L1_norm else self.dim
 
-        n_units = (float(self.grid_size) / (2.0 ** self.neg_allowed.sum())) ** (
-            1.0 / true_dim
-        ) - 1
+        n_units = (float(self.grid_size) / (2.0 ** self.neg_allowed.sum())) ** (1.0 / true_dim) - 1
         n_units = int(np.floor(n_units))
         if n_units < 0:
             n_units = 0
@@ -83,10 +78,7 @@ class GridGenerator:
             self.accumulator.append(self.entry.copy())
         else:
             if (index == self.dim - 1) and (self.force_L1_norm):
-                if self.neg_allowed[index] and max_val > 0:
-                    values = [-max_val, max_val]
-                else:
-                    values = [max_val]
+                values = [-max_val, max_val] if self.neg_allowed[index] and max_val > 0 else [max_val]
             else:
                 min_val = -max_val if self.neg_allowed[index] else 0
                 values = range(min_val, max_val + 1)

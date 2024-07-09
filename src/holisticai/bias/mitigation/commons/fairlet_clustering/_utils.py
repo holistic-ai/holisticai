@@ -43,7 +43,7 @@ def balance_calculation(data, centers, mapping):
     float
         Balance value
     """
-    fair = dict([(i, [0, 0]) for i in centers])
+    fair = {i: [0, 0] for i in centers}
     for i in mapping:
         fair[i[1]][1] += 1
         if data[i[0]][0] == 1:  # MARITAL
@@ -53,10 +53,7 @@ def balance_calculation(data, centers, mapping):
     for i in list(fair.keys()):
         p = fair[i][0]
         q = fair[i][1] - fair[i][0]
-        if p == 0 or q == 0:
-            balance = 0
-        else:
-            balance = min(float(p / q), float(q / p))
+        balance = 0 if p == 0 or q == 0 else min(float(p / q), float(q / p))
         curr_b.append(balance)
 
     return min(curr_b)
@@ -84,12 +81,8 @@ def plot_analysis(degrees, costs, balances, step_size):
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(14, 5))
     ax[0].plot(costs, marker=".", color="blue")
     ax[0].set_xticks(list(range(0, len(degrees), step_size)))
-    ax[0].set_xticklabels(
-        list(range(min(degrees), max(degrees) + 1, step_size)), fontsize=12
-    )
+    ax[0].set_xticklabels(list(range(min(degrees), max(degrees) + 1, step_size)), fontsize=12)
     ax[1].plot(balances, marker="x", color="saddlebrown")
     ax[1].set_xticks(list(range(0, len(degrees), step_size)))
-    ax[1].set_xticklabels(
-        list(range(min(degrees), max(degrees) + 1, step_size)), fontsize=12
-    )
+    ax[1].set_xticklabels(list(range(min(degrees), max(degrees) + 1, step_size)), fontsize=12)
     plt.show()

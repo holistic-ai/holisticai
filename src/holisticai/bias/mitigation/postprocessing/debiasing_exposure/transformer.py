@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
-
-from .algorithm import DELTRAlgorithm
-from .algorithm_utils import Standarizer
+from holisticai.bias.mitigation.postprocessing.debiasing_exposure.algorithm import DELTRAlgorithm
+from holisticai.bias.mitigation.postprocessing.debiasing_exposure.algorithm_utils import Standarizer
 
 
 class DebiasingExposure:
@@ -23,7 +22,7 @@ class DebiasingExposure:
         query_col="query_id",
         doc_col="doc_id",
         score_col="judgment",
-        feature_cols=[],
+        feature_cols=None,
         gamma: float = 1.0,
         number_of_iterations=3000,
         learning_rate=0.001,
@@ -76,11 +75,12 @@ class DebiasingExposure:
             If > 0, print progress.
         """
 
+        if feature_cols is None:
+            feature_cols = []
+
         # check if mandatory parameters are present
         if group_col is None:
-            raise ValueError(
-                "The name of column in data `group_col` must be initialized"
-            )
+            raise ValueError("The name of column in data `group_col` must be initialized")
         if gamma is None:
             raise ValueError("The `gamma` parameter must be initialized")
 
@@ -113,7 +113,7 @@ class DebiasingExposure:
 
     def _filter_invalid_examples(self, rankings):
         new_rankings = []
-        for q, ranking in rankings.groupby(self.query_col):
+        for _, ranking in rankings.groupby(self.query_col):
             if (ranking[self.group_col].sum() > 0).any():
                 new_rankings.append(ranking)
         new_rankings = pd.concat(new_rankings, axis=0).reset_index(drop=True)
@@ -137,11 +137,7 @@ class DebiasingExposure:
         rankings = self._filter_invalid_examples(rankings)
         if self.feature_cols == []:
             restricted_cols = [self.query_col, self.doc_col, self.score_col]
-            self.feature_cols = [
-                col
-                for col in rankings.columns.to_list()
-                if col not in restricted_cols
-            ]
+            self.feature_cols = [col for col in rankings.columns.to_list() if col not in restricted_cols]
 
         # prepare data
         (
@@ -156,9 +152,7 @@ class DebiasingExposure:
         if self._standardize:
             feature_matrix = self.standarizer.fit_transform(feature_matrix)
 
-        self._omega = self.algorithm.fit(
-            query_ids, protected_feature, training_scores, feature_matrix
-        )
+        self._omega = self.algorithm.fit(query_ids, protected_feature, training_scores, feature_matrix)
 
         # return model
         return self
@@ -182,9 +176,7 @@ class DebiasingExposure:
             raise SystemError("You need to train a model first!")
 
         # prepare data
-        query_ids, doc_ids, protected_attributes, feature_matrix = self._prepare_data(
-            rankings, has_judgment=False
-        )
+        query_ids, doc_ids, protected_attributes, feature_matrix = self._prepare_data(rankings, has_judgment=False)
 
         # standardize data if allowed
         if self._standardize:
@@ -232,5 +224,4 @@ class DebiasingExposure:
         if has_judgment:
             scores = data[self.score_col]
             return query_ids, doc_ids, protected_attributes, feature_matrix, scores
-        else:
-            return query_ids, doc_ids, protected_attributes, feature_matrix
+        return query_ids, doc_ids, protected_attributes, feature_matrix

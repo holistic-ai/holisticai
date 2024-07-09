@@ -1,9 +1,13 @@
+from __future__ import annotations
+
+import logging
 from typing import Optional
 
 import numpy as np
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-from tqdm import trange
+
+logger = logging.getLogger(__name__)
 
 
 class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
@@ -26,10 +30,10 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
             Number of iterations.
 
         alpha : float
-            Model parameter.
+            Model parameter. Alpha is the learning rate.
 
         lamda : float
-            Model parameter.
+            Model parameter. Lambda is the regularization parameter.
 
         verbose : int
             If >0, will show progress percentage.
@@ -95,18 +99,16 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
         W = np.ones((N, M))
         i_list, j_list = np.where(R > 0)
         W_s = W[i_list, j_list]
-        for _ in trange(self.steps, leave=self.verbose > 0):
+
+        logger.info("Blind Spot Awarness Matrix Factorization Algorithm Training")
+        for _ in range(self.steps):
             for i, j, wij in zip(i_list, j_list, W_s):
                 eij = R[i][j] - np.dot(P[i, :], Q[:, j])
                 P[i, :] = P[i, :] + self.alpha * (
-                    2 * eij * Q[:, j]
-                    - self.lamda * P[i, :]
-                    - self.beta * (P[i, :] - Q[:, j]) * wij
+                    2 * eij * Q[:, j] - self.lamda * P[i, :] - self.beta * (P[i, :] - Q[:, j]) * wij
                 )
                 Q[:, j] = Q[:, j] + self.alpha * (
-                    2 * eij * P[i, :]
-                    - self.lamda * Q[:, j]
-                    + self.beta * (P[i, :] - Q[:, j]) * wij
+                    2 * eij * P[i, :] - self.lamda * Q[:, j] + self.beta * (P[i, :] - Q[:, j]) * wij
                 )
 
         return P, Q

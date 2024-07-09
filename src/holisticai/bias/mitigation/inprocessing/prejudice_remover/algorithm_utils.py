@@ -31,7 +31,7 @@ class ObjectiveFunction:
             loss function value
         """
         coef = coef_.reshape(self.estimator.nb_group_values, self.estimator.nb_features)
-        X = self.estimator._preprocessing_data(X)
+        X = self.estimator.preprocessing_data(X)
         sigma = self.estimator.sigmoid(X=X, groups=groups, coef=coef)
         loss = self.loss_fn(y=y, sigma=sigma, groups=groups, coef=coef)
         return loss
@@ -54,7 +54,7 @@ class ObjectiveFunction:
         """
 
         coef = coef_.reshape(self.estimator.nb_group_values, self.estimator.nb_features)
-        X = self.estimator._preprocessing_data(X)
+        X = self.estimator.preprocessing_data(X)
         sigma = self.estimator.sigmoid(X=X, groups=groups, coef=coef)
         return self.loss_fn.gradient(X=X, y=y, sigma=sigma, groups=groups, coef=coef)
 
@@ -75,14 +75,14 @@ class PRLogger:
             logger_format="iteration",
         )
 
-    def set_log_fn(self, type, **kargs):
+    def set_log_fn(self, htype, **kargs):
         for param_name, param_fn in kargs.items():
-            self.log_params.append((param_name, type))
+            self.log_params.append((param_name, htype))
             self.fn_params[param_name] = param_fn
 
     def callback(self, x):
         self.step += 1
-        if self.verbose > 0:
+        if self.verbose > 0:  # noqa: SIM102
             if (self.step % self.print_interval) == 0 or (self.step % self.total_iterations) == 0:
                 args = [self.fn_params[pn](x) for pn, _ in self.log_params[1:]]
                 self.logger.update(self.step, *args)

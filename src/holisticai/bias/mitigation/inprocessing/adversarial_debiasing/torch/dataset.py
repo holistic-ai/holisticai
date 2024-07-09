@@ -19,9 +19,5 @@ class ADDataset(Dataset):
     def __getitem__(self, idx):
         X = torch.tensor(self.X[idx]).type(torch.FloatTensor).to(self.device)
         y = torch.tensor(self.y[idx, None]).type(torch.FloatTensor).to(self.device)
-        group = (
-            torch.tensor(self.groups_num[idx, None])
-            .type(torch.FloatTensor)
-            .to(self.device)
-        )
+        group = torch.tensor(self.groups_num[idx, None]).type(torch.FloatTensor).to(self.device)
         return (X, y), (y, group)

@@ -1,6 +1,8 @@
-import warnings
+import logging
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 def check_ranking(protected, mtable):
@@ -24,9 +26,7 @@ def check_ranking(protected, mtable):
     """
     # if the mtable has a different number elements than there are in the top docs return false
     if len(protected) != len(mtable):
-        raise ValueError(
-            "Number of documents in ranking and mtable length must be equal!"
-        )
+        raise ValueError("Number of documents in ranking and mtable length must be equal!")
 
     # check number of protected element at each rank
     return not (protected.cumsum().values < np.array(mtable)).any()
@@ -51,20 +51,15 @@ def validate_basic_parameters(k, p, alpha):
     """
     if k < 10 or k > 400:
         if k < 2:
-            raise ValueError(
-                "Total number of elements `k` should be between 10 and 400"
-            )
-        else:
-            warnings.warn("Library has not been tested with values outside this range")
+            raise ValueError("Total number of elements `k` should be between 10 and 400")
+        logger.warning("Library has not been tested with values outside this range")
 
     if p < 0.02 or p > 0.98:
         if p < 0 or p > 1:
             raise ValueError(
-                "The proportion of protected candidates `p` in the top-k ranking should be between "
-                "0.02 and 0.98"
+                "The proportion of protected candidates `p` in the top-k ranking should be between " "0.02 and 0.98"
             )
-        else:
-            warnings.warn("Library has not been tested with values outside this range")
+        logger.warning("Library has not been tested with values outside this range")
 
     validate_alpha(alpha)
 
@@ -72,8 +67,5 @@ def validate_basic_parameters(k, p, alpha):
 def validate_alpha(alpha):
     if alpha < 0.01 or alpha > 0.15:
         if alpha < 0.001 or alpha > 0.5:
-            raise ValueError(
-                "The significance level `alpha` must be between 0.01 and 0.15"
-            )
-        else:
-            warnings.warn("Library has not been tested with values outside this range")
+            raise ValueError("The significance level `alpha` must be between 0.01 and 0.15")
+        logger.warning("Library has not been tested with values outside this range")

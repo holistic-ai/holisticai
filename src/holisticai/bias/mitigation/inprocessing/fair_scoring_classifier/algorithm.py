@@ -1,7 +1,12 @@
-import cvxpy as cp
-import numpy as np
+from __future__ import annotations
 
-from .utils import *
+import logging
+from typing import Optional
+
+import numpy as np
+from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.utils import get_class_count, get_class_indexes
+
+logger = logging.getLogger(__name__)
 
 
 class FairScoreClassifierAlgorithm:
@@ -21,10 +26,10 @@ class FairScoreClassifierAlgorithm:
         objectives: str,
         fairness_groups: list,
         fairness_labels: list,
-        constraints: dict = {},
+        constraints: Optional[dict] = None,
         lambda_bound: int = 9,
         time_limit: int = 100,
-        verbose: int = 0
+        verbose: int = 0,
     ):
         """
         Init FairScoreClassifier object
@@ -49,7 +54,7 @@ class FairScoreClassifierAlgorithm:
         self.objectives = objectives
         self.fairness_groups = fairness_groups
         self.fairness_labels = fairness_labels
-        self.constraints = constraints
+        self.constraints = {} if constraints is None else constraints
         self.lambda_bound = lambda_bound
         self.time_limit = time_limit
         self.verbose = verbose
@@ -59,8 +64,8 @@ class FairScoreClassifierAlgorithm:
         class_indexes = get_class_indexes(y)
 
         self.lambdas = self.solve_model(X, y, N_class, class_indexes)
-        #accuracy = get_accuracy(X, y, self.lambdas)
-        #balanced_accuracy = get_balanced_accuracy(X, y, self.lambdas)
+        # accuracy = get_accuracy(X, y, self.lambdas)
+        # balanced_accuracy = get_balanced_accuracy(X, y, self.lambdas)
 
     def solve_model(self, X, y, N_class, class_indexes):
         N = len(X)
@@ -69,11 +74,14 @@ class FairScoreClassifierAlgorithm:
         gamma = 0.01
         M = self.lambda_bound * D + 1
 
+        import cvxpy as cp
+
         l = cp.Variable((L, D))
         constraints = [l <= self.lambda_bound, l >= -self.lambda_bound]
 
         for g in self.fairness_groups:
-            constraints.append(l[:, g] == 0)
+            constraint = l[:, g] == 0
+            constraints.append(constraint)
 
         z = cp.Variable(N, boolean=True)
 
@@ -94,9 +102,9 @@ class FairScoreClassifierAlgorithm:
             for i in range(N):
                 for offset in range(1, L):
                     new_contrant = -M * z[i] <= cp.sum(l[y_idx[i], :] @ X[i, :])
-                    - gamma * y_idx[i]
-                    - cp.sum(l[(y_idx[i] + offset) % L, :] @ X[i, :])
-                    - gamma * ((y_idx[i] + offset) % L)
+                    -gamma * y_idx[i]
+                    -cp.sum(l[(y_idx[i] + offset) % L, :] @ X[i, :])
+                    -gamma * ((y_idx[i] + offset) % L)
                     constraints.append(new_contrant)
 
         if "s" in self.constraints:
@@ -114,19 +122,19 @@ class FairScoreClassifierAlgorithm:
                 for index in range(L):
                     for offset in range(1, L):
                         new_constaint = -M * (1 - pos[i, index]) <= cp.sum(l[index, :] @ X[i, :])
-                        - gamma * index
-                        - cp.sum(l[(index + offset) % L, :] @ X[i, :])
-                        - gamma * ((index + offset) % L)
+                        -gamma * index
+                        -cp.sum(l[(index + offset) % L, :] @ X[i, :])
+                        -gamma * ((index + offset) % L)
                         constraints.append(new_constaint)
                 constraints.append(cp.sum(pos[i, :]) == 1)
 
         if "s" in self.constraints:
             for index in range(L):
-                constraints.append(cp.sum(alpha[index, :]) <= self.constraints["s"])
+                contraint = cp.sum(alpha[index, :]) <= self.constraints["s"]
+                constraints.append(contraint)
 
         for index in self.fairness_labels:
             for g in self.fairness_groups:
-
                 i_g = [i for i in range(N) if X[i][g] == 1]
                 i_g_bar = [i for i in range(N) if X[i][g] == 0]
                 N_g = len(i_g)
@@ -143,9 +151,7 @@ class FairScoreClassifierAlgorithm:
                 N_g_bar_neg = len(i_g_bar_neg)
 
                 if N_g == 0 or N_g_bar == 0:
-                    print(
-                        "At least one of the protected groups is empty, skipping fairness constraints"
-                    )
+                    logger.info("At least one of the protected groups is empty, skipping fairness constraints")
                     break
 
                 if "omr" in self.constraints:
@@ -167,12 +173,10 @@ class FairScoreClassifierAlgorithm:
                 if "sp" in self.constraints and i_g and i_g_bar:
                     constraints.append(
                         -self.constraints["sp"]
-                        <= (1 / N_g) * cp.sum(pos[i_g, index])
-                        - (1 / N_g_bar) * cp.sum(pos[i_g_bar, index])
+                        <= (1 / N_g) * cp.sum(pos[i_g, index]) - (1 / N_g_bar) * cp.sum(pos[i_g_bar, index])
                     )
                     constraints.append(
-                        (1 / N_g) * cp.sum(pos[i_g, index])
-                        - (1 / N_g_bar) * cp.sum(pos[i_g_bar, index])
+                        (1 / N_g) * cp.sum(pos[i_g, index]) - (1 / N_g_bar) * cp.sum(pos[i_g_bar, index])
                         <= self.constraints["sp"]
                     )
 
@@ -200,13 +204,7 @@ class FairScoreClassifierAlgorithm:
                         <= self.constraints["eo"]
                     )
 
-                if (
-                    "eod" in self.constraints
-                    and i_g_neg
-                    and i_g_bar_neg
-                    and i_g_pos
-                    and i_g_bar_pos
-                ):
+                if "eod" in self.constraints and i_g_neg and i_g_bar_neg and i_g_pos and i_g_bar_pos:
                     constraints.append(
                         -self.constraints["eod"]
                         <= (1 / N_g_neg) * cp.sum(pos[i_g_neg, index])
@@ -238,9 +236,7 @@ class FairScoreClassifierAlgorithm:
             cost /= len(N_class)
 
         if "a" in self.objectives and "s" in self.constraints:
-            cost = (1 / N) * cp.sum(z) + (1 / (self.constraints["s"] * L * N)) * cp.sum(
-                alpha
-            )
+            cost = (1 / N) * cp.sum(z) + (1 / (self.constraints["s"] * L * N)) * cp.sum(alpha)
 
         if "ba" in self.objectives and "s" in self.constraints:
             cost = 0
@@ -250,7 +246,7 @@ class FairScoreClassifierAlgorithm:
             cost += (1 / (self.constraints["s"] * L * N)) * cp.sum(alpha)
 
         prob = cp.Problem(cp.Minimize(cost), constraints)
-        prob.solve(solver=cp.CBC, verbose=self.verbose==1, maximumSeconds=self.time_limit)
+        prob.solve(solver=cp.CBC, verbose=self.verbose == 1, maximumSeconds=self.time_limit)
         return l.value
 
     def predict(self, X):
@@ -262,12 +258,11 @@ class FairScoreClassifierAlgorithm:
 
         y = []
 
-        for index, sample in enumerate(X):
+        for _, sample in enumerate(X):
             scores = []
             for l_list in self.lambdas:
-                scores.append(
-                    sum(feature * l_list[j] for j, feature in enumerate(sample))
-                )
+                score = sum([feature * l_list[j] for j, feature in enumerate(sample)])
+                scores.append(score)
             y_pred = []
             for i in range(len(scores)):
                 if i == np.argmax(scores):

@@ -22,8 +22,7 @@ class ClassifierModel(nn.Module):
         p = self.out_act(x)
         if trainable:
             return p, x
-        else:
-            return p
+        return p
 
 
 class AdversarialModel(nn.Module):
@@ -55,8 +54,7 @@ class AdversarialModel(nn.Module):
         p = self.out_act(x)
         if trainable:
             return p, x
-        else:
-            return p
+        return p
 
 
 class ADModel(nn.Module):

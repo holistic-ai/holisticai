@@ -8,10 +8,7 @@ class WassersteinBarycenterAlgorithm:
         self.eps = np.finfo(float).eps
 
     def fit(self, y_pred: np.ndarray, sensitive_groups: np.ndarray):
-
-        p_attr = self.sens_groups.fit_transform(
-            sensitive_groups, convert_numeric=True
-        ).squeeze()
+        p_attr = self.sens_groups.fit_transform(sensitive_groups, convert_numeric=True).squeeze()
         self.group_values = np.unique(p_attr)
 
         group_freq = [

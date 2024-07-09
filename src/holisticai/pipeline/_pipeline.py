@@ -89,7 +89,7 @@ class Pipeline(SKLPipeline, PipelineHelper):
             Pipeline with fitted steps.
         """
         super().fit(X, y, **fit_params)
-        Xt = self._transform_without_final(X)  # noqa: N806
+        Xt = self._transform_without_final(X)
         self.fit_post_estimator_transformers(Xt, y)
         return self
 
@@ -155,5 +155,5 @@ class Pipeline(SKLPipeline, PipelineHelper):
         dict
             dictionary with postprocessor outputs
         """
-        Xt = self._transform_without_final(X)  # noqa: N806
+        Xt = self._transform_without_final(X)
         return self._transform_post_estimator_transformers(Xt, **params)

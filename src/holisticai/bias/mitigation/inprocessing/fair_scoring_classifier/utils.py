@@ -17,9 +17,7 @@ def get_indexes_from_names(df, names):
     -------
     list : list of index
     """
-    indexes = []
-    for item in names:
-        indexes.append(df.columns.get_loc(item))
+    indexes = [df.columns.get_loc(item) for item in names]
     return indexes
 
 
@@ -38,11 +36,7 @@ def process_y(y):
     -------
     y_processed (list of labels)
     """
-    y_processed = []
-    for line in y:
-        for i in range(len(line)):
-            if line[i] == 1:
-                y_processed.append(i)
+    y_processed = [i for line in y for i, val in enumerate(line) if val == 1]
     return y_processed
 
 
@@ -147,10 +141,7 @@ def get_class_count(y):
     -------
     The count of each class
     """
-    count = []
-
-    for i in range(len(y[0])):
-        count.append(0)
+    count = [0 for i in range(len(y[0]))]
 
     for labels in y:
         for index, label in enumerate(labels):
@@ -175,11 +166,7 @@ def get_class_indexes(y):
     -------
     The indexes of each class
     """
-    indexes = []
-
-    for i in range(len(y[0])):
-        indexes.append([])
-
+    indexes = [[] for i in range(len(y[0]))]
     for i, labels in enumerate(y):
         for index, label in enumerate(labels):
             if label == 1:
@@ -208,10 +195,9 @@ def predict(x, l_lists):
     """
     y = []
 
-    for index, sample in enumerate(x):
-        scores = []
-        for l_list in l_lists:
-            scores.append(sum(feature * l_list[j] for j, feature in enumerate(sample)))
+    for _, sample in enumerate(x):
+        scores = [sum(feature * l_list[j] for j, feature in enumerate(sample)) for l_list in l_lists]
+
         y_pred = []
         for i in range(len(scores)):
             if i == np.argmax(scores):
@@ -224,13 +210,7 @@ def predict(x, l_lists):
 
 
 def format_labels(y):
-    y_formatted = []
-
-    for labels in y:
-        for i in range(len(labels)):
-            if labels[i] == 1:
-                y_formatted.append(i)
-
+    y_formatted = [i for labels in y for i in range(len(labels)) if labels[i] == 1]
     return y_formatted
 
 

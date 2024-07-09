@@ -4,7 +4,7 @@
 </h1>
 
 [![PyPI](https://img.shields.io/pypi/v/holisticai)](https://pypi.org/project/holisticai/)
-[![Documentation Status](https://readthedocs.org/projects/holisticai/badge/?version=latest)](https://holistic-ai.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/holisticai/badge/?version=latest)](https://holisticai.readthedocs.io/en/latest/?badge=latest)
 [![PyPI - License](https://img.shields.io/github/license/holistic-ai/holisticai)](https://img.shields.io/github/license/holistic-ai/holisticai)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/holisticai)](https://img.shields.io/pypi/dm/holisticai)
 [![Slack](https://img.shields.io/badge/Slack-Join-blue)](https://join.slack.com/t/holisticaicommunity/shared_invite/zt-2jamouyrn-BrMfeoBZIHT8HbLzB3P9QQ)
