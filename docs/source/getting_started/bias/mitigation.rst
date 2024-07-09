@@ -1,6 +1,6 @@
 
-Bias Mitigation
-============
+Mitigation
+==========
 
 .. contents:: **Contents:**
     :depth: 2
@@ -38,7 +38,7 @@ Inprocessing
 
 
 Post-processing
---------------
+---------------
 
 ...
 

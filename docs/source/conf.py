@@ -33,7 +33,7 @@ def run_notebook(notebook_path):
         except Exception as e:
             print(f"Error executing the notebook {notebook_path}: {e}")
 
-def run_all_notebooks(folder_path, output_directory):
+def run_all_notebooks(folder_path):
     for root, _, files in os.walk(folder_path):
         for file in files:
             if file.endswith('.ipynb'):
@@ -54,7 +54,7 @@ def copy_folder(origen, destino):
         if not os.path.exists(destino):
             os.makedirs(destino)
         shutil.copytree(origen, destino, dirs_exist_ok=True)
-        run_all_notebooks(destino)
+        #run_all_notebooks(destino)
         print(f"Folder copied from {origen} to {destino} sucessfully.")
     except Exception as e:
         print(f"Error when trying to copy folder: {e}")

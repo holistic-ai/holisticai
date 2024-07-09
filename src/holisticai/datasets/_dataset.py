@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from holisticai.utils.obj_rep.datasets import generate_html
+from holisticai.utils.obj_rep.object_repr import generate_html_for_generic_object
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -40,14 +40,25 @@ class DatasetDict(dict):
         return f"DatasetDict({{\n    {datasets_repr}\n}})"
 
     def _repr_html_(self):
-        dataset_info = []
+        nested_objs = []
         for name, dataset in self.datasets.items():
-            dataset_info.append(
-                {"type": "Dataset", "name": name, "features": dataset.features, "num_rows": dataset.num_rows}
+            nested_objs.append(
+                {
+                    "dtype": "Dataset",
+                    "name": name,
+                    "attributes": {
+                        "Number of Rows": dataset.num_rows,
+                        "Features": dataset.features
+                    },
+                }
             )
-
-        datasetdict_info = {"DatasetDict": dataset_info}
-        return generate_html(datasetdict_info)
+        # Example usage
+        obj = {
+            "dtype": "DatasetDict",
+            "attributes": {},
+            "nested_objects": nested_objs
+        }
+        return generate_html_for_generic_object(obj, feature_columns=5)
 
 
 class GroupByDataset:
@@ -96,11 +107,14 @@ class GroupByDataset:
         for group_name, groupby_obj_batch in self.groupby_obj:
             yield group_name, Dataset(groupby_obj_batch)
 
-    def __repr_info(self):
-        """Returns a dictionary containing the information about the GroupByDataset."""
-        return {
-            "GroupByDataset": {"grouped_names": self.grouped_names, "features": self.features, "ngroups": self.ngroups}
-        }
+    def count(self):
+        dss = []
+        for group_name, groupby_obj_batch in self.groupby_obj:
+            data = dict(zip(self.grouped_names,group_name))
+            data['group_size'] = len(groupby_obj_batch)
+            dss.append(data)
+        return pd.DataFrame(dss)
+
 
     def __repr__(self):
         """Returns a string representation of the GroupByDataset."""
@@ -114,8 +128,15 @@ class GroupByDataset:
 
     def _repr_html_(self):
         """Returns an HTML representation of the GroupByDataset."""
-        dataset_info = self.__repr_info()
-        return generate_html(dataset_info)
+        obj = {
+            "dtype": "GroupByDataset",
+                    "attributes": {
+                        "count": self.ngroups,
+                        "grouped_names": self.grouped_names,
+                        "Features": [" , ".join(self.features)]
+                    },
+        }
+        return generate_html_for_generic_object(obj, feature_columns=5)
 
 
 def dataframe_to_level_dict_with_series(df, row_index):
@@ -289,8 +310,14 @@ class Dataset:
         return {"Dataset": {"features": self.features, "num_rows": self.num_rows}}
 
     def _repr_html_(self):
-        dataset_info = self.__repr_info()
-        return generate_html(dataset_info)
+        obj = {
+            "dtype": "Dataset",
+                    "attributes": {
+                        "Number of Rows": self.num_rows,
+                        "Features": [" , ".join(self.features)]
+                    },
+        }
+        return generate_html_for_generic_object(obj, feature_columns=5)
 
     def __getitem__(self, key: str | int | list):
         """Returns a subset of the dataset based on the given key."""

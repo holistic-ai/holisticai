@@ -1,6 +1,6 @@
 
-Bias Metrics
-============
+Metrics
+=======
 
 Bias is defined as an unwanted prejudice in the decisions made by an AI system that systematically disadvantages a person or group. Various types of bias can exist and may be unintentionally introduced into algorithms at any stage of the development process, whether during data generation or model building.
 

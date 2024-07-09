@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-import cvxpy as cp
 import numpy as np
 from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.utils import get_class_count, get_class_indexes
 
@@ -74,6 +73,8 @@ class FairScoreClassifierAlgorithm:
         D = len(X[0])
         gamma = 0.01
         M = self.lambda_bound * D + 1
+
+        import cvxpy as cp
 
         l = cp.Variable((L, D))
         constraints = [l <= self.lambda_bound, l >= -self.lambda_bound]

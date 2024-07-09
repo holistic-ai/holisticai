@@ -30,10 +30,10 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
             Number of iterations.
 
         alpha : float
-            Model parameter.
+            Model parameter. Alpha is the learning rate.
 
         lamda : float
-            Model parameter.
+            Model parameter. Lambda is the regularization parameter.
 
         verbose : int
             If >0, will show progress percentage.

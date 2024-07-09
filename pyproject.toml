@@ -82,7 +82,9 @@ dependencies = [
   "pandas",
   "numpy==1.26",
   "pybind11>=2.12",
-  "pydantic"
+  "pydantic",
+  "jax",
+  "jaxopt"
 ]
 
 [tool.hatch.envs.sphinx.scripts]
@@ -106,7 +108,9 @@ dependencies = [
   "shap>=0.42.1",
   "ipykernel>=6.25.2",
   "ruff",
-  "pydantic"
+  "pydantic",
+  "jax",
+  "jaxopt"
 ]
 env-vars = { PYTHONPATH = "src" }
 

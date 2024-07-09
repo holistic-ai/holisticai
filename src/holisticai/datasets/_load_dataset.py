@@ -91,18 +91,30 @@ def load_student_multiclass_dataset(protected_attribute: Literal["sex", "address
 
 
 def load_student_dataset(
-    target: Literal["G1", "G2", "G3"] = "G3", protected_attribute: Literal["sex", "address", "Mjob", "Fjob"] = "sex"
+    target: Literal["G1", "G2", "G3"] = "G3", protected_attribute: Literal["sex", "address", "Mjob", "Fjob", "all"] = "sex"
 ):
-    # outputs = ["G1", "G2", "G3"]
-    # protected_attributes = ["sex", "address", "Mjob", "Fjob"]
+    if protected_attribute not in ["sex", "address", "Mjob", "Fjob", "all"]:
+        raise ValueError(f"Unknown protected attribute: {protected_attribute}")
+
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
     bunch = load_student()
+
     df = bunch["frame"]
+    for col in ["sex", "address", "Mjob", "Fjob"]:
+        df[col] = df[col].apply(lambda x: x.replace("'", ""))
 
     df = df.dropna()
     y = df[target]
-    group_a = pd.Series(df[protected_attribute], name="group_a")
-    group_b = pd.Series(df[protected_attribute], name="group_b")
+
+    if protected_attribute == "all":
+        p_attr = df[['sex','address',"Mjob", "Fjob"]]
+    else:
+        p_attr = pd.Series(df[protected_attribute], name="p_attr")
+    group_cols = {'p_attr':p_attr}
+    if protected_attribute=='sex':
+        group_a = pd.Series(df[protected_attribute]=="'F'", name="group_a")
+        group_b = ~group_a
+        group_cols.update({'group_a':group_a, 'group_b':group_b})
 
     for col in df.select_dtypes(include=["object"]):
         df[col] = pd.factorize(df[col])[0]
@@ -112,7 +124,7 @@ def load_student_dataset(
 
     x = df.astype(float)
     y = y.reset_index(drop=True)
-    return Dataset(X=x, y=y, group_a=group_a, group_b=group_b)
+    return Dataset(X=x, y=y, **group_cols)
 
 
 def load_lastfm_dataset():
@@ -291,7 +303,7 @@ def load_dataset(dataset_name: ProcessedDatasets, **kargs) -> Dataset:
     if dataset_name == "student_multiclass":
         return load_student_multiclass_dataset()
     if dataset_name == "student":
-        return load_student_dataset()
+        return load_student_dataset(**kargs)
     if dataset_name == "lastfm":
         return load_lastfm_dataset()
     if dataset_name == "us_crime":
