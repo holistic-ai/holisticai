@@ -85,7 +85,9 @@ dependencies = [
   "pybind11>=2.12",
   "pydantic",
   "jax",
-  "jaxopt"
+  "jaxopt",
+  "optax",
+  "flax"
 ]
 
 [tool.hatch.envs.sphinx.scripts]
@@ -111,7 +113,9 @@ dependencies = [
   "ruff",
   "pydantic",
   "jax",
-  "jaxopt"
+  "jaxopt",
+  "optax",
+  "flax"
 ]
 env-vars = { PYTHONPATH = "src" }
 
