@@ -28,7 +28,7 @@ __all__ = [
     "DebiasingLearningMF",
     "PopularityPropensityMF",
     "FairRec",
-    "AdversarialDebiasing"
+    "AdversarialDebiasing",
 ]
 import importlib.util
 

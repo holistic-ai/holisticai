@@ -159,6 +159,7 @@ def dataframe_to_level_dict_with_series(df, row_index):
             data[level_0_name] = feature.iloc[row_index]
     return data
 
+
 class DataLoader:
     def __init__(self, dataset, batch_size, dtype):
         self.batch_size = batch_size
@@ -169,27 +170,32 @@ class DataLoader:
     def batched(self):
         def batch_generator(batch_size):
             for i in range(self.num_batches):
-                batch = Dataset(data=self.dataset.data.iloc[i * batch_size:(i + 1) * batch_size])
+                batch = Dataset(data=self.dataset.data.iloc[i * batch_size : (i + 1) * batch_size])
                 yield batch
 
-        if self.dtype == 'jax':
+        if self.dtype == "jax":
             import jax.numpy as jnp
+
             def batch_generator_jax(batch_size):
                 for batch in batch_generator(batch_size):
-                    yield {f:jnp.array(batch[f].values) for f in batch.features}
+                    yield {f: jnp.array(batch[f].values) for f in batch.features}
+
             return batch_generator_jax(self.batch_size)
 
-        if self.dtype == 'pandas':
+        if self.dtype == "pandas":
+
             def batch_generator_pandas(batch_size):
                 for batch in batch_generator(batch_size):
-                    yield {f:batch[f] for f in batch.features}
+                    yield {f: batch[f] for f in batch.features}
+
             return batch_generator_pandas(self.batch_size)
 
-        if self.dtype == 'numpy':
-            import numpy as np
+        if self.dtype == "numpy":
+
             def batch_generator_numpy(batch_size):
                 for batch in batch_generator(batch_size):
-                    yield {f:batch[f].values for f in batch.features}
+                    yield {f: batch[f].values for f in batch.features}
+
             return batch_generator_numpy(self.batch_size)
         return batch_generator(self.batch_size)
 
@@ -206,7 +212,7 @@ class DataLoader:
                     "dtype": "Dataset",
                     "attributes": {"Number of Rows": self.dataset.num_rows, "Features": self.dataset.features},
                 }
-            ]
+            ],
         }
         return generate_html_for_generic_object(obj, feature_columns=5)
 
@@ -255,7 +261,7 @@ class Dataset:
         self.__update_metadata()
         self.random_state = np.random.RandomState()
 
-    def remove_columns(self, columns: str|list):
+    def remove_columns(self, columns: str | list):
         """Returns a new dataset with the given columns removed."""
         return Dataset(self.data.drop(columns, level=0, axis=1))
 
@@ -381,8 +387,6 @@ class Dataset:
             return subset
 
         raise NotImplementedError
-
-    
 
 
 def concatenate_datasets(part_datasets: list[Dataset]):

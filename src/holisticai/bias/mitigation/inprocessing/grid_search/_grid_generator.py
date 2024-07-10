@@ -62,7 +62,7 @@ class GridGenerator:
 
     def _generate_coefs(self):
         np_grid_values = self._build_grid()
-        grid_values = pd.DataFrame(np_grid_values[:self.grid_size]).T
+        grid_values = pd.DataFrame(np_grid_values[: self.grid_size]).T
         pos_grid_values = grid_values.clip(lower=0)
         neg_grid_values = -grid_values.clip(upper=0)
         lambda_vector = {"+": pos_grid_values, "-": neg_grid_values}

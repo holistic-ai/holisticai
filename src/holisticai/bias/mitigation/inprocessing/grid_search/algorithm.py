@@ -26,7 +26,8 @@ class GridSearchAlgorithm:
         grid_size: int = 20,
         grid_limit: int = 2,
         n_jobs=-1,
-        verbose=0):
+        verbose=0,
+    ):
         """
         Init GridSearchAlgorithm object
 
@@ -87,7 +88,7 @@ class GridSearchAlgorithm:
         self._load_data(X, y, sensitive_features)
         grid = self._generate_grid()
 
-        results =  Parallel(n_jobs=self.n_jobs, verbose=self.verbose)(
+        results = Parallel(n_jobs=self.n_jobs, verbose=self.verbose)(
             delayed(self.evaluate_candidate)(
                 X,
                 grid[col_name],
@@ -96,9 +97,9 @@ class GridSearchAlgorithm:
         )
 
         results = pd.DataFrame(results)
-        results['col_name'] = grid.columns
-        best_idx = results['loss'].idxmin()
-        best_colname = results['col_name'].iloc[best_idx]
+        results["col_name"] = grid.columns
+        best_idx = results["loss"].idxmin()
+        best_colname = results["col_name"].iloc[best_idx]
         self.bet_predictor = self._fit_estimator(X, grid[best_colname])
         return self
 
@@ -110,8 +111,8 @@ class GridSearchAlgorithm:
 
         objective = self.objective.gamma(predict_fn).iloc[0]
         gamma = self.constraint.gamma(predict_fn)
-        loss = (1- self.constraint_weight) * objective + self.constraint_weight * gamma.max()
-        return {'loss':loss, 'lambda_vec':lambda_vec}
+        loss = (1 - self.constraint_weight) * objective + self.constraint_weight * gamma.max()
+        return {"loss": loss, "lambda_vec": lambda_vec}
 
     def _load_data(self, X: Any, y: Any, sensitive_features: Any):
         self.constraint.load_data(X, y, sensitive_features)

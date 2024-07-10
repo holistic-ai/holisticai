@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import sys
 from typing import Optional
 
 import jax
@@ -19,6 +18,7 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 logger = logging.getLogger(__name__)
+
 
 class AdversarialDebiasing(BMImp):
     """Adversarial Debiasing
@@ -130,10 +130,11 @@ class AdversarialDebiasing(BMImp):
 
         self.sens_groups = SensitiveGroups()
 
-
     def transform_estimator(self, estimator=None):
         if estimator is None:
-            self.classifier = ClassifierModel(features_dim=self.features_dim, hidden_size=self.hidden_size, keep_prob=self.keep_prob)
+            self.classifier = ClassifierModel(
+                features_dim=self.features_dim, hidden_size=self.hidden_size, keep_prob=self.keep_prob
+            )
         else:
             self.estimator = estimator
         return self
@@ -172,15 +173,16 @@ class AdversarialDebiasing(BMImp):
         the same object
         """
         import pandas as pd
+
         params = self._load_data(X=X, y=y, group_a=group_a, group_b=group_b)
-        x = pd.DataFrame(params['X'])
+        x = pd.DataFrame(params["X"])
         y = pd.Series(params["y"])
         group_a = pd.Series(params["group_a"])
         group_b = pd.Series(params["group_b"])
         self.classes_ = params["classes_"]
 
         dataset = Dataset(X=x, y=y, group=group_a)
-        data_loader = DataLoader(dataset, batch_size=self.batch_size, dtype='jax')
+        data_loader = DataLoader(dataset, batch_size=self.batch_size, dtype="jax")
 
         feature_dim = x.shape[1]
 
@@ -188,29 +190,35 @@ class AdversarialDebiasing(BMImp):
         adversary_model = AdversarialModel()
         model = ADModel(classifier=self.classifier, adversarial=adversary_model)
         cls_state, adv_state = create_train_state(rng, model, learning_rate=self.learning_rate, feature_dim=feature_dim)
-        total_steps = self.epochs*data_loader.num_batches
+        total_steps = self.epochs * data_loader.num_batches
         step = 0
         for _ in range(self.epochs):
             losses_cls = []
             losses_adv = []
             for batch in data_loader:
                 rng, step_rng = jax.random.split(rng)
-                cls_state, adv_state, loss_cls, loss_adv = train_step(cls_state, adv_state, batch,
-                                                       use_debias=self.use_debias,
-                                                       adversary_loss_weight=self.adversary_loss_weight,
-                                                       rng=step_rng)
+                cls_state, adv_state, loss_cls, loss_adv = train_step(
+                    cls_state,
+                    adv_state,
+                    batch,
+                    use_debias=self.use_debias,
+                    adversary_loss_weight=self.adversary_loss_weight,
+                    rng=step_rng,
+                )
                 losses_cls.append(loss_cls)
                 losses_adv.append(loss_adv)
-                if self.verbose>0 and step % self.print_interval == 0:
-                    adv_loss_mean = f'{np.mean(losses_adv):.6f}' if self.use_debias else None
-                    logger.info(f"Step {step+1}/{total_steps}: Classifier Loss = {np.mean(losses_cls):.6f}, Adversarial Loss = {adv_loss_mean}")
-                step+=1
+                if self.verbose > 0 and step % self.print_interval == 0:
+                    adv_loss_mean = f"{np.mean(losses_adv):.6f}" if self.use_debias else None
+                    logger.info(
+                        f"Step {step+1}/{total_steps}: Classifier Loss = {np.mean(losses_cls):.6f}, Adversarial Loss = {adv_loss_mean}"
+                    )
+                step += 1
         self.cls_state, self.adv_state = cls_state, adv_state
         return self
 
     def _predict_proba(self, X: np.ndarray):
-        inputs=jnp.array(X)
-        y_prob = self.classifier.apply({'params': self.cls_state.params}, inputs, trainable=False)
+        inputs = jnp.array(X)
+        y_prob = self.classifier.apply({"params": self.cls_state.params}, inputs, trainable=False)
         return np.array(y_prob).ravel()
 
     def predict(self, X):

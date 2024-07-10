@@ -8,7 +8,9 @@ from sklearn import clone
 class Lagrangian:
     """Operations related to the Lagrangian"""
 
-    def __init__(self, X: np.ndarray, y: np.ndarray, estimator, constraints, B: float, opt_lambda: bool = True, **kwargs):
+    def __init__(
+        self, X: np.ndarray, y: np.ndarray, estimator, constraints, B: float, opt_lambda: bool = True, **kwargs
+    ):
         self.constraints = constraints
         self.constraints.load_data(X, y, **kwargs)
         self.obj = self.constraints.default_objective()
@@ -86,7 +88,11 @@ class Lagrangian:
 
     def _call_oracle(self, lambda_vec):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
-        y = (signed_weights > 0).astype(int) if self.constraints.PROBLEM_TYPE == "classification" else self.constraints.y_as_series
+        y = (
+            (signed_weights > 0).astype(int)
+            if self.constraints.PROBLEM_TYPE == "classification"
+            else self.constraints.y_as_series
+        )
         w = np.abs(signed_weights)
         sample_weight = self.constraints.total_samples * w / np.sum(w)
         estimator = clone(self.estimator, safe=False)
