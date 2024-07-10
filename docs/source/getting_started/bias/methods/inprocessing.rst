@@ -20,3 +20,5 @@ Here are the in-processing methods implemented in the Holistic AI package:
         inprocessing/rs_blind_spot_aware_blind_spot_aware_matrix_factorization.rst
         inprocessing/rs_popularity_propensity_propensity_scored_recommendations.rst
         inprocessing/rs_two_sided_fairness_fairrec_two_sided_fairness.rst
+        inprocessing/bc_adversarial_debiasing_adversarial_debiasing.rst
+        inprocessing/rs_popularity_propensity_matrix_factorization.rst
