@@ -34,7 +34,7 @@ dependencies = [
 
 [project.optional-dependencies]
 bias_metrics = ["scikit-learn>=1.0.2", "pandas>=1.1.5", "numpy>=1.19.5"]
-bias_mitigation = ["networkx>=3.1", "pandas>=1.1.5", "numpy>=1.19.5","pygad==3.3.1",]
+bias_mitigation = ["networkx>=3.1", "pandas>=1.1.5", "numpy>=1.19.5","pygad==3.3.1", "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
 xai_metrics = ["lime>=0.2.0.1", "shap>=0.42.1"]
 all = ["scikit-learn>=1.0.2", "pandas>=1.1.5", "numpy>=1.19.5", "networkx>=3.1", "pygad==3.3.1", "lime>=0.2.0.1", "shap>=0.42.1"]
 
