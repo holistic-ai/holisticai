@@ -1,16 +1,24 @@
 from __future__ import annotations
 
+import logging
+import sys
 from typing import Optional
 
+import jax
+import jax.numpy as jnp
 import numpy as np
-from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.dataset import ADDataset
-from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.models import ADModel, ClassifierModel
-from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.trainer import TrainArgs, Trainer
+from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.models import (
+    ADModel,
+    AdversarialModel,
+    ClassifierModel,
+    create_train_state,
+    train_step,
+)
+from holisticai.datasets import DataLoader, Dataset
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
 
-import torch
-
+logger = logging.getLogger(__name__)
 
 class AdversarialDebiasing(BMImp):
     """Adversarial Debiasing
@@ -91,7 +99,7 @@ class AdversarialDebiasing(BMImp):
         batch_size: Optional[int] = 32,
         shuffle: Optional[bool] = True,
         epochs: Optional[int] = 10,
-        initial_lr: Optional[float] = 0.01,
+        learning_rate: Optional[float] = 0.01,
         use_debias: Optional[bool] = True,
         adversary_loss_weight: Optional[float] = 0.1,
         verbose: Optional[int] = 1,
@@ -108,7 +116,7 @@ class AdversarialDebiasing(BMImp):
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.epochs = epochs
-        self.initial_lr = initial_lr
+        self.learning_rate = learning_rate
 
         # bias config
         self.adversary_loss_weight = adversary_loss_weight
@@ -118,48 +126,17 @@ class AdversarialDebiasing(BMImp):
         self.verbose = verbose
         self.print_interval = print_interval
         self.device = device
-        self.seed = seed
+        self.seed = seed if seed is not None else np.random.randint(0, 1000)
 
         self.sens_groups = SensitiveGroups()
 
+
     def transform_estimator(self, estimator=None):
         if estimator is None:
-            self.estimator = ClassifierModel(self.features_dim, self.hidden_size, self.keep_prob)
+            self.classifier = ClassifierModel(features_dim=self.features_dim, hidden_size=self.hidden_size, keep_prob=self.keep_prob)
         else:
             self.estimator = estimator
         return self
-
-    def _create_dataset(self, X, y, sensitive_features):
-        """
-        Organize data for pytorch environment.
-        """
-        groups_num = np.array(self.sens_groups.fit_transform(sensitive_features, convert_numeric=True))
-        dataset = ADDataset(X, y, groups_num, device=self.device)
-        return dataset
-
-    def _build_trainer(self, dataset):
-        """
-        Create a model trainer.
-        """
-
-        adm = ADModel(estimator=self.estimator).to(self.device)
-
-        train_args = TrainArgs(
-            epochs=self.epochs,
-            adversary_loss_weight=self.adversary_loss_weight,
-            batch_size=self.batch_size,
-            shuffle_data=self.shuffle,
-            verbose=self.verbose,
-            print_interval=self.print_interval,
-        )
-
-        trainer = Trainer(
-            model=adm,
-            dataset=dataset,
-            train_args=train_args,
-            use_debias=self.use_debias,
-        )
-        return trainer
 
     def fit(
         self,
@@ -194,22 +171,47 @@ class AdversarialDebiasing(BMImp):
         -------
         the same object
         """
-        params = self._load_data(y=y, group_a=group_a, group_b=group_b)
-        y = params["y"]
-        group_a = params["group_a"]
-        group_b = params["group_b"]
+        import pandas as pd
+        params = self._load_data(X=X, y=y, group_a=group_a, group_b=group_b)
+        x = pd.DataFrame(params['X'])
+        y = pd.Series(params["y"])
+        group_a = pd.Series(params["group_a"])
+        group_b = pd.Series(params["group_b"])
         self.classes_ = params["classes_"]
-        sensitive_features = np.stack([group_a, group_b], axis=1)
 
-        if self.seed is not None:
-            torch.manual_seed(self.seed)
+        dataset = Dataset(X=x, y=y, group=group_a)
+        data_loader = DataLoader(dataset, batch_size=self.batch_size, dtype='jax')
 
-        dataset = self._create_dataset(X, y, sensitive_features)
-        self.trainer = self._build_trainer(dataset)
+        feature_dim = x.shape[1]
 
-        self.trainer.train()
-
+        rng = jax.random.PRNGKey(self.seed)
+        adversary_model = AdversarialModel()
+        model = ADModel(classifier=self.classifier, adversarial=adversary_model)
+        cls_state, adv_state = create_train_state(rng, model, learning_rate=self.learning_rate, feature_dim=feature_dim)
+        total_steps = self.epochs*data_loader.num_batches
+        step = 0
+        for _ in range(self.epochs):
+            losses_cls = []
+            losses_adv = []
+            for batch in data_loader:
+                rng, step_rng = jax.random.split(rng)
+                cls_state, adv_state, loss_cls, loss_adv = train_step(cls_state, adv_state, batch,
+                                                       use_debias=self.use_debias,
+                                                       adversary_loss_weight=self.adversary_loss_weight,
+                                                       rng=step_rng)
+                losses_cls.append(loss_cls)
+                losses_adv.append(loss_adv)
+                if self.verbose>0 and step % self.print_interval == 0:
+                    adv_loss_mean = f'{np.mean(losses_adv):.6f}' if self.use_debias else None
+                    logger.info(f"Step {step+1}/{total_steps}: Classifier Loss = {np.mean(losses_cls):.6f}, Adversarial Loss = {adv_loss_mean}")
+                step+=1
+        self.cls_state, self.adv_state = cls_state, adv_state
         return self
+
+    def _predict_proba(self, X: np.ndarray):
+        inputs=jnp.array(X)
+        y_prob = self.classifier.apply({'params': self.cls_state.params}, inputs, trainable=False)
+        return np.array(y_prob).ravel()
 
     def predict(self, X):
         """
@@ -251,7 +253,7 @@ class AdversarialDebiasing(BMImp):
         np.ndarray: Predicted matrix probability per sample.
         """
         proba = np.empty((X.shape[0], 2))
-        proba[:, 1] = self._forward(X)
+        proba[:, 1] = self._predict_proba(X)
         proba[:, 0] = 1.0 - proba[:, 1]
         return proba
 
@@ -273,16 +275,5 @@ class AdversarialDebiasing(BMImp):
 
         np.ndarray: Predicted probability per sample.
         """
-        p = self._forward(X).reshape([-1])
-        return p
-
-    def _preprocessing_data(self, X):
-        X = np.array(X)
-        X = torch.tensor(X).type(torch.FloatTensor)[None, :]
-        return X
-
-    def _forward(self, X):
-        X = self._preprocessing_data(X)
-        with torch.no_grad():
-            p = self.estimator(X, trainable=False).ravel()
+        p = self._predict(X).reshape([-1])
         return p
