@@ -166,8 +166,8 @@ class ClassificationConstraint(BaseMoment):
             for group in self.group_values[:-1]:
                 pos_basis[i] = zero_vec
                 neg_basis[i] = zero_vec
-                pos_basis[i]["+", event_val, group] = 1
-                neg_basis[i]["-", event_val, group] = 1
+                pos_basis.loc[("+", event_val, group), i] = 1
+                neg_basis.loc[("-", event_val, group), i] = 1
                 neg_basis_present.at[i] = True
                 i += 1
         self.neg_basis_present = neg_basis_present

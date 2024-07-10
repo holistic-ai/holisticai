@@ -160,6 +160,63 @@ def dataframe_to_level_dict_with_series(df, row_index):
     return data
 
 
+class DataLoader:
+    def __init__(self, dataset, batch_size, dtype):
+        self.batch_size = batch_size
+        self.dataset = dataset
+        self.dtype = dtype
+        self.num_batches = int(np.ceil(len(dataset) / batch_size))
+
+    def batched(self):
+        def batch_generator(batch_size):
+            for i in range(self.num_batches):
+                batch = Dataset(data=self.dataset.data.iloc[i * batch_size : (i + 1) * batch_size])
+                yield batch
+
+        if self.dtype == "jax":
+            import jax.numpy as jnp
+
+            def batch_generator_jax(batch_size):
+                for batch in batch_generator(batch_size):
+                    yield {f: jnp.array(batch[f].values) for f in batch.features}
+
+            return batch_generator_jax(self.batch_size)
+
+        if self.dtype == "pandas":
+
+            def batch_generator_pandas(batch_size):
+                for batch in batch_generator(batch_size):
+                    yield {f: batch[f] for f in batch.features}
+
+            return batch_generator_pandas(self.batch_size)
+
+        if self.dtype == "numpy":
+
+            def batch_generator_numpy(batch_size):
+                for batch in batch_generator(batch_size):
+                    yield {f: batch[f].values for f in batch.features}
+
+            return batch_generator_numpy(self.batch_size)
+        return batch_generator(self.batch_size)
+
+    def __iter__(self):
+        """Iterates over the batches in the dataset."""
+        yield from self.batched()
+
+    def _repr_html_(self):
+        obj = {
+            "dtype": "DataLoader",
+            "attributes": {"Number of Batches": self.num_batches, "Batch Size": self.batch_size, "Type": self.dtype},
+            "nested_objects": [
+                {
+                    "dtype": "Dataset",
+                    "attributes": {"Number of Rows": self.dataset.num_rows, "Features": self.dataset.features},
+                }
+            ],
+        }
+        return generate_html_for_generic_object(obj, feature_columns=5)
+
+
 class Dataset:
     """Represents a dataset.
 
@@ -203,6 +260,10 @@ class Dataset:
             self.data = data.reset_index(drop=True)
         self.__update_metadata()
         self.random_state = np.random.RandomState()
+
+    def remove_columns(self, columns: str | list):
+        """Returns a new dataset with the given columns removed."""
+        return Dataset(self.data.drop(columns, level=0, axis=1))
 
     def rename(self, renames):
         """Returns a new dataset with renamed columns."""
