@@ -16,22 +16,6 @@ class DisparateImpactRemover(BMPre):
     repair_level : float, optional
         The amount of repair to be applied. It should be between 0.0 and 1.0. Default is 1.
 
-    Attributes
-    ----------
-    repair_level : float
-        The amount of repair to be applied.
-    sensgroup : SensitiveGroups
-        SensitiveGroups object
-
-    Methods
-    -------
-    fit()
-        Fit the model
-    transform(X, group_a, group_b)
-        Transform data
-    fit_transform(X, group_a, group_b)
-        Fit the model and transform data
-
     References
     ----------
     .. [1] Feldman, Michael, et al. "Certifying and removing disparate impact."
@@ -42,7 +26,7 @@ class DisparateImpactRemover(BMPre):
     def __init__(self, repair_level=1.0):
         self._assert_parameters(repair_level)
         self.repair_level = repair_level
-        self.sensgroup = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def _assert_parameters(self, repair_level):
         """
@@ -83,7 +67,7 @@ class DisparateImpactRemover(BMPre):
         sensitive_features = np.c_[group_a, group_b]
 
         # Convert the sensitive feature matrix to a numeric representation
-        p_attr = self.sensgroup.fit_transform(sensitive_features, convert_numeric=True).to_numpy()
+        p_attr = self._sensgroups.fit_transform(sensitive_features, convert_numeric=True).to_numpy()
 
         # Combine the sensitive feature matrix with the input data matrix
         data = np.c_[p_attr, X].tolist()

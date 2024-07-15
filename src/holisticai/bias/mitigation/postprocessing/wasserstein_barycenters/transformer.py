@@ -5,18 +5,22 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 class WassersteinBarycenter(BMPost):
     """
-    Fair Regression with Wasserstein Barycenters learning a real-valued function that
-    satisfies the Demographic Parity constraint. The strategy founds the optimal fair
-    predictor computing the Wasserstein barycenter of the distributions induced by the
+    Fair Regression with Wasserstein Barycenters learning a real-valued function that\
+    satisfies the Demographic Parity constraint. The strategy founds the optimal fair\
+    predictor computing the Wasserstein barycenter of the distributions induced by the\
     standard regression function on the sensitive groups.
 
-    References:
-        Chzhen, Evgenii, et al. "Fair regression with wasserstein barycenters."
+    Parameters
+    ----------
+    None
+
+    References
+    ----------
+        .. [1] Chzhen, Evgenii, et al. "Fair regression with wasserstein barycenters."\
         Advances in Neural Information Processing Systems 33 (2020): 7321-7331.
     """
 
     def __init__(self):
-        """Create a Calibrated Equalized Odds Post-processing instance."""
         self.algorithm = WassersteinBarycenterAlgorithm()
 
     def fit(self, y_pred: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
@@ -65,7 +69,7 @@ class WassersteinBarycenter(BMPost):
         Parameters
         ----------
         y_pred : array-like
-            Predicted vector (nb_examlpes,)
+            Predicted vector (nb_examples,)
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
@@ -75,7 +79,8 @@ class WassersteinBarycenter(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionary with new predictions
         """
         params = self._load_data(y_pred=y_pred, group_a=group_a, group_b=group_b)
 
@@ -106,7 +111,8 @@ class WassersteinBarycenter(BMPost):
             Group membership vector (binary)
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionary with new predictions
         """
         return self.fit(
             y_pred,

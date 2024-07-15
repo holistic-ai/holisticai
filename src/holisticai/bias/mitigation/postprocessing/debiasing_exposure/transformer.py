@@ -6,13 +6,51 @@ from holisticai.bias.mitigation.postprocessing.debiasing_exposure.algorithm_util
 
 class DebiasingExposure:
     """
-    Disparate Exposure Learning to Rank (DELTR) incorporates a measure of performance and a measure
-    of disparate exposure into its loss function. Trains a linear model based on performance and
+    Disparate Exposure Learning to Rank (DELTR) incorporates a measure of performance and a measure\
+    of disparate exposure into its loss function. Trains a linear model based on performance and\
     fairness for a protected group.
 
-    Reference
+    Parameters
+    ----------
+    group_col: str
+        Name of the column in data that contains protected attribute.
+
+    query_col:
+        Name of the column in data that contains query ids.
+
+    doc_col:
+        List of name of the column in data that contains document ids.
+
+    score_col:
+        Name of the column in data that contains judgment values.
+
+    feature_cols:
+        Name of the columns in data that contains feature values.
+
+    gamma: float
+        Gamma parameter for the cost calculation in the training phase (recommended to be around 1).
+
+    number_of_iterations: int
+        Number of iteration in gradient descent (optional).
+
+    learning_rate: float
+        Learning rate in gradient descent (optional).
+
+    lambdaa: float
+        Regularization constant (optional).
+
+    init_var: float
+        Range of values for initialization of weights (optional).
+
+    standardize: bool
+        Boolean indicating whether the data should be standardized or not (optional).
+
+    verbose : int
+        If > 0, print progress.
+
+    References
     ---------
-    [1] Zehlike, Meike, and Carlos Castillo. "Reducing disparate exposure in ranking: A learning to rank
+    .. [1] Zehlike, Meike, and Carlos Castillo. "Reducing disparate exposure in ranking: A learning to rank\
         approach." Proceedings of The Web Conference 2020. 2020.
     """
 
@@ -31,50 +69,6 @@ class DebiasingExposure:
         standardize=False,
         verbose=0,
     ):
-        """
-        Description
-        -----------
-        Init Disparate Exposure in Learning To Rank class.
-
-        Parameters
-        ----------
-        group_col: str
-            Name of the column in data that contains protected attribute.
-
-        query_col:
-            Name of the column in data that contains query ids.
-
-        doc_col:
-            List of name of the column in data that contains document ids.
-
-        score_col:
-            Name of the column in data that contains judgment values.
-
-        feature_cols:
-            Name of the columns in data that contains feature values.
-
-        gamma: float
-            Gamma parameter for the cost calculation in the training phase (recommended to be around 1).
-
-        number_of_iterations: int
-            Number of iteration in gradient descent (optional).
-
-        learning_rate: float
-            Learning rate in gradient descent (optional).
-
-        lambdaa: float
-            Regularization constant (optional).
-
-        init_var: float
-            Range of values for initialization of weights (optional).
-
-        standardize: bool
-            Boolean indicating whether the data should be standardized or not (optional).
-
-        verbose : int
-            If > 0, print progress.
-        """
-
         if feature_cols is None:
             feature_cols = []
 
@@ -121,8 +115,6 @@ class DebiasingExposure:
 
     def fit(self, rankings: pd.DataFrame):
         """
-        Description
-        -----------
         Trains a Disparate Exposure model on a given training set.
 
         Parameters
@@ -159,8 +151,6 @@ class DebiasingExposure:
 
     def transform(self, rankings: pd.DataFrame):
         """
-        Description
-        -----------
         Train a Disparate Exposure model to rank the prediction set.
 
         Parameters
@@ -202,8 +192,6 @@ class DebiasingExposure:
 
     def _prepare_data(self, data, has_judgment=False):
         """
-        Description
-        -----------
         Extracts the different columns of the input data.
 
         Parameters
@@ -214,6 +202,7 @@ class DebiasingExposure:
 
         Return
         ------
+        tuple
             Tuple of preprocessed data
         """
         query_ids = data[self.query_col]

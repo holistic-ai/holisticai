@@ -10,10 +10,17 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class LPDebiaserBinary(BMPost):
     """
-    Linear Programmin Debiaser is a postprocessing algorithms designed to debias pretrained classifiers.
+    Linear Programmin Debiaser is a postprocessing algorithms designed to debias pretrained classifiers.\
     The algorithm use constraints such as Equalized Odds and Equalized Opportunity.
-    References:
-        Hardt, Moritz, Eric Price, and Nati Srebro. "Equality of opportunity in supervised learning."
+
+    Parameters
+    ----------
+    constraint : str
+        Strategy used to evalute the cost function  The available contraints  are: "EqualizedOdds", "EqualizedOpportunity"
+
+    References
+    ----------
+        .. [1] Hardt, Moritz, Eric Price, and Nati Srebro. "Equality of opportunity in supervised learning."\
         Advances in neural information processing systems 29 (2016).
     """
 
@@ -24,18 +31,8 @@ class LPDebiaserBinary(BMPost):
         self,
         constraint: Optional[CONSTRAINT] = "EqualizedOdds",
     ):
-        """
-        Parameters
-        ----------
-        constraint : str
-            Strategy used to evalute the cost function  The available contraints  are:
-            [
-                "EqualizedOdds",
-                "EqualizedOpportunity"
-            ]
-        """
         self.constraint = constraint
-        self.sens_groups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def fit(
         self,
@@ -46,12 +43,10 @@ class LPDebiaserBinary(BMPost):
         y_proba: Optional[np.ndarray] = None,
     ):
         """
-
-        Description
-        ----------
-        Compute parameters for Linear Programming Debiaser.
-        For binary classification y_pred or y_proba can be used.
+        Compute parameters for Linear Programming Debiaser.\
+        For binary classification y_pred or y_proba can be used.\
         For Multiclass classification only y_pred must be used.
+
         Parameters
         ----------
         y : array-like
@@ -59,13 +54,14 @@ class LPDebiaserBinary(BMPost):
         y_pred : array-like
             Predicted label vector (num_examples,).
         y_proba : matrix-like
-            Predicted probability matrix (num_examples, num_classes). The probability
-            estimates must sum to 1 across the possible classes and each matrix value
+            Predicted probability matrix (num_examples, num_classes). The probability\
+            estimates must sum to 1 across the possible classes and each matrix value\
             must be in the interval [0,1].
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
             Group membership vector (binary)
+
         Returns
         -------
         Self
@@ -85,7 +81,7 @@ class LPDebiaserBinary(BMPost):
         y_proba = params.get("y_proba", None)
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        p_attr = self.sens_groups.fit_transform(sensitive_features, convert_numeric=True)
+        p_attr = self._sensgroups.fit_transform(sensitive_features, convert_numeric=True)
 
         constraints_catalog, objective_catalog = self._get_catalogs()
 
@@ -114,8 +110,8 @@ class LPDebiaserBinary(BMPost):
         y_pred : array-like
             Predicted vector (nb_examlpes,)
         y_proba : matrix-like
-            Predicted probability matrix (num_examples, num_classes). The probability
-            estimates must sum to 1 across the possible classes and each matrix value
+            Predicted probability matrix (num_examples, num_classes). The probability\
+            estimates must sum to 1 across the possible classes and each matrix value\
             must be in the interval [0,1].
         group_a : array-like
             Group membership vector (binary)
@@ -124,7 +120,8 @@ class LPDebiaserBinary(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionary of new predictions
         """
 
         params = self._load_data(y_pred=y_pred, y_proba=y_proba, group_a=group_a, group_b=group_b)
@@ -133,7 +130,7 @@ class LPDebiaserBinary(BMPost):
         group_b = params["group_b"] == 1
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        p_attr = self.sens_groups.transform(sensitive_features, convert_numeric=True)
+        p_attr = self._sensgroups.transform(sensitive_features, convert_numeric=True)
 
         y_proba = params.get("y_proba", None)
         y_pred = params.get("y_pred", None)
@@ -158,8 +155,8 @@ class LPDebiaserBinary(BMPost):
         y_pred : array-like
             Predicted vector (nb_examlpes,)
         y_proba : matrix-like
-            Predicted probability matrix (num_examples, num_classes). The probability
-            estimates must sum to 1 across the possible classes and each matrix value
+            Predicted probability matrix (num_examples, num_classes). The probability\
+            estimates must sum to 1 across the possible classes and each matrix value\
             must be in the interval [0,1].
         group_a : array-like
             Group membership vector (binary)
@@ -168,7 +165,8 @@ class LPDebiaserBinary(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionary of new predictions
         """
         return self.fit(
             y=y,

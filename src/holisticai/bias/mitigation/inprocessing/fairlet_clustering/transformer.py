@@ -26,7 +26,7 @@ class FairletClustering(BaseEstimator, BMImp):
     """Fairlet Clustering
 
     Fairlet Clustering inprocessing bias mitigation works in two steps:
-    (1) The pointset is partitioned into subsets called fairlets that satisfy
+    (1) The pointset is partitioned into subsets called fairlets that satisfy\
     the fairness requirement and approximately preserve the k-median objective.
     (2) Fairlets are merged into k clusters by one of the existing k-median algorithms.
 
@@ -48,22 +48,11 @@ class FairletClustering(BaseEstimator, BMImp):
             fairlet decomposition parameter for Vanilla and Scalable strategy
 
         seed : int
-        Random seed.
+            Random seed.
 
-    Methods
-    -------
-        fit(X, group_a, group_b)
-            Fit model using Fairlet Clustering.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
-
-        fit_predict(X, group_a, group_b)
-            Fit and Predict the cluster for the given samples.
-
-    Reference
+    References
     ---------
-        [1] Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
+        .. [1] Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
         Machine Learning. PMLR, 2019.
     """
 
@@ -116,7 +105,7 @@ class FairletClustering(BaseEstimator, BMImp):
 
         Returns
         -------
-        the same object
+            self
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         X = params["X"]
@@ -149,8 +138,8 @@ class FairletClustering(BaseEstimator, BMImp):
 
         Returns
         -------
-
-        numpy.ndarray: Predicted output per sample.
+        numpy.ndarray
+            Predicted output per sample.
         """
         params = self._load_data(X=X)
         X = params["X"]
@@ -178,8 +167,8 @@ class FairletClustering(BaseEstimator, BMImp):
 
         Returns
         -------
-
-        numpy.ndarray: Predicted cluster per sample.
+        numpy.ndarray
+            Predicted cluster per sample.
         """
         self.fit(X, group_a, group_b)
         return self.labels_

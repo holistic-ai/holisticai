@@ -9,17 +9,17 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 
 class Reweighing(BMPre):
-    def __init__(self):
-        """
-        Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before\
-        classification.
+    """
+    Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before\
+    classification.
 
-        References
-        ----------
-        .. [1] Kamiran, Faisal, and Toon Calders. "Data preprocessing techniques for classification\
-            without discrimination." Knowledge and information systems 33.1 (2012): 1-33.
-        """
-        self.__sens_groups = SensitiveGroups()
+    References
+    ----------
+    .. [1] Kamiran, Faisal, and Toon Calders. "Data preprocessing techniques for classification\
+        without discrimination." Knowledge and information systems 33.1 (2012): 1-33.
+    """
+    def __init__(self):
+        self.___sensgroups = SensitiveGroups()
 
     def fit(
         self,
@@ -54,7 +54,7 @@ class Reweighing(BMPre):
         group_a = params["group_a"]
         group_b = params["group_b"]
 
-        group_lbs = self.__sens_groups.fit_transform(np.stack([group_a, group_b], axis=1))
+        group_lbs = self.___sensgroups.fit_transform(np.stack([group_a, group_b], axis=1))
 
         classes = np.unique(y)
 
@@ -66,7 +66,7 @@ class Reweighing(BMPre):
 
         df["COUNT"] = 1
 
-        for g in self.__sens_groups.group_names:
+        for g in self.___sensgroups.group_names:
             for c in classes:
                 df[f"{g}-{c}"] = (df["GROUP_ID"] == g) & (df["LABEL"] == c)
 
@@ -83,12 +83,12 @@ class Reweighing(BMPre):
         df_group_values_weights = df_values_prob / df_group_values_prob
 
         self.sample_weight = np.ones_like(y, dtype=np.float32)
-        for g in self.__sens_groups.group_names:
+        for g in self.___sensgroups.group_names:
             for c in classes:
                 mask = df[f"{g}-{c}"]
                 self.sample_weight[mask] = df_group_values_weights.at[g, c]
 
-        self.update_estimator_param("sample_weight", self.sample_weight)
+        self._update_estimator_param("sample_weight", self.sample_weight)
 
         return self
 

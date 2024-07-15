@@ -11,13 +11,27 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class DisparateImpactRemoverRS(BMPos):
     """
-    Disparate impact remover edits feature values to increase group fairness
+    Disparate impact remover edits feature values to increase group fairness\
     while preserving rank-ordering within groups.
+
+    Parameters
+    ----------
+    group_col: str
+        Name of the column in data that contains protected attribute.
+
+    score_col:
+        Name of the column in data that contains judgment values.
+
+    repair_level : float
+        Repair amount 0.0 (min) -> 1.0 (max)
+
+    verbose : int
+        If > 0, print progress.
 
     References
     ----------
-        [1] Feldman, Michael, et al. "Certifying and removing disparate impact."
-        proceedings of the 21th ACM SIGKDD international conference on knowledge
+        .. [1] Feldman, Michael, et al. "Certifying and removing disparate impact."\
+        proceedings of the 21th ACM SIGKDD international conference on knowledge\
         discovery and data mining. 2015.
     """
 
@@ -29,25 +43,6 @@ class DisparateImpactRemoverRS(BMPos):
         repair_level=1.0,
         verbose=0,
     ):
-        """
-        Description
-        -----------
-        Init Disparate Exposure in Learning To Rank class.
-
-        Parameters
-        ----------
-        group_col: str
-            Name of the column in data that contains protected attribute.
-
-        score_col:
-            Name of the column in data that contains judgment values.
-
-        repair_level : float
-            Repair amount 0.0 (min) -> 1.0 (max)
-
-        verbose : int
-            If > 0, print progress.
-        """
         # assign mandatory parameters
         self.score_col = score_col
         self.query_col = query_col
@@ -55,7 +50,7 @@ class DisparateImpactRemoverRS(BMPos):
         self.verbose = verbose
         self._assert_parameters(repair_level)
         self.repair_level = repair_level
-        self.sensgroup = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
         self.dir = DisparateImpactRemover(repair_level=repair_level)
 
     def _assert_parameters(self, repair_level):
@@ -71,22 +66,40 @@ class DisparateImpactRemoverRS(BMPos):
         return new_rankings
 
     def fit_transform(self, rankings: pd.DataFrame):
+        """
+        Train a Disparate Exposure model to rank the prediction set, then transform the data.
+
+        Parameters
+        ----------
+        rankings:    DataFrame
+            The input data
+
+        Returns
+        -------
+            DataFrame
+        """
         return self.fit().transform(rankings)
 
     def fit(self):
+        """
+        Fit the model
+
+        Returns
+        -------
+            self
+        """
         return self
 
     def transform(self, rankings: pd.DataFrame):
         """
-        Description
-        -----------
         Train a Disparate Exposure model to rank the prediction set.
 
         Parameters
         ----------
         rankings:    DataFrame
+            The input data
 
-        Return
+        Returns
         ------
             DataFrame
         """
@@ -108,9 +121,10 @@ class DisparateImpactRemoverRS(BMPos):
         ranking : DataFrame
             Input data
 
-        Return
+        Returns
         ------
-            Self
+        DataFrame
+            Transformed data
         """
         data = np.c_[ranking[self.score_col].to_numpy()].tolist()
         group_a = ranking[self.group_col]

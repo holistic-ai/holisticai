@@ -14,9 +14,9 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 class DebiasingLearningMF(BMImp, RecommenderSystemBase):
     """Debiasing Learning Matrix Factorization
 
-    Debiasing Learning Matrix Factorization handles selection biases by adapting
-    models and estimation techniques from causal inference. The strategy leads to
-    unbiased performance estimators despite biased data, and to a matrix factorization
+    Debiasing Learning Matrix Factorization handles selection biases by adapting\
+    models and estimation techniques from causal inference. The strategy leads to\
+    unbiased performance estimators despite biased data, and to a matrix factorization\
     method that provides substantially improved prediction performance on real-world data.
 
     Parameters
@@ -52,14 +52,9 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
         verbose : int
             If >0, will show progress percentage.
 
-    Methods
-    -------
-        fit(X, propensities)
-            Fit model using Debiasing Learning Matrix Factorization.
-
     References
     ----------
-        [1] Schnabel, Tobias, et al. "Recommendations as treatments: Debiasing learning
+        .. [1] Schnabel, Tobias, et al. "Recommendations as treatments: Debiasing learning\
         and evaluation." international conference on machine learning. PMLR, 2016.
     """
 
@@ -105,6 +100,10 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
 
         propensities : matrix-like (optional)
                 Propensity matrix
+
+        Returns
+        -------
+            self
         """
         invP = None
         if propensities is not None:

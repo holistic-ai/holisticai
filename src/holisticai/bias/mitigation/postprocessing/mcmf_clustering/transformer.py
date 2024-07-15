@@ -11,35 +11,33 @@ if TYPE_CHECKING:
 
 class MCMF(BMPost):
     """
-    Minimal Cluster Modification for Fairnes (MCMF) is focused on the minimal change it so that the clustering is still
+    Minimal Cluster Modification for Fairnes (MCMF) is focused on the minimal change it so that the clustering is still\
     of good quality and fairer.
 
-    References:
-        Davidson, Ian, and S. S. Ravi. "Making existing clusterings fairer: Algorithms, complexity results and insights."
+    Parameters
+    ----------
+    metric : str
+        Measure function used in the objective function.
+        The metrics available are:
+        ["constant", "L1", "L2"]
+
+    solver : str
+        Algorithm name used to solve the standard form problem. Solver supported must depend of your scipy poackage version.
+        for scipy 1.9.0 the solvers available are:
+        ["highs", "highs-ds", "highs-ipm"]
+
+    group_mode: str
+        Set what groups will be fitted: ['a', 'b', 'ab']
+    verbose : int
+        If > 0 , then print logs.
+
+    References
+    ----------
+        .. [1] Davidson, Ian, and S. S. Ravi. "Making existing clusterings fairer: Algorithms, complexity results and insights."\
         Proceedings of the AAAI Conference on Artificial Intelligence. Vol. 34. No. 04. 2020.
     """
 
     def __init__(self, metric: str = "L1", solver: str = "highs", group_mode="a", verbose=0):
-        """
-        Create a Equalized Odds Post-processing instance.
-
-        Parameters
-        ----------
-        metric : str
-            Measure function used in the objective function.
-            The metrics available are:
-            ["constant", "L1", "L2"]
-
-        solver : str
-            Algorithm name used to solve the standard form problem. Solver supported must depend of your scipy poackage version.
-            for scipy 1.9.0 the solvers available are:
-            ["highs", "highs-ds", "highs-ipm"]
-
-        group_mode: str
-            Set what groups will be fitted: ['a', 'b', 'ab']
-        verbose : int
-            If > 0 , then print logs.
-        """
         self.metric = metric
         self.group_mode = group_mode
         self.solver = solver
@@ -47,6 +45,13 @@ class MCMF(BMPost):
         self.algorithm = Algorithm(metric=metric, solver=solver, verbose=verbose)
 
     def fit(self):
+        """
+        Fit the MCMF algorithm.
+
+        Returns
+        -------
+        self
+        """
         return self
 
     def fit_transform(
@@ -57,6 +62,31 @@ class MCMF(BMPost):
         group_b: np.ndarray,
         centroids: np.ndarray,
     ) -> dict[str, np.ndarray]:
+        """
+        Fit and transform the MCMF algorithm.
+
+        Description
+        ----------
+        Fit the MCMF algorithm and transform the predicted vector.
+
+        Parameters
+        ----------
+        X : matrix-like
+            Input matrix (nb_examples, nb_features)
+        y_pred : array-like
+            Predicted vector (nb_examples,)
+        group_a : array-like
+            Group membership vector (binary)
+        group_b : array-like
+            Group membership vector (binary)
+        centroids : ndarray
+            Centroids array
+
+        Returns
+        -------
+        dict
+            A dictionary with new predictions
+        """
         return self.transform(X, y_pred, group_a, group_b, centroids)
 
     def transform(
@@ -77,9 +107,9 @@ class MCMF(BMPost):
         Parameters
         ----------
         X : matrix-like
-            Input matrix (nb_examlpes, nb_features)
+            Input matrix (nb_examples, nb_features)
         y_pred : array-like
-            Predicted vector (nb_examlpes,)
+            Predicted vector (nb_examples,)
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
@@ -89,7 +119,8 @@ class MCMF(BMPost):
 
         Returns
         -------
-        Self
+        dict
+            A dictionary with new predictions
         """
         params = self._load_data(X=X, y_pred=y_pred, group_a=group_a, group_b=group_b)
 

@@ -13,7 +13,7 @@ class Algorithm:
         self.metric = metric
         self.solver = solver
         self.verbose = verbose
-        self.sens_group = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def init_parameters(self, y_pred: np.ndarray, p_attr: np.ndarray):
         k = len(np.unique(y_pred))

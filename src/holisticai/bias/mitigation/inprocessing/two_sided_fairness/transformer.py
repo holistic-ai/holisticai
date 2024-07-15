@@ -11,9 +11,9 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 class FairRec(BMImp):
     """Fair Recommendation System (FairRec)
 
-    FairRecommendationSystem (FairRec), exhibes the desired two-sided fairness by
-    mapping the fair recommendation problem to a fair allocation problem; moreover,
-    it is agnostic to the specifics of the data-driven model (that estimates the
+    FairRecommendationSystem (FairRec), exhibes the desired two-sided fairness by\
+    mapping the fair recommendation problem to a fair allocation problem; moreover,\
+    it is agnostic to the specifics of the data-driven model (that estimates the\
     product-customer relevance scores) which makes it more scalable and easy to adapt [1].
 
     Parameters
@@ -23,17 +23,9 @@ class FairRec(BMImp):
         MMS_fraction : float
             Maximin Share (MMS) threshold of producers exposure.
 
-    Methods
-    -------
-        fit(X)
-            Fit model using Fair Recommendation System.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
-
     References
     ----------
-        [1] Patro, Gourab K., et al. "Fairrec: Two-sided fairness for personalized
+        .. [1] Patro, Gourab K., et al. "Fairrec: Two-sided fairness for personalized\
         recommendations in two-sided platforms." Proceedings of The Web Conference 2020. 2020.
     """
 
@@ -42,6 +34,18 @@ class FairRec(BMImp):
         self.MMS_fraction = MMS_fraction
 
     def fit(self, X):
+        """
+        Fit model
+
+        Parameters
+        ----------
+        X : matrix-like
+            scored matrix, 0 means non-raked cases.
+
+        Returns
+        -------
+        self
+        """
         algorithm = FairRecAlg(rec_size=self.rec_size, MMS_fraction=self.MMS_fraction)
         self.recommendation = algorithm.rank(X)
         return self
@@ -55,9 +59,12 @@ class FairRec(BMImp):
         X : matrix-like
             scored matrix, 0 means non-raked cases.
 
+        top_n : int
+            Number of recommendations to return.
+
         Returns
         -------
-        recommendations : dict
+        dict
             A dictionary of recommendations for each user.
         """
         if top_n is None:

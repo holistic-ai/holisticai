@@ -12,9 +12,9 @@ from sklearn.base import BaseEstimator
 class VariationalFairClustering(BaseEstimator, BMImp):
     """Variational Fair Clustering
 
-    Variational Fair Clustering helps you to find clusters with specified proportions
-    of different demographic groups pertaining to a sensitive attribute of the dataset
-    (group_a and group_b) for any well-known clustering method such as K-means, K-median
+    Variational Fair Clustering helps you to find clusters with specified proportions\
+    of different demographic groups pertaining to a sensitive attribute of the dataset\
+    (group_a and group_b) for any well-known clustering method such as K-means, K-median\
     or Spectral clustering (Normalized cut).
 
     Parameters
@@ -40,20 +40,9 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         verbose : bool
             If true , print metrics
 
-    Methods
-    -------
-        fit(X, group_a, group_b)
-            Fit model using Variational Fair Clustering.
-
-        predict(X, group_a, group_b)
-            Predict the closest cluster each sample in X belongs to.
-
-        fit_predict(X, group_a, group_b)
-            Fit and Predict the cluster for the given samples.
-
     References
     ----------
-        [1] Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI
+        .. [1] Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI\
         Conference on Artificial Intelligence. Vol. 35. No. 12. 2021.
     """
 
@@ -83,7 +72,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         self.method = method
         self.normalize_input = normalize_input
         self.verbose = verbose
-        self.sens_group = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def fit(
         self,
@@ -112,13 +101,13 @@ class VariationalFairClustering(BaseEstimator, BMImp):
 
         Returns
         -------
-        the same object
+            self
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         X = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
-        p_attr = self.sens_group.fit_transform(np.c_[group_a, group_b], convert_numeric=True)
+        p_attr = self._sensgroups.fit_transform(np.c_[group_a, group_b], convert_numeric=True)
         self.algorithm.fit(X=X, p_attr=p_attr, random_state=np.random.RandomState(self.seed))
         return self
 
@@ -152,14 +141,14 @@ class VariationalFairClustering(BaseEstimator, BMImp):
 
         Returns
         -------
-
-        numpy.ndarray: Predicted output per sample.
+        numpy.ndarray
+            Predicted output per sample.
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         X = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
-        p_attr = self.sens_group.transform(np.c_[group_a, group_b], convert_numeric=True)
+        p_attr = self._sensgroups.transform(np.c_[group_a, group_b], convert_numeric=True)
         return self.algorithm.predict(X, p_attr)
 
     def fit_predict(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
@@ -184,8 +173,8 @@ class VariationalFairClustering(BaseEstimator, BMImp):
 
         Returns
         -------
-
-        numpy.ndarray: Predicted cluster per sample.
+        numpy.ndarray
+            Predicted cluster per sample.
         """
         self.fit(X, group_a, group_b)
         return self.labels_

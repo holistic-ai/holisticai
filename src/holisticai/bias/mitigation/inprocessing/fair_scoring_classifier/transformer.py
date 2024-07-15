@@ -13,8 +13,8 @@ from sklearn.base import BaseEstimator
 class FairScoreClassifier(BaseEstimator, BMImp):
     """Fair Score Classifier
 
-    Generates a classification model that integrates fairness constraints for multiclass classification. This algorithm
-    returns a matrix of lambda coefficients that scores a given input vector. The higher the score, the higher the probability
+    Generates a classification model that integrates fairness constraints for multiclass classification. This algorithm\
+    returns a matrix of lambda coefficients that scores a given input vector. The higher the score, the higher the probability\
     of the input vector to be classified as the majority class.
 
     Parameters
@@ -29,23 +29,12 @@ class FairScoreClassifier(BaseEstimator, BMImp):
             Lower and upper bound for the scoring system cofficients.
 
         time_limit : int
-        The time limit for the optimization algorithm.
-
-    Methods
-    -------
-        fit(X, y, group_a, group_b)
-            Fit model using Fair Score Classifier.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
-
-        transform_estimator(estimator)
-            Transform the estimator to be used in the pipeline.
+            The time limit for the optimization algorithm.
 
     References:
-        [1] Julien Rouzot, Julien Ferry, Marie-José Huguet. Learning Optimal Fair Scoring Systems for Multi-
-        Class Classification. ICTAI 2022 - The 34th IEEE International Conference on Tools with Artificial
-        Intelligence, Oct 2022, Virtual, United States. ￿
+        .. [1] Julien Rouzot, Julien Ferry, Marie-José Huguet. Learning Optimal Fair Scoring Systems for Multi-\
+        Class Classification. ICTAI 2022 - The 34th IEEE International Conference on Tools with Artificial\
+        Intelligence, Oct 2022, Virtual, United States.
     """
 
     def __init__(
@@ -86,11 +75,11 @@ class FairScoreClassifier(BaseEstimator, BMImp):
 
         Returns
         -------
-        the same object
+            self
         """
-        self.sensgroup = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
         groups = np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1).reshape([-1, 2])
-        p_attr = self.sensgroup.fit_transform(groups, convert_numeric=True)
+        p_attr = self._sensgroups.fit_transform(groups, convert_numeric=True)
         Xtrain = np.hstack([np.ones((X.shape[0], 1)), X, p_attr.values.reshape(-1, 1)])
         fairness_groups = [Xtrain.shape[1] - 1]
         y_oh = pd.get_dummies(np.squeeze(y))
@@ -109,7 +98,25 @@ class FairScoreClassifier(BaseEstimator, BMImp):
         return self
 
     def predict(self, X, group_a, group_b):
-        p_attr = self.sensgroup.transform(
+        """
+        Predict the target vector.
+
+        Parameters
+        ----------
+        X : matrix-like
+            input matrix
+
+        group_a : numpy array
+            binary mask vector
+
+        group_b : numpy array
+            binary mask vector
+
+        Returns
+        -------
+            numpy array
+        """
+        p_attr = self._sensgroups.transform(
             np.stack([np.squeeze(group_a), np.squeeze(group_b)], axis=1), convert_numeric=True
         )
         X_ = np.hstack([np.ones((X.shape[0], 1)), X, p_attr.values.reshape(-1, 1)])
@@ -118,5 +125,17 @@ class FairScoreClassifier(BaseEstimator, BMImp):
         return y_pred.idxmax(axis=1).values
 
     def transform_estimator(self, estimator):
+        """
+        Transform the estimator.
+
+        Parameters
+        ----------
+        estimator : object
+            The estimator object.
+
+        Returns
+        -------
+            self
+        """
         self.estimator = estimator
         return self

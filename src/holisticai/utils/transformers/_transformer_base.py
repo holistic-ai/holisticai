@@ -9,30 +9,30 @@ class TransformerBase:
     For each pipeline execution the transformer will be linked to the estimator and custom parameters.
     """
 
-    def has_param_handler(self):
+    def _has_param_handler(self):
         return hasattr(self, "params_hdl")
 
-    def link_parameters(self, params_hdl, estimator_hdl):
+    def _link_parameters(self, params_hdl, estimator_hdl):
         self.params_hdl = params_hdl
         self.estimator_hdl = estimator_hdl
 
-    def get_bias_param(self, param_name, default=None):
+    def _get_bias_param(self, param_name, default=None):
         if param_name in self.params_hdl.bias_mitigator:
             return self.params_hdl.bias_mitigator[param_name]
         return default
 
-    def update_bias_param(self, param_name, param_value):
+    def _update_bias_param(self, param_name, param_value):
         if hasattr(self, "params_hdl"):
             self.params_hdl.bias_mitigator[param_name] = param_value
         else:
             self.bias_mitigator_params[param_name] = param_value
 
-    def get_estimator_param(self, param_name, default=None):
+    def _get_estimator_param(self, param_name, default=None):
         if param_name in self.params_hdl.estimator:
             return self.params_hdl.estimator[param_name]
         return default
 
-    def update_estimator_param(self, param_name, param_value):
+    def _update_estimator_param(self, param_name, param_value):
         if hasattr(self, "params_hdl"):
             self.params_hdl.estimator[param_name] = param_value
         else:
@@ -80,7 +80,7 @@ class BMTransformerBase(ABC, TransformerBase):
 
         return params
 
-    def reformat_function(self, func):
+    def _reformat_function(self, func):
         def wrapped_func(*args, **kargs):
             self.estimator_params = {}
             self.bias_mitigator_params = {}
@@ -98,27 +98,27 @@ class BMTransformerBase(ABC, TransformerBase):
 
         if hasattr(obj, "fit"):
             docstring = obj.fit.__doc__
-            obj.fit = obj.reformat_function(obj.fit)
+            obj.fit = obj._reformat_function(obj.fit)
             obj.fit.__doc__ = docstring
 
         if hasattr(obj, "transform"):
             docstring = obj.transform.__doc__
-            obj.transform = obj.reformat_function(obj.transform)
+            obj.transform = obj._reformat_function(obj.transform)
             obj.transform.__doc__ = docstring
 
         if hasattr(obj, "fit_transform"):
             docstring = obj.fit_transform.__doc__
-            obj.fit_transform = obj.reformat_function(obj.fit_transform)
+            obj.fit_transform = obj._reformat_function(obj.fit_transform)
             obj.fit_transform.__doc__ = docstring
 
         if hasattr(obj, "predict"):
             docstring = obj.predict.__doc__
-            obj.predict = obj.reformat_function(obj.predict)
+            obj.predict = obj._reformat_function(obj.predict)
             obj.predict.__doc__ = docstring
 
         if hasattr(obj, "predict_proba"):
             docstring = obj.predict_proba.__doc__
-            obj.predict_proba = obj.reformat_function(obj.predict_proba)
+            obj.predict_proba = obj._reformat_function(obj.predict_proba)
             obj.predict_proba.__doc__ = docstring
 
         obj.estimator_params = {}

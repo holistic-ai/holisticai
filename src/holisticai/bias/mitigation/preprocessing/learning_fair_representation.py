@@ -47,20 +47,6 @@ class ObjectiveFunction:
             Output prediction error. Default is 0.1
         A_z : float, optional
             Fairness constraint term weight. Default is 0.5
-
-        Attributes
-        ----------
-        verbose : int
-            If zero, then no output
-        x : array-like
-            Input data
-        y : array-like
-            Target vector
-
-        Methods
-        -------
-        __call__(parameters)
-            Call the objective function
         """
         self.verbose = verbose
         self.x = x
@@ -116,42 +102,6 @@ class LearningFairRepresentation(BMPreprocessing):
     seed : int, optional
         Seed to make `predict` repeatable. Default is None
 
-    Attributes
-    ----------
-    seed : int
-        Seed to make `predict` repeatable
-    k : int
-        Number of prototypes
-    Ax : float
-        Input recontruction quality term weight
-    Ay : float
-        Output prediction error
-    Az : float
-        Fairness constraint term weight
-    w : array-like
-        Weights
-    prototypes : array-like
-        Prototypes
-    learned_model : array-like
-        Learned model
-    maxiter : int
-        Maximum number of iterations
-    maxfun : int
-        Maximum number of function evaluations
-    problem_type : str
-        Problem type
-    verbose : int
-        If zero, then no output
-
-    Methods
-    -------
-    fit(X, y_true, group_a, group_b)
-        Fit data to learn a fair representation transform
-    transform(X, group_a, group_b)
-        Transform data to a fair representation
-    fit_transform(X, y_true, group_a, group_b)
-        Fit and transform
-
     References
     ----------
     .. [1] Zemel, Rich, et al. "Learning fair representations."
@@ -204,7 +154,7 @@ class LearningFairRepresentation(BMPreprocessing):
         group_b : array-like
             Group membership vector (binary)
 
-        Return
+        Returns
         ------
             Self
         """
@@ -268,7 +218,7 @@ class LearningFairRepresentation(BMPreprocessing):
         group_b : array-like
             Group membership vector (binary)
 
-        Return
+        Returns
         ------
         array-like
             Transformed data
@@ -308,7 +258,7 @@ class LearningFairRepresentation(BMPreprocessing):
         group_b : array-like
             Group membership vector (binary)
 
-        Return
+        Returns
         ------
             Self
         """

@@ -128,7 +128,7 @@ class AdversarialDebiasing(BMImp):
         self.device = device
         self.seed = seed if seed is not None else np.random.randint(0, 1000)
 
-        self.sens_groups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def transform_estimator(self, estimator=None):
         if estimator is None:
