@@ -80,7 +80,7 @@ class BMTransformerBase(ABC, TransformerBase):
 
         return params
 
-    def _reformat_function(self, func):
+    def reformat_function(self, func):
         def wrapped_func(*args, **kargs):
             self.estimator_params = {}
             self.bias_mitigator_params = {}
@@ -98,27 +98,27 @@ class BMTransformerBase(ABC, TransformerBase):
 
         if hasattr(obj, "fit"):
             docstring = obj.fit.__doc__
-            obj.fit = obj._reformat_function(obj.fit)
+            obj.fit = obj.reformat_function(obj.fit)
             obj.fit.__doc__ = docstring
 
         if hasattr(obj, "transform"):
             docstring = obj.transform.__doc__
-            obj.transform = obj._reformat_function(obj.transform)
+            obj.transform = obj.reformat_function(obj.transform)
             obj.transform.__doc__ = docstring
 
         if hasattr(obj, "fit_transform"):
             docstring = obj.fit_transform.__doc__
-            obj.fit_transform = obj._reformat_function(obj.fit_transform)
+            obj.fit_transform = obj.reformat_function(obj.fit_transform)
             obj.fit_transform.__doc__ = docstring
 
         if hasattr(obj, "predict"):
             docstring = obj.predict.__doc__
-            obj.predict = obj._reformat_function(obj.predict)
+            obj.predict = obj.reformat_function(obj.predict)
             obj.predict.__doc__ = docstring
 
         if hasattr(obj, "predict_proba"):
             docstring = obj.predict_proba.__doc__
-            obj.predict_proba = obj._reformat_function(obj.predict_proba)
+            obj.predict_proba = obj.reformat_function(obj.predict_proba)
             obj.predict_proba.__doc__ = docstring
 
         obj.estimator_params = {}
