@@ -23,6 +23,8 @@ sys.path.insert(0, os.path.abspath('.'))
 import utils.xai_image_plots as xai_utils
 import inspect
 
+os.makedirs('_static/images', exist_ok=True)
+
 for name, obj in inspect.getmembers(xai_utils):
     if inspect.isfunction(obj) and name.startswith('image_'):
         obj()
