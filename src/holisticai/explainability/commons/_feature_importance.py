@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from holisticai.explainability.commons._definitions import (
@@ -37,15 +37,17 @@ def compute_ranked_feature_importance(importance: Importances, alpha=None) -> pd
 
     return importance[accum_feature_weight <= threshold]
 
+
 def compute_local_feature_importance(
     learning_task, dataset: Dataset, feature_importance_calculator: callable
 ) -> LocalConditionalFeatureImportance:
     ds = create_output_groups(dataset, learning_task)
 
     fimp = feature_importance_calculator(ds=ds)
-    local_feature_importance = LocalImportances(data=fimp, cond=ds['group'])
-    local_conditional_feature_importance =  local_feature_importance.conditional()
-    return local_feature_importance,local_conditional_feature_importance
+    local_feature_importance = LocalImportances(data=fimp, cond=ds["group"])
+    local_conditional_feature_importance = local_feature_importance.conditional()
+    return local_feature_importance, local_conditional_feature_importance
+
 
 def compute_global_conditional_feature_importance(
     learning_task, ds: Dataset, feature_importance_calculator: callable

@@ -31,6 +31,5 @@ __all__ = [
     "LocalImportances",
     "LocalConditionalFeatureImportance",
     "ConditionalFeatureImportance",
-    "PartialDependence"
-
+    "PartialDependence",
 ]

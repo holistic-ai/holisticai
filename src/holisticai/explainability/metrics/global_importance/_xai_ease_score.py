@@ -86,8 +86,7 @@ class XAIEaseAnnotator(BaseModel):
             score_data (DataFrame): The computed score data.
         """
         partial_dependence_formatted = {
-            f: partial_dependence.values[i]["average"][0]
-            for i, f in enumerate(ranked_feature_importance.feature_names)
+            f: partial_dependence.values[i]["average"][0] for i, f in enumerate(ranked_feature_importance.feature_names)
         }
         data = {feat: compare_tangents(df) for feat, df in partial_dependence_formatted.items()}
         score_data = compute_feature_scores(data, self.threshold)
@@ -194,12 +193,12 @@ def xai_ease_score(partial_dependence: PartialDependence, ranked_feature_importa
     >>> from holisticai.explainability.metrics.global_importance import xai_ease_score
     >>> partial_dependence = [
     ...     {
-    ...         'average': [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]],
-    ...         'grid_values': [[1,2,3,4,5,6,7,8,9]]
+    ...         "average": [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]],
+    ...         "grid_values": [[1, 2, 3, 4, 5, 6, 7, 8, 9]],
     ...     },
     ...     {
-    ...         'average': [[0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.4, 0.5, 0.6]], 
-    ...         'grid_values': [[1,2,3,4,5,6,7,8,9]]
+    ...         "average": [[0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.4, 0.5, 0.6]],
+    ...         "grid_values": [[1, 2, 3, 4, 5, 6, 7, 8, 9]],
     ...     },
     ... ]
     >>> partial_dependence = PartialDependence(values=partial_dependence)

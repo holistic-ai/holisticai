@@ -118,13 +118,19 @@ def plot_surrogate(feature_importance: Importances, ax=None, **kargs):
 
     """
 
-    if 'surrogate' not in feature_importance.extra_attrs:
+    if "surrogate" not in feature_importance.extra_attrs:
         raise ValueError("Surrogate key does not exist in feature_importance.extra_attrs")
 
     if ax is None:
         _, ax = plt.subplots(1, 1, figsize=(30, 10))
 
-    plot_tree(feature_importance.extra_attrs['surrogate'], feature_names=feature_importance.values, max_depth=3, ax=ax, **kargs)
+    plot_tree(
+        feature_importance.extra_attrs["surrogate"],
+        feature_names=feature_importance.values,
+        max_depth=3,
+        ax=ax,
+        **kargs,
+    )
     description = """Classification: Color indicate majority class.\nRegression: Color indicate extremity of values."""
     ax.text(0.02, 0.92, description, fontsize=15, ha="left", transform=plt.gca().transAxes)
     return ax

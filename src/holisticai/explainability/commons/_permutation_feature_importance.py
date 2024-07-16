@@ -46,8 +46,10 @@ class PermutationFeatureImportanceCalculator(BaseModel):
             feature_importances.append(np.mean(scores))
 
         features = list(X.columns)
-        feature_importances = pd.DataFrame.from_dict({"Variable": features, "Importance": feature_importances}).sort_values("Importance", ascending=False)
+        feature_importances = pd.DataFrame.from_dict(
+            {"Variable": features, "Importance": feature_importances}
+        ).sort_values("Importance", ascending=False)
         feature_importances["Importance"] = feature_importances["Importance"] / feature_importances["Importance"].sum()
-        feature_names = list(feature_importances['Variable'].values)
-        importances = np.array(feature_importances['Importance'].values)
+        feature_names = list(feature_importances["Variable"].values)
+        importances = np.array(feature_importances["Importance"].values)
         return Importances(values=importances, feature_names=feature_names)

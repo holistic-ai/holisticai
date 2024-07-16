@@ -62,6 +62,6 @@ class SurrogateFeatureImportanceCalculator(BaseModel):
         ).sort_values("Importance", ascending=False)
         feature_importances["Importance"] = feature_importances["Importance"] / feature_importances["Importance"].sum()
 
-        feature_names = list(feature_importances['Variable'].values)
-        importances = np.array(feature_importances['Importance'].values)
-        return Importances(values=importances, feature_names=feature_names, extra_attrs={'surrogate': surrogate})
+        feature_names = list(feature_importances["Variable"].values)
+        importances = np.array(feature_importances["Importance"].values)
+        return Importances(values=importances, feature_names=feature_names, extra_attrs={"surrogate": surrogate})

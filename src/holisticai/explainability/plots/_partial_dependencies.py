@@ -23,7 +23,7 @@ def plot_partial_dependence(partial_dependence, ranked_feature_importance, subpl
 
     Example
     -------
-    >>> partial_dependence = PartialDependence(values = [...])
+    >>> partial_dependence = PartialDependence(values=[...])
     >>> ranked_feature_importance = Importances(values=[...], feature_names=[...])
     >>> plot_partial_dependence(partial_dependence, ranked_feature_importance)
 

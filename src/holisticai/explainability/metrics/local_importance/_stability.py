@@ -50,11 +50,13 @@ def data_stability(local_feature_importance: LocalImportances):
     --------
     >>> import pandas as pd
     >>> from holisticai.explainability.commons import LocalImportances
-    >>> importances = pd.DataFrame({
-    ...     "feature_1": [0.10, 0.20, 0.30],
-    ...     "feature_2": [0.10, 0.25, 0.35],
-    ...     "feature_3": [0.15, 0.20, 0.30]
-    ... })
+    >>> importances = pd.DataFrame(
+    ...     {
+    ...         "feature_1": [0.10, 0.20, 0.30],
+    ...         "feature_2": [0.10, 0.25, 0.35],
+    ...         "feature_3": [0.15, 0.20, 0.30],
+    ...     }
+    ... )
     >>> local_importances = LocalImportances(importances)
     >>> stability_score = data_stability(local_importances)
     >>> print(stability_score)
@@ -111,11 +113,13 @@ def feature_stability(local_feature_importance: LocalImportances):
     --------
     >>> import pandas as pd
     >>> from holisticai.explainability.commons import LocalImportances
-    >>> importances = pd.DataFrame({
-    ...     "feature_1": [0.10, 0.20, 0.30],
-    ...     "feature_2": [0.10, 0.25, 0.35],
-    ...     "feature_3": [0.15, 0.20, 0.30]
-    ... })
+    >>> importances = pd.DataFrame(
+    ...     {
+    ...         "feature_1": [0.10, 0.20, 0.30],
+    ...         "feature_2": [0.10, 0.25, 0.35],
+    ...         "feature_3": [0.15, 0.20, 0.30],
+    ...     }
+    ... )
     >>> local_importances = LocalImportances(importances)
     >>> stability_score = feature_stability(local_importances)
     >>> print(stability_score)

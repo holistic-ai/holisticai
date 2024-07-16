@@ -13,9 +13,7 @@ class PositionParity(BaseModel):
     name: str = "Position Parity"
     reference: float = 1.0
 
-    def __call__(
-        self, conditional_feature_importance: ConditionalFeatureImportance, feature_importance: Importances
-    ):
+    def __call__(self, conditional_feature_importance: ConditionalFeatureImportance, feature_importance: Importances):
         conditional_position_parity = {}
         for group_name, cond_features in conditional_feature_importance:
             match_order = [c == r for c, r in zip(cond_features.feature_names, feature_importance.feature_names)]
@@ -24,7 +22,9 @@ class PositionParity(BaseModel):
         return np.mean(np.mean(list(conditional_position_parity.values())))
 
 
-def position_parity(conditional_feature_importance: ConditionalFeatureImportance, ranked_feature_importance: Importances):
+def position_parity(
+    conditional_feature_importance: ConditionalFeatureImportance, ranked_feature_importance: Importances
+):
     """
     Calculates the position parity metric.
 
@@ -46,16 +46,23 @@ def position_parity(conditional_feature_importance: ConditionalFeatureImportance
     Examples
     --------
     >>> import numpy as np
-    >>> from holisticai.explainability.commons import ConditionalFeatureImportance, Importances
+    >>> from holisticai.explainability.commons import (
+    ...     ConditionalFeatureImportance,
+    ...     Importances,
+    ... )
     >>> from holisticai.explainability.metrics import position_parity
     >>> values = np.array([0.50, 0.40, 0.10])
     >>> feature_names = ["feature_1", "feature_2", "feature_3"]
     >>> feature_importance = Importances(values=values, feature_names=feature_names)
     >>> values = {
-    ...     "group1": Importances(values=np.array([0.40, 0.35, 0.25]),
-    ...                           feature_names=["feature_1", "feature_2", "feature_3"]),
-    ...     "group2": Importances(values=np.array([0.50, 0.30, 0.20]),
-    ...                           feature_names=["feature_3", "feature_2", "feature_1"]),
+    ...     "group1": Importances(
+    ...         values=np.array([0.40, 0.35, 0.25]),
+    ...         feature_names=["feature_1", "feature_2", "feature_3"],
+    ...     ),
+    ...     "group2": Importances(
+    ...         values=np.array([0.50, 0.30, 0.20]),
+    ...         feature_names=["feature_3", "feature_2", "feature_1"],
+    ...     ),
     ... }
     >>> conditional_feature_importance = ConditionalFeatureImportance(values=values)
     >>> position_parity(conditional_feature_importance, feature_importance)

@@ -3,17 +3,12 @@ from __future__ import annotations
 from collections import namedtuple
 from typing import Literal, Union
 
-import pandas as pd
 from holisticai.explainability.commons import (
     PermutationFeatureImportanceCalculator,
     SurrogateFeatureImportanceCalculator,
 )
 from holisticai.explainability.commons._definitions import (
-    ConditionalFeatureImportance,
-    Importances,
     LearningTaskXAISettings,
-    LocalConditionalFeatureImportance,
-    LocalImportances,
 )
 from holisticai.explainability.commons._feature_importance import (
     compute_global_conditional_feature_importance,

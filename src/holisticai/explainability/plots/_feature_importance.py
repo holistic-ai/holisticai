@@ -23,8 +23,9 @@ def plot_feature_importance(feature_importance: Importances, alpha=0.8, top_n=20
 
     Example
     -------
-    >>> feature_importance = Importances(values=np.array([0.1, 0.2, 0.3, 0.4]),
-    ...                                  feature_names=['A', 'B', 'C', 'D'])
+    >>> feature_importance = Importances(
+    ...     values=np.array([0.1, 0.2, 0.3, 0.4]), feature_names=["A", "B", "C", "D"]
+    ... )
     >>> plot_feature_importance(feature_importance)
 
     The plot should look like this:
@@ -35,8 +36,8 @@ def plot_feature_importance(feature_importance: Importances, alpha=0.8, top_n=20
     """
 
     ranked_feature_importance = feature_importance.top_alpha(alpha=alpha)
-    ranked_feature_importance = ranked_feature_importance.as_dataframe().set_index('Variable')
-    feature_importances = feature_importance.as_dataframe().set_index('Variable')
+    ranked_feature_importance = ranked_feature_importance.as_dataframe().set_index("Variable")
+    feature_importances = feature_importance.as_dataframe().set_index("Variable")
 
     feature_importances.loc[:, "color"] = "#21918C"
     feature_importances.loc[ranked_feature_importance.index, "color"] = "#440154"
