@@ -28,7 +28,7 @@ class PrejudiceRemoverAlgorithm:
         self.logger = logger
         self.objective_fn = objective_fn
         self.maxiter = maxiter
-        self.sensgroups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def fit(self, X: np.ndarray, y: np.ndarray, sensitive_features: np.ndarray):
         """
@@ -48,7 +48,7 @@ class PrejudiceRemoverAlgorithm:
             Matrix where each columns is a sensitive feature e.g. [col_1=group_a, col_2=group_b]
         """
 
-        groups_num = self.sensgroups.fit_transform(sensitive_features, convert_numeric=True)
+        groups_num = self._sensgroups.fit_transform(sensitive_features, convert_numeric=True)
         self.estimator.init_params(X, y, groups_num)
         self.logger.set_log_fn(loss=lambda coef: self.objective_fn.loss(coef, X, y, groups_num), htype=float)
 
@@ -83,7 +83,7 @@ class PrejudiceRemoverAlgorithm:
         y : array, shape=(n_samples), dtype=int
             array of predicted class
         """
-        p_attr = self.sensgroups.transform(sensitive_features, convert_numeric=True)
+        p_attr = self._sensgroups.transform(sensitive_features, convert_numeric=True)
         return self.estimator.predict(X, p_attr)
 
     def predict_proba(self, X, sensitive_features):
@@ -103,5 +103,5 @@ class PrejudiceRemoverAlgorithm:
         y_proba : array, shape=(n_samples, n_classes), dtype=float
             array of predicted class
         """
-        p_attr = self.sensgroups.transform(sensitive_features, convert_numeric=True)
+        p_attr = self._sensgroups.transform(sensitive_features, convert_numeric=True)
         return self.estimator.predict_proba(X, p_attr)
