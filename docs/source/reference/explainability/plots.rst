@@ -1,68 +1,37 @@
 
-===============
-Bias Plots
-===============
+=====
+Plots
+=====
 
-`holisticai.bias.plots` implements the visualizations for **bias** tasks.
+`holisticai.explainability.plots` implements the visualizations for **explainability** tasks.
 
 
-.. _classification:
+.. _xai_feature_importance:
 
-Binary Classification Plots
-----------------------
-
-.. autosummary::
-    :toctree: .generated/
-    
-    holisticai.bias.plots.abroca_plot
-
-.. _multiclass:
-
-Multiclass Classification Plots
-----------------------
+Feature Importance
+------------------
 
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.bias.plots.accuracy_bar_plot
-    holisticai.bias.plots.frequency_plot
-    holisticai.bias.plots.disparate_impact_plot
-    holisticai.bias.plots.frequency_matrix_plot
-    holisticai.bias.plots.statistical_parity_plot
+    holisticai.explainability.plots.plot_feature_importance
 
-.. _regression:
+.. _xai_partial_dependencies:
 
-Regression Plots
-----------------------
+Partial Dependencies
+--------------------
 
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.bias.plots.disparate_impact_curve
-    holisticai.bias.plots.mae_bar_plot
-    holisticai.bias.plots.rmse_bar_plot
-    holisticai.bias.plots.statistical_parity_curve
-    holisticai.bias.plots.success_rate_curve
-    holisticai.bias.plots.success_rate_curves
+    holisticai.explainability.plots.plot_partial_dependence
 
-.. _recommender:
+.. _xai_tree_surrogates:
 
-Recommender Plots
-----------------------
+Surrogate
+---------
 
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.bias.plots.exposure_diff_plot
-    holisticai.bias.plots.exposure_ratio_plot
-    holisticai.bias.plots.long_tail_plot
-
-.. _report:
-
-Report Plots
-----------------------
-
-.. autosummary::
-    :toctree: .generated/
-    
-    holisticai.bias.plots.bias_metrics_report
+    holisticai.explainability.plots.plot_surrogate

@@ -4,10 +4,7 @@ from typing import TYPE_CHECKING, Union
 
 import numpy as np
 import pandas as pd
-from holisticai.explainability.commons._definitions import (
-    LearningTaskXAISettings,
-    PermutationFeatureImportance,
-)
+from holisticai.explainability.commons._definitions import Importances, LearningTaskXAISettings
 from numpy.random import RandomState
 from pydantic import BaseModel, ConfigDict
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -29,7 +26,7 @@ class PermutationFeatureImportanceCalculator(BaseModel):
     random_state: Union[RandomState, int] = RandomState(42)
     importance_type: str = "global"
 
-    def __call__(self, ds: Dataset) -> PermutationFeatureImportance:
+    def __call__(self, ds: Dataset) -> Importances:
         # Ensure the random state is consistent
         rng = np.random.RandomState(self.random_state) if isinstance(self.random_state, int) else self.random_state
 
@@ -49,9 +46,10 @@ class PermutationFeatureImportanceCalculator(BaseModel):
             feature_importances.append(np.mean(scores))
 
         features = list(X.columns)
-        feature_importance = pd.DataFrame({"Variable": features, "Importance": feature_importances})
-        feature_importance["Importance"] = feature_importance["Importance"] / feature_importance["Importance"].sum()
-
-        return PermutationFeatureImportance(
-            feature_importances=feature_importance.sort_values("Importance", ascending=False)
-        )
+        feature_importances = pd.DataFrame.from_dict(
+            {"Variable": features, "Importance": feature_importances}
+        ).sort_values("Importance", ascending=False)
+        feature_importances["Importance"] = feature_importances["Importance"] / feature_importances["Importance"].sum()
+        feature_names = list(feature_importances["Variable"].values)
+        importances = np.array(feature_importances["Importance"].values)
+        return Importances(values=importances, feature_names=feature_names)

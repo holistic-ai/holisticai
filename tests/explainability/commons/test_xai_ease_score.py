@@ -13,11 +13,11 @@ def xai_ease_score():
     return XAIEaseScore()
 
 def test_compute_xai_ease_score_data(xai_ease_annotator):
-    partial_dependence = namedtuple("partial_dependence", "partial_dependence")
-    partial_dependence.partial_dependence = [
+    from holisticai.explainability.commons import PartialDependence
+    partial_dependence = PartialDependence( values = [
         {'average': [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]]},
         {'average': [[0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.4, 0.5, 0.6]]},
-    ]
+    ])
     ranked_feature_importance = namedtuple("ranked_feature_importance", "feature_names")
     ranked_feature_importance.feature_names = ['feature1', 'feature2']
     score_data = xai_ease_annotator.compute_xai_ease_score_data(partial_dependence, ranked_feature_importance)
@@ -30,24 +30,23 @@ def test_compute_xai_ease_score(xai_ease_score):
     assert xai_ease_score.compute_xai_ease_score(score_data) == 0.75
 
 def test_xai_feature_ease_score(xai_ease_score):
-    partial_dependence = namedtuple("partial_dependence", "partial_dependence")
-    partial_dependence.partial_dependence = [
+    from holisticai.explainability.commons import PartialDependence
+    partial_dependence = PartialDependence( values = [
         {'average': [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]]},
         {'average': [[0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.4, 0.5, 0.6]]},
-    ]
+    ])
     ranked_feature_importance = namedtuple("ranked_feature_importance", "feature_names")
     ranked_feature_importance.feature_names = ['feature1', 'feature2']
     assert xai_ease_score(partial_dependence, ranked_feature_importance) == 0.5
 
 def test_xai_ease_score(xai_ease_score):
-    from holisticai.explainability.commons._definitions import PartialDependence
-    from holisticai.explainability.commons import PermutationFeatureImportance
+    from holisticai.explainability.commons import PartialDependence, Importances
     partial_dependence = [
         {'average': [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]], 'grid_values': [[1,2,3,4,5,6,7,8,9]]},
         {'average': [[0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.4, 0.5, 0.6]], 'grid_values': [[1,2,3,4,5,6,7,8,9]]},
     ]
-    partial_dependence = PartialDependence(partial_dependence=partial_dependence)
-    feature_importance = PermutationFeatureImportance(feature_importances=pd.DataFrame({'Variable': ['feature1', 'feature2'], 'Importance': [0.5, 0.5]}))
+    partial_dependence = PartialDependence(values=partial_dependence)
+    feature_importance = Importances(feature_names= ['feature1', 'feature2'], values=np.array([0.5, 0.5]))
     assert xai_ease_score(partial_dependence, feature_importance) == 0.5
     
 

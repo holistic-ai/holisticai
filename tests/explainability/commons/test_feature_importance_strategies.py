@@ -1,6 +1,5 @@
 from sklearn.linear_model import LogisticRegression
-from holisticai.explainability.commons import SurrogateFeatureImportanceCalculator,SurrogateFeatureImportance
-from holisticai.explainability.commons import PermutationFeatureImportanceCalculator,PermutationFeatureImportance
+from holisticai.explainability.commons import SurrogateFeatureImportanceCalculator, PermutationFeatureImportanceCalculator, Importances
 from holisticai.datasets import load_dataset
 import pytest
 import numpy as np
@@ -23,16 +22,16 @@ def test_surrogate_feature_importance_call(input_data):
     from holisticai.datasets import Dataset
     learning_task_settings = BinaryClassificationXAISettings(predict_fn=model.predict, predict_proba_fn=model.predict_proba, classes=[0,1])
     fi_strategy = SurrogateFeatureImportanceCalculator(learning_task_settings=learning_task_settings, random_state=RandomState(42))
-    result = fi_strategy(test)
-    assert isinstance(result, SurrogateFeatureImportance)
-    assert np.isclose(result.feature_importances.set_index('Variable').loc['education-num']['Importance'], 0.5263157894736843)
+    importance = fi_strategy(test)
+    assert isinstance(importance, Importances)
+    assert np.isclose(importance['education-num'], 0.5263157894736843)
     
 def test_permutation_feature_importance_call(input_data):
     model, test = input_data
     from holisticai.explainability.commons._definitions import BinaryClassificationXAISettings
     learning_task_settings = BinaryClassificationXAISettings(predict_fn=model.predict, predict_proba_fn=model.predict_proba, classes=[0,1])
     fi_strategy = PermutationFeatureImportanceCalculator(learning_task_settings=learning_task_settings, random_state=RandomState(42))
-    result = fi_strategy(test)
-    assert isinstance(result, PermutationFeatureImportance)
-    assert np.isclose(result.feature_importances.set_index('Variable').loc['education-num']['Importance'], 0.10526315789473678)
+    importance = fi_strategy(test)
+    assert isinstance(importance, Importances)
+    assert np.isclose(importance['education-num'], 0.10526315789473678)
     

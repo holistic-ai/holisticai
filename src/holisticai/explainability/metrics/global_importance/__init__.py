@@ -1,6 +1,6 @@
-from holisticai.explainability.metrics.global_importance._alpha_importance_score import (
-    AlphaImportanceScore,
-    alpha_importance_score,
+from holisticai.explainability.metrics.global_importance._alpha_score import (
+    AlphaScore,
+    alpha_score,
 )
 from holisticai.explainability.metrics.global_importance._importance_spread import (
     SpreadDivergence,
@@ -13,13 +13,13 @@ from holisticai.explainability.metrics.global_importance._rank_alignment import 
 from holisticai.explainability.metrics.global_importance._xai_ease_score import XAIEaseScore, xai_ease_score
 
 __all__ = [
-    "AlphaImportanceScore",
+    "AlphaScore",
     "XAIEaseScore",
     "PositionParity",
     "RankAlignment",
     "SpreadRatio",
     "SpreadDivergence",
-    "alpha_importance_score",
+    "alpha_score",
     "xai_ease_score",
     "position_parity",
     "rank_alignment",

@@ -28,4 +28,4 @@ def input_data():
 def test_get_partial_dependence_results_binary_classification(input_data):
     x, learning_task_settings, important_features = input_data
     results = compute_partial_dependence(x, important_features, learning_task_settings)
-    np.isclose(results[0].partial_dependence[0]['average'][0][0], 0.7463041031804294)
+    np.isclose(results[0].values[0]['average'][0][0], 0.7463041031804294)

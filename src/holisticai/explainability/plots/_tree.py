@@ -2,7 +2,7 @@ from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-from holisticai.explainability.commons import SurrogateFeatureImportance
+from holisticai.explainability.commons import Importances
 from sklearn.tree._export import _MPLTreeExporter
 
 
@@ -90,9 +90,47 @@ def plot_tree(
     return exporter.export(decision_tree, ax=ax)
 
 
-def plot_surrogate(feature_importance: SurrogateFeatureImportance, ax=None, **kargs):
+def plot_surrogate(feature_importance: Importances, ax=None, **kargs):
+    """
+    Plots the surrogate tree for feature importance.
+
+    Parameters
+    ----------
+    feature_importance: Importances
+        The feature importance object.
+    ax: (matplotlib.axes.Axes, optional)
+        The matplotlib axes to plot the tree on. If not provided, a new figure and axes will be created.
+    kargs:
+        Additional keyword arguments to be passed to the `plot_tree` function.
+
+    Returns
+    -------
+    ax: matplotlib.axes.Axes
+
+    Example
+    -------
+    >>> plot_surrogate(feature_importance)
+
+    The plot should look like this:
+
+    .. image:: /_static/images/xai_plot_surrogate.png
+        :alt: Plot Surrogate
+
+    """
+
+    if "surrogate" not in feature_importance.extra_attrs:
+        raise ValueError("Surrogate key does not exist in feature_importance.extra_attrs")
+
     if ax is None:
         _, ax = plt.subplots(1, 1, figsize=(30, 10))
-    plot_tree(feature_importance.surrogate, feature_names=feature_importance.feature_names, max_depth=3, ax=ax, **kargs)
+
+    plot_tree(
+        feature_importance.extra_attrs["surrogate"],
+        feature_names=feature_importance.values,
+        max_depth=3,
+        ax=ax,
+        **kargs,
+    )
     description = """Classification: Color indicate majority class.\nRegression: Color indicate extremity of values."""
     ax.text(0.02, 0.92, description, fontsize=15, ha="left", transform=plt.gca().transAxes)
+    return ax
