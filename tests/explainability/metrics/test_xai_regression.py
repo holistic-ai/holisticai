@@ -1,7 +1,7 @@
 from holisticai.datasets import load_dataset
 from sklearn.linear_model import LinearRegression
 from holisticai.explainability.metrics import regression_explainability_metrics, regression_explainability_features
-from holisticai.explainability.metrics.global_importance import alpha_importance_score, rank_alignment, position_parity, xai_ease_score
+from holisticai.explainability.metrics.global_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
 import numpy as np
 import pytest
 
@@ -38,5 +38,6 @@ def test_xai_classification_metrics_separated(input_data):
     value = xai_ease_score(xai_features.partial_dependence, xai_features.ranked_feature_importance)
     assert np.isclose(value, 1.0)
 
-    value = alpha_importance_score(xai_features.feature_importance, xai_features.ranked_feature_importance)
+    value = alpha_score(xai_features.feature_importance)
     assert np.isclose(value, 0.0891089108910891)
+

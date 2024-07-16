@@ -285,7 +285,7 @@ def load_dataset(dataset_name: ProcessedDatasets, **kargs) -> Dataset:
     ----------
     dataset_name: ProcessedDatasets
         The name of the dataset to load. The list of supported datasets are here: :ref:`processed_datasets`.
-    **kargs:
+    kargs:
         Additional keyword arguments to pass to the dataset loading functions.
 
     Returns

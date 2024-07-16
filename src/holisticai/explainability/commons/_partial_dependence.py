@@ -220,6 +220,6 @@ def compute_partial_dependence(x: pd.DataFrame, features: list[str], learning_ta
                 newp["individual"] = p["individual"][c][np.newaxis]
                 newp["average"] = p["average"][c][np.newaxis]
                 part_dep_feat.append(newp)
-            new_partial_dependence.append(PartialDependence(partial_dependence=part_dep_feat))
+            new_partial_dependence.append(PartialDependence(values=part_dep_feat))
         return new_partial_dependence
-    return PartialDependence(partial_dependence=partial_dependence)
+    return PartialDependence(values=partial_dependence)

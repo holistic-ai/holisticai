@@ -2,11 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Union
 
+import numpy as np
 import pandas as pd
-from holisticai.explainability.commons._definitions import (
-    LearningTaskXAISettings,
-    SurrogateFeatureImportance,
-)
+from holisticai.explainability.commons._definitions import Importances, LearningTaskXAISettings
 from numpy.random import RandomState
 from pydantic import BaseModel, ConfigDict
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -42,7 +40,7 @@ class SurrogateFeatureImportanceCalculator(BaseModel):
 
         raise ValueError("model_type must be either 'binary_classification', 'multi_classification' or 'regression'")
 
-    def __call__(self, ds: Dataset) -> SurrogateFeatureImportance:
+    def __call__(self, ds: Dataset) -> Importances:
         """
         Compute surrogate feature importance for a given model type, model and input features.
 
@@ -62,4 +60,8 @@ class SurrogateFeatureImportanceCalculator(BaseModel):
         feature_importances = pd.DataFrame.from_dict(
             {"Variable": feature_names, "Importance": importances}
         ).sort_values("Importance", ascending=False)
-        return SurrogateFeatureImportance(feature_importances=feature_importances, surrogate=surrogate)
+        feature_importances["Importance"] = feature_importances["Importance"] / feature_importances["Importance"].sum()
+
+        feature_names = list(feature_importances['Variable'].values)
+        importances = np.array(feature_importances['Importance'].values)
+        return Importances(values=importances, feature_names=feature_names, extra_attrs={'surrogate': surrogate})

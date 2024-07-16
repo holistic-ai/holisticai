@@ -6,12 +6,12 @@ Explainability Metrics
 .. _global_feature_importance:
 
 Global Feature Importance
---------------------------
+-------------------------
 
 .. autosummary::
     :toctree: .generated/
 
-    holisticai.explainability.metrics.alpha_importance_score
+    holisticai.explainability.metrics.alpha_score
     holisticai.explainability.metrics.xai_ease_score
     holisticai.explainability.metrics.position_parity
     holisticai.explainability.metrics.rank_alignment
@@ -21,7 +21,7 @@ Global Feature Importance
 .. _local_feature_importance:
 
 Local Feature Importance
---------------------------
+------------------------
 
 .. autosummary::
     :toctree: .generated/
