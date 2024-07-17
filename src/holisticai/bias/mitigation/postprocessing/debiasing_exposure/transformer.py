@@ -12,37 +12,37 @@ class DebiasingExposure:
 
     Parameters
     ----------
-    group_col: str
+    group_col : str
         Name of the column in data that contains protected attribute.
 
-    query_col:
-        Name of the column in data that contains query ids.
+    query_col : str
+        Name of the column in data that contains query ids (optional).
 
-    doc_col:
-        List of name of the column in data that contains document ids.
+    doc_col : str
+        List of name of the column in data that contains document ids (optional).
 
-    score_col:
-        Name of the column in data that contains judgment values.
+    score_col : str
+        Name of the column in data that contains judgment values (optional).
 
-    feature_cols:
-        Name of the columns in data that contains feature values.
+    feature_cols :
+        Name of the columns in data that contains feature values  (optional).
 
-    gamma: float
+    gamma : float
         Gamma parameter for the cost calculation in the training phase (recommended to be around 1).
 
-    number_of_iterations: int
+    number_of_iterations : int
         Number of iteration in gradient descent (optional).
 
-    learning_rate: float
+    learning_rate : float
         Learning rate in gradient descent (optional).
 
-    lambdaa: float
+    lambdaa : float
         Regularization constant (optional).
 
-    init_var: float
+    init_var : float
         Range of values for initialization of weights (optional).
 
-    standardize: bool
+    standardize : bool
         Boolean indicating whether the data should be standardized or not (optional).
 
     verbose : int
@@ -121,7 +121,7 @@ class DebiasingExposure:
         ----------
         rankings:  DataFrame
 
-        Return
+        Returns
         ------
             Self
         """
@@ -157,9 +157,10 @@ class DebiasingExposure:
         ----------
         rankings:    DataFrame
 
-        Return
+        Returns
         ------
-            DataFrame
+        DataFrame
+            Transformed data
         """
 
         if self._omega is None:

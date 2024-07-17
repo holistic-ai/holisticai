@@ -15,11 +15,13 @@ class GridSearchReduction(BaseEstimator, BMImp):
     """Grid Search Reduction
 
     Grid search technique can be used for fair classification or fair regression.
+
     (1) For classification it reduces fair classification to a sequence of cost-sensitive classification problems,\
     returning the deterministic classifier with the lowest empirical error subject to fair classification constraints among the\
-    candidates searched.
+    candidates searched [1]_.
+
     (2) For regression it uses the same priniciple to return a deterministic regressor with the lowest empirical error subject to the\
-    constraint of bounded group loss.
+    constraint of bounded group loss [2]_.
 
     Parameters
     ----------

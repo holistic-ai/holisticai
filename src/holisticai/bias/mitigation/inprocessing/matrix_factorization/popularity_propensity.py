@@ -17,9 +17,10 @@ logger = logging.getLogger(__name__)
 class PopularityPropensityMF(BMImp, RecommenderSystemBase):
     """Popularity Propensity Matrix Factorization
 
-    Popularity Propensity Matrix Factorization can be used for Recommender Systems.\
-    This model is trained with propensity matrix factorization defined in (Eq. 1) [1]. Here the propensity P(u,i)\
-    is estimated based on popularity.
+    Popularity Propensity Matrix Factorization address selection biases in recommender systems \
+    by using causal inference techniques to provide unbiased performance estimators \
+    and improve prediction accuracy. This method estimates the probability (propensity) \
+    that a user will rate an item and adjusts the training and evaluation processes accordingly.
 
     Parameters
     ----------

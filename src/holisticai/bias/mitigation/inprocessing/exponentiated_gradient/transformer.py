@@ -69,7 +69,7 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         seed: int
             seed for random initialization
 
-    Reference
+    References
     ---------
     .. [1] Agarwal, Alekh, et al. "A reductions approach to fair classification."
         International Conference on Machine Learning. PMLR, 2018.

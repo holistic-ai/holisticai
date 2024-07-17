@@ -10,10 +10,6 @@ class WassersteinBarycenter(BMPost):
     predictor computing the Wasserstein barycenter of the distributions induced by the\
     standard regression function on the sensitive groups.
 
-    Parameters
-    ----------
-    None
-
     References
     ----------
         .. [1] Chzhen, Evgenii, et al. "Fair regression with wasserstein barycenters."\

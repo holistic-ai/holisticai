@@ -14,7 +14,7 @@ class FairRec(BMImp):
     FairRecommendationSystem (FairRec), exhibes the desired two-sided fairness by\
     mapping the fair recommendation problem to a fair allocation problem; moreover,\
     it is agnostic to the specifics of the data-driven model (that estimates the\
-    product-customer relevance scores) which makes it more scalable and easy to adapt [1].
+    product-customer relevance scores) which makes it more scalable and easy to adapt [1]_.
 
     Parameters
     ----------

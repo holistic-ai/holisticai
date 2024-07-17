@@ -22,28 +22,28 @@ class FairTopK(BMPost):
 
     Parameters
     ----------
-    top_n: int
+    top_n : int
         The total number of elements.
 
-    p: float
+    p : float
         The proportion of protected candidates in the top-k ranking.
 
-    alpha: float
+    alpha : float
         The significance level.
 
-    query_col: str
+    query_col : str
         The name of the column in data that contains query ids.
 
-    doc_col: str
+    doc_col : str
         The name of the column in data that contains document ids.
 
-    group_col: str
+    group_col : str
         The name of the column in data that contains protected attribute.
 
-    score_col: str
+    score_col : str
         The name of the column in data that contains judgment values.
 
-    Reference
+    References
     ---------
     .. [1] Zehlike, Meike, et al. "Fa* ir: A fair top-k ranking algorithm." Proceedings of the 2017 ACM on\
     Conference on Information and Knowledge Management. 2017.
@@ -153,7 +153,7 @@ class FairTopK(BMPost):
         ranking: list
             The ranking to be checked (list of Resultinfo)
 
-        Return
+        Returns
         ------
         bool
             True if the ranking is fair, False otherwise.
@@ -176,7 +176,7 @@ class FairTopK(BMPost):
         mtable: list
             adjusted mtable
 
-        Return
+        Returns
         ------
         list
             List of re-ranked results.

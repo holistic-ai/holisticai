@@ -16,10 +16,10 @@ class DisparateImpactRemoverRS(BMPos):
 
     Parameters
     ----------
-    group_col: str
+    group_col : str
         Name of the column in data that contains protected attribute.
 
-    score_col:
+    score_col : str
         Name of the column in data that contains judgment values.
 
     repair_level : float
@@ -71,12 +71,13 @@ class DisparateImpactRemoverRS(BMPos):
 
         Parameters
         ----------
-        rankings:    DataFrame
+        rankings : DataFrame
             The input data
 
         Returns
         -------
-            DataFrame
+        DataFrame
+            Transformed data
         """
         return self.fit().transform(rankings)
 
@@ -96,12 +97,13 @@ class DisparateImpactRemoverRS(BMPos):
 
         Parameters
         ----------
-        rankings:    DataFrame
+        rankings : DataFrame
             The input data
 
         Returns
         ------
-            DataFrame
+        DataFrame
+            Transformed data
         """
         rankings = self._filter_invalid_examples(rankings)
         new_rankings = [self.transform_features(ranking) for q, ranking in rankings.groupby(self.query_col)]

@@ -26,8 +26,10 @@ class FairletClustering(BaseEstimator, BMImp):
     """Fairlet Clustering
 
     Fairlet Clustering inprocessing bias mitigation works in two steps:
+
     (1) The pointset is partitioned into subsets called fairlets that satisfy\
     the fairness requirement and approximately preserve the k-median objective.
+
     (2) Fairlets are merged into k clusters by one of the existing k-median algorithms.
 
     Parameters
@@ -52,7 +54,7 @@ class FairletClustering(BaseEstimator, BMImp):
 
     References
     ---------
-        .. [1] Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
+        .. [1] Backurs, Arturs, et al. "Scalable fair clustering." International Conference on\
         Machine Learning. PMLR, 2019.
     """
 

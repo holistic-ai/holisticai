@@ -22,11 +22,11 @@ class MCMF(BMPost):
         ["constant", "L1", "L2"]
 
     solver : str
-        Algorithm name used to solve the standard form problem. Solver supported must depend of your scipy poackage version.
+        Algorithm name used to solve the standard form problem. Solver supported must depend of your scipy package version.
         for scipy 1.9.0 the solvers available are:
         ["highs", "highs-ds", "highs-ipm"]
 
-    group_mode: str
+    group_mode : str
         Set what groups will be fitted: ['a', 'b', 'ab']
     verbose : int
         If > 0 , then print logs.

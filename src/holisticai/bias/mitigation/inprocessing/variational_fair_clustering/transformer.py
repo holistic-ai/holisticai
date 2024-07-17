@@ -29,7 +29,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
             specified lambda parameter
 
         method : str
-            cluster option : {'kmeans', 'kmedian'} (TODO: 'ncut' take too much time consuming)
+            cluster option : {'kmeans', 'kmedian'}
 
         normalize_input : str
             Normalize input data X

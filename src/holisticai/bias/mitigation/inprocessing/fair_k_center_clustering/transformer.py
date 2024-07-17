@@ -31,27 +31,22 @@ class FairKCenterClustering(BaseEstimator, BMImp):
     ----------
         req_nr_per_group : list
             Number of cluster for each group that will be founded.
+
             - Integer-vector of length m with entries in 0,...,k.
             - Sum of all entries must be equal to k (total number of clusters).
 
-        nr_initially_given: int
+        nr_initially_given : int
             Number of initial random centers.
 
-        strategy: Strategy used to compute the cluster centers. Available are:
+        strategy : str
+            Strategy used to compute the cluster centers. Available are:
+
             - 'Fair K-Center' (default)
             - 'Heuristic Greedy by Group'
             - 'Heuristic Greedy by Constraint'
 
-        seed: int,
+        seed : int,
             Initial random seed.
-
-    Methods
-    -------
-        fit(X, group_a, group_b)
-            Fit model using Fair K-Center Clustering.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
 
     References
     ---------

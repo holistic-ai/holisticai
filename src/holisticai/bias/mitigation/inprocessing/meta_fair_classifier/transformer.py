@@ -27,17 +27,6 @@ class MetaFairClassifier(BMImp):
         seed : int
             Random seed.
 
-    Methods
-    -------
-        fit(X, y, group_a, group_b)
-            Fit model using Meta Fair Classifier.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
-
-        predict_proba(X)
-            Predict the probability of each sample in X belongs to each class.
-
     References
     ----------
         .. [1] Celis, L. Elisa, et al. "Classification with fairness constraints:\
