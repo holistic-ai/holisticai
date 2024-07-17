@@ -7,7 +7,7 @@ import pandas as pd
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from holisticai.explainability.commons._definitions import FeatureImportance, PartialDependence
+    from holisticai.explainability.commons._definitions import Importances, PartialDependence
 
 
 def compute_feature_scores(data, threshold):
@@ -86,8 +86,7 @@ class XAIEaseAnnotator(BaseModel):
             score_data (DataFrame): The computed score data.
         """
         partial_dependence_formatted = {
-            f: partial_dependence.partial_dependence[i]["average"][0]
-            for i, f in enumerate(ranked_feature_importance.feature_names)
+            f: partial_dependence.values[i]["average"][0] for i, f in enumerate(ranked_feature_importance.feature_names)
         }
         data = {feat: compare_tangents(df) for feat, df in partial_dependence_formatted.items()}
         score_data = compute_feature_scores(data, self.threshold)
@@ -145,7 +144,7 @@ class XAIEaseScore(BaseModel):
     def __call__(
         self,
         partial_dependence: Union[PartialDependence, list[PartialDependence]],
-        ranked_feature_importance: FeatureImportance,
+        ranked_feature_importance: Importances,
     ):
         """
         Computes the XAI Ease Score for a set of partial dependence plots.
@@ -155,7 +154,7 @@ class XAIEaseScore(BaseModel):
             features (list): A list of feature names.
 
         Returns:
-            xai_ease_score (float): The computed XAI Ease Score.
+            float: The computed XAI Ease Score.
         """
 
         def compute_metric(pdep, rfi):
@@ -170,6 +169,43 @@ class XAIEaseScore(BaseModel):
         return compute_metric(partial_dependence, ranked_feature_importance)
 
 
-def xai_ease_score(partial_dependence, ranked_feature_importance):
+def xai_ease_score(partial_dependence: PartialDependence, ranked_feature_importance: Importances):
+    """
+    Calculates the XAI Ease Score metric.
+
+    This metric measures the ease of explaining a model's predictions using partial dependence plots
+    and ranked feature importance.
+
+    Parameters
+    ----------
+    partial_dependence: PartialDependence
+        The partial dependence values for each feature.
+    ranked_feature_importance: Importances
+        The ranked feature importance values.
+
+    Returns
+    -------
+        float: The XAI Ease Score.
+
+    Examples
+    --------
+    >>> from holisticai.explainability.commons import PartialDependence, Importances
+    >>> from holisticai.explainability.metrics.global_importance import xai_ease_score
+    >>> partial_dependence = [
+    ...     {
+    ...         "average": [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]],
+    ...         "grid_values": [[1, 2, 3, 4, 5, 6, 7, 8, 9]],
+    ...     },
+    ...     {
+    ...         "average": [[0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.4, 0.5, 0.6]],
+    ...         "grid_values": [[1, 2, 3, 4, 5, 6, 7, 8, 9]],
+    ...     },
+    ... ]
+    >>> partial_dependence = PartialDependence(values=partial_dependence)
+    >>> feature_importance = Importances(values=np.array([0.5, 0.5]),
+    >>> feature_names=['feature1', 'feature2'])
+    >>> xai_ease_score(partial_dependence, feature_importance)
+    0.5
+    """
     metric = XAIEaseScore()
     return metric(partial_dependence, ranked_feature_importance)

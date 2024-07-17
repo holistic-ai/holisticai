@@ -1,4 +1,5 @@
 import numpy as np
+from holisticai.explainability.commons import LocalImportances
 
 
 class DataStability:
@@ -6,7 +7,7 @@ class DataStability:
     name: str = "Data Stability"
 
     def __call__(self, local_feature_importance):
-        feature_importances = local_feature_importance.feature_importances.values
+        feature_importances = local_feature_importance.values
         # Calculate the median for each instance (row)
         medians_row = np.median(feature_importances, axis=1)
 
@@ -21,25 +22,42 @@ class DataStability:
         return np.mean(niqr_row)
 
 
-def data_stability(local_feature_importance):
+def data_stability(local_feature_importance: LocalImportances):
     """
     Calculate the data stability metric for local feature importances.
 
     This function computes the data stability metric, which measures the consistency
-    of feature importances across different instances in the dataset. It leverages the
-    DataStability class to calculate the normalized interquartile range (nIQR) of the
-    feature importances, providing a global measure of stability.
+    of feature importances across different instances in the dataset. The data stability
+    metric is calculated as the mean normalized interquartile range (nIQR) of the feature
+    importances. A higher data stability score indicates a higher level of consistency in
+    the feature importances across instances.
 
-    Parameters:
-    - local_feature_importance (array-like): A 2D array or list where each row represents
-      the feature importances for a single instance in the dataset.
+    The data stability metric is calculated using the DataStability class, which calculates
+    the normalized interquartile range (nIQR) of the feature importances. The nIQR is a
+    measure of the spread of the feature importances and provides a global measure of stability.
 
-    Returns:
-    - float: The mean normalized interquartile range (nIQR) of the feature importances,
-      serving as the data stability metric.
+    Parameters
+    ----------
+    local_feature_importance: LocalImportances
+      A LocalImportances object containing the feature importances for each instance in the dataset.
 
-    Example:
-    >>> local_importances = [[0.1, 0.2, 0.3], [0.1, 0.25, 0.35], [0.15, 0.2, 0.3]]
+    Returns
+    -------
+    float
+      The mean normalized interquartile range (nIQR) of the feature importances, serving as the data stability metric.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from holisticai.explainability.commons import LocalImportances
+    >>> importances = pd.DataFrame(
+    ...     {
+    ...         "feature_1": [0.10, 0.20, 0.30],
+    ...         "feature_2": [0.10, 0.25, 0.35],
+    ...         "feature_3": [0.15, 0.20, 0.30],
+    ...     }
+    ... )
+    >>> local_importances = LocalImportances(importances)
     >>> stability_score = data_stability(local_importances)
     >>> print(stability_score)
     """
@@ -51,8 +69,8 @@ class FeatureStability:
     reference: int = 0
     name: str = "Feature Stability"
 
-    def __call__(self, local_feature_importance):
-        feature_importances = local_feature_importance.feature_importances.values
+    def __call__(self, local_feature_importance: LocalImportances):
+        feature_importances = local_feature_importance.values
         # Calculate the median for each feature (column)
         medians = np.median(feature_importances, axis=0)
 
@@ -67,27 +85,44 @@ class FeatureStability:
         return np.mean(niqr)
 
 
-def feature_stability(local_feature_importance):
+def feature_stability(local_feature_importance: LocalImportances):
     """
     Calculate the feature stability metric for local feature importances.
 
-    This function computes the feature stability metric, which assesses the consistency
+    This function computes the feature stability metric, which measures the consistency
     of feature importances for individual features across different instances in the dataset.
-    It utilizes the FeatureStability class to calculate a stability score for each feature,
-    reflecting how stable the importance of each feature is across the dataset.
+    The feature stability metric is calculated as the mean normalized interquartile range (nIQR)
+    of the feature importances. A higher feature stability score indicates a higher level of
+    consistency in the importance of each feature across instances.
 
-    Parameters:
-    - local_feature_importance (array-like): A 2D array or list where each row represents
-      the feature importances for a single instance in the dataset.
+    The feature stability metric is calculated using the FeatureStability class, which calculates
+    the normalized interquartile range (nIQR) of the feature importances. The nIQR is a measure
+    of the spread of the feature importances and provides a global measure of stability for each feature.
 
-    Returns:
-    - dict: A dictionary where each key is a feature index and each value is the stability
-      score of that feature, indicating the consistency of its importance across instances.
+    Parameters
+    ----------
+    local_feature_importance: LocalImportances
+      A LocalImportances object containing the feature importances for each instance in the dataset.
 
-    Example:
-    >>> local_importances = [[0.1, 0.2, 0.3], [0.1, 0.25, 0.35], [0.15, 0.2, 0.3]]
-    >>> stability_scores = feature_stability(local_importances)
-    >>> print(stability_scores)
+    Returns
+    -------
+    float
+      The mean normalized interquartile range (nIQR) of the feature importances, serving as the feature stability metric.
+
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> from holisticai.explainability.commons import LocalImportances
+    >>> importances = pd.DataFrame(
+    ...     {
+    ...         "feature_1": [0.10, 0.20, 0.30],
+    ...         "feature_2": [0.10, 0.25, 0.35],
+    ...         "feature_3": [0.15, 0.20, 0.30],
+    ...     }
+    ... )
+    >>> local_importances = LocalImportances(importances)
+    >>> stability_score = feature_stability(local_importances)
+    >>> print(stability_score)
     """
     metric = FeatureStability()
     return metric(local_feature_importance)

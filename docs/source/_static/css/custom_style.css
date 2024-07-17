@@ -2,13 +2,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
 body{
-  font-family:"Inter";
+  font-family:'Roboto', sans-serif;
   margin-left: 10px;  /* Adjust this value as needed */
   margin-right: 10px; /* Adjust this value as needed */
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family:"Inter";
+  font-family:'Roboto', sans-serif;
 }
 
 .btn-primary {
