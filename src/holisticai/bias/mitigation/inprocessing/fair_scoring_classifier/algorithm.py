@@ -116,8 +116,12 @@ class FairScoreClassifierAlgorithm:
                     if y[i][index] == 1:
                         for offset in range(1, L):
                             constraint = {
-                                'type': 'ineq',
-                                'fun': lambda l_flat: M * z[i] + np.dot(l_flat[index * D:(index + 1) * D], X[i]) - gamma * index - np.dot(l_flat[((index + offset) % L) * D:((index + offset) % L + 1) * D], X[i]) - gamma * ((index + offset) % L)
+                                "type": "ineq",
+                                "fun": lambda l_flat: M * z[i]
+                                + np.dot(l_flat[index * D : (index + 1) * D], X[i])
+                                - gamma * index
+                                - np.dot(l_flat[((index + offset) % L) * D : ((index + offset) % L + 1) * D], X[i])
+                                - gamma * ((index + offset) % L),
                             }
                             constraints.append(constraint)
 
@@ -125,25 +129,35 @@ class FairScoreClassifierAlgorithm:
             alpha = np.zeros((L, D))  # Alpha matrix
             for index in range(L):  # Constraint alpha to model non-zero lambda coefficients
                 for j in range(D):
-                    constraints.append({
-                        'type': 'ineq',
-                        'fun': lambda l_flat: self.lambda_bound * alpha[index][j] - l_flat[index * D + j]
-                    })
-                    constraints.append({
-                        'type': 'ineq',
-                        'fun': lambda l_flat: l_flat[index * D + j] + self.lambda_bound * alpha[index][j]
-                    })
+                    constraints.append(
+                        {
+                            "type": "ineq",
+                            "fun": lambda l_flat: self.lambda_bound * alpha[index][j] - l_flat[index * D + j],
+                        }
+                    )
+                    constraints.append(
+                        {
+                            "type": "ineq",
+                            "fun": lambda l_flat: l_flat[index * D + j] + self.lambda_bound * alpha[index][j],
+                        }
+                    )
 
         def objective_function(l_flat):
             l = l_flat.reshape(L, D)  # noqa: F841
             if "a" in self.objectives and "s" not in self.constraints:
                 return (1 / N) * np.sum(z)  # Minimize loss
             if "ba" in self.objectives and "s" not in self.constraints:
-                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(N_class)  # Minimize balanced loss
+                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(
+                    N_class
+                )  # Minimize balanced loss
             if "a" in self.objectives and "s" in self.constraints:
-                return (1 / N) * np.sum(z) + (1 / (self.constraints["s"] * L * N)) * np.sum(alpha)  # Minimize loss and alphas
+                return (1 / N) * np.sum(z) + (1 / (self.constraints["s"] * L * N)) * np.sum(
+                    alpha
+                )  # Minimize loss and alphas
             if "ba" in self.objectives and "s" in self.constraints:
-                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(N_class) + (1 / (self.constraints["s"] * L * N)) * np.sum(alpha)  # Minimize balanced loss and alphas
+                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(
+                    N_class
+                ) + (1 / (self.constraints["s"] * L * N)) * np.sum(alpha)  # Minimize balanced loss and alphas
             return None
 
         l_flat = l.flatten()
