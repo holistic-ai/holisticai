@@ -2,6 +2,7 @@
 from holisticai.bias.mitigation.inprocessing.exponentiated_gradient.transformer import ExponentiatedGradientReduction
 from holisticai.bias.mitigation.inprocessing.fair_k_center_clustering.transformer import FairKCenterClustering
 from holisticai.bias.mitigation.inprocessing.fair_k_mediam_clustering.transformer import FairKMedianClustering
+from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.transformer import FairScoreClassifier
 from holisticai.bias.mitigation.inprocessing.fairlet_clustering.transformer import FairletClustering
 from holisticai.bias.mitigation.inprocessing.grid_search.transformer import GridSearchReduction
 from holisticai.bias.mitigation.inprocessing.matrix_factorization.blind_spot_aware import BlindSpotAwareMF
@@ -23,6 +24,7 @@ __all__ = [
     "FairKCenterClustering",
     "FairKMedianClustering",
     "FairletClustering",
+    "FairScoreClassifier",
     "BlindSpotAwareMF",
     "DebiasingLearningMF",
     "PopularityPropensityMF",
@@ -35,9 +37,3 @@ if torch_spec is not None:
     from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.transformer import AdversarialDebiasing
 
     __all__ += ["AdversarialDebiasing"]
-
-cvxpy_spec = importlib.util.find_spec("cvxpy")
-if cvxpy_spec is not None:
-    from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.transformer import FairScoreClassifier
-
-    __all__ += ["FairScoreClassifier"]

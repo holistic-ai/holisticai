@@ -4,7 +4,12 @@ import logging
 from typing import Optional
 
 import numpy as np
-from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.utils import get_class_count, get_class_indexes
+from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.utils import (
+    get_class_count,
+    get_class_indexes,
+    get_initial_solution,
+)
+from scipy.optimize import minimize
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +34,7 @@ class FairScoreClassifierAlgorithm:
         constraints: Optional[dict] = None,
         lambda_bound: int = 9,
         time_limit: int = 100,
+        num_threads: int = 1,
         verbose: int = 0,
     ):
         """
@@ -57,6 +63,7 @@ class FairScoreClassifierAlgorithm:
         self.constraints = {} if constraints is None else constraints
         self.lambda_bound = lambda_bound
         self.time_limit = time_limit
+        self.num_threads = num_threads
         self.verbose = verbose
 
     def fit(self, X, y):
@@ -68,186 +75,87 @@ class FairScoreClassifierAlgorithm:
         # balanced_accuracy = get_balanced_accuracy(X, y, self.lambdas)
 
     def solve_model(self, X, y, N_class, class_indexes):
-        N = len(X)
-        L = len(y[0])
-        D = len(X[0])
-        gamma = 0.01
-        M = self.lambda_bound * D + 1
+        """
+        Solve the optimization problem to find the lambda coefficients that minimize the loss function.
+        Adapted from the original code in `paper <https://gitlab.laas.fr/roc/julien-rouzot/fairscoringsystemsv0>`_ .
 
-        import cvxpy as cp
+        Parameters
+        ----------
+        X : np.array
+            The input features matrix.
 
-        l = cp.Variable((L, D))
-        constraints = [l <= self.lambda_bound, l >= -self.lambda_bound]
+        y : np.array
+            The target labels matrix.
 
-        for g in self.fairness_groups:
-            constraint = l[:, g] == 0
-            constraints.append(constraint)
+        N_class : list
+            The number of samples in each class.
 
-        z = cp.Variable(N, boolean=True)
+        class_indexes : list
+            The indexes of each class.
+        """
+        N = len(X)  # Number of samples in the dataset
+        L = len(y[0])  # Number of labels in the dataset
+        D = len(X[0])  # Number of features for a sample in the dataset
+        gamma = 0.01  # Margin parameter
+        M = self.lambda_bound * D + 1  # Get an upper bound on the max score
 
-        if "s" in self.constraints:
-            alpha = cp.Variable((L, D), boolean=True)
+        if "ba" in self.objectives:
+            N_class = get_class_count(y)  # Get the number of samples in each class
+            class_indexes = get_class_indexes(y)  # Get the indexes of each class
 
-        if (
-            "omr" in self.constraints
-            or "sp" in self.constraints
-            or "pe" in self.constraints
-            or "eo" in self.constraints
-            or "eod" in self.constraints
-        ):
-            pos = cp.Variable((N, L), boolean=True)
+        maj, _ = get_initial_solution(y)  # Get the majority class index
 
-        y_idx = np.argmax(y, axis=1)
+        l = np.zeros((L, D))  # Initialize lambda matrix
+        z = np.zeros(N)  # Loss variable
+
+        constraints = []
+
         if "a" in self.objectives or "ba" in self.objectives:
-            for i in range(N):
-                for offset in range(1, L):
-                    new_contrant = -M * z[i] <= cp.sum(l[y_idx[i], :] @ X[i, :])
-                    -gamma * y_idx[i]
-                    -cp.sum(l[(y_idx[i] + offset) % L, :] @ X[i, :])
-                    -gamma * ((y_idx[i] + offset) % L)
-                    constraints.append(new_contrant)
-
-        if "s" in self.constraints:
-            constraints.append(-self.lambda_bound * alpha <= l)
-            constraints.append(l <= self.lambda_bound * alpha)
-
-        if (
-            "omr" in self.constraints
-            or "sp" in self.constraints
-            or "pe" in self.constraints
-            or "eo" in self.constraints
-            or "eod" in self.constraints
-        ):
-            for i in range(N):
+            for i in range(N):  # Constraint z to model misclassifications
                 for index in range(L):
-                    for offset in range(1, L):
-                        new_constaint = -M * (1 - pos[i, index]) <= cp.sum(l[index, :] @ X[i, :])
-                        -gamma * index
-                        -cp.sum(l[(index + offset) % L, :] @ X[i, :])
-                        -gamma * ((index + offset) % L)
-                        constraints.append(new_constaint)
-                constraints.append(cp.sum(pos[i, :]) == 1)
+                    if y[i][index] == 1:
+                        for offset in range(1, L):
+                            constraint = {
+                                'type': 'ineq',
+                                'fun': lambda l_flat: M * z[i] + np.dot(l_flat[index * D:(index + 1) * D], X[i]) - gamma * index - np.dot(l_flat[((index + offset) % L) * D:((index + offset) % L + 1) * D], X[i]) - gamma * ((index + offset) % L)
+                            }
+                            constraints.append(constraint)
 
         if "s" in self.constraints:
-            for index in range(L):
-                contraint = cp.sum(alpha[index, :]) <= self.constraints["s"]
-                constraints.append(contraint)
+            alpha = np.zeros((L, D))  # Alpha matrix
+            for index in range(L):  # Constraint alpha to model non-zero lambda coefficients
+                for j in range(D):
+                    constraints.append({
+                        'type': 'ineq',
+                        'fun': lambda l_flat: self.lambda_bound * alpha[index][j] - l_flat[index * D + j]
+                    })
+                    constraints.append({
+                        'type': 'ineq',
+                        'fun': lambda l_flat: l_flat[index * D + j] + self.lambda_bound * alpha[index][j]
+                    })
 
-        for index in self.fairness_labels:
-            for g in self.fairness_groups:
-                i_g = [i for i in range(N) if X[i][g] == 1]
-                i_g_bar = [i for i in range(N) if X[i][g] == 0]
-                N_g = len(i_g)
-                N_g_bar = len(i_g_bar)
+        def objective_function(l_flat):
+            l = l_flat.reshape(L, D)  # noqa: F841
+            if "a" in self.objectives and "s" not in self.constraints:
+                return (1 / N) * np.sum(z)  # Minimize loss
+            if "ba" in self.objectives and "s" not in self.constraints:
+                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(N_class)  # Minimize balanced loss
+            if "a" in self.objectives and "s" in self.constraints:
+                return (1 / N) * np.sum(z) + (1 / (self.constraints["s"] * L * N)) * np.sum(alpha)  # Minimize loss and alphas
+            if "ba" in self.objectives and "s" in self.constraints:
+                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(N_class) + (1 / (self.constraints["s"] * L * N)) * np.sum(alpha)  # Minimize balanced loss and alphas
+            return None
 
-                i_g_pos = [i for i in range(N) if X[i][g] == 1 and y[i][index] == 1]
-                i_g_neg = [i for i in range(N) if X[i][g] == 1 and y[i][index] == 0]
-                N_g_pos = len(i_g_pos)
-                N_g_neg = len(i_g_neg)
+        l_flat = l.flatten()
+        sol = minimize(objective_function, l_flat, constraints=constraints)
 
-                i_g_bar_pos = [i for i in range(N) if X[i][g] == 0 and y[i][index] == 1]
-                i_g_bar_neg = [i for i in range(N) if X[i][g] == 0 and y[i][index] == 0]
-                N_g_bar_pos = len(i_g_bar_pos)
-                N_g_bar_neg = len(i_g_bar_neg)
+        if sol.success:
+            l_lists = sol.x.reshape(L, D).tolist()
+        else:
+            print("[ERROR] Found no solution for this configuration, you may want to soften your constraints")  # noqa: T201
+            l_lists = []
 
-                if N_g == 0 or N_g_bar == 0:
-                    logger.info("At least one of the protected groups is empty, skipping fairness constraints")
-                    break
-
-                if "omr" in self.constraints:
-                    constraints.append(
-                        -self.constraints["omr"]
-                        <= (1 / N_g) * cp.sum(pos[i_g_neg, index])
-                        + cp.sum(1 - pos[i_g_pos, index])
-                        - (1 / N_g_bar) * cp.sum(pos[i_g_bar_neg, index])
-                        + cp.sum(1 - pos[i_g_bar_pos, index])
-                    )
-                    constraints.append(
-                        (1 / N_g) * cp.sum(pos[i_g_neg, index])
-                        + cp.sum(1 - pos[i_g_pos, index])
-                        - (1 / N_g_bar) * cp.sum(pos[i_g_bar_neg, index])
-                        + cp.sum(1 - pos[i_g_bar_pos, index])
-                        <= self.constraints["omr"]
-                    )
-
-                if "sp" in self.constraints and i_g and i_g_bar:
-                    constraints.append(
-                        -self.constraints["sp"]
-                        <= (1 / N_g) * cp.sum(pos[i_g, index]) - (1 / N_g_bar) * cp.sum(pos[i_g_bar, index])
-                    )
-                    constraints.append(
-                        (1 / N_g) * cp.sum(pos[i_g, index]) - (1 / N_g_bar) * cp.sum(pos[i_g_bar, index])
-                        <= self.constraints["sp"]
-                    )
-
-                if "pe" in self.constraints and i_g_neg and i_g_bar_neg:
-                    constraints.append(
-                        -self.constraints["pe"]
-                        <= (1 / N_g_neg) * cp.sum(pos[i_g_neg, index])
-                        - (1 / N_g_bar_neg) * cp.sum(pos[i_g_bar_neg, index])
-                    )
-                    constraints.append(
-                        (1 / N_g_neg) * cp.sum(pos[i_g_neg, index])
-                        - (1 / N_g_bar_neg) * cp.sum(pos[i_g_bar_neg, index])
-                        <= self.constraints["pe"]
-                    )
-
-                if "eo" in self.constraints and i_g_pos and i_g_bar_pos:
-                    constraints.append(
-                        -self.constraints["eo"]
-                        <= (1 / N_g_pos) * cp.sum(pos[i_g_pos, index])
-                        - (1 / N_g_bar_pos) * cp.sum(pos[i_g_bar_pos, index])
-                    )
-                    constraints.append(
-                        (1 / N_g_pos) * cp.sum(pos[i_g_pos, index])
-                        - (1 / N_g_bar_pos) * cp.sum(pos[i_g_bar_pos, index])
-                        <= self.constraints["eo"]
-                    )
-
-                if "eod" in self.constraints and i_g_neg and i_g_bar_neg and i_g_pos and i_g_bar_pos:
-                    constraints.append(
-                        -self.constraints["eod"]
-                        <= (1 / N_g_neg) * cp.sum(pos[i_g_neg, index])
-                        - (1 / N_g_bar_neg) * cp.sum(pos[i_g_bar_neg, index])
-                    )
-                    constraints.append(
-                        (1 / N_g_neg) * cp.sum(pos[i_g_neg, index])
-                        - (1 / N_g_bar_neg) * cp.sum(pos[i_g_bar_neg, index])
-                        <= self.constraints["eod"]
-                    )
-                    constraints.append(
-                        -self.constraints["eod"]
-                        <= (1 / N_g_pos) * cp.sum(pos[i_g_pos, index])
-                        - (1 / N_g_bar_pos) * cp.sum(pos[i_g_bar_pos, index])
-                    )
-                    constraints.append(
-                        (1 / N_g_pos) * cp.sum(pos[i_g_pos, index])
-                        - (1 / N_g_bar_pos) * cp.sum(pos[i_g_bar_pos, index])
-                        <= self.constraints["eod"]
-                    )
-
-        if "a" in self.objectives and "s" not in self.constraints:
-            cost = (1 / N) * cp.sum(z)
-
-        if "ba" in self.objectives and "s" not in self.constraints:
-            cost = 0
-            for i, indexes in enumerate(class_indexes):
-                cost += cp.sum(z[indexes]) / N_class[i]
-            cost /= len(N_class)
-
-        if "a" in self.objectives and "s" in self.constraints:
-            cost = (1 / N) * cp.sum(z) + (1 / (self.constraints["s"] * L * N)) * cp.sum(alpha)
-
-        if "ba" in self.objectives and "s" in self.constraints:
-            cost = 0
-            for i, indexes in enumerate(class_indexes):
-                cost += cp.sum(z[indexes]) / N_class[i]
-            cost /= len(N_class)
-            cost += (1 / (self.constraints["s"] * L * N)) * cp.sum(alpha)
-
-        prob = cp.Problem(cp.Minimize(cost), constraints)
-        prob.solve(solver=cp.CBC, verbose=self.verbose == 1, maximumSeconds=self.time_limit)
-        return l.value
+        return l_lists
 
     def predict(self, X):
         """
