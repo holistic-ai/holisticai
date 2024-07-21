@@ -14,8 +14,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
 
     Variational Fair Clustering helps you to find clusters with specified proportions
     of different demographic groups pertaining to a sensitive attribute of the dataset
-    (group_a and group_b) for any well-known clustering method such as K-means, K-median
-    or Spectral clustering (Normalized cut).
+    (group_a and group_b) for any well-known clustering method such as K-means or K-median.
 
     Parameters
     ----------
@@ -29,7 +28,7 @@ class VariationalFairClustering(BaseEstimator, BMImp):
             specified lambda parameter
 
         method : str
-            cluster option : {'kmeans', 'kmedian'} (TODO: 'ncut' take too much time consuming)
+            cluster option : {'kmeans', 'kmedian'}
 
         normalize_input : str
             Normalize input data X
