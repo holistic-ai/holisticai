@@ -1,6 +1,6 @@
 import pandas as pd
 from holisticai.explainability.metrics.global_importance import (
-    AlphaImportanceScore,
+    AlphaScore,
     PositionParity,
     RankAlignment,
     SpreadDivergence,
@@ -12,8 +12,8 @@ from holisticai.explainability.metrics.local_importance import DataStability, Fe
 
 def compute_global_explainability_metrics_from_features(xai_features):
     results = []
-    metric = AlphaImportanceScore()
-    value = metric(xai_features.feature_importance, xai_features.ranked_feature_importance)
+    metric = AlphaScore()
+    value = metric(xai_features.feature_importance)
     results.append({"metric": metric.name, "value": value, "reference": metric.reference})
 
     metric = XAIEaseScore()

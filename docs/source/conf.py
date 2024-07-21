@@ -19,6 +19,15 @@ import os
 import shutil
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
+sys.path.insert(0, os.path.abspath('.'))
+import utils.xai_image_plots as xai_utils
+import inspect
+
+os.makedirs('_static/images', exist_ok=True)
+
+for name, obj in inspect.getmembers(xai_utils):
+    if inspect.isfunction(obj) and name.startswith('image_'):
+        obj()
 
 def run_notebook(notebook_path):
     with open(notebook_path) as f:
@@ -119,6 +128,7 @@ exclude_patterns = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+numfig=True
 
 html_logo = "hai_logo.svg"
 html_favicon = "holistic_ai.png"
@@ -135,6 +145,7 @@ html_theme_options = {
     "github_url": "https://github.com/holistic-ai/holisticai",
     "twitter_url": "https://twitter.com/holistic_ai",
     "show_version_warning_banner": True,
+    "secondary_sidebar_items": [],
 #    "announcement": "Visit our website and <a href='https://www.holisticai.com/demo'>schedule a demo</a> with our experts to find out how Holistic AI can help you shield against AI risks.",
     "icon_links": [
         {

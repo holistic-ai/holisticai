@@ -1,4 +1,5 @@
 # imports
+from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.transformer import AdversarialDebiasing
 from holisticai.bias.mitigation.inprocessing.exponentiated_gradient.transformer import ExponentiatedGradientReduction
 from holisticai.bias.mitigation.inprocessing.fair_k_center_clustering.transformer import FairKCenterClustering
 from holisticai.bias.mitigation.inprocessing.fair_k_mediam_clustering.transformer import FairKMedianClustering
@@ -29,6 +30,7 @@ __all__ = [
     "DebiasingLearningMF",
     "PopularityPropensityMF",
     "FairRec",
+    "AdversarialDebiasing",
 ]
 import importlib.util
 

@@ -1,11 +1,12 @@
 from holisticai.explainability.commons._definitions import (
     BinaryClassificationXAISettings,
-    FeatureImportance,
+    ConditionalFeatureImportance,
     Importances,
+    LocalConditionalFeatureImportance,
+    LocalImportances,
     MultiClassificationXAISettings,
-    PermutationFeatureImportance,
+    PartialDependence,
     RegressionClassificationXAISettings,
-    SurrogateFeatureImportance,
 )
 from holisticai.explainability.commons._lime import LIMEImportanceCalculator
 from holisticai.explainability.commons._permutation_feature_importance import PermutationFeatureImportanceCalculator
@@ -22,12 +23,13 @@ __all__ = [
     "MultiClassificationXAISettings",
     "PermutationFeatureImportanceCalculator",
     "SurrogateFeatureImportanceCalculator",
-    "SurrogateFeatureImportance",
-    "PermutationFeatureImportance",
-    "FeatureImportance",
     "compute_explainability_features",
     "select_feature_importance_strategy",
     "Importances",
     "LIMEImportanceCalculator",
     "SHAPImportanceCalculator",
+    "LocalImportances",
+    "LocalConditionalFeatureImportance",
+    "ConditionalFeatureImportance",
+    "PartialDependence",
 ]

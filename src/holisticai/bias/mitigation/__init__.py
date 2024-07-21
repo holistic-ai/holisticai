@@ -4,6 +4,7 @@ The :mod:`holisticai.bias.mitigation` module includes preprocessing, inprocessin
 
 # inprocessing algorithm classes
 from holisticai.bias.mitigation.inprocessing import (
+    AdversarialDebiasing,
     BlindSpotAwareMF,
     DebiasingLearningMF,
     ExponentiatedGradientReduction,
@@ -44,6 +45,7 @@ from holisticai.bias.mitigation.preprocessing import (
 
 # all
 __all__ = [
+    "AdversarialDebiasing",
     "CorrelationRemover",
     "Reweighing",
     "LearningFairRepresentation",
@@ -76,11 +78,6 @@ __all__ = [
 
 import importlib
 from typing import Literal
-
-torch_spec = importlib.util.find_spec("torch")
-if torch_spec is not None:
-    from holisticai.bias.mitigation.inprocessing import AdversarialDebiasing
-__all__ += ["AdversarialDebiasing"]
 
 networkx_spec = importlib.util.find_spec("networkx")
 if networkx_spec is not None:

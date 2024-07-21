@@ -1,9 +1,44 @@
+from holisticai.explainability.commons import Importances
 from matplotlib import pyplot as plt
 
 
-def plot_feature_importance(feature_importance, ranked_feature_importance, top_n=20, ax=None):
-    ranked_feature_importance = ranked_feature_importance.feature_importances.set_index("Variable")
-    feature_importances = feature_importance.feature_importances.set_index("Variable")
+def plot_feature_importance(feature_importance: Importances, alpha=0.8, top_n=20, ax=None):
+    """
+    Bar plot of ranked feature importance.
+
+    Parameters
+    ----------
+    feature_importance: Importances
+        The feature importance data.
+    top_n: (int, optional)
+        The number of top features to display. Defaults to 20.
+    alpha: (float, optional)
+        Percentage of importance to consider as top features. Defaults to 0.8.
+    ax: (matplotlib.axes.Axes, optional)
+        The matplotlib axes to plot on. If not provided, a new figure and axes will be created.
+
+    Returns
+    -------
+        matplotlib.axes.Axes: The matplotlib axes object containing the plot.
+
+    Example
+    -------
+    >>> feature_importance = Importances(
+    ...     values=np.array([0.1, 0.2, 0.3, 0.4]), feature_names=["A", "B", "C", "D"]
+    ... )
+    >>> plot_feature_importance(feature_importance)
+
+    The plot should look like this:
+
+    .. image:: /_static/images/xai_plot_feature_importance.png
+        :alt: Plot Feature Importance
+
+    """
+
+    ranked_feature_importance = feature_importance.top_alpha(alpha=alpha)
+    ranked_feature_importance = ranked_feature_importance.as_dataframe().set_index("Variable")
+    feature_importances = feature_importance.as_dataframe().set_index("Variable")
+
     feature_importances.loc[:, "color"] = "#21918C"
     feature_importances.loc[ranked_feature_importance.index, "color"] = "#440154"
     feature_importances.reset_index(inplace=True, drop=False)
@@ -22,3 +57,5 @@ def plot_feature_importance(feature_importance, ranked_feature_importance, top_n
         ax.set_title(f"{feature_importance.strategy.title()} Feature Importance")
     else:
         ax.set_title("Feature Importance")
+
+    return ax

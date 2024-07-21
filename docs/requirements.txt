@@ -13,3 +13,5 @@ pybind11>=2.12
 pydantic
 jax
 jaxopt
+optax
+flax
