@@ -18,7 +18,7 @@ class MetaFairClassifierAlgorithm:
         self.steps = steps
         self.constraint = constraint
         self.logger = logger
-        self.sens_groups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def range(self, eps, tau):
         a = np.arange(np.ceil(tau / eps), step=self.steps) * eps
@@ -83,7 +83,7 @@ class MetaFairClassifierAlgorithm:
         y_true[y == 0] = -1
         y_true = np.array(y_true)
 
-        groups_num = self.sens_groups.fit_transform(sensitive_features, convert_numeric=True)
+        groups_num = self._sensgroups.fit_transform(sensitive_features, convert_numeric=True)
         groups_num = np.array(groups_num)
         train = np.c_[X, y_true, groups_num]
         mean = np.mean(train, axis=0)

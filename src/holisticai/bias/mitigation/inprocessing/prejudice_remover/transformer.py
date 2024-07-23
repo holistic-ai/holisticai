@@ -14,7 +14,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
     """Prejudice Remover
 
-    Prejudice remover is an in-processing technique that adds a
+    Prejudice remover is an in-processing technique that adds a\
     discrimination-aware regularization term to the learning objective.
 
     Parameters
@@ -47,21 +47,10 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         print_interval : int
         Each `print_interval` steps print information.
 
-    Methods
-    -------
-        fit(X, y_true, group_a, group_b)
-            Fit model using Prejudice Remover.
-
-        predict(X, group_a, group_b)
-            Predict the closest cluster each sample in X belongs to.
-
-        predict_proba(X, group_a, group_b)
-            Predict the probability of each sample in X belongs to each class.
-
     References
     ----------
-        [1] Kamishima, Toshihiro, et al. "Fairness-aware classifier with prejudice remover regularizer."
-        Joint European conference on machine learning and knowledge discovery in databases.
+        .. [1] Kamishima, Toshihiro, et al. "Fairness-aware classifier with prejudice remover regularizer."\
+        Joint European conference on machine learning and knowledge discovery in databases.\
         Springer, Berlin, Heidelberg, 2012.
     """
 
@@ -88,6 +77,22 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
         self.print_interval = print_interval
 
     def transform_estimator(self, estimator=None):  # noqa: ARG002
+        """
+        Transform estimator
+
+        Description
+        -----------
+        Transform the estimator to the Prejudice Remover model.
+
+        Parameters
+        ----------
+        estimator : object (optional)
+            Estimator to be transformed.
+
+        Returns
+        -------
+            self
+        """
         # Regularized Binary Cross Entropy
         loss_ = PRBinaryCrossEntropy(C=self.C, eta=self.eta)
 
@@ -186,8 +191,8 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
 
         Returns
         -------
-
-        numpy.ndarray: Predicted output per sample.
+        numpy.ndarray
+            Predicted output per sample.
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         X = params["X"]
@@ -217,8 +222,8 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
 
         Returns
         -------
-
-        numpy.ndarray: Predicted output per sample.
+        numpy.ndarray
+            Predicted output per sample.
         """
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         X = params["X"]

@@ -19,7 +19,7 @@ def check_ranking(protected, mtable):
     mtable: List
         The mtable against to check (list of int)
 
-    Return
+    Returns
     ------
         bool
         Returns whether the rankings satisfies the mtable

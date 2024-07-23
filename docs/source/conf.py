@@ -104,7 +104,7 @@ nbsphinx_execute = 'never'  # Puede ser 'auto', 'always', o 'never'
 
 html_show_sourcelink = False
 # autodoc options
-autodoc_default_options = {"members": True, "inherited-members": True}
+autodoc_default_options = {"members": True, "inherited-members": False}
 
 # Turn on autosummary
 autosummary_generate = True

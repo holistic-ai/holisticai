@@ -4,11 +4,11 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class WassersteinBarycenterAlgorithm:
     def __init__(self):
-        self.sens_groups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
         self.eps = np.finfo(float).eps
 
     def fit(self, y_pred: np.ndarray, sensitive_groups: np.ndarray):
-        p_attr = self.sens_groups.fit_transform(sensitive_groups, convert_numeric=True).squeeze()
+        p_attr = self._sensgroups.fit_transform(sensitive_groups, convert_numeric=True).squeeze()
         self.group_values = np.unique(p_attr)
 
         group_freq = [
@@ -56,7 +56,7 @@ class WassersteinBarycenterAlgorithm:
         return yf
 
     def transform(self, y_pred: np.ndarray, sensitive_groups: np.ndarray):
-        ST = self.sens_groups.transform(sensitive_groups, convert_numeric=True)
+        ST = self._sensgroups.transform(sensitive_groups, convert_numeric=True)
         noise = self.eps * np.random.randn(len(y_pred)).squeeze()
         YT = y_pred + noise
         YF = np.array([self._update_yt(yt, st) for yt, st in zip(YT, ST)])

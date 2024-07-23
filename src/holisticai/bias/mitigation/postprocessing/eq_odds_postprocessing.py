@@ -10,14 +10,25 @@ from sklearn.metrics import confusion_matrix
 
 class EqualizedOdds(BMPost):
     """
-    Equalized odds postprocessing use linear programming to find the probability with which change
+    Equalized odds postprocessing use linear programming to find the probability with which change\
     favorable labels (y=1) to unfavorable labels (y=0) in the output estimator to optimize equalized odds.
 
-    References:
-        Hardt, Moritz, Eric Price, and Nati Srebro. "Equality of opportunity in supervised learning."
+    Parameters
+    ----------
+    solver : str
+        Algorithm name used to solve the standard form problem. Solver supported must depend of your scipy poackage version.
+        for scipy 1.9.0 the solvers available are:
+        ["highs", "highs-ds", "highs-ipm", "interior-point", "revised simplex", "simplex"]
+
+    seed : int
+        Random seed for repeatability.
+
+    References
+    ----------
+        .. [1] Hardt, Moritz, Eric Price, and Nati Srebro. "Equality of opportunity in supervised learning."\
         Advances in neural information processing systems 29 (2016).
 
-        Pleiss, Geoff, et al. "On fairness and calibration."
+        .. [2] Pleiss, Geoff, et al. "On fairness and calibration."\
         Advances in neural information processing systems 30 (2017).
     """
 
@@ -31,19 +42,6 @@ class EqualizedOdds(BMPost):
     ]
 
     def __init__(self, solver: str | None = "highs", seed: int | None = 42):
-        """
-        Create a Equalized Odds Post-processing instance.
-
-        Parameters
-        ----------
-        solver : str
-            Algorithm name used to solve the standard form problem. Solver supported must depend of your scipy poackage version.
-            for scipy 1.9.0 the solvers available are:
-            ["highs", "highs-ds", "highs-ipm", "interior-point", "revised simplex", "simplex"]
-
-        seed : int
-            Random seed for repeatability.
-        """
         self.solver = solver
         self.seed = seed
 
@@ -177,7 +175,7 @@ class EqualizedOdds(BMPost):
 
         Returns
         -------
-        Self
+            Self
         """
         if self.seed is not None:
             np.random.seed(self.seed)
@@ -233,7 +231,8 @@ class EqualizedOdds(BMPost):
 
         Returns
         -------
-        A dictionary with two keys, y_pred and y_score, which refers to the predicted labels and their probabilities, respectively.
+        dict
+            A dictionary with two keys, y_pred and y_score, which refers to the predicted labels and their probabilities, respectively.
         """
         params = self._load_data(y_pred=y_pred, group_a=group_a, group_b=group_b)
 

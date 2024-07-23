@@ -30,7 +30,7 @@ class UTransformersHandler:
         self.steps_groups = {tag: [step for step in steps if step[0].startswith(tag)] for tag in BIAS_TAGS}
         for steps in self.steps_groups.values():
             for step in steps:
-                step[1].link_parameters(params_hdl, estimator_hdl)
+                step[1]._link_parameters(params_hdl, estimator_hdl)  # noqa: SLF001
 
     def bias_mitigators_validation(self, steps):
         """Validate stem words and bias mitigator position in the pipeline"""
