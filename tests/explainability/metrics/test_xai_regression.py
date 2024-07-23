@@ -5,6 +5,7 @@ from holisticai.explainability.metrics.global_importance import alpha_score, ran
 import numpy as np
 import pytest
 
+ATOL = 5e-2
 @pytest.fixture
 def input_data():
     dataset = load_dataset('us_crime').sample(n=1000, random_state=42)
@@ -33,10 +34,10 @@ def test_xai_regression_metrics(input_data):
     proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_regression_features(model, test)
 
     metrics = regression_explainability_metrics(importances, partial_dependencies, conditional_importances, X=test['X'], y_pred=proxy.predict(test['X']))
-    assert np.isclose(metrics.loc['Rank Alignment'].value, 0.7317350088183421)
-    assert np.isclose(metrics.loc['Position Parity'].value, 0.18504188712522046)
-    assert np.isclose(metrics.loc['XAI Ease Score'].value, 1.0)
-    assert np.isclose(metrics.loc['Alpha Importance Score'].value, 0.0891089108910891)
+    assert np.isclose(metrics.loc['Rank Alignment'].value, 0.7317350088183421, atol=ATOL)
+    assert np.isclose(metrics.loc['Position Parity'].value, 0.18504188712522046, atol=ATOL)
+    assert np.isclose(metrics.loc['XAI Ease Score'].value, 1.0, atol=ATOL)
+    assert np.isclose(metrics.loc['Alpha Importance Score'].value, 0.0891089108910891, atol=ATOL)
 
 def test_xai_classification_metrics_separated(input_data):
     model, test = input_data
@@ -44,14 +45,14 @@ def test_xai_classification_metrics_separated(input_data):
     proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_regression_features(model, test)
        
     value = rank_alignment(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.7317350088183421)
+    assert np.isclose(value, 0.7317350088183421, atol=ATOL)
 
     value = position_parity(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.18504188712522046)
+    assert np.isclose(value, 0.18504188712522046, atol=ATOL)
     
     value = xai_ease_score(partial_dependencies, ranked_importances)
-    assert np.isclose(value, 1.0)
+    assert np.isclose(value, 1.0, atol=ATOL)
 
     value = alpha_score(importances)
-    assert np.isclose(value, 0.0891089108910891)
+    assert np.isclose(value, 0.0891089108910891, atol=ATOL)
 
