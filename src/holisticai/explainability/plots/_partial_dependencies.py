@@ -1,8 +1,12 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from holisticai.explainability.metrics.global_importance._xai_ease_score import XAIEaseAnnotator
+from holisticai.utils import Importances, PartialDependence
 
 
-def plot_partial_dependence(partial_dependence, ranked_feature_importance, subplots=(1, 1), figsize=None):
+def plot_partial_dependence(
+    partial_dependence: PartialDependence, ranked_feature_importance: Importances, subplots=(1, 1), figsize=None
+):
     """
     Plots the partial dependence of features on the predicted target.
 
@@ -32,7 +36,7 @@ def plot_partial_dependence(partial_dependence, ranked_feature_importance, subpl
     .. image:: /_static/images/xai_plot_partial_dependence.png
         :alt: Plot Partial Dependence
     """
-    fig, axs = plt.subplots(*subplots, figsize=figsize)
+    _, axs = plt.subplots(*subplots, figsize=figsize)
     axs = [axs] if isinstance(axs, plt.Axes) else axs.flatten()
     n_plots = min(len(axs), len(partial_dependence.values))
     annotator = XAIEaseAnnotator()
@@ -47,9 +51,15 @@ def plot_partial_dependence(partial_dependence, ranked_feature_importance, subpl
         feature_name = ranked_feature_importance.feature_names[feature_index]
         feature_value = ranked_feature_importance[feature_index]
 
+        curve_media = np.mean(individuals, axis=0)
+        curve_std = np.std(individuals, axis=0)
+        curve_lower = curve_media - curve_std
+        curve_upper = curve_media + curve_std
+
         ax.plot(x, average, color="blue", label=level.loc[feature_name])
-        for curve in individuals:
-            ax.plot(x, curve, alpha=0.05, color="skyblue")
+        # for curve in individuals:
+        #    ax.plot(x, curve, alpha=0.05, color="skyblue")
+        ax.fill_between(x, curve_lower, curve_upper, color="skyblue", alpha=0.2)
 
         ymin = individuals.min()
         ymax = individuals.max()
@@ -65,4 +75,3 @@ def plot_partial_dependence(partial_dependence, ranked_feature_importance, subpl
         ax.grid(True)
         ax.legend()
     plt.tight_layout()
-    return fig

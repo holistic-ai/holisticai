@@ -1,50 +1,39 @@
 import numpy as np
-from holisticai.explainability.commons import LocalImportances
+from holisticai.explainability.metrics.global_importance._importance_spread import spread_divergence
+from holisticai.utils import Importances, LocalImportances
 
 
 class DataStability:
-    reference: int = 0
+    reference: int = 1
     name: str = "Data Stability"
 
-    def __call__(self, local_feature_importance):
-        feature_importances = local_feature_importance.values
-        # Calculate the median for each instance (row)
-        medians_row = np.median(feature_importances, axis=1)
+    def __call__(self, local_feature_importance: LocalImportances):
+        spreads = []
+        for weights in np.array(local_feature_importance.values):
+            from holisticai.utils import Importances
 
-        # Calculate the interquartile range (IQR) for each instance
-        q75_row, q25_row = np.percentile(feature_importances, [75, 25], axis=1)
-        iqr_row = q75_row - q25_row
-
-        # Calculate the Normalized Interquartile Range (nIQR) for each instance
-        niqr_row = iqr_row / medians_row
-
-        # Calculate the mean of the nIQR to obtain a global measure of Data Stability
-        return np.mean(niqr_row)
+            spread = spread_divergence(
+                Importances(values=weights, feature_names=local_feature_importance.feature_names)
+            )
+            spreads.append(spread)
+        instances_names = list(range(local_feature_importance.values.shape[0]))
+        data_divergence = Importances(values=spreads, feature_names=instances_names)
+        return spread_divergence(data_divergence)
 
 
 def data_stability(local_feature_importance: LocalImportances):
     """
-    Calculate the data stability metric for local feature importances.
-
-    This function computes the data stability metric, which measures the consistency
-    of feature importances across different instances in the dataset. The data stability
-    metric is calculated as the mean normalized interquartile range (nIQR) of the feature
-    importances. A higher data stability score indicates a higher level of consistency in
-    the feature importances across instances.
-
-    The data stability metric is calculated using the DataStability class, which calculates
-    the normalized interquartile range (nIQR) of the feature importances. The nIQR is a
-    measure of the spread of the feature importances and provides a global measure of stability.
+    Calculate the data stability score based on the local feature importances.
 
     Parameters
     ----------
-    local_feature_importance: LocalImportances
-      A LocalImportances object containing the feature importances for each instance in the dataset.
+    local_feature_importance : LocalImportances
+      The local feature importances calculated for each instance.
 
     Returns
     -------
     float
-      The mean normalized interquartile range (nIQR) of the feature importances, serving as the data stability metric.
+      The data stability score.
 
     Examples
     --------
@@ -61,53 +50,40 @@ def data_stability(local_feature_importance: LocalImportances):
     >>> stability_score = data_stability(local_importances)
     >>> print(stability_score)
     """
-    metric = DataStability()
-    return metric(local_feature_importance)
+    ds = DataStability()
+    return ds(local_feature_importance)
 
 
 class FeatureStability:
-    reference: int = 0
+    reference: int = 1
     name: str = "Feature Stability"
 
     def __call__(self, local_feature_importance: LocalImportances):
-        feature_importances = local_feature_importance.values
-        # Calculate the median for each feature (column)
-        medians = np.median(feature_importances, axis=0)
+        transposed_data = np.array(local_feature_importance.values).T
+        transposed_data_norm = transposed_data / np.sum(transposed_data, axis=0)
+        spreads = []
+        instances_names = list(range(local_feature_importance.values.shape[0]))
+        for weights in transposed_data_norm:
+            spread = spread_divergence(Importances(values=weights, feature_names=instances_names))
+            spreads.append(spread)
 
-        # Calculate the interquartile range (IQR) for each feature
-        q75, q25 = np.percentile(feature_importances, [75, 25], axis=0)
-        iqr = q75 - q25
-
-        # Calculate the Normalized Interquartile Range (nIQR) for each feature
-        niqr = iqr / medians
-
-        # Calculate the mean of the nIQR to obtain a global measure of Feature Stability
-        return np.mean(niqr)
+        feature_divergence = Importances(values=spreads, feature_names=local_feature_importance.feature_names)
+        return spread_divergence(feature_divergence)
 
 
 def feature_stability(local_feature_importance: LocalImportances):
     """
-    Calculate the feature stability metric for local feature importances.
-
-    This function computes the feature stability metric, which measures the consistency
-    of feature importances for individual features across different instances in the dataset.
-    The feature stability metric is calculated as the mean normalized interquartile range (nIQR)
-    of the feature importances. A higher feature stability score indicates a higher level of
-    consistency in the importance of each feature across instances.
-
-    The feature stability metric is calculated using the FeatureStability class, which calculates
-    the normalized interquartile range (nIQR) of the feature importances. The nIQR is a measure
-    of the spread of the feature importances and provides a global measure of stability for each feature.
+    Calculate the feature stability score based on the local feature importances.
 
     Parameters
     ----------
-    local_feature_importance: LocalImportances
-      A LocalImportances object containing the feature importances for each instance in the dataset.
+    local_feature_importance : LocalImportances
+      The local feature importances calculated for each instance.
 
     Returns
     -------
     float
-      The mean normalized interquartile range (nIQR) of the feature importances, serving as the feature stability metric.
+      The feature stability score.
 
     Examples
     --------
@@ -124,5 +100,5 @@ def feature_stability(local_feature_importance: LocalImportances):
     >>> stability_score = feature_stability(local_importances)
     >>> print(stability_score)
     """
-    metric = FeatureStability()
-    return metric(local_feature_importance)
+    fs = FeatureStability()
+    return fs(local_feature_importance)

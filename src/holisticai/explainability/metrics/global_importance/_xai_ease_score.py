@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import Union
 
 import numpy as np
 import pandas as pd
+from holisticai.utils import Importances, PartialDependence
 from pydantic import BaseModel
-
-if TYPE_CHECKING:
-    from holisticai.explainability.commons._definitions import Importances, PartialDependence
 
 
 def compute_feature_scores(data, threshold):
@@ -159,13 +157,13 @@ class XAIEaseScore(BaseModel):
 
         def compute_metric(pdep, rfi):
             score_data = self.annotator.compute_xai_ease_score_data(pdep, rfi)
-            return self.compute_xai_ease_score(score_data)
+            return float(self.compute_xai_ease_score(score_data))
 
         if isinstance(partial_dependence, list):
             scores = [compute_metric(pdep, ranked_feature_importance) for pdep in partial_dependence]
             if self.detailed:
                 return scores
-            return np.mean(scores)
+            return float(np.mean(scores))
         return compute_metric(partial_dependence, ranked_feature_importance)
 
 

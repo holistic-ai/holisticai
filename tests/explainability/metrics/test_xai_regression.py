@@ -1,6 +1,6 @@
 from holisticai.datasets import load_dataset
 from sklearn.linear_model import LinearRegression
-from holisticai.explainability.metrics import regression_explainability_metrics, regression_explainability_features
+from holisticai.explainability.metrics import regression_explainability_metrics
 from holisticai.explainability.metrics.global_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
 import numpy as np
 import pytest
@@ -16,28 +16,42 @@ def input_data():
     model.fit(train['X'], train['y'])
     return model, test
 
+def get_regression_features(model, test):
+    from holisticai.utils import RegressionProxy
+    from holisticai.utils.feature_importances import compute_permutation_feature_importance
+    from holisticai.utils.inspection import compute_partial_dependence
+    
+    proxy = RegressionProxy(predict=model.predict)
+    importances  = compute_permutation_feature_importance(X=test['X'], y=test['y'], proxy=proxy)
+    ranked_importances = importances.top_alpha(0.8)
+    partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
+    conditional_importances  = compute_permutation_feature_importance(X=test['X'], y=test['y'], proxy=proxy, conditional=True)
+    return proxy, importances, ranked_importances, conditional_importances, partial_dependencies
+
 def test_xai_regression_metrics(input_data):
     model, test = input_data
-    metrics = regression_explainability_metrics(test['X'], test['y'], model.predict)
-    assert np.isclose(metrics.loc['Rank Alignment'].value, 0.7147597001763668)
-    assert np.isclose(metrics.loc['Position Parity'].value, 0.13373015873015873)
+    proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_regression_features(model, test)
+
+    metrics = regression_explainability_metrics(importances, partial_dependencies, conditional_importances, X=test['X'], y_pred=proxy.predict(test['X']))
+    assert np.isclose(metrics.loc['Rank Alignment'].value, 0.7317350088183421)
+    assert np.isclose(metrics.loc['Position Parity'].value, 0.18504188712522046)
     assert np.isclose(metrics.loc['XAI Ease Score'].value, 1.0)
     assert np.isclose(metrics.loc['Alpha Importance Score'].value, 0.0891089108910891)
 
 def test_xai_classification_metrics_separated(input_data):
     model, test = input_data
 
-    xai_features = regression_explainability_features(test["X"], test["y"], model.predict)
-        
-    value = rank_alignment(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.7147597001763668)
+    proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_regression_features(model, test)
+       
+    value = rank_alignment(conditional_importances, ranked_importances)
+    assert np.isclose(value, 0.7317350088183421)
 
-    value = position_parity(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 0.13373015873015873)
+    value = position_parity(conditional_importances, ranked_importances)
+    assert np.isclose(value, 0.18504188712522046)
     
-    value = xai_ease_score(xai_features.partial_dependence, xai_features.ranked_feature_importance)
+    value = xai_ease_score(partial_dependencies, ranked_importances)
     assert np.isclose(value, 1.0)
 
-    value = alpha_score(xai_features.feature_importance)
+    value = alpha_score(importances)
     assert np.isclose(value, 0.0891089108910891)
 
