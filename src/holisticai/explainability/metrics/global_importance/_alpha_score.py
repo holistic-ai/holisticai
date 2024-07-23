@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from holisticai.explainability.commons import Importances
-from holisticai.explainability.commons._feature_importance import compute_ranked_feature_importance
+from holisticai.utils import Importances
 from pydantic import BaseModel
 
 
-def calculate_alpha_importance(feature_importance, alpha=0.8):
+def calculate_alpha_importance(feature_importance: Importances, alpha=0.8):
     """
     Calculates the alpha importance of a feature based on its feature importance.
 
@@ -22,7 +21,7 @@ def calculate_alpha_importance(feature_importance, alpha=0.8):
                greater than or equal to alpha to the total number of features.
 
     """
-    alpha_feat_imp = compute_ranked_feature_importance(feature_importance, alpha)
+    alpha_feat_imp = feature_importance.top_alpha(alpha)
     len_alpha = len(alpha_feat_imp)
     len_100 = len(feature_importance)
     return len_alpha / len_100

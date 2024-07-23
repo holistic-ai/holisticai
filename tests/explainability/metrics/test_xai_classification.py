@@ -1,6 +1,6 @@
 from holisticai.datasets import load_dataset
 from sklearn.naive_bayes import GaussianNB
-from holisticai.explainability.metrics import classification_explainability_metrics, classification_explainability_features
+from holisticai.explainability.metrics import classification_explainability_metrics
 from holisticai.explainability.metrics.global_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
 import numpy as np
 import pytest
@@ -15,14 +15,35 @@ def input_data():
     model.fit(train['X'], train['y'])
     return model, test
 
+def get_classification_features(model, test, strategy):
+    from holisticai.utils import BinaryClassificationProxy
+    from holisticai.utils.inspection import compute_partial_dependence
 
-@pytest.mark.parametrize("strategy, rank_alignment, position_parity, xai_ease_score, alpha_imp_score", [
-    ("permutation", 1.0, 1.0, 1.0, 0.012195121951219513),
-    ("surrogate",  1.0, 1.0, 1.0, 0.012195121951219513)
+    if strategy=='permutation':
+        from holisticai.utils.feature_importances import compute_permutation_feature_importance as compute_feature_importance
+    elif strategy=='surrogate':
+        from holisticai.utils.feature_importances import compute_surrogate_feature_importance as compute_feature_importance
+    else:
+        raise ValueError("Invalid strategy")
+    
+    
+    proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=model.classes_)
+    importances  = compute_feature_importance(X=test['X'], y=test['y'], proxy=proxy)
+    ranked_importances = importances.top_alpha(0.8)
+    partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
+    conditional_importances  = compute_feature_importance(X=test['X'], y=test['y'], proxy=proxy, conditional=True)
+    return proxy, importances, ranked_importances, conditional_importances, partial_dependencies
+
+
+@pytest.mark.parametrize("strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment", [
+    ("permutation", 0.010309278350515464, 1.0, 0.0, 0.0),
+    ("surrogate",  0.010309278350515464, 1.0, 1.0, 1.0)
 ])
-def test_xai_classification_metrics(strategy, rank_alignment, position_parity, xai_ease_score, alpha_imp_score, input_data):
+def test_xai_classification_metrics(strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment, input_data):
     model, test = input_data
-    metrics = classification_explainability_metrics(test['X'], test['y'], model.predict, model.predict_proba, classes=[0,1], strategy=strategy)
+    proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_classification_features(model, test, strategy)
+
+    metrics = classification_explainability_metrics(importances, partial_dependencies, conditional_importances, X=test['X'], y_pred=proxy.predict(test['X']))
     assert np.isclose(metrics.loc['Rank Alignment'].value, rank_alignment)
     assert np.isclose(metrics.loc['Position Parity'].value, position_parity)
     assert np.isclose(metrics.loc['XAI Ease Score'].value, xai_ease_score)
@@ -32,24 +53,24 @@ def test_xai_classification_metrics(strategy, rank_alignment, position_parity, x
 def test_xai_classification_metrics_separated(input_data):
     model, test = input_data
 
-    xai_features = classification_explainability_features(test["X"], test["y"], model.predict, model.predict_proba, classes=[0,1])
+    proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_classification_features(model, test, 'permutation')
         
-    value = rank_alignment(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 1.0)
+    value = rank_alignment(conditional_importances, ranked_importances)
+    assert np.isclose(value, 0.0)
 
-    value = position_parity(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
-    assert np.isclose(value, 1.0)
+    value = position_parity(conditional_importances, ranked_importances)
+    assert np.isclose(value, 0.0)
     
-    value = xai_ease_score(xai_features.partial_dependence, xai_features.ranked_feature_importance)
+    value = xai_ease_score(partial_dependencies, ranked_importances)
     assert np.isclose(value, 1.0)
 
-    value = alpha_score(xai_features.feature_importance)
-    assert np.isclose(value, 0.012195121951219513)
+    value = alpha_score(importances)
+    assert np.isclose(value, 0.010309278350515464)
 
 
 def test_rank_alignment():
     from holisticai.explainability.metrics import rank_alignment
-    from holisticai.explainability.commons import ConditionalFeatureImportance, Importances
+    from holisticai.utils import ConditionalImportance, Importances
 
     values = {
         '0': Importances(values=[0.1, 0.2, 0.3, 0.4], 
@@ -57,14 +78,14 @@ def test_rank_alignment():
         '1': Importances(values=[0.4, 0.3, 0.2, 0.1], 
                          feature_names=['feature_1', 'feature_2', 'feature_3', 'feature_4'])
     }
-    conditional_feature_importance = ConditionalFeatureImportance(values=values)
+    conditional_feature_importance = ConditionalImportance(values=values)
 
     ranked_feature_importance = Importances(values=[0.5, 0.3, 0.2], feature_names=['feature_1', 'feature_2', 'feature_3'])
     score = rank_alignment(conditional_feature_importance, ranked_feature_importance)
     assert np.isclose(score,0.6944444444444444)
 
 def test_position_parity():
-    from holisticai.explainability.commons import ConditionalFeatureImportance, Importances
+    from holisticai.utils import ConditionalImportance, Importances
     from holisticai.explainability.metrics import position_parity
     import numpy as np
 
@@ -78,12 +99,12 @@ def test_position_parity():
     "group2": Importances(values=np.array([0.50, 0.30, 0.20]),
                            feature_names=["feature_3", "feature_2", "feature_1"]),
     }
-    conditional_feature_importance = ConditionalFeatureImportance(values=values)
+    conditional_feature_importance = ConditionalImportance(values=values)
     score = position_parity(conditional_feature_importance, feature_importance)
     assert np.isclose(score,0.6388888888888888)
 
 def test_alpha_score():
-    from holisticai.explainability.commons import Importances
+    from holisticai.utils import Importances
     from holisticai.explainability.metrics import alpha_score
 
     values = np.array([0.10, 0.20, 0.30])
@@ -93,7 +114,7 @@ def test_alpha_score():
     assert np.isclose(score, 0.6666666666666666)
 
 def test_xai_ease_score():
-    from holisticai.explainability.commons import PartialDependence, Importances
+    from holisticai.utils import PartialDependence, Importances
     from holisticai.explainability.metrics.global_importance import xai_ease_score
     
     partial_dependence = [
@@ -113,7 +134,7 @@ def test_xai_ease_score():
     assert np.isclose(score, 0.5)
 
 def test_spread_ratio():
-    from holisticai.explainability.commons import Importances
+    from holisticai.utils import Importances
     from holisticai.explainability.metrics.global_importance import spread_ratio
     
     values = np.array([0.10, 0.20, 0.30])
@@ -123,7 +144,7 @@ def test_spread_ratio():
     assert np.isclose(score, 0.9206198357143052)
 
 def test_spread_divergence():
-    from holisticai.explainability.commons import Importances
+    from holisticai.utils import Importances
     from holisticai.explainability.metrics.global_importance import spread_divergence
     
     values = np.array([0.10, 0.20, 0.30])

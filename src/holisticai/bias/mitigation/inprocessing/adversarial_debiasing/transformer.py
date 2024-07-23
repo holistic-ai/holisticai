@@ -6,6 +6,7 @@ from typing import Optional
 import jax
 import jax.numpy as jnp
 import numpy as np
+import pandas as pd
 from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.models import (
     ADModel,
     AdversarialModel,
@@ -18,6 +19,10 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 logger = logging.getLogger(__name__)
+
+
+def is_numeric(df):
+    return all(pd.api.types.is_numeric_dtype(df[col]) for col in df.columns)
 
 
 class AdversarialDebiasing(BMImp):
@@ -176,6 +181,9 @@ class AdversarialDebiasing(BMImp):
 
         params = self._load_data(X=X, y=y, group_a=group_a, group_b=group_b)
         x = pd.DataFrame(params["X"])
+        if not is_numeric(x):
+            raise ValueError("Adversarial Debiasing only works with numeric features.")
+
         y = pd.Series(params["y"])
         group_a = pd.Series(params["group_a"])
         group_b = pd.Series(params["group_b"])
@@ -239,6 +247,8 @@ class AdversarialDebiasing(BMImp):
 
         np.ndarray: Predicted output per sample.
         """
+        if not is_numeric(X):
+            raise ValueError("Adversarial Debiasing only works with numeric features.")
         p = self.predict_proba(X)
         return np.argmax(p, axis=1).ravel()
 
@@ -260,6 +270,9 @@ class AdversarialDebiasing(BMImp):
 
         np.ndarray: Predicted matrix probability per sample.
         """
+        if not is_numeric(X):
+            raise ValueError("Adversarial Debiasing only works with numeric features.")
+
         proba = np.empty((X.shape[0], 2))
         proba[:, 1] = self._predict_proba(X)
         proba[:, 0] = 1.0 - proba[:, 1]
@@ -283,5 +296,8 @@ class AdversarialDebiasing(BMImp):
 
         np.ndarray: Predicted probability per sample.
         """
+        if not is_numeric(X):
+            raise ValueError("Adversarial Debiasing only works with numeric features.")
+
         p = self._predict(X).reshape([-1])
         return p
