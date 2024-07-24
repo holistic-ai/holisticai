@@ -1,3 +1,4 @@
+=======
 Mitigation
 ==========
 
@@ -5,51 +6,49 @@ Mitigation
 
    This page is currently under construction. Please check back later for updates.
 
-.. contents:: **Contents:**
-    :depth: 2
+.. note::
+    Bias mitigation can be approached through **pre-processing**, **in-processing**, and **post-processing** methods.
 
-Introduction
-------------
+Bias in AI systems can lead to systematic disadvantages for certain individuals or groups. To address and reduce these biases, several mitigation methods can be employed throughout the development process, from data generation to model deployment. This document outlines various techniques and strategies for mitigating bias in AI systems.
 
-Bias is defined as an unwanted prejudice in the decisions made by an AI system that systematically disadvantages a person or group. Various types of bias can exist and may be unintentionally introduced into algorithms at any stage of the development process, whether during data generation or model building.
+**Pre-processing Methods**
 
-    In order to measure whether a system treats different groups of people equally, we can follow two approaches: **equality of outcome** and **equality of opportunity**.
+Pre-processing techniques aim to mitigate bias by transforming the data before it is used to train a model. This can include:
 
-When we select **equality of outcome**, we ask that all subgroups have equal outcomes. For example, in a recruitment context, we may require that the percentage of applicants hired is consistent across groups (e.g. we want to hire 5% of all female applicants and 5% of all male applicants). Mathematically, this means that the likelihood of a positive outcome is equal for members of each group (regardless of the ground-truth labels):
+- **Reweighting**: Adjusting the weights of data points to ensure balanced representation across groups.
+- **Resampling**: Over-sampling underrepresented groups or under-sampling overrepresented groups to achieve a balanced dataset.
+- **Data Augmentation**: Generating synthetic data to bolster the representation of minority groups.
+- **Fair Representation Learning**: Learning new representations of data that remove sensitive information while retaining useful information for prediction.
 
-.. math::
-    P(\hat{Y} = 1 | G = a) = P(\hat{Y} = 1 | G = b) \quad \forall a, b
+**In-processing Methods**
 
-that is, the probability of a positive outcome is the same for all groups. 
+In-processing techniques modify the learning algorithm itself to reduce bias during the model training phase. This can include:
 
-When we select **equality of opportunity**, we ask that all subgroups are given the same opportunity of outcomes. For example, if we have a face recognition algorithm, we may want the classifier to perform equally well for all ethnicities and genders. Mathematically, the probability of a person in the positive class being correctly assigned a positive outcome and the probability of a person in a negative class being incorrectly assigned a positive outcome should both be the same for privileged and unprivileged group members. In this case, ground-truth labels are used to define the groups, and the following condition should hold:
+- **Adversarial Debiasing**: Training the model in conjunction with an adversary that penalizes the model for producing biased predictions.
+- **Fairness Constraints**: Incorporating constraints that enforce fairness criteria directly into the optimization objective of the learning algorithm.
+- **Regularization Techniques**: Adding regularization terms to the loss function that penalize bias.
 
-.. math::
-    P(\hat{Y} = 1 | Y = y, G = a) = P(\hat{Y} = 1 | Y = y, G = b) \quad \forall a, b ~~and~~ y \in \{0, 1\}
+**Post-processing Methods**
 
-that is, the probability of a positive outcome is the same for all groups, given the ground-truth labels.
+Post-processing techniques adjust the predictions of the trained model to mitigate bias. This can include:
 
-Pre-processing
---------------
+- **Calibrated Equalized Odds**: Adjusting the decision thresholds for different groups to achieve equalized odds across groups.
+- **Reject Option Classification**: Allowing uncertain predictions to be reconsidered, particularly for disadvantaged groups, to improve fairness.
+- **Output Adjustment**: Modifying the output probabilities to ensure fair treatment across groups.
 
-...
-
-Inprocessing
-------------
-
-...
+    .. toctree::
+        :maxdepth: 1
 
 
-Post-processing
----------------
-
-...
+        methods/preprocessing
+        methods/inprocessing
+        methods/postprocessing
 
 Summary Table
 -------------
 
-The following table summarizes the metrics that can be used to measure bias in different types of tasks.
+The following table summarizes the bias mitigation methods and their applicability at different Machine Learning (ML) tasks.
 
-.. csv-table:: Bias Metrics
-    :header: "Class", "Task", "Metrics", "Ideal Value", "Fair Area", "Description"
-    :file: bias_metrics.csv
+.. csv-table:: **Bias Mitigation Methods**
+    :header: "Type Strategy", "Method name", "Binary Classification", "Multi Classification", "Regression", "Clustering", "Recommender Systems"
+    :file: bias_mitigation.csv
