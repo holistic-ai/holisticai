@@ -15,11 +15,13 @@ class GridSearchReduction(BaseEstimator, BMImp):
     """Grid Search Reduction
 
     Grid search technique can be used for fair classification or fair regression.
-    (1) For classification it reduces fair classification to a sequence of cost-sensitive classification problems,
-    returning the deterministic classifier with the lowest empirical error subject to fair classification constraints among the
-    candidates searched.
-    (2) For regression it uses the same priniciple to return a deterministic regressor with the lowest empirical error subject to the
-    constraint of bounded group loss.
+
+    (1) For classification it reduces fair classification to a sequence of cost-sensitive classification problems,\
+    returning the deterministic classifier with the lowest empirical error subject to fair classification constraints among the\
+    candidates searched [1]_.
+
+    (2) For regression it uses the same priniciple to return a deterministic regressor with the lowest empirical error subject to the\
+    constraint of bounded group loss [2]_.
 
     Parameters
     ----------
@@ -33,7 +35,7 @@ class GridSearchReduction(BaseEstimator, BMImp):
                 - "BoundedGroupLoss"
 
         constraint_weight : float
-            Specifies the relative weight put on the constraint violation when selecting the
+            Specifies the relative weight put on the constraint violation when selecting the\
             best model. The weight placed on the error rate will be :code:`1-constraint_weight`
 
         loss : str
@@ -49,31 +51,20 @@ class GridSearchReduction(BaseEstimator, BMImp):
             The number of Lagrange multipliers to generate in the grid
 
         grid_limit : float
-            The largest Lagrange multiplier to generate. The grid will contain
-            values distributed between :code:`-grid_limit` and :code:`grid_limit`
+            The largest Lagrange multiplier to generate. The grid will contain\
+            values distributed between :code:`-grid_limit` and :code:`grid_limit`\
             by default
 
         verbose : int
             If >0, will show progress percentage.
 
-    Methods
-    -------
-        fit(X, y_true, group_a, group_b)
-            Fit model using Grid Search Reduction.
-
-        predict(X)
-            Prediction
-
-        predict_proba(X)
-            Probability Prediction
-
     References
     ----------
-        [1] Agarwal, Alekh, et al. "A reductions approach to fair classification."
+        .. [1] Agarwal, Alekh, et al. "A reductions approach to fair classification."\
         International Conference on Machine Learning. PMLR, 2018.
 
-        [2] Agarwal, Alekh, Miroslav Dudík, and Zhiwei Steven Wu.
-        "Fair regression: Quantitative definitions and reduction-based algorithms."
+        .. [2] Agarwal, Alekh, Miroslav Dudík, and Zhiwei Steven Wu.\
+        "Fair regression: Quantitative definitions and reduction-based algorithms."\
         International Conference on Machine Learning. PMLR, 2019.
     """
 
@@ -202,7 +193,8 @@ class GridSearchReduction(BaseEstimator, BMImp):
 
         Returns
         -------
-        numpy.ndarray: Predicted output
+        numpy.ndarray
+            Predicted output
         """
         return self.model_.predict(X)
 

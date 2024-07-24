@@ -10,6 +10,10 @@ from holisticai.explainability.metrics.global_importance._importance_spread impo
 )
 from holisticai.explainability.metrics.global_importance._position_parity import PositionParity, position_parity
 from holisticai.explainability.metrics.global_importance._rank_alignment import RankAlignment, rank_alignment
+from holisticai.explainability.metrics.global_importance._surrogate import (
+    surrogate_accuracy_score,
+    surrogate_mean_squared_error,
+)
 from holisticai.explainability.metrics.global_importance._xai_ease_score import XAIEaseScore, xai_ease_score
 
 __all__ = [
@@ -25,4 +29,6 @@ __all__ = [
     "rank_alignment",
     "spread_ratio",
     "spread_divergence",
+    "surrogate_accuracy_score",
+    "surrogate_mean_squared_error",
 ]

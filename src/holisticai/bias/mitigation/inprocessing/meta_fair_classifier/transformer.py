@@ -9,14 +9,14 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 
 class MetaFairClassifier(BMImp):
     """
-    The meta algorithm here takes the fairness metric as part of the input
-    and returns a classifier optimized w.r.t. that fairness metric.
+    The meta algorithm here takes the fairness metric as part of the input\
+    and returns a classifier optimized w.r.t. that fairness metric.\
     The algorithm support only binary protected groups -> group_a = 1 - group_b
 
     Parameters
     ----------
         tau : float
-            Fairness penalty parameter (0,1). Higher parameter increate the threshold
+            Fairness penalty parameter (0,1). Higher parameter increate the threshold\
             for a valid estimator.
 
         constraint : str
@@ -27,21 +27,10 @@ class MetaFairClassifier(BMImp):
         seed : int
             Random seed.
 
-    Methods
-    -------
-        fit(X, y, group_a, group_b)
-            Fit model using Meta Fair Classifier.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
-
-        predict_proba(X)
-            Predict the probability of each sample in X belongs to each class.
-
     References
     ----------
-        [1] Celis, L. Elisa, et al. "Classification with fairness constraints:
-        A meta-algorithm with provable guarantees." Proceedings of the conference on
+        .. [1] Celis, L. Elisa, et al. "Classification with fairness constraints:\
+        A meta-algorithm with provable guarantees." Proceedings of the conference on\
         fairness, accountability, and transparency. 2019.
     """
 
@@ -104,7 +93,7 @@ class MetaFairClassifier(BMImp):
 
         Returns
         -------
-        the same object
+        self
         """
         params = self._load_data(y=y, group_a=group_a, group_b=group_b)
         y = params["y"]
@@ -131,8 +120,8 @@ class MetaFairClassifier(BMImp):
 
         Returns
         -------
-
-        numpy.ndarray: Predicted output per sample.
+        numpy.ndarray
+            Predicted output per sample.
         """
         return self.algorithm.predict(X)
 

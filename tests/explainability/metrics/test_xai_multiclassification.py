@@ -1,6 +1,6 @@
 from sklearn.naive_bayes import GaussianNB
 from holisticai.datasets import load_dataset   
-from holisticai.explainability.metrics import multiclass_explainability_metrics, multiclass_explainability_features
+from holisticai.explainability.metrics import multiclass_explainability_metrics
 from holisticai.explainability.metrics.global_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
 import numpy as np
 import pytest
@@ -15,6 +15,21 @@ def input_data():
     model = GaussianNB()
     model.fit(train['X'], train['y'])
     return model, test
+
+
+def get_multiclass_features(model, test):
+    from holisticai.utils import MultiClassificationProxy
+    from holisticai.utils.feature_importances import compute_permutation_feature_importance
+    from holisticai.utils.inspection import compute_partial_dependence
+    
+    proxy = MultiClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=model.classes_)
+    importances  = compute_permutation_feature_importance(X=test['X'], y=test['y'], proxy=proxy)
+    ranked_importances = importances.top_alpha(0.8)
+    partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
+    conditional_importances  = compute_permutation_feature_importance(X=test['X'], y=test['y'], proxy=proxy, conditional=True)
+    return importances, ranked_importances, conditional_importances, partial_dependencies
+
+
 
 @pytest.mark.skip(reason="Sometimes fails due to randomization of the dataset.")
 @pytest.mark.parametrize("strategy, rank_alignment, position_parity, xai_ease_score, alpha_imp_score", [
@@ -33,16 +48,16 @@ def test_xai_multiclassification_metrics(strategy, rank_alignment, position_pari
 def test_xai_classification_metrics_separated(input_data):
     model, test = input_data
     
-    xai_features = multiclass_explainability_features(test["X"], test["y"], model.predict, model.predict_proba, classes=[0,1,2])
+    importances, ranked_importances, conditional_importances, partial_dependencies = get_multiclass_features(model, test)
         
-    value = rank_alignment(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
+    value = rank_alignment(conditional_importances, ranked_importances)
     assert np.isclose(value, 0.4743650793650794)
 
-    value = position_parity(xai_features.conditional_feature_importance, xai_features.ranked_feature_importance)
+    value = position_parity(conditional_importances, ranked_importances)
     assert np.isclose(value, 0.129973544973545)
     
-    value = xai_ease_score(xai_features.partial_dependence, xai_features.ranked_feature_importance)
+    value = xai_ease_score(partial_dependencies, ranked_importances)
     assert np.isclose(value, 0.8833333333333333)
 
-    value = alpha_score(xai_features.feature_importance, xai_features.ranked_feature_importance)
+    value = alpha_score(importances)
     assert np.isclose(value, 0.38461538461538464)

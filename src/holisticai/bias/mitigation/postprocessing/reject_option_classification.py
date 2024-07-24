@@ -16,12 +16,41 @@ def statistical_parity(group_a, group_b, y_pred, _):
 
 class RejectOptionClassification(BMPost):
     """
-    Reject option classification gives favorable outcomes (y=1) to unpriviliged groups and unfavorable outcomes (y=0)to
+    Reject option classification gives favorable outcomes (y=1) to unpriviliged groups and unfavorable outcomes (y=0) to\
     priviliged groups in a confidence band around the decision boundary with the highest uncertainty.
 
-    References:
-    Kamiran, Faisal, Asim Karim, and Xiangliang Zhang. "Decision theory for discrimination-aware classification."
-    2012 IEEE 12th International Conference on Data Mining. IEEE, 2012.
+    Parameters
+    ----------
+    low_class_thresh : float
+        Smallest classification threshold to use in the optimization.
+        Should be between 0. and 1.
+    low_class_thresh : float
+        Smallest classification threshold to use in the optimization.
+        Should be between 0. and 1.
+    high_class_thresh : float
+        Highest classification threshold to use in the optimization.
+        Should be between 0. and 1.
+    num_class_thresh : int
+        Number of classification thresholds between low_class_thresh and high_class_thresh for the optimization
+        search. Should be > 0.
+    num_ROC_margin : int
+        Number of relevant ROC margins to be used in the optimization search. Should be > 0.
+    metric_name : str
+        Name of the metric to use for the optimization. Allowed options are:
+        "Statistical parity difference",
+        "Average odds difference",
+        "Equal opportunity difference".
+    metric_ub : float
+        Upper bound of constraint on the metric value
+    metric_lb : float
+        Lower bound of constraint on the metric value
+    verbose : int
+        If >0, will show progress percentage.
+
+    References
+    ----------
+        .. [1] Kamiran, Faisal, Asim Karim, and Xiangliang Zhang. "Decision theory for discrimination-aware classification."\
+        2012 IEEE 12th International Conference on Data Mining. IEEE, 2012.
     """
 
     ALLOWED_METRICS = Literal[
@@ -42,38 +71,6 @@ class RejectOptionClassification(BMPost):
         num_workers: int | None = 4,
         verbose: int | None = 0,
     ):
-        """
-        Create a Reject Option Classification Post-processing instance.
-
-        Parameters
-        ----------
-        low_class_thresh : float
-            Smallest classification threshold to use in the optimization.
-            Should be between 0. and 1.
-        low_class_thresh : float
-            Smallest classification threshold to use in the optimization.
-            Should be between 0. and 1.
-        high_class_thresh : float
-            Highest classification threshold to use in the optimization.
-            Should be between 0. and 1.
-        num_class_thresh : int
-            Number of classification thresholds between low_class_thresh and high_class_thresh for the optimization
-            search. Should be > 0.
-        num_ROC_margin : int
-            Number of relevant ROC margins to be used in the optimization search. Should be > 0.
-        metric_name : str
-            Name of the metric to use for the optimization. Allowed options are:
-            "Statistical parity difference",
-            "Average odds difference",
-            "Equal opportunity difference".
-        metric_ub : float
-            Upper bound of constraint on the metric value
-        metric_lb : float
-            Lower bound of constraint on the metric value
-        verbose : int
-            If >0, will show progress percentage.
-
-        """
         super().__init__()
 
         allowed_metrics = [
@@ -129,7 +126,7 @@ class RejectOptionClassification(BMPost):
         Parameters
         ----------
         y : array-like
-            Target vector (nb_examlpes,)
+            Target vector (nb_examples,)
         y_proba : matrix-like
             Predicted probability matrix (num_examples, num_classes). The probability
             estimates must sum to 1 across the possible classes and each matrix value
@@ -141,7 +138,7 @@ class RejectOptionClassification(BMPost):
 
         Returns
         -------
-        Self
+            Self
         """
 
         params = self._load_data(y=y, y_proba=y_proba, group_a=group_a, group_b=group_b)
@@ -184,19 +181,19 @@ class RejectOptionClassification(BMPost):
         # configurations = []
         # self.num_cases = len(args_iterator)
         # for i, argv in enumerate(args_iterator):
-        #    configurations.append(evaluate_threshold(*argv))
+        #    configurations.append(_evaluate_threshold(*argv))
         #    self._log_progres(i)
 
         # Pool
         from multiprocessing import Pool
 
         with Pool(self.num_workers) as p:
-            configurations = list(p.starmap(evaluate_threshold, args_iterator))
+            configurations = list(p.starmap(_evaluate_threshold, args_iterator))
 
         # Joblib
         # from joblib import Parallel, delayed
         # configurations = Parallel(n_jobs=-1)(
-        #    delayed(evaluate_threshold)(*args) for args in args_iterator
+        #    delayed(_evaluate_threshold)(*args) for args in args_iterator
         # )
 
         configurations = list(itertools.chain.from_iterable(configurations))
@@ -235,10 +232,10 @@ class RejectOptionClassification(BMPost):
         Parameters
         ----------
         y_pred : array-like
-            Predicted vector (nb_examlpes,)
+            Predicted vector (nb_examples,)
         y_proba : matrix-like
-            Predicted probability matrix (num_examples, num_classes). The probability
-            estimates must sum to 1 across the possible classes and each matrix value
+            Predicted probability matrix (num_examples, num_classes). The probability\
+            estimates must sum to 1 across the possible classes and each matrix value\
             must be in the interval [0,1].
         group_a : array-like
             Group membership vector (binary)
@@ -247,7 +244,8 @@ class RejectOptionClassification(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionary of new predictions
         """
         params = self._load_data(y_pred=y_pred, y_proba=y_proba, group_a=group_a, group_b=group_b)
 
@@ -277,7 +275,7 @@ class RejectOptionClassification(BMPost):
             sys.stdout.flush()
 
 
-def evaluate_threshold(fair_metric, labels, likelihoods, group_a, group_b, class_thresh, num_roc_margin):
+def _evaluate_threshold(fair_metric, labels, likelihoods, group_a, group_b, class_thresh, num_roc_margin):
     base_predictions = np.where(likelihoods > class_thresh, 1, 0)
     high_roc_margin = class_thresh if class_thresh <= 0.5 else 1.0 - class_thresh
     roc_margins = np.linspace(0.0, high_roc_margin, num_roc_margin)
@@ -295,6 +293,35 @@ def evaluate_threshold(fair_metric, labels, likelihoods, group_a, group_b, class
 
 
 def predict(predictions, likelihoods, group_a, group_b, threshold, roc_margin):
+    """
+    Predict the output using the ROC method.
+
+    Description
+    ----------
+    Predict the output using the fitted threshold and ROC margin.
+
+    Parameters
+    ----------
+    predictions : array-like
+        Predicted vector (nb_examples,)
+    likelihoods : matrix-like
+        Predicted probability matrix (num_examples, num_classes). The probability\
+        estimates must sum to 1 across the possible classes and each matrix value\
+        must be in the interval [0,1].
+    group_a : array-like
+        Group membership vector (binary)
+    group_b : array-like
+        Group membership vector (binary)
+    threshold : float
+        float value to discriminate between 0 and 1
+    roc_margin : float
+        float value to determine the margin around the decision boundary
+
+    Returns
+    -------
+    array-like
+        A new array of predictions
+    """
     # Indices of critical region around the classification boundary
     upper_threshold = threshold + roc_margin
     lower_threshold = threshold - roc_margin

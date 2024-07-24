@@ -17,9 +17,10 @@ logger = logging.getLogger(__name__)
 class PopularityPropensityMF(BMImp, RecommenderSystemBase):
     """Popularity Propensity Matrix Factorization
 
-    Popularity Propensity Matrix Factorization can be used for Recommender Systems.
-    This model is trained with propensity matrix factorization defined in (Eq. 1) [1]. Here the propensity P(u,i)
-    is estimated based on popularity.
+    Popularity Propensity Matrix Factorization address selection biases in recommender systems \
+    by using causal inference techniques to provide unbiased performance estimators \
+    and improve prediction accuracy. This method estimates the probability (propensity) \
+    that a user will rate an item and adjusts the training and evaluation processes accordingly.
 
     Parameters
     ----------
@@ -35,14 +36,9 @@ class PopularityPropensityMF(BMImp, RecommenderSystemBase):
         verbose : int
             If >0, will show progress percentage.
 
-    Methods
-    -------
-        fit(X)
-            Fit model using Popularity Propensity Matrix Factorization.
-
     References:
-        [1] Tobias Schnabel, Adith Swaminathan, Ashudeep Singh, Navin Chandak, and
-        Thorsten Joachims. 2016. Recommendations as treatments: Debiasing learning
+        .. [1] Tobias Schnabel, Adith Swaminathan, Ashudeep Singh, Navin Chandak, and\
+        Thorsten Joachims. 2016. Recommendations as treatments: Debiasing learning\
         and evaluation. arXiv preprint arXiv:1602.05352 (2016).
     """
 
@@ -73,6 +69,10 @@ class PopularityPropensityMF(BMImp, RecommenderSystemBase):
 
         Q0 : matrix-like (optional)
             Initial P matrix (numItems, K)
+
+        Returns
+        -------
+            self
         """
         numUsers, numItems = X.shape
         P0 = kargs.get("P", np.random.rand(numUsers, self.K))
@@ -86,6 +86,25 @@ class PopularityPropensityMF(BMImp, RecommenderSystemBase):
     def _coordinate_descent_matrix_factorization(self, R, P, Q, propensity):
         """
         Coordinate Descent Matrix Factorization Algorithm
+
+        Parameters
+        ----------
+        R : matrix-like
+            rating matrix, 0 means non-raked cases.
+
+        P : matrix-like
+            Initial P matrix (numUsers, K)
+
+        Q : matrix-like
+            Initial P matrix (numItems, K)
+
+        propensity : matrix-like
+            Propensity matrix (numUsers, numItems)
+
+        Returns
+        -------
+        tuple
+            P matrix, Q matrix
         """
         N, M = R.shape
         Q = Q.T

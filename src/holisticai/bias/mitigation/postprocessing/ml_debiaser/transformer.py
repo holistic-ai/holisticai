@@ -9,15 +9,41 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class MLDebiaser(BMPost):
     """
-    MLDebiaser postprocessing debias predictions w.r.t. the sensitive class in
-    each demographic group. This procedure takes as input a vector y and solves
-    the optimization problem subject to the statistical parity constraint. This
+    MLDebiaser postprocessing debias predictions w.r.t. the sensitive class in\
+    each demographic group. This procedure takes as input a vector y and solves\
+    the optimization problem subject to the statistical parity constraint. This\
     bias mitigation can be used for classification (binary and multiclass).
 
-    Reference
+    Parameters
+    ----------
+    gamma : float
+        The regularization parameter.
+
+    eps : float
+        The tolerance for the convergence of the optimization algorithm.
+
+    eta : float
+        The step size for the optimization algorithm.
+
+    sgd_steps : int
+        The number of steps for the stochastic gradient descent optimization.
+
+    full_gradient_epochs : int
+        The number of epochs for the full gradient optimization.
+
+    batch_size : int
+        The batch size for the optimization algorithm.
+
+    max_iter : int
+        The maximum number of iterations for the optimization algorithm.
+
+    verbose : bool
+        The verbosity of the optimization algorithm.
+
+    References
     ---------
-        Alabdulmohsin, Ibrahim M., and Mario Lucic. "A near-optimal algorithm for debiasing
-        trained machine learning models." Advances in Neural Information Processing Systems
+        .. [1] Alabdulmohsin, Ibrahim M., and Mario Lucic. "A near-optimal algorithm for debiasing\
+        trained machine learning models." Advances in Neural Information Processing Systems\
         34 (2021): 8072-8084.
     """
 
@@ -40,7 +66,7 @@ class MLDebiaser(BMPost):
         self.batch_size = batch_size
         self.max_iter = max_iter
         self.verbose = verbose
-        self.sens_groups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def fit(self, y_proba: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
         """
@@ -68,7 +94,7 @@ class MLDebiaser(BMPost):
         group_b = params["group_b"] == 1
         num_classes = y_proba.shape[1]
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        self.sens_groups.fit(sensitive_features)
+        self._sensgroups.fit(sensitive_features)
 
         if num_classes > 2:
             self.algorithm = Reduce2BinaryAlgorithm(
@@ -109,7 +135,7 @@ class MLDebiaser(BMPost):
         Parameters
         ----------
         y_proba : array-like
-            Predicted probability matrix (nb_examlpes, nb_classes)
+            Predicted probability matrix (nb_examples, nb_classes)
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
@@ -119,7 +145,8 @@ class MLDebiaser(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionnary with new predictions
         """
         params = self._load_data(y_proba=y_proba, group_a=group_a, group_b=group_b)
 
@@ -127,7 +154,7 @@ class MLDebiaser(BMPost):
         group_b = params["group_b"] == 1
         y_proba = params["y_proba"]
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        p_attr = self.sens_groups.transform(sensitive_features, convert_numeric=True)
+        p_attr = self._sensgroups.transform(sensitive_features, convert_numeric=True)
 
         # Multiclass classification
         if type(self.algorithm) is Reduce2BinaryAlgorithm:

@@ -104,7 +104,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         The number of red points in a fairlet.
     q : int
         The number of blue points in a fairlet.
-    sensgroups : SensitiveGroups
+    _sensgroups : SensitiveGroups
         The sensitive groups.
 
     Methods
@@ -123,7 +123,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
         assert p <= q, "Please use balance parameters in the correct order"
         self.p = p
         self.q = q
-        self.sensgroups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def decompose(self, node, dataset, donelist, depth):
         """
@@ -268,7 +268,7 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
             The cost of the decomposition.
         """
         sensitive_groups = np.c_[group_a, group_b]
-        colors = self.sensgroups.fit_transform(sensitive_groups, convert_numeric=True)
+        colors = self._sensgroups.fit_transform(sensitive_groups, convert_numeric=True)
         root = build_quadtree(dataset)
         "Main fairlet clustering function, returns cost wrt original metric (not tree metric)"
         p = self.p

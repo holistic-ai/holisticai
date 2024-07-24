@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
 import numpy as np
+from numpy.random import RandomState
 
 
 class DatasetDict(dict):
@@ -170,7 +171,7 @@ class DataLoader:
     def batched(self):
         def batch_generator(batch_size):
             for i in range(self.num_batches):
-                batch = Dataset(data=self.dataset.data.iloc[i * batch_size : (i + 1) * batch_size])
+                batch = Dataset(self.dataset.data.iloc[i * batch_size : (i + 1) * batch_size])
                 yield batch
 
         if self.dtype == "jax":
@@ -242,8 +243,8 @@ class Dataset:
         features_counts = features_values.value_counts()
         self.features_is_series = {key: (value == 1) for key, value in features_counts.items()}
 
-    def __init__(self, data: pd.DataFrame | None = None, **kargs):
-        if data is None:
+    def __init__(self, _data: pd.DataFrame | None = None, **kargs):
+        if _data is None:
             self.data = {}
             for name, value in kargs.items():
                 if isinstance(value, pd.DataFrame):
@@ -257,7 +258,7 @@ class Dataset:
             self.data.columns = self.data.columns.set_names(["features", "subfeatures"])
             self.data.reset_index(drop=True)
         else:
-            self.data = data.reset_index(drop=True)
+            self.data = _data.reset_index(drop=True)
         self.__update_metadata()
         self.random_state = np.random.RandomState()
 
@@ -419,7 +420,7 @@ def apply_fn_to_multilevel_df(df, fn):
     return result_df
 
 
-def sample_n(group, n, random_state=None):
+def sample_n(group: pd.DataFrame, n: int, random_state: Union[RandomState, None] = None) -> pd.DataFrame:
     if len(group) < n:
         return group
     return group.sample(n=n, replace=False, random_state=random_state)

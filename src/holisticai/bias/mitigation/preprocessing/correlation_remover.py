@@ -23,6 +23,12 @@ class CorrelationRemover(BMPre):
     in order to remove their correlation with the sensitive feature columns while retaining\
     as much information as possible (as measured by the least-squares error).
 
+    Parameters
+    ----------
+    alpha : float, optional
+        parameter to control how much to filter, for alpha=1.0 we filter out
+        all information while for alpha=0.0 we don't apply any. Default is 1.
+
     Notes
     -----
     This method will change the original dataset by removing all correlation with sensitive\
@@ -32,13 +38,6 @@ class CorrelationRemover(BMPre):
     """
 
     def __init__(self, alpha=1):
-        """
-        Parameters
-        ----------
-        alpha : float, optional
-            parameter to control how much to filter, for alpha=1.0 we filter out
-            all information while for alpha=0.0 we don't apply any. Default is 1.
-        """
         self.alpha = alpha
 
     def fit(self, X: jnp.ndarray, group_a: jnp.ndarray, group_b: jnp.ndarray):
@@ -54,7 +53,7 @@ class CorrelationRemover(BMPre):
         group_b : array-like
             Group membership vector (binary)
 
-        Return
+        Returns
         ------
         Self
         """
@@ -107,7 +106,7 @@ class CorrelationRemover(BMPre):
         group_b : array-like
             Group membership vector (binary)
 
-        Return
+        Returns
         ------
             Self
         """

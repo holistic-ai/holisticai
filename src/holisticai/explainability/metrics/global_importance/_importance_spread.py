@@ -1,5 +1,5 @@
 import numpy as np
-from holisticai.explainability.commons import Importances
+from holisticai.utils import Importances
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy
 
@@ -23,23 +23,23 @@ class ImportanceSpread:
         feature_weight = importance / sum(importance)
         feature_equal_weight = np.array([1.0 / len(importance)] * len(importance))
 
-        if self.divergence is True:
+        if self.divergence:
             metric = 1 - jensenshannon(feature_weight, feature_equal_weight, base=2)
         else:
             metric = entropy(feature_weight) / entropy(feature_equal_weight)
-        return metric
+        return float(metric)
 
 
 class SpreadRatio(ImportanceSpread):
     name: str = "Spread Ratio"
-    reference = 0
-    divergence = False
+    reference: float = 0
+    divergence: bool = False
 
 
 class SpreadDivergence(ImportanceSpread):
     name: str = "Spread Divergence"
-    reference = 0
-    divergence = True
+    reference: float = 0
+    divergence: bool = True
 
 
 def spread_ratio(feature_importance: Importances):
