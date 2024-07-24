@@ -1,3 +1,5 @@
+.. default-role:: math
+
 Stability Metrics
 =================
 
@@ -8,106 +10,73 @@ The Data Stability and Feature Stability metrics are designed to evaluate the co
    :depth: 1
 
 Data Stability
---------------
-
-Data Stability measures the consistency of feature importance across different instances in the dataset. A high data stability score indicates that the importance of features remains relatively stable across various data points, enhancing interpretability and reliability.
+----------------------
 
 Methodology
 ~~~~~~~~~~~
-
-1. **Compute Feature Importance for Each Instance:**
-   - Calculate the feature importance for each instance in the dataset.
-
-2. **Calculate Median and Interquartile Range (IQR) for Each Instance:**
-   - Compute the median feature importance for each instance.
-   - Compute the interquartile range (IQR) for each instance, defined as the difference between the 75th percentile (Q3) and the 25th percentile (Q1) of feature importance values.
-
-3. **Calculate Normalized Interquartile Range (nIQR) for Each Instance:**
-   - Normalize the IQR by dividing it by the median feature importance for each instance.
-
-4. **Compute Data Stability Score:**
-   - Aggregate the normalized IQR values across all instances to compute the Data Stability Score. A lower normalized IQR indicates higher stability.
+The **Data Stability** metric evaluates the consistency of local feature importances across different instances. It measures how much the importances of features vary for different instances in a dataset.
 
 Mathematical Representation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Let :math:`\mathbf{I} = \{I_1, I_2, \ldots, I_n\}` be the set of local feature importances for \( n \) instances, where each \( I_i \) is a vector of feature importances.
 
-Let \( F_i \) denote the feature importance vector for instance \( i \). The median and IQR for instance \( i \) are given by:
-
-.. math::
-
-   \text{Median}_i = \text{median}(F_i)
-
-   \text{IQR}_i = Q3(F_i) - Q1(F_i)
-
-The normalized IQR (nIQR) for instance \( i \) is:
+1. **Calculation of Spread Divergence:**
 
 .. math::
 
-   \text{nIQR}_i = \frac{\text{IQR}_i}{\text{Median}_i}
+   S_i = \text{spread_divergence}(I_i)
 
-The Data Stability Score \( \lambda_D \) is the mean of the nIQR values:
+2. **Calculation of Data Stability:**
 
 .. math::
 
-   \lambda_D = \frac{1}{N} \sum_{i=1}^{N} \text{nIQR}_i
-
-where \( N \) is the number of instances.
+   \text{Data_Stability} = \text{spread_divergence}(\{S_i \mid i = 1, \ldots, n\})
 
 Interpretation
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+- **High value:** Indicates that the feature importances are consistent across instances. This suggests that the model has a uniform understanding of the data, facilitating interpretation and increasing confidence in the model's explanations.
+- **Low value:** Indicates that the feature importances vary significantly between instances. This can make the model harder to interpret and reduce confidence in its predictions.
 
-- **High Score:** Indicates that the importance of features is consistent across different instances, making the model more interpretable and reliable.
-- **Low Score:** Indicates that the importance of features varies significantly across different instances, making the model less interpretable and potentially less reliable.
+The **Data Stability** metric uses spread divergence to evaluate the stability of feature importances. This divergence measures the dispersion of importances across different instances, providing a quantitative measure of consistency.
 
 
 Feature Stability
 -----------------
 
-Feature Stability measures the consistency of feature importance across different features in the dataset. A high feature stability score indicates that the importance of features remains relatively stable across various data points, enhancing interpretability and reliability.
-
 Methodology
-~~~~~~~~~~~
-
-1. **Compute Feature Importance for Each Feature:**
-   - Calculate the feature importance for each feature across all instances in the dataset.
-
-2. **Calculate Median and Interquartile Range (IQR) for Each Feature:**
-   - Compute the median feature importance for each feature.
-   - Compute the interquartile range (IQR) for each feature, defined as the difference between the 75th percentile (Q3) and the 25th percentile (Q1) of feature importance values.
-
-3. **Calculate Normalized Interquartile Range (nIQR) for Each Feature:**
-   - Normalize the IQR by dividing it by the median feature importance for each feature.
-
-4. **Compute Feature Stability Score:**
-   - Aggregate the normalized IQR values across all features to compute the Feature Stability Score. A lower normalized IQR indicates higher stability.
+~~~~~~~~~~~~
+The **Feature Stability** metric measures the stability of individual feature importances across different instances. It focuses on the consistency of the importance of a specific feature throughout the dataset.
 
 Mathematical Representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Let :math:`\mathbf{I} = \{I_1, I_2, \ldots, I_n\}` be the set of local feature importances for \( n \) instances, where each \( I_i \) is a vector of feature importances.
 
-Let \( F_j \) denote the feature importance vector for feature \( j \). The median and IQR for feature \( j \) are given by:
-
-.. math::
-
-   \text{Median}_j = \text{median}(F_j)
-
-   \text{IQR}_j = Q3(F_j) - Q1(F_j)
-
-The normalized IQR (nIQR) for feature \( j \) is:
+1. **Normalization and Transposition of Data:**
 
 .. math::
 
-   \text{nIQR}_j = \frac{\text{IQR}_j}{\text{Median}_j}
+   \mathbf{I}^T = \begin{pmatrix}
+   I_{1,1} & I_{1,2} & \cdots & I_{1,n} \\
+   I_{2,1} & I_{2,2} & \cdots & I_{2,n} \\
+   \vdots & \vdots & \ddots & \vdots \\
+   I_{m,1} & I_{m,2} & \cdots & I_{m,n}
+   \end{pmatrix}
 
-The Feature Stability Score \( \lambda_F \) is the mean of the nIQR values:
+2. **Calculation of Spread Divergence for Each Feature:**
 
 .. math::
 
-   \lambda_F = \frac{1}{M} \sum_{j=1}^{M} \text{nIQR}_j
+   S_j = \text{spread_divergence}(I_j^T)
 
-where \( M \) is the number of features.
+3. **Calculation of Feature Stability:**
+
+.. math::
+
+   \text{Feature_Stability} = \text{spread_divergence}(\{S_j \mid j = 1, \ldots, m\})
 
 Interpretation
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+- **High value:** Indicates that the importance of a specific feature is consistent across instances. This suggests that the feature is robust and its relationship with the model's target is reliable.
+- **Low value:** Indicates that the importance of a feature varies significantly between instances. This may suggest that the feature is less reliable and its relationship with the model's target may be weak.
 
-- **High Score:** Indicates that the importance of features is consistent across different features, making the model more interpretable and reliable.
-- **Low Score:** Indicates that the importance of features varies significantly across different features, making the model less interpretable and potentially less reliable.
+The **Feature Stability** metric uses spread divergence to evaluate the stability of individual feature importances. This divergence measures the dispersion of the importances of each feature across different instances, providing a quantitative measure of their consistency.

@@ -1,4 +1,4 @@
-from holisticai.explainability.commons import Importances
+from holisticai.utils import Importances
 from matplotlib import pyplot as plt
 
 

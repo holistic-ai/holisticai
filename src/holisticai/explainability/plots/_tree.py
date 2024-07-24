@@ -2,7 +2,7 @@ from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-from holisticai.explainability.commons import Importances
+from holisticai.utils import Importances
 from sklearn.tree._export import _MPLTreeExporter
 
 

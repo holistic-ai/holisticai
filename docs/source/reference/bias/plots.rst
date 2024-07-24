@@ -1,7 +1,7 @@
 
-===============
-Bias Plots
-===============
+=====
+Plots
+=====
 
 `holisticai.bias.plots` implements the visualizations for **bias** tasks.
 
