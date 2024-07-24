@@ -15,14 +15,37 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 class FairTopK(BMPost):
     """
-    Fair Top K bias mitigation can be used for Recommender Systems.
-    The strategy extends group fairness definition using the standard notion of protected groups
-    and is based on ensuring that the proportion of protected candidates in every prefix of the top-k
+    Fair Top K bias mitigation can be used for Recommender Systems.\
+    The strategy extends group fairness definition using the standard notion of protected groups\
+    and is based on ensuring that the proportion of protected candidates in every prefix of the top-k\
     ranking.
 
-    Reference
+    Parameters
+    ----------
+    top_n : int
+        The total number of elements.
+
+    p : float
+        The proportion of protected candidates in the top-k ranking.
+
+    alpha : float
+        The significance level.
+
+    query_col : str
+        The name of the column in data that contains query ids.
+
+    doc_col : str
+        The name of the column in data that contains document ids.
+
+    group_col : str
+        The name of the column in data that contains protected attribute.
+
+    score_col : str
+        The name of the column in data that contains judgment values.
+
+    References
     ---------
-    Zehlike, Meike, et al. "Fa* ir: A fair top-k ranking algorithm." Proceedings of the 2017 ACM on
+    .. [1] Zehlike, Meike, et al. "Fa* ir: A fair top-k ranking algorithm." Proceedings of the 2017 ACM on\
     Conference on Information and Knowledge Management. 2017.
     """
 
@@ -56,10 +79,15 @@ class FairTopK(BMPost):
         Parameters
         ----------
         rankings : DataFrame
-            Predicted matrix scores (nb_examlpes*top_n, 3) [query_id, doc_id, scores]
+            Predicted matrix scores (nb_examples*top_n, 3) [query_id, doc_id, scores]
 
         p_attr: matrix-like
             Item groups (nb_examples, 3) [query_id, doc_id, protected]
+
+        Returns
+        -------
+        DataFrame
+            The re-ranked dataframe.
         """
         if p_attr is None:
             if self.group_col not in rankings.columns:
@@ -77,8 +105,6 @@ class FairTopK(BMPost):
 
     def transform_ranking(self, ranking):
         """
-        Description
-        -----------
         Applies FA*IR re-ranking to the input ranking using an adjusted mtable
 
         Parameters
@@ -86,9 +112,10 @@ class FairTopK(BMPost):
         ranking: list
             The ranking to be re-ranked (list of FairScoreDoc)
 
-        Return
+        Returns
         ------
-        :return:
+        DataFrame
+            The re-ranked dataframe.
         """
         protected = ranking[ranking[self.group_col]]
         non_protected = ranking[~ranking[self.group_col]]
@@ -103,7 +130,7 @@ class FairTopK(BMPost):
 
         Return
         ------
-            list
+        list
             mtable as list of int elements
         """
 
@@ -119,8 +146,6 @@ class FairTopK(BMPost):
 
     def is_fair(self, ranking):
         """
-        Description
-        -----------
         Checks if the ranking is fair for the given parameters
 
         Parameters
@@ -128,16 +153,15 @@ class FairTopK(BMPost):
         ranking: list
             The ranking to be checked (list of Resultinfo)
 
-        Return
+        Returns
         ------
-            bool
+        bool
+            True if the ranking is fair, False otherwise.
         """
         return check_ranking(ranking[self.group_col], self._create_adjusted_mtable())
 
     def _fair_top_k(self, protected_candidates, non_protected_candidates, mtable):
         """
-        Description
-        -----------
         Reorganize the results info ensuring true the mtable condition (#protected[:i] >= mtable[i]).
 
         Parameters
@@ -152,9 +176,9 @@ class FairTopK(BMPost):
         mtable: list
             adjusted mtable
 
-        Return
+        Returns
         ------
-            : list
+        list
             List of re-ranked results.
         """
         result = []

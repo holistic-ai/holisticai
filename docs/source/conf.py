@@ -19,6 +19,15 @@ import os
 import shutil
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor
+sys.path.insert(0, os.path.abspath('.'))
+import utils.xai_image_plots as xai_utils
+import inspect
+
+os.makedirs('_static/images', exist_ok=True)
+
+for name, obj in inspect.getmembers(xai_utils):
+    if inspect.isfunction(obj) and name.startswith('image_'):
+        obj()
 
 def run_notebook(notebook_path):
     with open(notebook_path) as f:
@@ -33,7 +42,7 @@ def run_notebook(notebook_path):
         except Exception as e:
             print(f"Error executing the notebook {notebook_path}: {e}")
 
-def run_all_notebooks(folder_path, output_directory):
+def run_all_notebooks(folder_path):
     for root, _, files in os.walk(folder_path):
         for file in files:
             if file.endswith('.ipynb'):
@@ -54,7 +63,7 @@ def copy_folder(origen, destino):
         if not os.path.exists(destino):
             os.makedirs(destino)
         shutil.copytree(origen, destino, dirs_exist_ok=True)
-        run_all_notebooks(destino)
+        #run_all_notebooks(destino)
         print(f"Folder copied from {origen} to {destino} sucessfully.")
     except Exception as e:
         print(f"Error when trying to copy folder: {e}")
@@ -95,7 +104,7 @@ nbsphinx_execute = 'never'  # Puede ser 'auto', 'always', o 'never'
 
 html_show_sourcelink = False
 # autodoc options
-autodoc_default_options = {"members": True, "inherited-members": True}
+autodoc_default_options = {"members": True, "inherited-members": False}
 
 # Turn on autosummary
 autosummary_generate = True
@@ -119,6 +128,7 @@ exclude_patterns = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+numfig=True
 
 html_logo = "hai_logo.svg"
 html_favicon = "holistic_ai.png"
@@ -135,6 +145,7 @@ html_theme_options = {
     "github_url": "https://github.com/holistic-ai/holisticai",
     "twitter_url": "https://twitter.com/holistic_ai",
     "show_version_warning_banner": True,
+    "secondary_sidebar_items": [],
 #    "announcement": "Visit our website and <a href='https://www.holisticai.com/demo'>schedule a demo</a> with our experts to find out how Holistic AI can help you shield against AI risks.",
     "icon_links": [
         {

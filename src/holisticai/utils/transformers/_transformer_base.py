@@ -9,30 +9,30 @@ class TransformerBase:
     For each pipeline execution the transformer will be linked to the estimator and custom parameters.
     """
 
-    def has_param_handler(self):
+    def _has_param_handler(self):
         return hasattr(self, "params_hdl")
 
-    def link_parameters(self, params_hdl, estimator_hdl):
+    def _link_parameters(self, params_hdl, estimator_hdl):
         self.params_hdl = params_hdl
         self.estimator_hdl = estimator_hdl
 
-    def get_bias_param(self, param_name, default=None):
+    def _get_bias_param(self, param_name, default=None):
         if param_name in self.params_hdl.bias_mitigator:
             return self.params_hdl.bias_mitigator[param_name]
         return default
 
-    def update_bias_param(self, param_name, param_value):
+    def _update_bias_param(self, param_name, param_value):
         if hasattr(self, "params_hdl"):
             self.params_hdl.bias_mitigator[param_name] = param_value
         else:
             self.bias_mitigator_params[param_name] = param_value
 
-    def get_estimator_param(self, param_name, default=None):
+    def _get_estimator_param(self, param_name, default=None):
         if param_name in self.params_hdl.estimator:
             return self.params_hdl.estimator[param_name]
         return default
 
-    def update_estimator_param(self, param_name, param_value):
+    def _update_estimator_param(self, param_name, param_value):
         if hasattr(self, "params_hdl"):
             self.params_hdl.estimator[param_name] = param_value
         else:

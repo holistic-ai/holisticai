@@ -1,5 +1,20 @@
-import numpy as np
+import jax.numpy as jnp
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
+from jax import jit
+
+
+@jit
+def _fit(X, sensitive_features, sensitive_mean):
+    sensitive_features_center = sensitive_features - sensitive_mean
+    beta = jnp.linalg.lstsq(sensitive_features_center, X, rcond=None)[0]
+    return beta
+
+
+@jit
+def _transform(X, sensitive_features, beta, alpha, sensitive_mean):
+    sensitive_features_center = sensitive_features - sensitive_mean
+    x_filtered = X - jnp.dot(sensitive_features_center, beta)
+    return alpha * x_filtered + (1 - alpha) * X
 
 
 class CorrelationRemover(BMPre):
@@ -7,6 +22,12 @@ class CorrelationRemover(BMPre):
     CorrelationRemover applies a linear transformation to the non-sensitive feature columns\
     in order to remove their correlation with the sensitive feature columns while retaining\
     as much information as possible (as measured by the least-squares error).
+
+    Parameters
+    ----------
+    alpha : float, optional
+        parameter to control how much to filter, for alpha=1.0 we filter out
+        all information while for alpha=0.0 we don't apply any. Default is 1.
 
     Notes
     -----
@@ -17,16 +38,9 @@ class CorrelationRemover(BMPre):
     """
 
     def __init__(self, alpha=1):
-        """
-        Parameters
-        ----------
-        alpha : float, optional
-            parameter to control how much to filter, for alpha=1.0 we filter out
-            all information while for alpha=0.0 we don't apply any. Default is 1.
-        """
         self.alpha = alpha
 
-    def fit(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
+    def fit(self, X: jnp.ndarray, group_a: jnp.ndarray, group_b: jnp.ndarray):
         """
         Learn the projection required to make the dataset uncorrelated with groups (group_a and group_b).
 
@@ -39,7 +53,7 @@ class CorrelationRemover(BMPre):
         group_b : array-like
             Group membership vector (binary)
 
-        Return
+        Returns
         ------
         Self
         """
@@ -48,14 +62,13 @@ class CorrelationRemover(BMPre):
         group_a = params["group_a"]
         group_b = params["group_b"]
 
-        sensitive_features = np.stack([group_a, group_b], axis=1).astype(np.int32)
-        self.sensitive_mean_ = sensitive_features.mean()
-        sensitive_features_center = sensitive_features - self.sensitive_mean_
-        self.beta_, _, _, _ = np.linalg.lstsq(sensitive_features_center, x, rcond=None)
+        sensitive_features = jnp.stack([group_a, group_b], axis=1).astype(jnp.int32)
+        self.sensitive_mean_ = jnp.mean(sensitive_features, axis=0)
+        self.beta_ = _fit(x, sensitive_features, self.sensitive_mean_)
         self.x_shape_ = x.shape
         return self
 
-    def transform(self, X: np.ndarray, group_a: np.ndarray, group_b: np.ndarray):
+    def transform(self, X: jnp.ndarray, group_a: jnp.ndarray, group_b: jnp.ndarray):
         """
         Transform X by applying the correlation remover.
 
@@ -71,25 +84,16 @@ class CorrelationRemover(BMPre):
         -------
             np.ndarray
         """
-
         params = self._load_data(X=X, group_a=group_a, group_b=group_b)
         x = params["X"]
         group_a = params["group_a"]
         group_b = params["group_b"]
-        sensitive_features = np.stack([group_a, group_b], axis=1).astype(np.int32)
-        self.sensitive_mean_ = sensitive_features.mean()
-        sensitive_features_center = sensitive_features - self.sensitive_mean_
-        x_filtered = x - sensitive_features_center.dot(self.beta_)
-        x = np.atleast_2d(x)
-        x_filtered = np.atleast_2d(x_filtered)
-        return self.alpha * x_filtered + (1 - self.alpha) * X
 
-    def fit_transform(
-        self,
-        X: np.ndarray,
-        group_a: np.ndarray,
-        group_b: np.ndarray,
-    ):
+        sensitive_features = jnp.stack([group_a, group_b], axis=1).astype(jnp.int32)
+        x_filtered = _transform(x, sensitive_features, self.beta_, self.alpha, self.sensitive_mean_)
+        return x_filtered
+
+    def fit_transform(self, X: jnp.ndarray, group_a: jnp.ndarray, group_b: jnp.ndarray):
         """
         Fit and transform
 
@@ -102,8 +106,9 @@ class CorrelationRemover(BMPre):
         group_b : array-like
             Group membership vector (binary)
 
-        Return
+        Returns
         ------
             Self
         """
-        return self.fit(X, group_a, group_b).transform(X, group_a, group_b)
+        self.fit(X, group_a, group_b)
+        return self.transform(X, group_a, group_b)

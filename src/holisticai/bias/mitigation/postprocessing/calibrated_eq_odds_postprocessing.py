@@ -8,34 +8,25 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 class CalibratedEqualizedOdds(BMPost):
     r"""
-    Calibrated equalized odds postprocessing optimizes over calibrated classifier score outputs to find
+    Calibrated equalized odds postprocessing optimizes over calibrated classifier score outputs to find \
     probabilities with which to change output labels with an equalized odds objective.
-    References:
-        Pleiss, Geoff, et al. "On fairness and calibration."
-        Advances in neural information processing systems 30 (2017).
 
-    Notes
-    -----
-    Notes about the implementation algorithm (if needed).
+    Parameters
+    ----------
+    cost_constraint : str
+        Strategy used to evalute the cost function  The available contraints  are: "fnr", "fpr", "weighted" \
+        false negative rate (fnr), false positive rate (fpr), and weighted
 
-    This can have multiple paragraphs.
+    alpha : float
+        Used only with cost contraint  "weighted".
+        Value between 0 and 1 used to combine fnr and fpr cost constraint.
 
-    You may include some math:
-
-    .. math:: X(e^{j\omega } ) = x(n)e^{ - j\omega n}
-
-    And even use a Greek symbol like :math:`\omega` inline.
+    seed: int
+        A seed value for random number generators. This ensures reproducibility of results.
 
     References
     ----------
-    Cite the relevant literature, e.g. [1]_.  You may also cite these
-    references in the notes section above.
-
-    .. [1] O. McNoleg, "The integration of GIS, remote sensing,
-       expert systems and adaptive co-kriging for environmental habitat
-       modelling of the Highland Haggis using object-oriented, fuzzy-logic
-       and neural-network techniques," Computers & Geosciences, vol. 22,
-       pp. 585-588, 1996.
+    .. [1] Pleiss, Geoff, et al. “On fairness and calibration.” Advances in neural information processing systems 30 (2017).
 
     """
 
@@ -47,27 +38,6 @@ class CalibratedEqualizedOdds(BMPost):
         alpha: float | None = None,
         seed: int | None = 42,
     ):
-        """
-        Create a Calibrated Equalized Odds Post-processing instance.
-
-        Parameters
-        ----------
-        cost_constraint : str
-            Strategy used to evalute the cost function  The available contraints  are:
-            [
-                "fnr",
-                "fpr",
-                "weighted"
-            ]
-            false negative rate (fnr), false positive rate (fpr), and weighted
-
-        alpha : float
-            Used only with cost contraint  "weighted".
-            Value between 0 and 1 used to combine fnr and fpr cost constraint.
-
-        seed: int
-            A seed value for random number generators. This ensures reproducibility of results.
-        """
         self.cost_constraint = cost_constraint
         self.alpha = alpha
         self.random_state = np.random.RandomState(seed)
@@ -83,8 +53,8 @@ class CalibratedEqualizedOdds(BMPost):
             msg = f"unknown cost constraint: {self.cost_constraint}"
             raise ValueError(msg)
 
-        gfpr = generalized_fpr(y, y_score, sample_weight=sample_weight)
-        gfnr = generalized_fnr(y, y_score, sample_weight=sample_weight)
+        gfpr = _generalized_fpr(y, y_score, sample_weight=sample_weight)
+        gfnr = _generalized_fnr(y, y_score, sample_weight=sample_weight)
 
         return (1 - alpha) * gfpr + alpha * gfnr
 
@@ -137,7 +107,7 @@ class CalibratedEqualizedOdds(BMPost):
             or computed by previous preprocessing strategy.
         Returns
         -------
-        Self
+            Self
         """
         params = self._load_data(
             y=y,
@@ -198,7 +168,8 @@ class CalibratedEqualizedOdds(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionary of new predictions
         """
 
         params = self._load_data(y_pred=y_pred, y_proba=y_proba, group_a=group_a, group_b=group_b)
@@ -262,7 +233,8 @@ class CalibratedEqualizedOdds(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionary of new predictions
         """
         return self.fit(
             y,
@@ -273,14 +245,14 @@ class CalibratedEqualizedOdds(BMPost):
         ).transform(y, y_proba, group_a, group_b, threshold)
 
 
-def generalized_fpr(y, y_score, sample_weight):
+def _generalized_fpr(y, y_score, sample_weight):
     neg_idx = y != 1
     neg_weights = sample_weight[neg_idx]
     neg = neg_weights.sum()
     return (y_score[neg_idx] * neg_weights).sum() / neg
 
 
-def generalized_fnr(y, y_score, sample_weight):
+def _generalized_fnr(y, y_score, sample_weight):
     pos_idx = y == 1
     pos_weights = sample_weight[pos_idx]
     pos = pos_weights.sum()

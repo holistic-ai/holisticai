@@ -12,3 +12,7 @@ numpy==1.26
 pybind11>=2.12
 cvxpy
 pydantic
+jax
+jaxopt
+optax
+flax

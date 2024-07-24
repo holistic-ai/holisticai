@@ -1,10 +1,9 @@
-from __future__ import annotations
-
 import copy
-import sys
-from typing import Optional
+from typing import Any
 
+import pandas as pd
 from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
+from sklearn.utils.parallel import Parallel, delayed
 
 
 class GridSearchAlgorithm:
@@ -15,161 +14,146 @@ class GridSearchAlgorithm:
 
     Reference
     ---------
-
     Agarwal, Alekh, et al. "A reductions approach to fair classification."
     International Conference on Machine Learning. PMLR, 2018.
     """
 
     def __init__(
         self,
-        estimator,
-        constraint,
-        constraint_weight: Optional[float] = 0.5,
-        grid_size: Optional[int] = 20,
-        grid_limit: Optional[int] = 2,
-        verbose: Optional[int] = 0,
+        estimator: Any,
+        constraint: Any,
+        constraint_weight: float = 0.5,
+        grid_size: int = 20,
+        grid_limit: int = 2,
+        n_jobs=-1,
+        verbose=0,
     ):
         """
         Init GridSearchAlgorithm object
 
         Parameters
         ----------
-
-        estimator :
+        estimator : object
             An estimator implementing methods :code:`fit(X, y, sample_weight=sample_weight)` and
             :code:`predict(X)`, where `X` is the matrix of features, `y` is the
             vector of labels, and `sample_weight` is a vector of weights.
             In binary classification labels `y` and predictions returned by
             :code:`predict(X)` are either 0 or 1.
 
-        generator : float
-            grid generator utility
-
-        constraint : ClassificationContraint
-            The disparity constraint
+        constraint : ClassificationConstraint
+            The disparity constraint.
 
         constraint_weight : float
             Specifies the relative weight put on the constraint violation when selecting the
-            best model. The weight placed on the error rate will be :code:`1-constraint_weight`
+            best model. The weight placed on the error rate will be :code:`1-constraint_weight`.
 
         grid_size: int
-            number of columns to be generated in the grid.
+            Number of columns to be generated in the grid.
 
         grid_limit : float
-            range of the values in the grid generated.
+            Range of the values in the grid generated.
 
         verbose : int
             If >0, will show progress percentage.
         """
+        self.estimator: Any = estimator
+        self.constraint: Any = constraint
+        self.objective: Any = constraint.default_objective()
+        self.grid_limit: int = grid_limit
+        self.grid_size: int = grid_size
+        self.constraint_weight = constraint_weight
+        self.n_jobs = n_jobs
+        self.verbose = verbose
 
-        self.constraint = constraint
-        self.estimator = estimator
-        self.objective = constraint.default_objective()
-        self.grid_limit = grid_limit
-        self.grid_size = grid_size
-        self.monitor = Monitor(constraint_weight=constraint_weight, verbose=verbose)
-
-    def fit(self, X, y, sensitive_features):
+    def fit(self, X: Any, y: Any, sensitive_features: Any):
         """
         Fit model using Grid Search Algorithm.
 
         Parameters
         ----------
-
         X : matrix-like
-            input matrix
+            Input matrix.
 
-        y_true : numpy array
-            target vector
+        y : numpy array
+            Target vector.
 
         sensitive_features : numpy array
-            Matrix where each columns is a sensitive feature e.g. [col_1=group_a, col_2=group_b]
+            Matrix where each column is a sensitive feature e.g. [col_1=group_a, col_2=group_b].
 
         Returns
         -------
-        the same object
+        GridSearchAlgorithm
+            The same object.
         """
+        self._load_data(X, y, sensitive_features)
+        grid = self._generate_grid()
+
+        results = Parallel(n_jobs=self.n_jobs, verbose=self.verbose)(
+            delayed(self.evaluate_candidate)(
+                X,
+                grid[col_name],
+            )
+            for col_name in grid
+        )
+
+        results = pd.DataFrame(results)
+        results["col_name"] = grid.columns
+        best_idx = results["loss"].idxmin()
+        best_colname = results["col_name"].iloc[best_idx]
+        self.bet_predictor = self._fit_estimator(X, grid[best_colname])
+        return self
+
+    def evaluate_candidate(self, X, lambda_vec):
+        current_estimator = self._fit_estimator(X, lambda_vec)
+
+        def predict_fn(X: Any) -> Any:
+            return current_estimator.predict(X)
+
+        objective = self.objective.gamma(predict_fn).iloc[0]
+        gamma = self.constraint.gamma(predict_fn)
+        loss = (1 - self.constraint_weight) * objective + self.constraint_weight * gamma.max()
+        return {"loss": loss, "lambda_vec": lambda_vec}
+
+    def _load_data(self, X: Any, y: Any, sensitive_features: Any):
         self.constraint.load_data(X, y, sensitive_features)
         self.objective.load_data(X, y, sensitive_features)
 
+    def _generate_grid(self) -> Any:
         neg_allowed = self.constraint.neg_basis_present
         objective_in_the_span = self.constraint.default_objective_lambda_vec is not None
 
-        self.generator = GridGenerator(
+        generator = GridGenerator(
             grid_size=self.grid_size,
             grid_limit=self.grid_limit,
             neg_allowed=neg_allowed,
             force_L1_norm=objective_in_the_span,
         )
 
-        grid = self.generator.generate_grid(self.constraint)
-        self.monitor.total_steps = grid.shape[1]
-        for col_name in grid:
-            lambda_vec = grid[col_name]
+        return generator.generate_grid(self.constraint)
 
-            weights = self.constraint.signed_weights(lambda_vec)
-            if not objective_in_the_span:
-                weights += self.objective.signed_weights()
+    def _fit_estimator(self, X: Any, lambda_vec: Any):
+        weights = self._compute_weights(lambda_vec)
+        y_reduction, weights = self._get_reduction(weights)
+        current_estimator = copy.deepcopy(self.estimator)
+        current_estimator.fit(X, y_reduction, sample_weight=weights)
+        return current_estimator
 
-            if self.constraint.PROBLEM_TYPE == "classification":
-                y_reduction = 1 * (weights > 0)
-                weights = weights.abs()
-            else:
-                y_reduction = self.constraint.y_as_series
+    def _compute_weights(self, lambda_vec: Any) -> Any:
+        weights = self.constraint.signed_weights(lambda_vec)
+        if not self.constraint.default_objective_lambda_vec:
+            weights += self.objective.signed_weights()
+        return weights
 
-            current_estimator = copy.deepcopy(self.estimator)
-            current_estimator.fit(X, y_reduction, sample_weight=weights)
+    def _get_reduction(self, weights: Any) -> tuple:
+        if self.constraint.PROBLEM_TYPE == "classification":
+            y_reduction = 1 * (weights > 0)
+            weights = weights.abs()
+        else:
+            y_reduction = self.constraint.y_as_series
+        return y_reduction, weights
 
-            def predict_fn(X):
-                return current_estimator.predict(X)
+    def predict(self, X: Any) -> Any:
+        return self.bet_predictor.predict(X)
 
-            objective_ = self.objective.gamma(predict_fn)[0]
-            gamma_ = self.constraint.gamma(predict_fn)
-
-            self.monitor.save(lambda_vec, current_estimator, objective_, gamma_)
-            self.monitor.log_progress()
-
-        self.best_idx_ = self.monitor.get_best_idx()
-
-        return self
-
-    def predict(self, X):
-        return self.monitor.predictors_[self.best_idx_].predict(X)
-
-    def predict_proba(self, X):
-        return self.monitor.predictors_[self.best_idx_].predict_proba(X)
-
-
-class Monitor:
-    """Monitor class used to store historical data"""
-
-    def __init__(self, constraint_weight, verbose):
-        self.predictors_ = []
-        self.lambda_vecs_ = []
-        self.objectives_ = []
-        self.gammas_ = []
-        self.losses = []
-        self.constraint_weight = float(constraint_weight)
-        self.objective_weight = 1.0 - constraint_weight
-        self.verbose = verbose
-        self.total_steps = 0
-        self.step = 0
-
-    def loss_fct(self, objective, gamma):
-        return self.objective_weight * objective + self.constraint_weight * gamma.max()
-
-    def save(self, lambda_vec, current_estimator, objective, gamma):
-        self.predictors_.append(current_estimator)
-        self.losses.append(self.loss_fct(objective, gamma))
-        self.objectives_.append(objective)
-        self.gammas_.append(gamma)
-        self.lambda_vecs_.append(lambda_vec)
-
-    def get_best_idx(self):
-        return self.losses.index(min(self.losses))
-
-    def log_progress(self):
-        self.step += 1
-        if self.verbose:
-            sys.stdout.write(f"\r{self.step}/{self.total_steps}\tloss (best):{min(self.losses):.4f}")
-            sys.stdout.flush()
+    def predict_proba(self, X: Any) -> Any:
+        return self.bet_predictor.predict_proba(X)

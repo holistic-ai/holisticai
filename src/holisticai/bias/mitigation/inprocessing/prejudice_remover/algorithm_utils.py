@@ -1,3 +1,4 @@
+import numpy as np
 from holisticai.bias.mitigation.inprocessing.commons import Logging
 
 
@@ -30,7 +31,7 @@ class ObjectiveFunction:
         loss : float
             loss function value
         """
-        coef = coef_.reshape(self.estimator.nb_group_values, self.estimator.nb_features)
+        coef = coef_.reshape(self.estimator.nb_group_values, self.estimator.nb_features).astype(np.float64)
         X = self.estimator.preprocessing_data(X)
         sigma = self.estimator.sigmoid(X=X, groups=groups, coef=coef)
         loss = self.loss_fn(y=y, sigma=sigma, groups=groups, coef=coef)
@@ -53,7 +54,7 @@ class ObjectiveFunction:
             first derivative of loss function
         """
 
-        coef = coef_.reshape(self.estimator.nb_group_values, self.estimator.nb_features)
+        coef = coef_.reshape(self.estimator.nb_group_values, self.estimator.nb_features).astype(np.float64)
         X = self.estimator.preprocessing_data(X)
         sigma = self.estimator.sigmoid(X=X, groups=groups, coef=coef)
         return self.loss_fn.gradient(X=X, y=y, sigma=sigma, groups=groups, coef=coef)

@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from holisticai.utils.obj_rep.datasets import generate_html
+from holisticai.utils.obj_rep.object_repr import generate_html_for_generic_object
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
 import numpy as np
+from numpy.random import RandomState
 
 
 class DatasetDict(dict):
@@ -19,7 +20,7 @@ class DatasetDict(dict):
 
     Parameters:
     -----------
-    **datasets : dict
+    datasets : dict
         A dictionary containing the datasets, where the keys are the names of the datasets and the values are the datasets themselves.
 
     Methods:
@@ -40,14 +41,18 @@ class DatasetDict(dict):
         return f"DatasetDict({{\n    {datasets_repr}\n}})"
 
     def _repr_html_(self):
-        dataset_info = []
+        nested_objs = []
         for name, dataset in self.datasets.items():
-            dataset_info.append(
-                {"type": "Dataset", "name": name, "features": dataset.features, "num_rows": dataset.num_rows}
+            nested_objs.append(
+                {
+                    "dtype": "Dataset",
+                    "name": name,
+                    "attributes": {"Number of Rows": dataset.num_rows, "Features": dataset.features},
+                }
             )
-
-        datasetdict_info = {"DatasetDict": dataset_info}
-        return generate_html(datasetdict_info)
+        # Example usage
+        obj = {"dtype": "DatasetDict", "attributes": {}, "nested_objects": nested_objs}
+        return generate_html_for_generic_object(obj, feature_columns=5)
 
 
 class GroupByDataset:
@@ -96,11 +101,13 @@ class GroupByDataset:
         for group_name, groupby_obj_batch in self.groupby_obj:
             yield group_name, Dataset(groupby_obj_batch)
 
-    def __repr_info(self):
-        """Returns a dictionary containing the information about the GroupByDataset."""
-        return {
-            "GroupByDataset": {"grouped_names": self.grouped_names, "features": self.features, "ngroups": self.ngroups}
-        }
+    def count(self):
+        dss = []
+        for group_name, groupby_obj_batch in self.groupby_obj:
+            data = dict(zip(self.grouped_names, group_name))
+            data["group_size"] = len(groupby_obj_batch)
+            dss.append(data)
+        return pd.DataFrame(dss)
 
     def __repr__(self):
         """Returns a string representation of the GroupByDataset."""
@@ -114,8 +121,15 @@ class GroupByDataset:
 
     def _repr_html_(self):
         """Returns an HTML representation of the GroupByDataset."""
-        dataset_info = self.__repr_info()
-        return generate_html(dataset_info)
+        obj = {
+            "dtype": "GroupByDataset",
+            "attributes": {
+                "count": self.ngroups,
+                "grouped_names": self.grouped_names,
+                "Features": [" , ".join(self.features)],
+            },
+        }
+        return generate_html_for_generic_object(obj, feature_columns=5)
 
 
 def dataframe_to_level_dict_with_series(df, row_index):
@@ -147,6 +161,63 @@ def dataframe_to_level_dict_with_series(df, row_index):
     return data
 
 
+class DataLoader:
+    def __init__(self, dataset, batch_size, dtype):
+        self.batch_size = batch_size
+        self.dataset = dataset
+        self.dtype = dtype
+        self.num_batches = int(np.ceil(len(dataset) / batch_size))
+
+    def batched(self):
+        def batch_generator(batch_size):
+            for i in range(self.num_batches):
+                batch = Dataset(self.dataset.data.iloc[i * batch_size : (i + 1) * batch_size])
+                yield batch
+
+        if self.dtype == "jax":
+            import jax.numpy as jnp
+
+            def batch_generator_jax(batch_size):
+                for batch in batch_generator(batch_size):
+                    yield {f: jnp.array(batch[f].values) for f in batch.features}
+
+            return batch_generator_jax(self.batch_size)
+
+        if self.dtype == "pandas":
+
+            def batch_generator_pandas(batch_size):
+                for batch in batch_generator(batch_size):
+                    yield {f: batch[f] for f in batch.features}
+
+            return batch_generator_pandas(self.batch_size)
+
+        if self.dtype == "numpy":
+
+            def batch_generator_numpy(batch_size):
+                for batch in batch_generator(batch_size):
+                    yield {f: batch[f].values for f in batch.features}
+
+            return batch_generator_numpy(self.batch_size)
+        return batch_generator(self.batch_size)
+
+    def __iter__(self):
+        """Iterates over the batches in the dataset."""
+        yield from self.batched()
+
+    def _repr_html_(self):
+        obj = {
+            "dtype": "DataLoader",
+            "attributes": {"Number of Batches": self.num_batches, "Batch Size": self.batch_size, "Type": self.dtype},
+            "nested_objects": [
+                {
+                    "dtype": "Dataset",
+                    "attributes": {"Number of Rows": self.dataset.num_rows, "Features": self.dataset.features},
+                }
+            ],
+        }
+        return generate_html_for_generic_object(obj, feature_columns=5)
+
+
 class Dataset:
     """Represents a dataset.
 
@@ -172,8 +243,8 @@ class Dataset:
         features_counts = features_values.value_counts()
         self.features_is_series = {key: (value == 1) for key, value in features_counts.items()}
 
-    def __init__(self, data: pd.DataFrame | None = None, **kargs):
-        if data is None:
+    def __init__(self, _data: pd.DataFrame | None = None, **kargs):
+        if _data is None:
             self.data = {}
             for name, value in kargs.items():
                 if isinstance(value, pd.DataFrame):
@@ -187,9 +258,13 @@ class Dataset:
             self.data.columns = self.data.columns.set_names(["features", "subfeatures"])
             self.data.reset_index(drop=True)
         else:
-            self.data = data.reset_index(drop=True)
+            self.data = _data.reset_index(drop=True)
         self.__update_metadata()
         self.random_state = np.random.RandomState()
+
+    def remove_columns(self, columns: str | list):
+        """Returns a new dataset with the given columns removed."""
+        return Dataset(self.data.drop(columns, level=0, axis=1))
 
     def rename(self, renames):
         """Returns a new dataset with renamed columns."""
@@ -289,8 +364,11 @@ class Dataset:
         return {"Dataset": {"features": self.features, "num_rows": self.num_rows}}
 
     def _repr_html_(self):
-        dataset_info = self.__repr_info()
-        return generate_html(dataset_info)
+        obj = {
+            "dtype": "Dataset",
+            "attributes": {"Number of Rows": self.num_rows, "Features": [" , ".join(self.features)]},
+        }
+        return generate_html_for_generic_object(obj, feature_columns=5)
 
     def __getitem__(self, key: str | int | list):
         """Returns a subset of the dataset based on the given key."""
@@ -342,7 +420,7 @@ def apply_fn_to_multilevel_df(df, fn):
     return result_df
 
 
-def sample_n(group, n, random_state=None):
+def sample_n(group: pd.DataFrame, n: int, random_state: Union[RandomState, None] = None) -> pd.DataFrame:
     if len(group) < n:
         return group
     return group.sample(n=n, replace=False, random_state=random_state)

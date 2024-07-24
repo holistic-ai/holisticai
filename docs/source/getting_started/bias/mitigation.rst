@@ -1,10 +1,15 @@
-Bias Mitigation Methods
-========================
+=======
+Mitigation
+==========
 
-Bias in AI systems can lead to systematic disadvantages for certain individuals or groups. To address and reduce these biases, several mitigation methods can be employed throughout the development process, from data generation to model deployment. This document outlines various techniques and strategies for mitigating bias in AI systems.
+.. warning::
+
+   This page is currently under construction. Please check back later for updates.
 
 .. note::
     Bias mitigation can be approached through **pre-processing**, **in-processing**, and **post-processing** methods.
+
+Bias in AI systems can lead to systematic disadvantages for certain individuals or groups. To address and reduce these biases, several mitigation methods can be employed throughout the development process, from data generation to model deployment. This document outlines various techniques and strategies for mitigating bias in AI systems.
 
 **Pre-processing Methods**
 
@@ -33,6 +38,7 @@ Post-processing techniques adjust the predictions of the trained model to mitiga
 
     .. toctree::
         :maxdepth: 1
+
 
         methods/preprocessing
         methods/inprocessing

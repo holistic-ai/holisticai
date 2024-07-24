@@ -10,11 +10,22 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class LPDebiaserMulticlass(BMPost):
     """
-    Linear Programming Debiaser is a postprocessing algorithms designed to debias pretrained classifiers.
-    The algorithm use constraints such as Equalized Odds and Equalized Opportunity.
+    Linear Programming Debiaser is a postprocessing algorithms designed to debias pretrained classifiers.\
+    The algorithm use constraints such as Equalized Odds and Equalized Opportunity.\
     This technique extends LPDebiaserBinary for multiclass classification.
-    References:
-        Putzel, Preston, and Scott Lee. "Blackbox Post-Processing for Multiclass Fairness."
+
+    Parameters
+    ----------
+    constraint : str
+        Strategy used to evalute the cost function  The available contraints  are:\
+        "EqualizedOdds", "EqualizedOpportunity"
+
+    loss : str
+        The loss function to optimize: "macro", "micro". The default is "macro"
+
+    References
+    ----------
+        .. [1] Putzel, Preston, and Scott Lee. "Blackbox Post-Processing for Multiclass Fairness."\
         arXiv preprint arXiv:2201.04461 (2022).
     """
 
@@ -26,27 +37,9 @@ class LPDebiaserMulticlass(BMPost):
         constraint: CONSTRAINT = "EqualizedOdds",
         loss: OBJ_FUN = "macro",
     ):
-        """
-        Parameters
-        ----------
-        constraint : str
-            Strategy used to evalute the cost function  The available contraints  are:
-            [
-                "EqualizedOdds",
-                "EqualizedOpportunity"
-            ]
-
-        loss : str
-            The loss function to optimize:
-            [
-                "macro",
-                "micro"
-            ],
-            default "macro"
-        """
         self.constraint = constraint
         self.loss = loss
-        self.sens_groups = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def fit(
         self,
@@ -56,12 +49,10 @@ class LPDebiaserMulticlass(BMPost):
         group_b: np.ndarray,
     ):
         """
+        Compute parameters for Linear Programming Debiaser.\
+        For binary classification y_pred or y_proba can be used.\
+        For Multiclass classification only y_pred must be used.\
 
-        Description
-        ----------
-        Compute parameters for Linear Programming Debiaser.
-        For binary classification y_pred or y_proba can be used.
-        For Multiclass classification only y_pred must be used.
         Parameters
         ----------
         y : array-like
@@ -72,6 +63,7 @@ class LPDebiaserMulticlass(BMPost):
             Group membership vector (binary)
         group_b : array-like
             Group membership vector (binary)
+
         Returns
         -------
         Self
@@ -84,7 +76,7 @@ class LPDebiaserMulticlass(BMPost):
         y_pred = params["y_pred"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        p_attr = self.sens_groups.fit_transform(sensitive_features, convert_numeric=True)
+        p_attr = self._sensgroups.fit_transform(sensitive_features, convert_numeric=True)
 
         constraints_catalog, objective_catalog = self._get_catalogs()
 
@@ -109,7 +101,7 @@ class LPDebiaserMulticlass(BMPost):
         Parameters
         ----------
         y_pred : array-like
-            Predicted vector (nb_examlpes,)
+            Predicted vector (nb_examples,)
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
@@ -117,7 +109,8 @@ class LPDebiaserMulticlass(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionnary with new predictions
         """
 
         params = self._load_data(y_pred=y_pred, group_a=group_a, group_b=group_b)
@@ -127,7 +120,7 @@ class LPDebiaserMulticlass(BMPost):
         y_pred = params["y_pred"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1)
-        p_attr = self.sens_groups.transform(sensitive_features, convert_numeric=True)
+        p_attr = self._sensgroups.transform(sensitive_features, convert_numeric=True)
         new_y_pred = self.algorithm.predict(y_pred=y_pred, p_attr=p_attr)
         return {"y_pred": new_y_pred}
 
@@ -146,7 +139,7 @@ class LPDebiaserMulticlass(BMPost):
         y : array-like
             Target vector
         y_pred : array-like
-            Predicted vector (nb_examlpes,)
+            Predicted vector (nb_examples,)
         group_a : array-like
             Group membership vector (binary)
         group_b : array-like
@@ -154,7 +147,8 @@ class LPDebiaserMulticlass(BMPost):
 
         Returns
         -------
-        dictionnary with new predictions
+        dict
+            A dictionnary with new predictions
         """
         return self.fit(
             y=y,

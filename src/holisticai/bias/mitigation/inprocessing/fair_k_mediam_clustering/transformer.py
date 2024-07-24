@@ -12,41 +12,34 @@ from sklearn.base import BaseEstimator
 class FairKMedianClustering(BaseEstimator, BMImp):
     """Fair K-Median Clustering
 
-    Fair K-median clustering inprocessing bias mitigation is an approximation algorithms for
-    group representative k-median clustering. Implementation of Algorithm 2. from [1]. The
-    algorithm reduces the max group cost function.
+    Fair K-median clustering inprocessing bias mitigation is an approximation algorithm for\
+    group representative k-median clustering. The fair k-median method addresses fairness in clustering \
+    by ensuring equitable representation across different demographic groups. It involves bundling, \
+    matching and sampling. This method aims to minimize bias and provide fair clustering solutions.
 
     Parameters
     ----------
-        n_clusters: int
+        n_clusters : int
             number of clusters.
 
-        max_iter: int
+        max_iter : int
             Max number of iteration for LS or epochs for GA.
 
-        strategy: str
+        strategy : str
             Minimization method used. Available:
             - LS (Local Search).
             - GA (Genetic Algorithm)
 
-        verbose: int
+        verbose : int
             if > 0 , print progress information.
 
-        seed: int
+        seed : int
             random seed.
 
-        algorithm: KMediamClusteringAlgorithm
-            Algorithm used to fit the model.
-
-    Methods
-    -------
-        fit(X, group_a, group_b)
-            Fit model using Fair K-median Clustering.
-
-    Reference:
+    References
     ----------
-        [1] Abbasi, Mohsen, Aditya Bhaskara, and Suresh Venkatasubramanian. "Fair clustering via
-        equitable group representations." Proceedings of the 2021 ACM Conference on Fairness,
+        .. [1] Abbasi, Mohsen, Aditya Bhaskara, and Suresh Venkatasubramanian. "Fair clustering via\
+        equitable group representations." Proceedings of the 2021 ACM Conference on Fairness,\
         Accountability, and Transparency. 2021.
     """
 
@@ -63,7 +56,7 @@ class FairKMedianClustering(BaseEstimator, BMImp):
         self.verbose = verbose
         self.seed = seed
         self.strategy = strategy
-        self.sensgroup = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
         self.algorithm = KMediamClusteringAlgorithm(
             n_clusters=n_clusters, max_iter=max_iter, strategy=strategy, verbose=verbose
         )
@@ -93,7 +86,7 @@ class FairKMedianClustering(BaseEstimator, BMImp):
         group_b = params["group_b"]
 
         sensitive_groups = np.c_[group_a, group_b]
-        p_attr = np.array(self.sensgroup.fit_transform(sensitive_groups, convert_numeric=True))
+        p_attr = np.array(self._sensgroups.fit_transform(sensitive_groups, convert_numeric=True))
 
         self.algorithm.fit(X, p_attr)
         return self

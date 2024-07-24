@@ -34,7 +34,7 @@ dependencies = [
 
 [project.optional-dependencies]
 bias_metrics = ["scikit-learn>=1.0.2", "pandas>=1.1.5", "numpy>=1.19.5"]
-bias_mitigation = ["networkx>=3.1", "pandas>=1.1.5", "numpy>=1.19.5","pygad==3.3.1",]
+bias_mitigation = ["networkx>=3.1", "pandas>=1.1.5", "numpy>=1.19.5","pygad==3.3.1", "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
 xai_metrics = ["lime>=0.2.0.1", "shap>=0.42.1"]
 all = ["scikit-learn>=1.0.2", "pandas>=1.1.5", "numpy>=1.19.5", "networkx>=3.1", "pygad==3.3.1", "lime>=0.2.0.1", "shap>=0.42.1"]
 
@@ -69,6 +69,7 @@ exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/utils/trade_of
 [tool.hatch.envs.sphinx]
 inherit = ["all"]
 dependencies = [
+  "scikit-learn>=1.0.2", 
   "cvxpy",
   "sphinx",
   "pydata-sphinx-theme",
@@ -82,7 +83,11 @@ dependencies = [
   "pandas",
   "numpy==1.26",
   "pybind11>=2.12",
-  "pydantic"
+  "pydantic",
+  "jax",
+  "jaxopt",
+  "optax",
+  "flax"
 ]
 
 [tool.hatch.envs.sphinx.scripts]
@@ -106,7 +111,11 @@ dependencies = [
   "shap>=0.42.1",
   "ipykernel>=6.25.2",
   "ruff",
-  "pydantic"
+  "pydantic",
+  "jax",
+  "jaxopt",
+  "optax",
+  "flax"
 ]
 env-vars = { PYTHONPATH = "src" }
 

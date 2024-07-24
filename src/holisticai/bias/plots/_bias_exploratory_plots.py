@@ -57,6 +57,10 @@ def group_pie_plot(y_feat, ax=None, size=None, title=None):
             fig.suptitle(title)
         else:
             fig.suptitle("Group proportions")
+    elif title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Group proportions")
 
     # chart
     colors = get_colors(len(value_counts), extended_colors=True)
@@ -220,22 +224,17 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
     matplotlib ax
     """
     # setup
-    sns.set()
+    sns.set_theme()
     if ax is None:
         fig, ax = plt.subplots(figsize=size)
-        if title is not None:
-            fig.suptitle(title)
-        else:
-            fig.suptitle("Histogram Plot")
 
-    colors = get_colors(len(np.unique(p_attr)))
-    hai_palette = sns.color_palette(colors)
-
-    if p_attr is None:
-        hai_color = hai_palette[0]
-        hai_palette = None
-    else:
+    if p_attr is not None:
+        colors = get_colors(len(np.unique(p_attr)))
+        hai_palette = sns.color_palette(colors)
         hai_color = None
+    else:
+        hai_palette = None
+        hai_color = sns.color_palette("husl", 1)[0]
 
     # charting
     sns.histplot(
@@ -248,8 +247,14 @@ def histogram_plot(y_feat, p_attr=None, ax=None, size=None, title=None):
         common_norm=False,
         ax=ax,
     )
-    _, labels = plt.xticks()
-    plt.setp(labels, rotation=45)
 
-    # return
+    # Set x-ticks to be the indices of the classes
+    ax.set_xticks(range(len(np.unique(y_feat))))
+    ax.set_xticklabels(np.unique(y_feat), rotation=45)
+
+    if title is not None:
+        ax.set_title(title)
+    else:
+        ax.set_title("Histogram Plot")
+
     return ax

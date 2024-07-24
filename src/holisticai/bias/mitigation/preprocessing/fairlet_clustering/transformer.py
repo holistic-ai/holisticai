@@ -43,26 +43,6 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
     seed : int, optional
         Random seed. Default is None.
 
-    Attributes
-    ----------
-    decomposition : DecompositionMixin
-        Fairlet decomposition strategy
-    mapping : matrix-like, optional
-        Mapping of the fairlets
-    centers : matrix-like, optional
-        Fairlet centers
-    X : matrix-like
-        Input matrix
-    sample_weight : matrix-like
-        Samples weights vector
-
-    Methods
-    -------
-    fit_transform(X, group_a, group_b, sample_weight)
-        Fit the model
-    transform(X)
-        Transform the model
-
     References
     ----------
     .. [1] `Backurs, Arturs, et al. "Scalable fair clustering." International Conference on
@@ -126,7 +106,7 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
             mapping[fairlet] = i
             sample_weight[fairlet] = len(fairlet) / len(x)
 
-        self.update_estimator_param("sample_weight", sample_weight)
+        self._update_estimator_param("sample_weight", sample_weight)
         self.sample_weight = sample_weight
         self.X = x
         self.mapping = mapping

@@ -23,39 +23,34 @@ STRATEGIES_CATALOG = {
 class FairKCenterClustering(BaseEstimator, BMImp):
     """Fair K-Center Clustering
 
-    Fair K-Center Clustering inprocessing bias mitigation implements an approximation algorithm
-    for the k-centers problem under the fairness contraint with running time linear in the
+    Fair K-Center Clustering inprocessing bias mitigation implements an approximation algorithm\
+    for the k-centers problem under the fairness contraint with running time linear in the\
     size of the dataset and k (number of cluster).
 
     Parameters
     ----------
         req_nr_per_group : list
             Number of cluster for each group that will be founded.
+
             - Integer-vector of length m with entries in 0,...,k.
             - Sum of all entries must be equal to k (total number of clusters).
 
-        nr_initially_given: int
+        nr_initially_given : int
             Number of initial random centers.
 
-        strategy: Strategy used to compute the cluster centers. Available are:
+        strategy : str
+            Strategy used to compute the cluster centers. Available are:
+
             - 'Fair K-Center' (default)
             - 'Heuristic Greedy by Group'
             - 'Heuristic Greedy by Constraint'
 
-        seed: int,
+        seed : int,
             Initial random seed.
 
-    Methods
-    -------
-        fit(X, group_a, group_b)
-            Fit model using Fair K-Center Clustering.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
-
-    Reference
+    References
     ---------
-        [1] Kleindessner, Matthäus, Pranjal Awasthi, and Jamie Morgenstern. "Fair k-center clustering
+        .. [1] Kleindessner, Matthäus, Pranjal Awasthi, and Jamie Morgenstern. "Fair k-center clustering\
         for data summarization." International Conference on Machine Learning. PMLR, 2019.
     """
 
@@ -72,7 +67,7 @@ class FairKCenterClustering(BaseEstimator, BMImp):
         self.nr_initially_given = nr_initially_given
         self.strategy = strategy
         self.seed = seed
-        self.sensgroup = SensitiveGroups()
+        self._sensgroups = SensitiveGroups()
 
     def fit(self, X, group_a, group_b):
         """
@@ -99,7 +94,7 @@ class FairKCenterClustering(BaseEstimator, BMImp):
         group_b = params["group_b"]
 
         sensitive_groups = np.c_[group_a, group_b]
-        p_attr = np.array(self.sensgroup.fit_transform(sensitive_groups, convert_numeric=True))
+        p_attr = np.array(self._sensgroups.fit_transform(sensitive_groups, convert_numeric=True))
 
         n = len(X)
         dmat = pairwise_distances(X, metric="l1")
@@ -126,4 +121,17 @@ class FairKCenterClustering(BaseEstimator, BMImp):
         return np.concatenate([self.centers, self.initially_given], axis=0)
 
     def predict(self, X):
+        """
+        Predict the closest cluster each sample in X belongs to.
+
+        Parameters
+        ----------
+        X : matrix-like
+            Input matrix
+
+        Returns
+        -------
+        numpy array
+            A distance matrix between the samples and the clusters.
+        """
         return pairwise_distances(self.all_centroids, X, metric="l1").argmin(axis=0)

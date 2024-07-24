@@ -1,8 +1,8 @@
 .. _bias_api:
 
-=============
+====
 Bias
-=============
+====
 
 Bias in machine learning refers to unfair discrimination based on characteristics such as race, gender, age, or socioeconomic status. It is crucial to address bias for fairness, transparency, and accountability in AI systems.
 

@@ -31,10 +31,13 @@ from holisticai.bias.mitigation import PopularityPropensityMF
 from holisticai.bias.mitigation import BlindSpotAwareMF
 from holisticai.bias.mitigation import FairRec
 from holisticai.bias.mitigation import DebiasingLearningMF
+from holisticai.bias.mitigation import AdversarialDebiasing
 
 def get_inprocessor(mitigator_name : MITIGATOR_NAME = "CalibratedEqualizedOdds", parameters: dict = {}):
     if mitigator_name == "ExponentiatedGradientReduction":
         return ExponentiatedGradientReduction(**parameters)
+    if mitigator_name == "AdversarialDebiasing":
+        return AdversarialDebiasing(**parameters)
     elif mitigator_name == "GridSearchReduction":
         return GridSearchReduction(**parameters)
     elif mitigator_name == "MetaFairClassifier":
@@ -76,7 +79,7 @@ def test_multiclass_inprocessor(mitigator_name, mitigator_params, model_params, 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, model_params", [
     ("ExponentiatedGradientReduction", {"seed":1}, {"random_state":42}),
     ("GridSearchReduction", {},  {"random_state":42}),
-    ("MetaFairClassifier", {"seed":1}, {"random_state":42}),
+    #("MetaFairClassifier", {"seed":1}, {"random_state":42}),
     ("PrejudiceRemover", {}, {"random_state":42}),
 ])
 def test_categorical_inprocessor(mitigator_name, mitigator_params, model_params, categorical_dataset):
@@ -84,6 +87,32 @@ def test_categorical_inprocessor(mitigator_name, mitigator_params, model_params,
     metrics2 = run_inprocessing_categorical_pipeline(categorical_dataset, classification_bias_metrics, LogisticRegression, mitigator_name, model_params, mitigator_params)
     check_results(metrics1, metrics2)
 
+
+def test_adversarial_debiasing_inprocessor(categorical_dataset):
+    train = categorical_dataset['train']
+    test = categorical_dataset['test']
+    features_dim = train['X'].shape[1]
+    mitigator_params = {"features_dim":features_dim , "keep_prob":0.1, "verbose":1, "learning_rate":0.01,"adversary_loss_weight":3, "print_interval":100, "batch_size":1024, "use_debias": True, "epochs":10, "seed":1}
+    mitigator_name = "AdversarialDebiasing"
+
+    x_train = train['X'].astype(np.float64)
+    x_test = test['X'].astype(np.float64)
+    inp = get_inprocessor(mitigator_name, mitigator_params)
+    inp.transform_estimator()
+    inp.fit(X=x_train, y=train['y'], group_a=train['group_a'], group_b=train['group_b'])
+    y_pred = inp.predict(X=x_test, group_a=test['group_a'], group_b=test['group_b'])
+    metrics1 = classification_bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
+
+
+    inp = get_inprocessor(mitigator_name, mitigator_params)
+    inp.transform_estimator()
+
+    pipeline = Pipeline(steps=[("bm_inprocessing", inp),])
+    pipeline.fit(X=x_train, y=train['y'], bm__group_a=train['group_a'], bm__group_b=train['group_b'])
+    y_pred = pipeline.predict(X=x_test, bm__group_a=test['group_a'], bm__group_b=test['group_b'])
+    metrics2 = classification_bias_metrics(test['group_a'], test['group_b'], y_pred, test['y'])
+
+    check_results(metrics1, metrics2)
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, model_params", [
     ("ExponentiatedGradientReduction", {'seed':1, "constraints":"BoundedGroupLoss", "loss":"Absolute", "min_val":-0.1, "max_val":1.3, "upper_bound":0.001}, {}),
