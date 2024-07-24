@@ -1,0 +1,30 @@
+Preprocessing,Correlation Remover,X,X,X,,
+Preprocessing,Disparate Impact Remover,X,X,X,X,
+Preprocessing,Learning Fair Representation,X,,,,
+Preprocessing,Reweighing,X,X,,,
+Preprocessing,Fair Clustering,,,,X,
+Inprocessing,"Adversarial Debiasing ",X,,,,
+Inprocessing,Exponentiated Gradient,X,,X,,
+Inprocessing,Fair K Center Clustering,,,,X,
+Inprocessing,Fair K Median Clustering,,,,X,
+Inprocessing,Fair Scoring Classifier,,X,,,
+Inprocessing,Fairlet Clustering,,,,X,
+Inprocessing,Grid Search,X,,X,,
+Inprocessing,Debiasing Learning,,,,,X
+Inprocessing,Blind Spot Aware,,,,,X
+Inprocessing,Popularity Propensity,,,,,X
+Inprocessing,Meta Fair Classifier,X,,,,
+Inprocessing,Prejudice Remover,X,,,,
+Inprocessing,Two Sided Fairness,,,,,X
+Inprocessing,Variational Fair Clustering,,,,X,
+Postprocessing,Debiasing Exposure,,,,,X
+Postprocessing,Fair Top-K,,,,,X
+Postprocessing,LP Debiaser,X,X,,,
+Postprocessing,MCMF Clustering,,,,X,
+Postprocessing,ML Debiaser,X,X,,,
+Postprocessing,Plugin Estimator and Recalibration,,,X,,
+Postprocessing,Wasserstein Barycenters,,,X,,
+Postprocessing,Calibrated Equalized Odds,X,,,,
+Postprocessing,Equalized Odds,X,,,,
+Postprocessing,Reject Option Classification,X,,,,
+Postprocessing,Disparate Impact Remover for RS,,,,,X

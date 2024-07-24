@@ -47,6 +47,7 @@ def spread_ratio(feature_importance: Importances):
     Calculates the spread ratio of the given feature importance.
     The spread ratio measures the degree of evenness or concentration in the distribution of feature importance values.
     A higher spread ratio indicates a more evenly distributed feature importance, while a lower spread ratio indicates a more concentrated feature importance.
+    A lower ratio concentrates the importances and facilitates interpretability.
 
     Parameters
     ----------
@@ -58,8 +59,9 @@ def spread_ratio(feature_importance: Importances):
     float:
         The spread ratio of the feature importance.
 
-    Exemplo
-    -------
+    Examples
+    --------
+
     >>> from holisticai.explainability.commons import Importances
     >>> from holisticai.explainability.metrics.global_importance import spread_ratio
     >>> values = np.array([0.10, 0.20, 0.30])
@@ -75,11 +77,13 @@ def spread_ratio(feature_importance: Importances):
 
 def spread_divergence(feature_importance: Importances):
     """
-    Calculates the spread divergence metric for a given feature importance.
+    Calculates the spread divergence metric based on the inverse of the Jensen-Shannon distance
+    (square root of the Jensen-Shannon divergence), for a given feature importance.
+    A lower ratio concentrates the importances and facilitates interpretability.
 
     Parameters
     ----------
-    - feature_importance: Importances
+    feature_importance: Importances
         The feature importance values for the features.
 
     Returns
@@ -88,13 +92,15 @@ def spread_divergence(feature_importance: Importances):
 
     Example
     -------
+
     >>> from holisticai.explainability.commons import Importances
     >>> from holisticai.explainability.metrics.global_importance import (
     ...     spread_divergence,
     ... )
-    >>> values = np.array([0.10, 0.20, 0.30])
-    >>> feature_names = ["feature_1", "feature_2", "feature_3"]
-    >>> feature_importance = Importances(values=values, feature_names=feature_names)
+    >>> feature_importance = Importances(
+    ...     values=np.array([0.10, 0.20, 0.30]),
+    ...     feature_names=["feature_1", "feature_2", "feature_3"],
+    ... )
     >>> score = spread_divergence(feature_importance)
     0.8196393599933761
 
