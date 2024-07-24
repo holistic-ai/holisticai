@@ -24,6 +24,8 @@ class DataStability:
 def data_stability(local_feature_importance: LocalImportances):
     """
     Calculate the data stability score based on the local feature importances.
+    Data Stability measures the stability of the feature importance values across different instances.
+    Higher values indicate more stable feature importance values across instances.
 
     Parameters
     ----------
@@ -74,6 +76,8 @@ class FeatureStability:
 def feature_stability(local_feature_importance: LocalImportances):
     """
     Calculate the feature stability score based on the local feature importances.
+    Feature Stability measures the stability of the feature importance values across different features.
+    Higher values indicate more stable feature importance values across features.
 
     Parameters
     ----------

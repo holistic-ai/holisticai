@@ -56,7 +56,7 @@ class AlphaScore(BaseModel):
 
 def alpha_score(feature_importance: Importances, alpha: float = 0.8):
     """
-    Calculates the alpha importance score using the given feature importance and ranked feature importance.
+    Alpha Score calculates the proportion of features that account for the alpha percentage of the overall feature importance.
 
     Parameters
     ----------
@@ -70,13 +70,13 @@ def alpha_score(feature_importance: Importances, alpha: float = 0.8):
     Returns
     -------
     float
-        The alpha importance score.
+        The alpha importance score
 
     Examples
     --------
     >>> from holisticai.explainability.commons import Importance
     >>> from holisticai.explainability.metrics import alpha_score
-    >>> values = np.array([0.10, 0.20, 0.30])
+    >>> values = np.array([0.50, 0.30, 0.20])
     >>> feature_names = ["feature_1", "feature_2", "feature_3"]
     >>> feature_importance = Importance(values=values, feature_names=feature_names)
     >>> alpha_score(feature_importance)
