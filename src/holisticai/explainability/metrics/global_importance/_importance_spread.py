@@ -98,8 +98,8 @@ def spread_divergence(feature_importance: Importances):
     ...     spread_divergence,
     ... )
     >>> feature_importance = Importances(
-    ... values=np.array([0.10, 0.20, 0.30]), 
-    ... feature_names=["feature_1", "feature_2", "feature_3"]
+    ...     values=np.array([0.10, 0.20, 0.30]),
+    ...     feature_names=["feature_1", "feature_2", "feature_3"],
     ... )
     >>> score = spread_divergence(feature_importance)
     0.8196393599933761

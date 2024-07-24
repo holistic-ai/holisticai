@@ -45,19 +45,21 @@ def position_parity(conditional_feature_importance: ConditionalImportance, ranke
     ...     Importances,
     ... )
     >>> from holisticai.explainability.metrics import position_parity
-    >>> conditional_feature_importance = ConditionalImportance(values = {
-    ...     "group1": Importances(
-    ...         values=np.array([0.40, 0.35, 0.25]),
-    ...         feature_names=["feature_1", "feature_2", "feature_3"],
-    ...     ),
-    ...     "group2": Importances(
-    ...         values=np.array([0.50, 0.30, 0.20]),
-    ...         feature_names=["feature_3", "feature_2", "feature_1"],
-    ...     ),
-    ... })
+    >>> conditional_feature_importance = ConditionalImportance(
+    ...     values={
+    ...         "group1": Importances(
+    ...             values=np.array([0.40, 0.35, 0.25]),
+    ...             feature_names=["feature_1", "feature_2", "feature_3"],
+    ...         ),
+    ...         "group2": Importances(
+    ...             values=np.array([0.50, 0.30, 0.20]),
+    ...             feature_names=["feature_3", "feature_2", "feature_1"],
+    ...         ),
+    ...     }
+    ... )
     >>> ranked_feature_importance = Importances(
-    ...     values = np.array([0.50, 0.40, 0.10]),
-    ...     feature_names = ["feature_1", "feature_2", "feature_3"],
+    ...     values=np.array([0.50, 0.40, 0.10]),
+    ...     feature_names=["feature_1", "feature_2", "feature_3"],
     ... )
     >>> position_parity(conditional_feature_importance, ranked_feature_importance)
     0.6388888888888888

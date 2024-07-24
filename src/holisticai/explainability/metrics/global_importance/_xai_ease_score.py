@@ -172,7 +172,7 @@ def xai_ease_score(partial_dependence: PartialDependence, ranked_feature_importa
     Calculates the XAI Ease Score metric.
 
     This metric measures the ease of explaining a model's predictions using partial dependence plots
-    and ranked feature importance. The XAI Ease Score takes into account the similarity between regions 
+    and ranked feature importance. The XAI Ease Score takes into account the similarity between regions
     of the partial dependence plots of different features and assigns scores based on the similarity values.
 
     Parameters

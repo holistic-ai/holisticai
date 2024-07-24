@@ -57,16 +57,18 @@ def rank_alignment(conditional_feature_importance: ConditionalImportance, ranked
     ...     Importances,
     ... )
     >>> from holisticai.explainability.metrics import rank_alignment
-    >>> conditional_feature_importance = ConditionalImportance(values = {
-    ...     "0": Importances(
-    ...         values=[0.1, 0.2, 0.3, 0.4],
-    ...         feature_names=["feature_2", "feature_3", "feature_4"],
-    ...     ),
-    ...     "1": Importances(
-    ...         values=[0.4, 0.3, 0.2, 0.1],
-    ...         feature_names=["feature_1", "feature_2", "feature_3", "feature_4"],
-    ...     ),
-    ... })
+    >>> conditional_feature_importance = ConditionalImportance(
+    ...     values={
+    ...         "0": Importances(
+    ...             values=[0.1, 0.2, 0.3, 0.4],
+    ...             feature_names=["feature_2", "feature_3", "feature_4"],
+    ...         ),
+    ...         "1": Importances(
+    ...             values=[0.4, 0.3, 0.2, 0.1],
+    ...             feature_names=["feature_1", "feature_2", "feature_3", "feature_4"],
+    ...         ),
+    ...     }
+    ... )
     >>> ranked_feature_importance = Importances(
     ...     values=[0.5, 0.3, 0.2],
     ...     feature_names=["feature_1", "feature_2", "feature_3"],
