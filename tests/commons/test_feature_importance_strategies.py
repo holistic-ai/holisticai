@@ -22,7 +22,7 @@ def test_surrogate_feature_importance_call(input_data):
     from holisticai.utils import BinaryClassificationProxy
     proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=[0,1])
     fi_strategy = SurrogateFeatureImportanceCalculator(random_state=RandomState(42))
-    importance = fi_strategy.compute_importances(test, proxy=proxy)
+    importance = fi_strategy.compute_importances(test['X'], proxy=proxy)
     assert isinstance(importance, Importances)
     assert np.isclose(importance['capital-loss'], 0.37037037037037046, atol=5e-2)
     

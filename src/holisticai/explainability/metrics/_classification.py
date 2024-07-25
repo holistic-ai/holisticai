@@ -14,7 +14,7 @@ from holisticai.explainability.metrics.global_importance import (
 from holisticai.explainability.metrics.global_importance._surrogate import surrogate_accuracy_score
 from holisticai.explainability.metrics.local_importance import DataStability, FeatureStability
 from holisticai.utils import (
-    ConditionalImportance,
+    ConditionalImportances,
     Importances,
     LocalImportances,
     PartialDependence,
@@ -24,7 +24,7 @@ from holisticai.utils import (
 def classification_explainability_metrics(
     importances: Importances,
     partial_dependencies: PartialDependence,
-    conditional_importances: ConditionalImportance,
+    conditional_importances: ConditionalImportances,
     X: Union[pd.DataFrame, None] = None,
     y_pred: Union[pd.Series, None] = None,
     local_importances: Union[LocalImportances, None] = None,

@@ -23,10 +23,10 @@ def get_multiclass_features(model, test):
     from holisticai.utils.inspection import compute_partial_dependence
     
     proxy = MultiClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=model.classes_)
-    importances  = compute_permutation_feature_importance(X=test['X'], y=test['y'], proxy=proxy)
+    importances  = compute_permutation_feature_importance(proxy=proxy, X=test['X'], y=test['y'])
     ranked_importances = importances.top_alpha(0.8)
     partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
-    conditional_importances  = compute_permutation_feature_importance(X=test['X'], y=test['y'], proxy=proxy, conditional=True)
+    conditional_importances  = compute_permutation_feature_importance(proxy=proxy, X=test['X'], y=test['y'], conditional=True)
     return importances, ranked_importances, conditional_importances, partial_dependencies
 
 

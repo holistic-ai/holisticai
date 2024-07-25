@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.utils.parallel import Parallel, delayed
 
 from holisticai.datasets import Dataset
-from holisticai.utils._definitions import ConditionalImportance, Importances, ModelProxy
+from holisticai.utils._definitions import ConditionalImportances, Importances, ModelProxy
 from holisticai.utils.feature_importances import group_samples_by_learning_task
 
 metric_scores = {
@@ -21,14 +21,14 @@ metric_scores = {
 
 
 def compute_permutation_feature_importance(
+    proxy: ModelProxy,
     X: pd.DataFrame,
     y: pd.Series,
-    proxy: ModelProxy,
     n_repeats: int = 5,
     n_jobs: int = -1,
     random_state: Union[RandomState, int, None] = None,
     conditional: bool = False,
-) -> Union[Importances, ConditionalImportance]:
+) -> Union[Importances, ConditionalImportances]:
     pfi = PermutationFeatureImportanceCalculator(n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state)
     if conditional:
         sample_groups = group_samples_by_learning_task(y, proxy.learning_task)
@@ -36,7 +36,7 @@ def compute_permutation_feature_importance(
             group_name: pfi.compute_importances(Dataset(X=X.loc[indexes], y=y.loc[indexes]), proxy=proxy)
             for group_name, indexes in sample_groups.items()
         }
-        return ConditionalImportance(values=values)
+        return ConditionalImportances(values=values)
     return pfi.compute_importances(Dataset(X=X, y=y), proxy)
 
 
