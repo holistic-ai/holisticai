@@ -23,7 +23,13 @@ Below is a list of modules in ``holisticai``:
         :link: explainability/index.html
         :shadow: md
 
-        Metrics and many visualization tools for bias in various learning tasks.
+        Metrics and visualization tools for explainability in various learning tasks.
+
+    .. grid-item-card:: Security
+        :link: security/index.html
+        :shadow: md
+
+        Metrics and mitigation strategies for security in various learning tasks.
 
     .. grid-item-card:: Pipeline
         :link: pipeline.html

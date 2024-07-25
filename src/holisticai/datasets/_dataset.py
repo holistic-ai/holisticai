@@ -250,11 +250,11 @@ class Dataset:
                 if isinstance(value, pd.DataFrame):
                     self.data[name] = value.reset_index(drop=True)
                 elif isinstance(value, pd.Series):
-                    self.data[name] = pd.Series(value.reset_index(drop=True), name=name)
+                    self.data[name] = pd.Series(value.reset_index(drop=True), name=name).astype(value.dtype)
                 else:
                     msg = f"Variable '{name}' is of type {type(value)}, but only pd.DataFrame and pd.Series are supported."
                     raise TypeError(msg)
-            self.data = pd.concat(self.data.values(), axis=1, keys=self.data.keys())
+            self.data = pd.concat(self.data, axis=1)
             self.data.columns = self.data.columns.set_names(["features", "subfeatures"])
             self.data.reset_index(drop=True)
         else:
@@ -388,6 +388,26 @@ class Dataset:
             return subset
 
         raise NotImplementedError
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, str):
+            raise TypeError("Key must be a string.")
+
+        feature_exists = key in self.data.columns.levels[0]
+        existing_subfeatures = self.data[key].columns if feature_exists else []
+        if feature_exists:
+            self.data = self.data.drop(columns=key, level="features")
+
+        if isinstance(value, pd.DataFrame):
+            new_columns = pd.MultiIndex.from_product([[key], value.columns])
+            value.columns = new_columns
+            self.data = self.data.join(value)
+
+        if isinstance(value, pd.Series):
+            new_column = (key, value.name or len(existing_subfeatures))
+            self.data[new_column] = value
+
+        self.data.columns = self.data.columns.set_names(["features", "subfeatures"])
 
 
 def concatenate_datasets(part_datasets: list[Dataset]):

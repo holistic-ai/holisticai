@@ -1,8 +1,16 @@
-=======
+==========
 Mitigation
 ==========
 
 .. warning::
+
+   This page is currently under construction. Please check back later for updates.
+
+.. contents:: **Contents:**
+    :depth: 2
+
+Introduction
+------------
 
    This page is currently under construction. Please check back later for updates.
 

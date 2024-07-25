@@ -27,7 +27,7 @@ def convert_float_to_categorical(target, nb_classes, numeric_classes=True):
     y = target.copy()
     for i, c in enumerate(labels):
         y[(target.values >= v[i]) & (target.values < v[i + 1])] = c
-    return y.astype(np.int32)
+    return y.astype("category")
 
 
 def get_protected_values(df, protected_attribute, protected_value):
