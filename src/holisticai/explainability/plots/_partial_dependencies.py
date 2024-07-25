@@ -5,7 +5,11 @@ from holisticai.utils import Importances, PartialDependence
 
 
 def plot_partial_dependence(
-    partial_dependence: PartialDependence, ranked_feature_importance: Importances, subplots=(1, 1), figsize=None, class_idx=0
+    partial_dependence: PartialDependence,
+    ranked_feature_importance: Importances,
+    subplots=(1, 1),
+    figsize=None,
+    class_idx=0,
 ):
     """
     Plots the partial dependence of features on the predicted target.
