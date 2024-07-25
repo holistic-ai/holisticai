@@ -87,7 +87,7 @@ class SelectorsHandler:
         for sn, selector in selectors_by_importance.items():
             logger.info(f"Fitting selector {sn}")
             if importances is None:
-                importances = compute_permutation_feature_importance(X, y, self.proxy)
+                importances = compute_permutation_feature_importance(proxy=self.proxy, X=X, y=y)
             selector.fit(importances)
 
         self.selectors = {**selectors_by_data, **selectors_by_importance}

@@ -7,8 +7,7 @@ import pandas as pd
 from numpy.random import RandomState
 from sklearn.metrics import accuracy_score, mean_squared_error
 
-from holisticai.datasets import Dataset
-from holisticai.utils import ConditionalImportance, Importances, ModelProxy
+from holisticai.utils import ConditionalImportances, Importances, ModelProxy
 from holisticai.utils.feature_importances import group_samples_by_learning_task
 
 metric_scores = {
@@ -19,21 +18,24 @@ metric_scores = {
 
 
 def compute_surrogate_feature_importance(
-    X: pd.DataFrame,
-    y: pd.Series,
     proxy: ModelProxy,
+    X: pd.DataFrame,
+    y: Union[pd.Series, None] = None,
     random_state: Union[RandomState, int, None] = None,
     conditional: bool = False,
-) -> Union[Importances, ConditionalImportance]:
+) -> Union[Importances, ConditionalImportances]:
+    if conditional and y is None:
+        raise ValueError("y must be provided when conditional=True")
+
     pfi = SurrogateFeatureImportanceCalculator(random_state=random_state)
     if conditional:
         sample_groups = group_samples_by_learning_task(y, proxy.learning_task)
         values = {
-            group_name: pfi.compute_importances(Dataset(X=X.loc[indexes], y=y.loc[indexes]), proxy=proxy)
+            group_name: pfi.compute_importances(X=X.loc[indexes], proxy=proxy)
             for group_name, indexes in sample_groups.items()
         }
-        return ConditionalImportance(values=values)
-    return pfi.compute_importances(Dataset(X=X, y=y), proxy)
+        return ConditionalImportances(values=values)
+    return pfi.compute_importances(X=X, proxy=proxy)
 
 
 class SurrogateFeatureImportanceCalculator:
@@ -58,19 +60,18 @@ class SurrogateFeatureImportanceCalculator:
 
         raise ValueError("model_type must be either 'binary_classification', 'multi_classification' or 'regression'")
 
-    def compute_importances(self, dataset: Dataset, proxy: ModelProxy) -> Importances:
+    def compute_importances(self, X: pd.DataFrame, proxy: ModelProxy) -> Importances:
         """
         Compute surrogate feature importance for a given model type, model and input features.
 
-        Args:
-            model_type (str): The type of the model, either 'binary_classification' or 'regression'.
-            model (sklearn estimator): The model to compute surrogate feature importance for.
+        Parameters
+        ----------
             x (pandas.DataFrame): The input features.
+            proxy ModelProxy: The model proxy.
 
         Returns:
-            holisticai.explainability.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
+            holisticai.utils.feature_importance.SurrogateFeatureImportance: The surrogate feature importance.
         """
-        X = dataset["X"]
         y_pred = proxy.predict(X)
         surrogate = self.create_surrogate_model(X, y_pred, proxy.learning_task)
         feature_names = X.columns

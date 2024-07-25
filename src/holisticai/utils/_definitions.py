@@ -72,14 +72,14 @@ class Importances(BaseModel):
     def __len__(self):
         return len(self.feature_names)
 
-    def top_alpha(self, alpha=0.8):
+    def top_alpha(self, alpha=0.8) -> Importances:
         feature_weight = self.values / self.values.sum()
         accum_feature_weight = feature_weight.cumsum()
         threshold = max(accum_feature_weight.min(), alpha)
         return self[accum_feature_weight <= threshold]
 
 
-class ConditionalImportance(BaseModel):
+class ConditionalImportances(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     values: dict[str, Importances]
 
@@ -110,7 +110,7 @@ class LocalImportances:
             group_name: LocalImportances(data=group_data["DataFrame"])
             for group_name, group_data in self.data.groupby(("Serie", "condition"))
         }
-        return LocalConditionalImportance(values=values)
+        return LocalConditionalImportances(values=values)
 
     @property
     def feature_names(self):
@@ -123,13 +123,13 @@ class LocalImportances:
         return Importances(values=fip["values"].values, feature_names=fip["feature_names"].tolist())
 
 
-class LocalConditionalImportance:
+class LocalConditionalImportances:
     def __init__(self, values: dict[str, LocalImportances]):
         self.values = values
 
     def to_global(self):
         values = {group_name: lfi.to_global() for group_name, lfi in self.values.items()}
-        return ConditionalImportance(values=values)
+        return ConditionalImportances(values=values)
 
     @property
     def feature_names(self):

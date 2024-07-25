@@ -28,10 +28,10 @@ def get_classification_features(model, test, strategy):
     
     
     proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=model.classes_)
-    importances  = compute_feature_importance(X=test['X'], y=test['y'], proxy=proxy)
+    importances  = compute_feature_importance(proxy=proxy, X=test['X'], y=test['y'])
     ranked_importances = importances.top_alpha(0.8)
     partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
-    conditional_importances  = compute_feature_importance(X=test['X'], y=test['y'], proxy=proxy, conditional=True)
+    conditional_importances  = compute_feature_importance(proxy=proxy, X=test['X'], y=test['y'], conditional=True)
     return proxy, importances, ranked_importances, conditional_importances, partial_dependencies
 
 
@@ -70,7 +70,7 @@ def test_xai_classification_metrics_separated(input_data):
 
 def test_rank_alignment():
     from holisticai.explainability.metrics import rank_alignment
-    from holisticai.utils import ConditionalImportance, Importances
+    from holisticai.utils import ConditionalImportances, Importances
 
     values = {
         '0': Importances(values=[0.1, 0.2, 0.3, 0.4], 
@@ -78,14 +78,14 @@ def test_rank_alignment():
         '1': Importances(values=[0.4, 0.3, 0.2, 0.1], 
                          feature_names=['feature_1', 'feature_2', 'feature_3', 'feature_4'])
     }
-    conditional_feature_importance = ConditionalImportance(values=values)
+    conditional_feature_importance = ConditionalImportances(values=values)
 
     ranked_feature_importance = Importances(values=[0.5, 0.3, 0.2], feature_names=['feature_1', 'feature_2', 'feature_3'])
     score = rank_alignment(conditional_feature_importance, ranked_feature_importance)
     assert np.isclose(score,0.6944444444444444)
 
 def test_position_parity():
-    from holisticai.utils import ConditionalImportance, Importances
+    from holisticai.utils import ConditionalImportances, Importances
     from holisticai.explainability.metrics import position_parity
     import numpy as np
 
@@ -99,7 +99,7 @@ def test_position_parity():
     "group2": Importances(values=np.array([0.50, 0.30, 0.20]),
                            feature_names=["feature_3", "feature_2", "feature_1"]),
     }
-    conditional_feature_importance = ConditionalImportance(values=values)
+    conditional_feature_importance = ConditionalImportances(values=values)
     score = position_parity(conditional_feature_importance, feature_importance)
     assert np.isclose(score,0.6388888888888888)
 
