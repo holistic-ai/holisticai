@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-# AI privacy toolkit
-# Abigail Goldsteen, Ola Saadi, Ron Shmelkin, Shlomit Shachor, Natalia Razinkov, "AI privacy toolkit", SoftwareX, Volume 22, 2023, 101352, ISSN 2352-7110
-# Retrieved from https://www.softxjournal.com/article/S2352-7110(23)00048-1/fulltext
-# GitHub Repository: https://github.com/IBM/ai-privacy-toolkit
 from collections import Counter
 from typing import Optional, Union
 
@@ -17,10 +13,39 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 
 class Anonymize:
-    """
+    """Anonymize
     Class for performing tailored, model-guided anonymization of training datasets for ML models.
 
-    References:
+    Parameters
+    ----------
+    k : int
+        The privacy parameter that determines the number of records that will be indistinguishable from each
+        other (when looking at the quasi identifiers). Should be at least 2.
+
+    quasi_identifiers :  np.ndarray or list of strings or integers.
+        The features that need to be minimized in case of pandas data, and indexes of features
+        in case of numpy data.
+
+    quasi_identifer_slices: list of lists of strings or integers.
+        If some of the quasi-identifiers represent 1-hot encoded features that need to remain
+        consistent after anonymization, provide a list containing the list of column names
+        or indexes that represent a single feature.
+
+    categorical_features : list
+        The list of categorical features (if supplied, these featurtes will be one-hot encoded
+        before using them to train the decision tree model).
+
+    is_regression : bool
+        Whether the model is a regression model or not (if False, assumes a classification model).
+        Default is False.
+
+    train_only_QI : bool
+        The required method to train data set for anonymization. Default is
+        to train the tree on all features.
+
+
+    References
+    ----------
 
     Goldsteen, Abigail, Gilad Ezov, Ron Shmelkin, Micha Moffie, and Ariel Farkash. "Anonymizing machine learning models."
     In International Workshop on Data Privacy Management, pp. 121-136. Cham: Springer International Publishing, 2021.
@@ -38,38 +63,6 @@ class Anonymize:
         is_regression: Optional[bool] = False,
         train_only_QI: Optional[bool] = False,
     ):
-        """
-        Parameters
-        ----------
-        k : int
-            The privacy parameter that determines the number of records that will be indistinguishable from each
-            other (when looking at the quasi identifiers). Should be at least 2.
-
-        quasi_identifiers :  np.ndarray or list of strings or integers.
-            The features that need to be minimized in case of pandas data, and indexes of features
-            in case of numpy data.
-
-        quasi_identifer_slices: list of lists of strings or integers.
-            If some of the quasi-identifiers represent 1-hot encoded features that need to remain
-            consistent after anonymization, provide a list containing the list of column names
-            or indexes that represent a single feature.
-
-        categorical_features : list
-            The list of categorical features (if supplied, these featurtes will be one-hot encoded
-            before using them to train the decision tree model).
-
-        is_regression : bool
-            Whether the model is a regression model or not (if False, assumes a classification model).
-            Default is False.
-
-        train_only_QI : bool
-            The required method to train data set for anonymization. Default is
-            to train the tree on all features.
-
-        Return
-        ------
-        self
-        """
         if k < 2:
             raise ValueError("k should be a positive integer with a value of 2 or higher")
         if quasi_identifiers is None or len(quasi_identifiers) < 1:

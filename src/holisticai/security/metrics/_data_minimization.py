@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Union
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -42,32 +44,6 @@ class DataMinimizationAccuracyRatio:
         return float(metrics_results["Score"].loc[index])
 
 
-def data_minimization_accuracy_ratio(
-    y_true: pd.Series, y_pred: pd.Series, y_pred_dm: dict[str, pd.Series], return_results=False
-):
-    """
-    Calculate the accuracy ratio for data minimization.
-
-    Parameters
-    ----------
-    y_true: pd.Series
-        The true labels.
-    y_pred: pd.Series
-        The predicted labels.
-    y_pred_dm: dict[str, pd.Series]
-        The predicted labels for each data minimization technique.
-    return_results: bool
-        Whether to return the results or not. Default is False.
-
-    Returns
-    -------
-        float: The accuracy ratio for data minimization.
-        pd.DataFrame: The results of the data minimization if return_results is True.
-    """
-    dm = DataMinimizationAccuracyRatio()
-    return dm(y_true, y_pred, y_pred_dm, return_results)
-
-
 class DataMinimizationMSERatio:
     reference: float = 0
     name: str = "Data Minimization MSE Ratio"
@@ -105,29 +81,48 @@ class DataMinimizationMSERatio:
         return float(metrics_results["Score"].loc[index])
 
 
-def data_minimization_mse_ratio(
-    y_true: pd.Series, y_pred: pd.Series, y_pred_dm: dict[str, pd.Series], return_results=False
+def get_learning_task(y_true: pd.Series):
+    if y_true.dtype.kind in ["i", "u", "O"]:
+        return "classification"
+    if y_true.dtype.kind in ["f"]:
+        return "regression"
+    raise ValueError(f"Unknown learning task. dtype: {y_true.dtype.kind}")
+
+
+def data_minimization_score(
+    y_true: pd.Series,
+    y_pred: pd.Series,
+    y_pred_dm: dict[str, pd.Series],
+    return_results=False,
+    learning_task: Union[str, None] = None,
 ):
     """
-    Calculate the accuracy ratio for data minimization.
+    Calculate the accuracy ratio for data minimization. The accuracy ratio is the ratio of the accuracy of the data minimization model to the accuracy of the original model.
 
     Parameters
     ----------
     y_true: pd.Series
-        The true values.
+        The true labels.
     y_pred: pd.Series
-        The predicted values.
+        The predicted labels.
     y_pred_dm: dict[str, pd.Series]
-        The predicted values for each data minimization technique.
+        The predicted labels for each data minimization technique.
     return_results: bool
         Whether to return the results or not. Default is False.
-
+    learning_task: str (Optional)
+        The learning task. Can be either "classification" or "regression". If None, it will be inferred from the data.
     Returns
     -------
         float: The accuracy ratio for data minimization.
         pd.DataFrame: The results of the data minimization if return_results is True.
     """
-    dm = DataMinimizationMSERatio()
+    if learning_task is None:
+        learning_task = get_learning_task(y_true)
+
+    if learning_task == "classification":
+        dm = DataMinimizationAccuracyRatio()
+    if learning_task == "regression":
+        dm = DataMinimizationMSERatio()
     return dm(y_true, y_pred, y_pred_dm, return_results)
 
 

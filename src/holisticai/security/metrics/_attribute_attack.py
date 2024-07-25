@@ -1,23 +1,29 @@
+from __future__ import annotations
+
+from typing import Any, Callable, Union
+
 import pandas as pd
 from holisticai.security.commons import BlackBoxAttack
-from sklearn.metrics import accuracy_score
+from holisticai.security.metrics._utils import check_valid_output_type
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.metrics import accuracy_score, f1_score, mean_absolute_error, mean_squared_error
 
 
-def _check_categorical_labels(y: pd.Series):
+def to_numerical_or_categorical(y: pd.Series):
+    if y.dtype.kind in ["f"]:
+        return y
+
+    if y.dtype.kind in ["i", "u"]:
+        return y.astype("category")
+
     if len(y.unique()) < 2:
         raise ValueError("The target variable must have more than 1 unique value")
-    y = y.astype("category")
-    return y
+    return y.astype("category")
 
 
-def _check_regression_outputs(y: pd.Series):
-    if y.dtype.kind not in ["i", "u", "f"]:
-        raise ValueError("The target variable must contain real values for regression tasks")
-
-
-class AttributeAttackAccuracyScore:
+class AttributeAttackScore:
     reference: float = 0
-    name: str = "Attribute Attack Accuracy Score"
+    name: str = "Attribute Attack Score"
 
     def __call__(
         self,
@@ -25,39 +31,59 @@ class AttributeAttackAccuracyScore:
         x_test: pd.DataFrame,
         y_train: pd.Series,
         y_test: pd.Series,
-        learning_task: str,
         attribute_attack: str,
+        attack_train_ratio: float = 0.5,
+        metric_fn: Union[str, Callable, None] = None,
+        attacker_estimator: Any = None,
     ) -> float:
-        if learning_task in ["binary_classification", "multi_classification"]:
-            y_train = _check_categorical_labels(y_train)
-            y_test = _check_categorical_labels(y_test)
-        elif learning_task == "regression":
-            _check_regression_outputs(y_train)
-            _check_regression_outputs(y_test)
-        else:
-            raise ValueError(
-                "The learning task must be one of 'binary_classification', 'multi_classification', or 'regression'"
-            )
+        check_valid_output_type(y_train)
 
-        attacker = BlackBoxAttack(attack_feature=attribute_attack, attack_train_ratio=0.5)
+        y_train = to_numerical_or_categorical(y_train)
+        y_test = to_numerical_or_categorical(y_test)
+
+        if attacker_estimator is None:
+            has_continous_values = x_train[attribute_attack].dtype.kind in ["i", "u", "f"]
+            attacker_estimator = LinearRegression() if has_continous_values else LogisticRegression()
+            if metric_fn is None:
+                metric_fn = mean_squared_error if has_continous_values else accuracy_score
+
+        if isinstance(metric_fn, str):
+            if metric_fn == "accuracy":
+                metric_fn = accuracy_score
+            if metric_fn == "f1":
+                metric_fn = f1_score
+            if metric_fn == "mean_squared_error":
+                metric_fn = mean_squared_error
+            if metric_fn == "mean_absolute_error":
+                metric_fn = mean_absolute_error
+
+        attacker = BlackBoxAttack(
+            attacker_estimator=attacker_estimator,
+            attack_feature=attribute_attack,
+            attack_train_ratio=attack_train_ratio,
+        )
 
         attacker.fit(x_train, y_train)
 
         y_attack, y_pred_attack = attacker.transform(x_test, y_test)
 
-        return accuracy_score(y_attack, y_pred_attack)
+        return metric_fn(y_attack, y_pred_attack)
 
 
-def attribute_attack_accuracy_score(
+def attribute_attack_score(
     x_train: pd.DataFrame,
     x_test: pd.DataFrame,
     y_train: pd.Series,
     y_test: pd.Series,
-    learning_task: str,
     attribute_attack: str,
+    attack_train_ratio: float = 0.5,
+    **kargs,
 ) -> float:
     """
-    Calculate the accuracy score for black box attribute attack.
+    Calculate the accuracy score for black box attribute attack. It is done as follows:
+    - The attack attribute is removed from the training data.
+    - The label is added as an input feature, and a machine learning model is trained.
+    - The model is used to predict the removed attribute, and the prediction is compared with the actual value.
 
     Parameters
     ----------
@@ -69,14 +95,16 @@ def attribute_attack_accuracy_score(
         The training labels.
     y_test: pd.Series
         The testing labels.
-    learning_task: str
-        The learning task.
     attribute_attack: str
-        The attribute to attack.
+        The attribute column in the x_train dataframe to attack.
+    attack_train_ratio: float
+        The ratio of the attack data to the training data.
 
+    kargs: aditional attributes are passed to AttributeAttackScore class
     Returns
     -------
         float: The accuracy score for black box attribute attack.
     """
-    bb = AttributeAttackAccuracyScore()
-    return bb(x_train, x_test, y_train, y_test, learning_task, attribute_attack)
+
+    bb = AttributeAttackScore()
+    return bb(x_train, x_test, y_train, y_test, attribute_attack, attack_train_ratio, **kargs)

@@ -5,7 +5,7 @@ import pandas as pd
 def cp_mat(y_true, y_pred, n_classes):
     """Returns the matrix of conditional probabilities y_pred | y_true"""
     tab = pd.crosstab(y_true, y_pred)
-    cols = list(set(map(str, range(n_classes))) - set(map(str, tab.columns)))
+    cols = list({str(int(x)) for x in range(n_classes)} - {str(int(x)) for x in tab.columns})
     if cols != []:
         tab[cols] = 0
     tab = tab.values

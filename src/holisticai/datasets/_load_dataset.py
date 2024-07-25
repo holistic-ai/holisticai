@@ -84,7 +84,7 @@ def load_adult_dataset(protected_attribute: Literal["race", "sex"] | None = None
             group_a = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_a")
             group_b = pd.Series(get_protected_values(df, protected_attribute, "Female"), name="group_b")
 
-        y = df[output_variable].map({"<=50K": 0, ">50K": 1})
+        y = df[output_variable].map({"<=50K": 0, ">50K": 1}).astype("category")
         xt = df[feature_names]
         categorical_features = xt.select_dtypes(include=["category"]).columns
         xt = pd.get_dummies(xt, columns=categorical_features).astype(np.float64)
@@ -114,7 +114,7 @@ def load_law_school_dataset(protected_attribute: Literal["race1", "gender"] = "r
             group_b = pd.Series(get_protected_values(df, protected_attribute, "Male"), name="group_b")
 
         y = df[output_variable]
-        y = y.map({"FALSE": 0, "TRUE": 1})
+        y = y.map({"FALSE": 0, "TRUE": 1}).astype("category")
         X = df.drop(drop_columns, axis=1)
         return Dataset(X=X, y=y, group_a=group_a, group_b=group_b)
 
@@ -297,7 +297,7 @@ def load_us_crime_multiclass_dataset():
     group_a = pd.Series(df[protected_attribute] > threshold, name="group_a")
     group_b = pd.Series(~group_a, name="group_b")
     p_attr = pd.Series([1 if i else 0 for i in group_a])
-    y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3))
+    y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3)).astype("category")
     remove_columns = [protected_attribute, output_column]
     x = df.drop(columns=remove_columns)
     numeric_features = x.select_dtypes(include=[np.number]).columns
