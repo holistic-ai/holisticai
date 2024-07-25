@@ -178,7 +178,7 @@ def wrap_sklearn_model(proxy: ModelProxy):
     return None
 
 
-def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: ModelProxy):
+def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: ModelProxy) -> PartialDependence:
     supported_learning_tasks = ["binary_classification", "regression", "multi_classification"]
     if proxy.learning_task not in supported_learning_tasks:
         raise ValueError(f"Learning task {proxy.learning_task} is not supported for partial dependence computation")
@@ -213,6 +213,6 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
                 newp["individual"] = p["individual"][c][np.newaxis]
                 newp["average"] = p["average"][c][np.newaxis]
                 part_dep_feat.append(newp)
-            new_partial_dependence.append(PartialDependence(values=part_dep_feat))
-        return new_partial_dependence
-    return PartialDependence(values=partial_dependence)
+            new_partial_dependence.append(part_dep_feat)
+        return PartialDependence(values=new_partial_dependence)
+    return PartialDependence(values=[partial_dependence])

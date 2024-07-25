@@ -141,4 +141,4 @@ class LocalConditionalImportances:
 
 class PartialDependence(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    values: list[dict]
+    values: list[list[dict]]
