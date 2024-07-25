@@ -117,7 +117,7 @@ def test_xai_ease_score():
     from holisticai.utils import PartialDependence, Importances
     from holisticai.explainability.metrics.global_importance import xai_ease_score
     
-    partial_dependence = [
+    partial_dependence = [[
         {
             'average': [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]],
             'grid_values': [[1,2,3,4,5,6,7,8,9]]
@@ -126,7 +126,7 @@ def test_xai_ease_score():
             'average': [[0.4, 0.5, 0.6, 0.6, 0.5, 0.4, 0.4, 0.5, 0.6]], 
             'grid_values': [[1,2,3,4,5,6,7,8,9]]
         },
-    ]
+    ]]
     partial_dependence = PartialDependence(values=partial_dependence)
     feature_importance = Importances(values=np.array([0.5, 0.5]),
     feature_names=['feature1', 'feature2'])

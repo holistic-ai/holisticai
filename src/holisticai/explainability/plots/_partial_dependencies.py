@@ -5,7 +5,7 @@ from holisticai.utils import Importances, PartialDependence
 
 
 def plot_partial_dependence(
-    partial_dependence: PartialDependence, ranked_feature_importance: Importances, subplots=(1, 1), figsize=None
+    partial_dependence: PartialDependence, ranked_feature_importance: Importances, subplots=(1, 1), figsize=None, class_idx=0
 ):
     """
     Plots the partial dependence of features on the predicted target.
@@ -36,16 +36,17 @@ def plot_partial_dependence(
     .. image:: /_static/images/xai_plot_partial_dependence.png
         :alt: Plot Partial Dependence
     """
+    partial_dependence_values = partial_dependence.values[class_idx]
     _, axs = plt.subplots(*subplots, figsize=figsize)
     axs = [axs] if isinstance(axs, plt.Axes) else axs.flatten()
-    n_plots = min(len(axs), len(partial_dependence.values))
+    n_plots = min(len(axs), len(partial_dependence_values))
     annotator = XAIEaseAnnotator()
     for feature_index in range(n_plots):
         ax = axs[feature_index]
-        individuals = partial_dependence.values[feature_index]["individual"][0]
-        average = partial_dependence.values[feature_index]["average"][0]
-        x = partial_dependence.values[feature_index]["grid_values"][0]
-        level = annotator.compute_xai_ease_score_data(partial_dependence, ranked_feature_importance).set_index(
+        individuals = partial_dependence_values[feature_index]["individual"][0]
+        average = partial_dependence_values[feature_index]["average"][0]
+        x = partial_dependence_values[feature_index]["grid_values"][0]
+        level = annotator.compute_xai_ease_score_data(partial_dependence_values, ranked_feature_importance).set_index(
             "feature"
         )["scores"]
         feature_name = ranked_feature_importance.feature_names[feature_index]

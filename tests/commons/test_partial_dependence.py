@@ -27,4 +27,4 @@ def test_get_partial_dependence_results_binary_classification(input_data):
     importances  = compute_permutation_feature_importance(proxy=proxy, X=test['X'], y=test['y'])
     ranked_importances = importances.top_alpha(0.8)
     partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
-    np.isclose(partial_dependencies.values[0]['average'][0][0], 0.03)
+    np.isclose(partial_dependencies.values[0][0]['average'][0][0], 0.03)
