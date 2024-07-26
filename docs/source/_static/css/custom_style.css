@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+body{
+  font-family:'Roboto', sans-serif;
+  margin-left: 10px;  /* Adjust this value as needed */
+  margin-right: 10px; /* Adjust this value as needed */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family:'Roboto', sans-serif;
+}
+
+.btn-primary {
+  background-color: #141e41;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.btn-primary:visited {
+  color: white;
+}
+
+.wy-side-nav-search {
+  background-color:#141e41;
+}
+
+div.admonition.admonition-youtube {
+  border-color: #141e41; /* YouTube red */
+}
+div.admonition.admonition-youtube > .admonition-title {
+  background-color: #141e41;
+  color: white;
+}
+div.admonition.admonition-youtube > .admonition-title:after {
+  color: #141e41;
+  content: "\f26c"; /* fa-solid fa-tv */
+}
+div.admonition.admonition-youtube .video-container {
+  width: 100%;
+}
+div.admonition.admonition-youtube .video-container iframe {
+  width: 100%;
+  height: auto;
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.intro-card {
+  padding: 10px 10px 20px 10px;
+}
+
+.intro-card .sd-card-img-top {
+  margin: 10px;
+  height: 52px;
+  background: none !important;
+}
+
+.button-container {
+  grid-template-columns: 1fr 1fr 1fr; /* Two columns */
+  gap: 1rem; /* Space between buttons */
+}
+
+.sourcelink {
+  display: none;
+}
+
+.wy-nav-content {
+  max-width: 100%;
+}
+
+.rst-content {
+  max-width: 100%;
+}

@@ -1,0 +1,35 @@
+.generic-object-container {
+    padding: 1px;
+    margin: 1px;
+}
+.generic-object-content {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0px;
+    margin: 10px;
+    text-align: left;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    color: #333;
+    display: inline-block;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+.generic-object-header {
+    background-color: #e0e0e0;
+    color: #000;
+    font-size: 12px;
+    padding: 10px 150px 10px 20px;
+    margin: 0px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+    border-radius: 5px 5px 0 0;
+    font-weight: bold;
+}
+.generic-object-body {
+    padding: 5px 10px 5px 10px;
+}
+.attribute-list {
+    margin: 2px 0;
+    padding: 2px;
+}

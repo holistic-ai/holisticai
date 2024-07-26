@@ -1,44 +1,131 @@
-[tool.commitizen]
-version = "0.7.3"
-changelog_incremental = true
-version_files = [
-    "pyproject.toml:version"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "holisticai"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [{ name = "research", email = "research@holisticai.com" }]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "scikit-learn>=1.0.2",
+  "pandas",
+  "matplotlib",
+  "networkx>=3.1",
+  "seaborn",
+  "numpy>=1.25",
+  "pybind11>=2.12",
+  ]
+
+[project.optional-dependencies]
+bias = ["networkx>=3.1", "pygad==3.3.1", "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
+explainability = ["lime>=0.2.0.1", "shap>=0.42.1"]
+security = ["jax>=0.4.30", "jaxopt>=0.8.3"]
+all = ["networkx>=3.1", "pygad==3.3.1", "lime>=0.2.0.1", "shap>=0.42.1",  "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
+
+[project.urls]
+Documentation = "https://github.com/holistic-ai/holisticai#readme"
+Issues = "https://github.com/holistic-ai/holisticai/issues"
+Source = "https://github.com/holistic-ai/holisticai"
+
+[tool.hatch.version]
+path = "src/holisticai/__about__.py"
+
+[tool.coverage.run]
+source_pkgs = ["holisticai", "tests"]
+branch = true
+parallel = true
+omit = ["src/holisticai/__about__.py"]
+
+[tool.coverage.paths]
+holistic_ai = ["src/holisticai", "*/holisticai/src/holisticai"]
+tests = ["tests", "*/holisticai/tests"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.hatch.envs.hatch-static-analysis]
+config-path = "ruff_default.toml"
+
+[tool.ruff]
+extend = "ruff_default.toml"
+exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/utils/trade_off_analysers/**"]
+
+[tool.hatch.envs.sphinx]
+inherit = ["all"]
+dependencies = [
+  "scikit-learn>=1.0.2", 
+  "cvxpy",
+  "sphinx",
+  "pydata-sphinx-theme",
+  "myst_parser",
+  "nbsphinx",
+  "jupyter",
+  "sphinx_copybutton",
+  "sphinx_design",
+  "sphinx_togglebutton",
+  "sphinxcontrib.youtube",
+  "pandas",
+  "numpy==1.26",
+  "pybind11>=2.12",
+  "pydantic",
+  "jax",
+  "jaxopt",
+  "optax",
+  "flax"
 ]
 
-[tool.poetry]
-name = "holisticai"
-version = "0.7.3"
-description = "Holistic AI Library"
-authors = ["Research Team"]
-maintainers = ["Research Team <researchteam@holisticai.com>"]
-readme = "README.md"
+[tool.hatch.envs.sphinx.scripts]
+foo = ["which sphinx-build"]
+build = ["PYTHONPATH=./src sphinx-build -b html docs/source docs/build"]
 
-[tool.poetry.dependencies]
-python = ">=3.8,<4.0.0"
-scikit-learn = ">=1.0.2"
+[tool.hatch.envs.testing]
+dependencies = [
+  "scikit-learn>=1.0.2", 
+  "pandas>=1.1.5", 
+  "numpy>=1.19.5",
+  "seaborn>=0.11.2",
+  "networkx>=3.1",
+  "lime>=0.2.0.1",
+  "shap>=0.42.1",
+  "flake8>=5.0.4",
+  "pre-commit>=2.20.0",
+  "pytest>=7.1.3",
+  "commitizen>=2.40.0",
+  "lime>=0.2.0.1",
+  "shap>=0.42.1",
+  "ipykernel>=6.25.2",
+  "ruff",
+  "pydantic",
+  "jax",
+  "jaxopt",
+  "optax",
+  "flax"
+]
+env-vars = { PYTHONPATH = "src" }
 
-tqdm = {version=">=4.64.1",  optional = true}
-cvxpy = {extras=["cbc"], version=">1.3.0",  optional = true}
-cvxopt = {version=">=1.3.0",  optional = true}
-seaborn = {version=">=0.11.2",  optional = true}
-networkx = {version=">=3.1",  optional = true}
-lime = {version=">=0.2.0.1",  optional = true}
-shap = {version=">=0.42.1",  optional = true}
+[tool.hatch.envs.testing.scripts]
+run = ["python -m pytest tests --cache-clear"]
+foo = ["which python"]
 
-[tool.poetry.extras]
-bias = ["tqdm", "cvxpy", "cvxopt", "seaborn", "networkx"]
-explainability = ["lime", "shap", "pydotplus", "dtreeviz"]
-all = ["tqdm", "cvxpy", "cvxopt", "seaborn", "networkx", "lime", "shap", "pydotplus", "dtreeviz"]
+[tool.hatch.envs.default]
+env-vars = { PYTHONPATH = "src" }
 
-[tool.poetry.group.dev.dependencies]
-flake8 = "^5.0.4"
-pre-commit = "^2.20.0"
-pytest = "^7.1.3"
-commitizen = "^2.40.0"
-lime = "^0.2.0.1"
-shap = "^0.42.1"
-ipykernel = "^6.25.2"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.hatch.build.targets.wheel]
+packages = ["src/holisticai"]
