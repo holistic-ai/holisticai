@@ -6,13 +6,13 @@ from holisticai.utils import PartialDependence, Importances
 static_image_folder = '_static/images'
 def image_plot_partial_dependence():
     noise = 0.1*np.random.randn(50,5)
-    partial_dependence = PartialDependence(values = [
+    partial_dependence = PartialDependence(values = [[
         {
             "individual": np.array([[[1, 2, 3, 3.7, 4.5]]])+noise,
             "average": np.array([[1, 2, 3, 3.7 ,4.5]]),
             "grid_values": np.array([[0.1, 0.2, 0.3, 0.4, 0.5]])
         }
-    ])
+    ]])
     ranked_feature_importance = Importances(values=[0.123], feature_names=["Feature 1"])
 
     plot_partial_dependence(partial_dependence, ranked_feature_importance)
