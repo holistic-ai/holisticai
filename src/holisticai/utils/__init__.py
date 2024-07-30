@@ -5,9 +5,9 @@ The :mod:`holisticai.utils` module includes utils helper tools
 # formatting
 from holisticai.utils._definitions import (
     BinaryClassificationProxy,
-    ConditionalImportance,
+    ConditionalImportances,
     Importances,
-    LocalConditionalImportance,
+    LocalConditionalImportances,
     LocalImportances,
     ModelProxy,
     MultiClassificationProxy,
@@ -41,8 +41,8 @@ __all__ = [
     "create_proxy",
     "Importances",
     "LocalImportances",
-    "LocalConditionalImportance",
+    "LocalConditionalImportances",
     "PartialDependence",
-    "ConditionalImportance",
+    "ConditionalImportances",
     "ModelProxy",
 ]

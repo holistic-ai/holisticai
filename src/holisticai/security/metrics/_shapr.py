@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import jax.numpy as jnp
 import numpy as np
+import pandas as pd
 from holisticai.utils.models.neighbors import KNeighborsClassifier
 from jax.nn import one_hot
 from numpy.typing import ArrayLike
@@ -143,10 +144,10 @@ class ShaprScore:
 
 
 def shapr_score(
-    y_train: ArrayLike,
-    y_test: ArrayLike,
-    y_pred_train: ArrayLike,
-    y_pred_test: ArrayLike,
+    y_train: pd.Series,
+    y_test: pd.Series,
+    y_pred_train: pd.Series,
+    y_pred_test: pd.Series,
     batch_size=500,
     train_size=1.0,
 ) -> jnp.ndarray:
@@ -156,17 +157,17 @@ def shapr_score(
     Parameters
     ----------
 
-    y_train: (nb_samples, nb_classes) or indices of shape (nb_samples,)
-        Target values (class labels) of `x_train`, one-hot-encoded.
+    y_train: pd.Series
+        (nb_samples, nb_classes) or indices of shape (nb_samples,). Target values (class labels) of `x_train`, one-hot-encoded.
 
-    y_test: (nb_samples, nb_classes) or indices of shape (nb_samples,).
-        Target values (class labels) of `x_test`, one-hot-encoded.
+    y_test: pd.Series
+        (nb_samples, nb_classes) or indices of shape (nb_samples,). Target values (class labels) of `x_test`, one-hot-encoded.
 
-    y_pred_train: (nb_samples, nb_classes) or indices of shape (nb_samples,)
-        Predicted values (class labels) of `x_train`, one-hot-encoded.
+    y_pred_train: pd.Series
+        (nb_samples, nb_classes) or indices of shape (nb_samples,). Predicted values (class labels) of `x_train`, one-hot-encoded.
 
-    y_pred_test: (nb_samples, nb_classes) or indices of shape (nb_samples,)
-        Predicted values (class labels) of `x_test`, one-hot-encoded.
+    y_pred_test: pd.Series
+        (nb_samples, nb_classes) or indices of shape (nb_samples,). Predicted values (class labels) of `x_test`, one-hot-encoded.
 
     batch_size: int, default=100
         The number of samples to process in each batch.
@@ -174,14 +175,13 @@ def shapr_score(
     train_size: float, default=1.0
         The fraction of the training set to use for the k-nearest neighbors search
 
-    Return
-    ------
-        float: an average SHAPr scores across all samples in the training set. The higher the value,
-             the higher the privacy leakage for that sample. Any value above 0 should be considered a privacy leak.
+    Returns
+    -------
+        float: The higher the value, the higher the privacy leakage for that sample. Any value above 0 should be considered a privacy leak.
 
     Reference
     ---------
-    .. [1] https://arxiv.org/abs/2101.10078
+    .. [1] https://arxiv.org/abs/2112.02230
 
     """
     shapr = ShaprScore()

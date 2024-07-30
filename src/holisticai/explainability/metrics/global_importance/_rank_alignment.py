@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
-from holisticai.utils import ConditionalImportance, Importances
+from holisticai.utils import ConditionalImportances, Importances
 from pydantic import BaseModel
 
 
@@ -9,12 +9,12 @@ class RankAlignment(BaseModel):
     name: str = "Rank Alignment"
     reference: float = 1.0
 
-    def __call__(self, conditional_feature_importance: ConditionalImportance, feature_importance: Importances):
+    def __call__(self, conditional_feature_importance: ConditionalImportances, feature_importance: Importances):
         """
         Calculates the rank alignment metric between conditional feature importance and overall feature importance.
 
         Args:
-            conditional_feature_importance (ConditionalImportance): Conditional feature importance object.
+            conditional_feature_importance (ConditionalImportances): Conditional feature importance object.
             feature_importance (Importances): Overall feature importance object.
 
         Returns:
@@ -34,14 +34,14 @@ class RankAlignment(BaseModel):
         return float(np.mean(np.mean(list(conditional_position_parity.values()))))
 
 
-def rank_alignment(conditional_feature_importance: ConditionalImportance, ranked_feature_importance: Importances):
+def rank_alignment(conditional_feature_importance: ConditionalImportances, ranked_feature_importance: Importances):
     """
     The `Rank Alignment` metric is used to measure the alignment between conditional feature importance and overall feature importance.
     It provides a way to assess how well the importance rankings of features in a conditional context match the rankings in the overall context.
 
     Parameters
     ----------
-    conditional_feature_importance: ConditionalImportance
+    conditional_feature_importance: ConditionalImportances
         The feature importance for each output label (classification) or output region (regression).
     ranked_feature_importance: Importances
         The ranked feature importance values.
@@ -53,11 +53,11 @@ def rank_alignment(conditional_feature_importance: ConditionalImportance, ranked
     Example
     -------
     >>> from holisticai.explainability.commons import (
-    ...     ConditionalImportance,
+    ...     ConditionalImportances,
     ...     Importances,
     ... )
     >>> from holisticai.explainability.metrics import rank_alignment
-    >>> conditional_feature_importance = ConditionalImportance(
+    >>> conditional_feature_importance = ConditionalImportances(
     ...     values={
     ...         "0": Importances(
     ...             values=[0.1, 0.2, 0.3, 0.4],

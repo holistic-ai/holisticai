@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
@@ -12,9 +11,10 @@ def append_if_not_empty(original_array, array_to_append):
 
 
 class BlackBoxAttack:
-    def __init__(self, attack_feature, attack_train_ratio=0.5):
+    def __init__(self, attacker_estimator, attack_feature, attack_train_ratio=0.5):
         self.attack_feature = attack_feature
         self.attack_train_ratio = attack_train_ratio
+        self.attacker_estimator = attacker_estimator
 
     def create_preprocessor(self, X):
         categorical_features = X.select_dtypes(include=["category"]).columns
@@ -56,19 +56,16 @@ class BlackBoxAttack:
         """
 
         categorical_features = []
-        is_regression = True
         y_train_attack = X[self.attack_feature]
         X_train_attack = X.drop(columns=[self.attack_feature])
         X_train_attack["label"] = y
         if y_train_attack.dtype == "category":
             categorical_features.append("label")
-            is_regression = False
         # Create transformers for numerical and categorical features
 
         preprocessor = self.create_preprocessor(X_train_attack)
 
-        attacker_estimator = LinearRegression() if is_regression else LogisticRegression()
-        attacker = Pipeline(steps=[("preprocessor", preprocessor), ("estimator", attacker_estimator)])
+        attacker = Pipeline(steps=[("preprocessor", preprocessor), ("estimator", self.attacker_estimator)])
 
         attack_train_size = int(X_train_attack.shape[0] * self.attack_train_ratio)
         attacker.fit(X_train_attack[:attack_train_size], y_train_attack[:attack_train_size])

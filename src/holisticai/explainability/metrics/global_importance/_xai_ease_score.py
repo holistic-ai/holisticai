@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Union
-
 import numpy as np
 import pandas as pd
 from holisticai.utils import Importances, PartialDependence
@@ -84,7 +82,7 @@ class XAIEaseAnnotator(BaseModel):
             score_data (DataFrame): The computed score data.
         """
         partial_dependence_formatted = {
-            f: partial_dependence.values[i]["average"][0] for i, f in enumerate(ranked_feature_importance.feature_names)
+            f: partial_dependence[i]["average"][0] for i, f in enumerate(ranked_feature_importance.feature_names)
         }
         data = {feat: compare_tangents(df) for feat, df in partial_dependence_formatted.items()}
         score_data = compute_feature_scores(data, self.threshold)
@@ -141,7 +139,7 @@ class XAIEaseScore(BaseModel):
 
     def __call__(
         self,
-        partial_dependence: Union[PartialDependence, list[PartialDependence]],
+        partial_dependence: PartialDependence,
         ranked_feature_importance: Importances,
     ):
         """
@@ -159,12 +157,10 @@ class XAIEaseScore(BaseModel):
             score_data = self.annotator.compute_xai_ease_score_data(pdep, rfi)
             return float(self.compute_xai_ease_score(score_data))
 
-        if isinstance(partial_dependence, list):
-            scores = [compute_metric(pdep, ranked_feature_importance) for pdep in partial_dependence]
-            if self.detailed:
-                return scores
-            return float(np.mean(scores))
-        return compute_metric(partial_dependence, ranked_feature_importance)
+        scores = [compute_metric(pdep, ranked_feature_importance) for pdep in partial_dependence.values]
+        if self.detailed:
+            return scores
+        return float(np.mean(scores))
 
 
 def xai_ease_score(partial_dependence: PartialDependence, ranked_feature_importance: Importances):

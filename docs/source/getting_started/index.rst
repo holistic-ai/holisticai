@@ -38,6 +38,12 @@ This section will guide you through the installation of the `holisticai` open-so
          :shadow: md
             
          Explainability metrics and techniques.          
+
+   .. grid-item-card:: Security
+         :link: security/index.html
+         :shadow: md
+            
+         Security metrics and mitigation techniques.          
         
 
 .. If you update this toctree, also update the manual toctree in the

@@ -1,8 +1,16 @@
-=======
+==========
 Mitigation
 ==========
 
 .. warning::
+
+   This page is currently under construction. Please check back later for updates.
+
+.. contents:: **Contents:**
+    :depth: 2
+
+Introduction
+------------
 
    This page is currently under construction. Please check back later for updates.
 
@@ -36,13 +44,12 @@ Post-processing techniques adjust the predictions of the trained model to mitiga
 - **Reject Option Classification**: Allowing uncertain predictions to be reconsidered, particularly for disadvantaged groups, to improve fairness.
 - **Output Adjustment**: Modifying the output probabilities to ensure fair treatment across groups.
 
-    .. toctree::
-        :maxdepth: 1
+.. toctree::
+    :maxdepth: 1
 
-
-        methods/preprocessing
-        methods/inprocessing
-        methods/postprocessing
+    mitigation/preprocessing
+    mitigation/inprocessing
+    mitigation/postprocessing
 
 Summary Table
 -------------
