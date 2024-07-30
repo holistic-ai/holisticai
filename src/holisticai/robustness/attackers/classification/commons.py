@@ -9,6 +9,7 @@ import pandas as pd
 def x_array_to_df(x_arr, feature_names):
     return pd.DataFrame(x_arr, columns=feature_names)
 
+
 def x_to_nd_array(x: pd.DataFrame):
     return np.array(x)
 
@@ -36,6 +37,7 @@ def to_categorical(labels: Union[np.ndarray, list[float]], nb_classes: Optional[
     categorical[np.arange(labels.shape[0]), np.squeeze(labels)] = 1
     return categorical
 
+
 def format_function_predict_proba(learning_task, predict_proba_fn):
     """
     Format the predict_proba function based on the learning task.
@@ -54,10 +56,12 @@ def format_function_predict_proba(learning_task, predict_proba_fn):
     """
     match learning_task:
         case "binary_classification":
+
             def forward(x: np.ndarray, feature_names: list[str]):
                 x_df = x_array_to_df(x, feature_names=feature_names)
                 score = np.array(predict_proba_fn(x_df))
                 if score.ndim == 2:
                     return score
-                return np.stack([1-score, score], axis=1)
+                return np.stack([1 - score, score], axis=1)
+
     return forward

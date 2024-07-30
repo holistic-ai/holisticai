@@ -4,6 +4,7 @@ predictions. It is an advanced version of the Boundary attack.
 
 | Paper link: https://arxiv.org/abs/1904.02144
 """
+
 from __future__ import annotations
 
 from typing import Callable, Literal, Optional, Union
@@ -57,7 +58,8 @@ class HopSkipJump(BaseModel):
     ----------
     .. [1] Chen, J., Jordan, M. I., & Wainwright, M. J. (2019). HopSkipJumpAttack: A query-efficient decision-based attack. In 2020 ieee symposium on security and privacy (sp) (pp. 1277-1294). IEEE.
     """
-    name : Literal["HSJ"] = "HSJ"
+
+    name: Literal["HSJ"] = "HSJ"
 
     batch_size: int = 64
     targeted: bool = False
@@ -67,12 +69,12 @@ class HopSkipJump(BaseModel):
     init_eval: int = 100
     init_size: int = 100
     verbose: bool = True
-    predictor: Callable[[NDArray], NDArray|ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
-    clip_values : tuple =()
-    input_shape : list =[]
-    input_size : int = 0
-    theta : float = 0.0
-    feature_names: list =[]
+    predictor: Callable[[NDArray], NDArray | ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
+    clip_values: tuple = ()
+    input_shape: list = []
+    input_size: int = 0
+    theta: float = 0.0
+    feature_names: list = []
     curr_iter: int = 0
 
     def __init__(self, **kwargs):
@@ -103,9 +105,7 @@ class HopSkipJump(BaseModel):
 
         return np.array(self.predictor(x_df))
 
-    def generate(
-        self, x_df: pd.DataFrame, y: Optional[np.ndarray] = None, **kwargs
-    ) -> pd.DataFrame:
+    def generate(self, x_df: pd.DataFrame, y: Optional[np.ndarray] = None, **kwargs) -> pd.DataFrame:
         """
         Generate adversarial samples and return them in an array.
 
@@ -129,9 +129,7 @@ class HopSkipJump(BaseModel):
         if y is None:
             # Throw error if attack is targeted, but no targets are provided
             if self.targeted:  # pragma: no cover
-                raise ValueError(
-                    "Target labels `y` need to be provided for a targeted attack."
-                )
+                raise ValueError("Target labels `y` need to be provided for a targeted attack.")
 
             # Use model predictions as correct outputs
             y = self.predict(x)
@@ -175,7 +173,6 @@ class HopSkipJump(BaseModel):
 
         # Generate the adversarial samples
         for ind, val in enumerate(x_adv):
-
             self.curr_iter = start
 
             if self.targeted:
@@ -244,18 +241,14 @@ class HopSkipJump(BaseModel):
             An adversarial example.
         """
         # First, create an initial adversarial sample
-        initial_sample = self._init_sample(
-            x, y, y_p, init_pred, adv_init, mask, clip_min, clip_max
-        )
+        initial_sample = self._init_sample(x, y, y_p, init_pred, adv_init, mask, clip_min, clip_max)
 
         # If an initial adversarial example is not found, then return the original image
         if initial_sample is None:
             return x
 
         # If an initial adversarial example found, then go with HopSkipJump attack
-        x_adv = self._attack(
-            initial_sample[0], x, initial_sample[1], mask, clip_min, clip_max
-        )
+        x_adv = self._attack(initial_sample[0], x, initial_sample[1], mask, clip_min, clip_max)
 
         return x_adv
 
@@ -312,9 +305,7 @@ class HopSkipJump(BaseModel):
 
             # Attack unsatisfied yet and the initial image unsatisfied
             for _ in range(self.init_size):
-                random_img = nprd.uniform(clip_min, clip_max, size=x.shape).astype(
-                    x.dtype
-                )
+                random_img = nprd.uniform(clip_min, clip_max, size=x.shape).astype(x.dtype)
 
                 if mask is not None:
                     random_img = random_img * mask + x * (1 - mask)
@@ -343,9 +334,7 @@ class HopSkipJump(BaseModel):
 
             # The initial image unsatisfied
             for _ in range(self.init_size):
-                random_img = nprd.uniform(clip_min, clip_max, size=x.shape).astype(
-                    x.dtype
-                )
+                random_img = nprd.uniform(clip_min, clip_max, size=x.shape).astype(x.dtype)
 
                 if mask is not None:
                     random_img = random_img * mask + x * (1 - mask)
@@ -426,9 +415,7 @@ class HopSkipJump(BaseModel):
             )
 
             # Next compute the number of evaluations and compute the update
-            num_eval = min(
-                int(self.init_eval * np.sqrt(self.curr_iter + 1)), self.max_eval
-            )
+            num_eval = min(int(self.init_eval * np.sqrt(self.curr_iter + 1)), self.max_eval)
 
             update = self._compute_update(
                 current_sample=current_sample,
@@ -655,10 +642,7 @@ class HopSkipJump(BaseModel):
         satisfied = self._adversarial_satisfactory(
             samples=eval_samples, target=target, clip_min=clip_min, clip_max=clip_max
         )
-        f_val = (
-            2 * satisfied.reshape([num_eval] + [1] * len(self.input_shape))
-            - 1.0
-        )
+        f_val = 2 * satisfied.reshape([num_eval] + [1] * len(self.input_shape)) - 1.0
 
         if np.mean(f_val) == 1.0:
             grad = np.mean(rnd_noise, axis=0)
@@ -731,8 +715,6 @@ class HopSkipJump(BaseModel):
         if norm == 2:
             result = (1 - alpha) * original_sample + alpha * current_sample
         else:
-            result = np.clip(
-                current_sample, original_sample - alpha, original_sample + alpha
-            )
+            result = np.clip(current_sample, original_sample - alpha, original_sample + alpha)
 
         return result

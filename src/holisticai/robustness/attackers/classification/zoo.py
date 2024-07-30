@@ -5,6 +5,7 @@ gradients.
 
 | Paper link: https://arxiv.org/abs/1708.03999
 """
+
 from __future__ import annotations
 
 from typing import Any, Callable, Literal, Optional
@@ -78,7 +79,8 @@ class ZooAttack(BaseModel):
               black-box attacks to deep neural networks without training substitute models." In Proceedings of the 10th\\
                 ACM Workshop on Artificial Intelligence and Security, pp. 15-26. 2017.
     """
-    name : Literal["Zoo"] = "Zoo"
+
+    name: Literal["Zoo"] = "Zoo"
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
     confidence: float = 0.0
@@ -94,16 +96,16 @@ class ZooAttack(BaseModel):
     batch_size: int = 1
     variable_h: float = 0.2
     verbose: bool = True
-    input_is_feature_vector : bool =False
-    clip_values : tuple = (0,1)
-    predict_proba_fn : Callable[[NDArray, list], NDArray|ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
-    predict_proba: Callable[[NDArray], NDArray|ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
-    input_shape: tuple =()
-    input_size : int = 0
-    nb_classes: int =2
-    adam_mean: Optional[NDArray|ArrayLike|None]=None
-    adam_var: Optional[NDArray|ArrayLike|None]=None
-    adam_epochs: Optional[NDArray|ArrayLike|None]=None
+    input_is_feature_vector: bool = False
+    clip_values: tuple = (0, 1)
+    predict_proba_fn: Callable[[NDArray, list], NDArray | ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
+    predict_proba: Callable[[NDArray], NDArray | ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
+    input_shape: tuple = ()
+    input_size: int = 0
+    nb_classes: int = 2
+    adam_mean: Optional[NDArray | ArrayLike | None] = None
+    adam_var: Optional[NDArray | ArrayLike | None] = None
+    adam_epochs: Optional[NDArray | ArrayLike | None] = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -139,9 +141,6 @@ class ZooAttack(BaseModel):
             self._current_noise = np.zeros((self.batch_size, *self.input_shape), dtype=np.float32)
         self._sample_prob = np.ones(self._current_noise.size, dtype=np.float32) / self._current_noise.size
 
-
-
-
     def _loss(
         self, x: np.ndarray, x_adv: np.ndarray, target: np.ndarray, c_weight: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -165,9 +164,7 @@ class ZooAttack(BaseModel):
             The predictions, the L2 distances, and the loss values.
         """
         l2dist = np.sum(np.square(x - x_adv).reshape(x_adv.shape[0], -1), axis=1)
-        ratios = [1.0] + [
-            int(new_size) / int(old_size) for new_size, old_size in zip(self.input_shape, x.shape[1:])
-        ]
+        ratios = [1.0] + [int(new_size) / int(old_size) for new_size, old_size in zip(self.input_shape, x.shape[1:])]
         preds = self.predict_proba(np.array(zoom(x_adv, zoom=ratios)))
         z_target = np.sum(preds * target, axis=1)
         z_other = np.max(
@@ -394,7 +391,6 @@ class ZooAttack(BaseModel):
         best_attack = np.array([x_adv[i] for i in range(x_adv.shape[0])])
 
         for iter_ in range(self.max_iter):
-
             # Upscaling for very large number of iterations
             if self.use_resize:
                 if iter_ == 2000:
@@ -601,7 +597,7 @@ class ZooAttack(BaseModel):
 
         # ADAM update
         mean[index] = beta1 * mean[index] + (1 - beta1) * grads
-        var[index] = beta2 * var[index] + (1 - beta2) * grads ** 2
+        var[index] = beta2 * var[index] + (1 - beta2) * grads**2
 
         corr = (np.sqrt(1 - np.power(beta2, adam_epochs[index]))) / (1 - np.power(beta1, adam_epochs[index]))
         orig_shape = current_noise.shape
