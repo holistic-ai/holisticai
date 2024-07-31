@@ -46,7 +46,7 @@ class DatasetDict(dict):
         nested_objs = []
         for name, dataset in self.datasets.items():
             repr_info = dataset.repr_info()
-            repr_info['name'] = name
+            repr_info["name"] = name
             nested_objs.append(repr_info)
         # Example usage
         obj = {"dtype": "DatasetDict", "attributes": {}, "nested_objects": nested_objs}
@@ -278,7 +278,9 @@ class Dataset:
         """Returns a random sample of n rows from the dataset."""
         if random_state is None:
             random_state = self.random_state
-        return Dataset(sample_n(self.data, n, random_state=random_state).reset_index(drop=True), _metadata=self._metadata)
+        return Dataset(
+            sample_n(self.data, n, random_state=random_state).reset_index(drop=True), _metadata=self._metadata
+        )
 
     def filter(self, fn):
         """Returns a new dataset with rows filtered based on the given function."""

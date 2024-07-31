@@ -38,7 +38,7 @@ def create_preprocessor(X, numerical_transform: bool = True, categorical_transfo
     return ColumnTransformer(transformers=transformers)
 
 
-def load_adult_dataset(protected_attribute: Union[Literal["race", "sex"],None] = None, preprocessed: bool = True):
+def load_adult_dataset(protected_attribute: Union[Literal["race", "sex"], None] = None, preprocessed: bool = True):
     sensitive_attribute = ["race", "sex"]
     feature_names = [
         "age",
@@ -102,7 +102,9 @@ def load_adult_dataset(protected_attribute: Union[Literal["race", "sex"],None] =
     return Dataset(X=x, y=y, p_attrs=p_attrs)
 
 
-def load_law_school_dataset(protected_attribute: Union[Literal["race", "gender"],None] = None, preprocessed: bool = True):
+def load_law_school_dataset(
+    protected_attribute: Union[Literal["race", "gender"], None] = None, preprocessed: bool = True
+):
     bunch = load_law_school()
     sensitive_attribute = ["race1", "gender"]
     output_variable = "bar"
@@ -115,14 +117,14 @@ def load_law_school_dataset(protected_attribute: Union[Literal["race", "gender"]
             if protected_attribute == "race":
                 ga_label = "white"
                 gb_label = "non-white"
-                group_a = pd.Series(get_protected_values(df, 'race1', ga_label), name="group_a")
-                group_b = pd.Series(get_protected_values(df, 'race1', gb_label), name="group_b")
+                group_a = pd.Series(get_protected_values(df, "race1", ga_label), name="group_a")
+                group_b = pd.Series(get_protected_values(df, "race1", gb_label), name="group_b")
 
             elif protected_attribute == "gender":
                 ga_label = "Female"
                 gb_label = "Male"
-                group_a = pd.Series(get_protected_values(df, 'gender', ga_label), name="group_a")
-                group_b = pd.Series(get_protected_values(df, 'gender', gb_label), name="group_b")
+                group_a = pd.Series(get_protected_values(df, "gender", ga_label), name="group_a")
+                group_b = pd.Series(get_protected_values(df, "gender", gb_label), name="group_b")
             else:
                 raise ValueError("The protected attribute must be one of: race or gender")
 
@@ -140,7 +142,9 @@ def load_law_school_dataset(protected_attribute: Union[Literal["race", "gender"]
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_student_multiclass_dataset(protected_attribute: Union[Literal["sex", "address"],None] = None, preprocessed=True):
+def load_student_multiclass_dataset(
+    protected_attribute: Union[Literal["sex", "address"], None] = None, preprocessed=True
+):
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     output_column = "G3"
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
@@ -190,7 +194,11 @@ def load_student_multiclass_dataset(protected_attribute: Union[Literal["sex", "a
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_student_dataset(target: Literal["G1", "G2", "G3"] = "G3", preprocessed: bool = True, protected_attribute: Union[Literal["sex", "address"], None] = None):
+def load_student_dataset(
+    target: Literal["G1", "G2", "G3"] = "G3",
+    preprocessed: bool = True,
+    protected_attribute: Union[Literal["sex", "address"], None] = None,
+):
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
     bunch = load_student()
@@ -207,9 +215,9 @@ def load_student_dataset(target: Literal["G1", "G2", "G3"] = "G3", preprocessed:
     p_attrs = df[sensitive_attributes]
     if preprocessed:
         if protected_attribute is not None:
-            if protected_attribute== "sex":
-                ga_label="'F'"
-                gb_label="'M'"
+            if protected_attribute == "sex":
+                ga_label = "'F'"
+                gb_label = "'M'"
                 group_a = pd.Series(df["sex"] == "'F'", name="group_a")
                 group_b = pd.Series(df["sex"] == "'M'", name="group_b")
             else:
@@ -340,7 +348,9 @@ def load_us_crime_multiclass_dataset():
     return Dataset(X=x[numeric_features], y=y_cat, group_a=group_a, group_b=group_b, p_attr=p_attr)
 
 
-def load_clinical_records_dataset(preprocessed: bool = True, protected_attribute: Union[Literal["sex", "address"], None] = None):
+def load_clinical_records_dataset(
+    preprocessed: bool = True, protected_attribute: Union[Literal["sex", "address"], None] = None
+):
     """
     Processes the heart dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
