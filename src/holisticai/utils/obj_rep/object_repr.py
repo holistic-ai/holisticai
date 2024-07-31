@@ -26,6 +26,7 @@ def generate_html_for_generic_object(obj, feature_columns=5):
     name = obj.get("name", "N/A")
     obj_type = obj.get("dtype", "N/A").upper()
     attributes = obj.get("attributes", {})
+    metadata = obj.get("metadata", None)
     nested_objects = obj.get("nested_objects", [])
 
     # Generate HTML for attributes
@@ -34,6 +35,14 @@ def generate_html_for_generic_object(obj, feature_columns=5):
         if isinstance(value, list):
             value = ", ".join(map(str, value))  # noqa: PLW2901
         attributes_html += f'<div class="attribute-list">- {key}: {value}</div>'
+
+    if isinstance(metadata, str):
+        attributes_html += f'<div class="attribute-list">- Metadata: {metadata}</div>'
+    elif isinstance(metadata, dict):
+        for key, value in attributes.items():
+            if isinstance(value, list):
+                value = ", ".join(map(str, value))  # noqa: PLW2901
+            attributes_html += f'<div class="attribute-list">- {key}: {value}</div>'
 
     # Generate HTML for nested objects
     nested_objects_html = ""

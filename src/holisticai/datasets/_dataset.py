@@ -10,6 +10,8 @@ from holisticai.utils.obj_rep.object_repr import generate_html_for_generic_objec
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+import json
+
 import numpy as np
 from numpy.random import RandomState
 
@@ -43,13 +45,9 @@ class DatasetDict(dict):
     def _repr_html_(self):
         nested_objs = []
         for name, dataset in self.datasets.items():
-            nested_objs.append(
-                {
-                    "dtype": "Dataset",
-                    "name": name,
-                    "attributes": {"Number of Rows": dataset.num_rows, "Features": dataset.features},
-                }
-            )
+            repr_info = dataset.repr_info()
+            repr_info['name'] = name
+            nested_objs.append(repr_info)
         # Example usage
         obj = {"dtype": "DatasetDict", "attributes": {}, "nested_objects": nested_objs}
         return generate_html_for_generic_object(obj, feature_columns=5)
@@ -243,7 +241,7 @@ class Dataset:
         features_counts = features_values.value_counts()
         self.features_is_series = {key: (value == 1) for key, value in features_counts.items()}
 
-    def __init__(self, _data: pd.DataFrame | None = None, **kargs):
+    def __init__(self, _data: pd.DataFrame | None = None, _metadata=None, **kargs):
         if _data is None:
             self.data = {}
             for name, value in kargs.items():
@@ -260,26 +258,27 @@ class Dataset:
         else:
             self.data = _data.reset_index(drop=True)
         self.__update_metadata()
+        self._metadata = _metadata
         self.random_state = np.random.RandomState()
 
     def remove_columns(self, columns: str | list):
         """Returns a new dataset with the given columns removed."""
-        return Dataset(self.data.drop(columns, level=0, axis=1))
+        return Dataset(self.data.drop(columns, level=0, axis=1), _metadata=self._metadata)
 
     def rename(self, renames):
         """Returns a new dataset with renamed columns."""
-        return Dataset(self.data.rename(columns=renames, level=0))
+        return Dataset(self.data.rename(columns=renames, level=0), _metadata=self._metadata)
 
     def select(self, indices: Iterable):
         """Returns a new dataset with selected rows based on the given indices."""
         existing_indices = [idx for idx in indices if idx in self.indices]
-        return Dataset(self.data.iloc[existing_indices])
+        return Dataset(self.data.iloc[existing_indices], _metadata=self._metadata)
 
     def sample(self, n, random_state=None):
         """Returns a random sample of n rows from the dataset."""
         if random_state is None:
             random_state = self.random_state
-        return Dataset(sample_n(self.data, n, random_state=random_state).reset_index(drop=True))
+        return Dataset(sample_n(self.data, n, random_state=random_state).reset_index(drop=True), _metadata=self._metadata)
 
     def filter(self, fn):
         """Returns a new dataset with rows filtered based on the given function."""
@@ -289,7 +288,7 @@ class Dataset:
             return fn(new_row)
 
         new_datad = self.data[self.data.apply(fnw, axis=1)]
-        return Dataset(new_datad)
+        return Dataset(new_datad, _metadata=self._metadata)
 
     def groupby(self, key: list[str] | str):
         """Returns a new GroupByDataset object based on the given key."""
@@ -344,13 +343,13 @@ class Dataset:
             updated_data.columns = new_columns
         self.data.update(updated_data)
         new_data = pd.concat([self.data, updated_data[updated_data.columns.difference(self.data.columns)]], axis=1)
-        return Dataset(new_data)
+        return Dataset(new_data, _metadata=self._metadata)
 
     def train_test_split(self, test_size=0.3, **kargs):
         """Splits the dataset into train and test datasets."""
         train_df, test_df = train_test_split(self.data, test_size=test_size, **kargs)
-        train = Dataset(train_df)
-        test = Dataset(test_df)
+        train = Dataset(train_df, _metadata=self._metadata)
+        test = Dataset(test_df, _metadata=self._metadata)
         return DatasetDict(train=train, test=test)
 
     def __len__(self):
@@ -358,17 +357,17 @@ class Dataset:
         return self.num_rows
 
     def __repr__(self):
-        return f"Dataset({{\n" f"        features: {self.features},\n" f"        num_rows: {self.num_rows}\n" f"    }})"
+        return json.dumps(self.repr_info())
 
-    def __repr_info(self):
-        return {"Dataset": {"features": self.features, "num_rows": self.num_rows}}
-
-    def _repr_html_(self):
-        obj = {
+    def repr_info(self):
+        return {
             "dtype": "Dataset",
             "attributes": {"Number of Rows": self.num_rows, "Features": [" , ".join(self.features)]},
+            "metadata": self._metadata,
         }
-        return generate_html_for_generic_object(obj, feature_columns=5)
+
+    def _repr_html_(self):
+        return generate_html_for_generic_object(self.repr_info(), feature_columns=5)
 
     def __getitem__(self, key: str | int | list):
         """Returns a subset of the dataset based on the given key."""
