@@ -349,7 +349,7 @@ def load_us_crime_multiclass_dataset():
 
 
 def load_clinical_records_dataset(
-    preprocessed: bool = True, protected_attribute: Union[Literal["sex", "address"], None] = None
+    preprocessed: bool = True, protected_attribute: Union[Literal["sex"], None] = None
 ):
     """
     Processes the heart dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
