@@ -22,7 +22,11 @@ logger = logging.getLogger(__name__)
 
 
 def is_numeric(df):
-    return all(pd.api.types.is_numeric_dtype(df[col]) for col in df.columns)
+    if isinstance(df, pd.DataFrame):
+        return all(pd.api.types.is_numeric_dtype(df[col]) for col in df.columns)
+    if isinstance(df, np.ndarray):
+        return np.issubdtype(df.dtype, np.number)
+    raise ValueError("Input must be a pandas DataFrame or numpy array.")
 
 
 class AdversarialDebiasing(BMImp):

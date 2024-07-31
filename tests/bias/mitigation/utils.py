@@ -43,7 +43,7 @@ def recommender_dataset():
 
 @pytest.fixture
 def clustering_dataset():
-    dataset = load_dataset("clinical_records")
+    dataset = load_dataset("clinical_records", protected_attribute='sex')
     return dataset.train_test_split(test_size=0.2, stratify=dataset['y'], random_state=0)
 
 def check_results(df1, df2, atol=1e-5):
