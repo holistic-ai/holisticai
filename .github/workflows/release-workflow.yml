@@ -1,4 +1,4 @@
-name: Python Package Release and notification
+name: Python Package Release
 
 on:
   workflow_dispatch:
