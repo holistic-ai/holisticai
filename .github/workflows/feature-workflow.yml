@@ -1,4 +1,4 @@
-name: Feature Branch CI
+name: Test and Lint feature/bugfix branches
 
 on:
   push:
@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.7
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5.1.1
         with:
           python-version: "3.9"
           cache: "pip"
@@ -30,8 +30,8 @@ jobs:
             python -m pip install --upgrade pip 
             pip install hatch
 
-      - name: lint and format
+      - name: Lint and Format
         run: hatch fmt --check
 
-      - name: run tests
+      - name: Run tests
         run: hatch run testing:run

@@ -1,4 +1,4 @@
-name: Start a New Release
+name: Python Package Release and notification
 
 on:
   workflow_dispatch:
@@ -13,16 +13,22 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v2
+        with:
+          application_id: ${{ secrets.APPLICATION_ID }}
+          application_private_key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+
       - name: Checkout code
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.7
         with:
           fetch-tags: true
           ref: main
-          token: ${{ secrets.APP_SECRET }} # Needed to trigger other actions
-          
+          token: ${{ steps.get_workflow_token.outputs.token }} # Needed to trigger other actions
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5.1.1
         with:
           python-version: "3.9"
 
