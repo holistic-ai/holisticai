@@ -1,4 +1,4 @@
-name: Start a New Release
+name: Python Package Release and notification
 
 on:
   workflow_dispatch:
