@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4.1.7
         with:
           fetch-tags: true
+          fetch-depth: 0
           ref: main
           token: ${{ steps.app-token.outputs.token }} # Needed to trigger other actions
 
@@ -36,9 +37,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install hatch git-cliff
 
-      - name: Update changelog
+      - name: Bump version and create
         run: |
+          git tag ${{ inputs.version }}
+          git push origin ${{ inputs.version }}
+
+      - name: Update Changelog
+        run: |
+          hatch version ${{ inputs.version }}
           git cliff -o CHANGELOG.md
+          
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update version and changelog"
+          git push --follow-tags
 
       - name: Create Release
         id: create_release
@@ -50,52 +65,3 @@ jobs:
           release_name: Release ${{ inputs.version }}
           draft: false
           prerelease: false
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Update version and changelog"
-          git push --follow-tags
-
-      - name: Bump version and create tag
-        run: |
-          hatch version ${{ inputs.version }}
-          hatch build
-
-      - name: Publish to PyPI
-        env:
-          HATCH_INDEX_USER: __token__
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          hatch publish
-
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          channel-id: "${{ vars.SLACK_CHANNEL_ID }}"
-          payload: |
-            {
-              "attachments": [
-              {
-                "color": "#36a64f",
-                "pretext": "Release holisticai *v${{ github.event.inputs.version }}* is on the way :rocket:",
-                "fields": [
-                  {
-                    "title": "Release Notes",
-                    "value": "https://github.com/${{ github.repository }}/releases/tag/${{ github.event.inputs.version }}",
-                    "short": false
-                  },
-                  {
-                    "title": "Repository",
-                    "value": "https://github.com/${{ github.repository }}",
-                    "short": false
-                  }
-                ]
-              }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
