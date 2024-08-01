@@ -43,6 +43,7 @@ jobs:
             HATCH_INDEX_USER: __token__
             HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
         run: |
+            hatch build
             hatch publish
 
       - name: Post to a Slack channel
