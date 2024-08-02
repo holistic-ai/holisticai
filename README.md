@@ -86,7 +86,7 @@ bias_metrics_report(model_type='binary_classification', table_metrics=metrics)
 ### Documentation and Tutorials
 ---
 
-* [Documentation](https://holistic-ai.readthedocs.io/en/latest/)
+* [Documentation](https://holisticai.readthedocs.io/en/latest/)
 * [Notebooks](https://github.com/holistic-ai/holisticai/tree/main/tutorials)
 * [Holistic AI Website](https://holisticai.com)
 
