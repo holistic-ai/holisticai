@@ -23,9 +23,22 @@ Raw datasets are the initial data collected from the original sources. These dat
 Processed Datasets
 ~~~~~~~~~~~~~~~~~~
 
-Processed datasets are refined and structured for specific machine learning tasks, addressing various technical concerns such as bias, efficacy, and explainability. These datasets are encapsulated within a Dataset object, containing variables that are ready for the machine learning process. The table below provides details on these processed datasets.
+Processed datasets are refined and structured for specific machine learning tasks, addressing various technical concerns such as bias, efficacy, explainability, etc. These datasets are encapsulated within a :ref:`datasets_objects`, containing variables that are ready for the machine learning process. The table below provides details on these processed datasets. The function load_dataset in :ref:`dataset_loading_functions` allow us to load the processed datasets. The function receibe the following parameters:
+
+- **Protected Attribute**: The attribute that is considered sensitive and should be protected from bias.
+- **Processed**: The method used to process X and y. Normally categorical to numerical encoding, normalization, and standardization.
+- **Target**: If the dataset has more than one target, the primary target is specified here.
 
 .. csv-table:: Processed Datasets
     :header: "Dataset", "Load Data Method", "Learning Task", "Technical Risk"
     :file: datasets.csv
     :widths: 7, 7, 7, 7
+
+
+You can use this processed datasets using the function load_dataset from holisticai.datasets. For example, to load the processed version of the Adult dataset and use the protected attribute sex, represented by group_a and group_b, we can use the following code:
+
+.. code-block:: python
+
+   from holisticai.datasets import load_dataset
+    
+    dataset = load_dataset("adult", processed=True, protected_attribute="sex")

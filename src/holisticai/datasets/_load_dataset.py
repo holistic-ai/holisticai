@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Union
+from typing import Literal, Union, overload
 
 import numpy as np
 import pandas as pd
@@ -73,33 +73,33 @@ def load_adult_dataset(protected_attribute: Union[Literal["race", "sex"], None] 
     df = df.dropna().reset_index(drop=True)
     p_attrs = df[sensitive_attribute]
     if preprocessed:
-        if protected_attribute is not None:
-            if protected_attribute == "race":
-                ga_label = "White"
-                gb_label = "Black"
-                group_a = pd.Series(get_protected_values(df, protected_attribute, ga_label), name="group_a")
-                group_b = pd.Series(get_protected_values(df, protected_attribute, gb_label), name="group_b")
-
-            elif protected_attribute == "sex":
-                ga_label = "Male"
-                gb_label = "Female"
-                group_a = pd.Series(get_protected_values(df, protected_attribute, ga_label), name="group_a")
-                group_b = pd.Series(get_protected_values(df, protected_attribute, gb_label), name="group_b")
-            else:
-                raise ValueError("The protected attribute must be: race or sex")
-
         y = df[output_variable].map({"<=50K": 0, ">50K": 1}).astype("category")
         xt = df[feature_names]
         categorical_features = xt.select_dtypes(include=["category"]).columns
         xt = pd.get_dummies(xt, columns=categorical_features).astype(np.float64)
+    else:
+        xt = df[feature_names].astype(column_types)
+        y = df[output_variable]
+
+    if protected_attribute is not None:
+        if protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Black"
+            group_a = pd.Series(get_protected_values(df, protected_attribute, ga_label), name="group_a")
+            group_b = pd.Series(get_protected_values(df, protected_attribute, gb_label), name="group_b")
+
+        elif protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(get_protected_values(df, protected_attribute, ga_label), name="group_a")
+            group_b = pd.Series(get_protected_values(df, protected_attribute, gb_label), name="group_b")
+        else:
+            raise ValueError("The protected attribute must be: race or sex")
+
         if protected_attribute is not None:
             metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
             return Dataset(X=xt, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
-        return Dataset(X=xt, y=y, p_attrs=p_attrs)
-
-    x = df[feature_names].astype(column_types)
-    y = df[output_variable]
-    return Dataset(X=x, y=y, p_attrs=p_attrs)
+    return Dataset(X=xt, y=y, p_attrs=p_attrs)
 
 
 def load_law_school_dataset(
@@ -112,33 +112,29 @@ def load_law_school_dataset(
     df = bunch["frame"]
     df = df.dropna()
     p_attrs = df[sensitive_attribute]
-    if preprocessed:
-        if protected_attribute is not None:
-            if protected_attribute == "race":
-                ga_label = "white"
-                gb_label = "non-white"
-                group_a = pd.Series(get_protected_values(df, "race1", ga_label), name="group_a")
-                group_b = pd.Series(get_protected_values(df, "race1", gb_label), name="group_b")
-
-            elif protected_attribute == "gender":
-                ga_label = "Female"
-                gb_label = "Male"
-                group_a = pd.Series(get_protected_values(df, "gender", ga_label), name="group_a")
-                group_b = pd.Series(get_protected_values(df, "gender", gb_label), name="group_b")
-            else:
-                raise ValueError("The protected attribute must be one of: race or gender")
-
-        y = df[output_variable]
-        y = y.map({"FALSE": 0, "TRUE": 1}).astype("category")
-        X = df.drop(drop_columns, axis=1)
-        if protected_attribute is not None:
-            metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
-            return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
-        return Dataset(X=X, y=y, p_attrs=p_attrs)
-
     y = df[output_variable]
+    if preprocessed:
+        y = y.map({"FALSE": 0, "TRUE": 1}).astype("category")
     X = df.drop(drop_columns, axis=1)
 
+    if protected_attribute is not None:
+        if protected_attribute == "race":
+            ga_label = "white"
+            gb_label = "non-white"
+            group_a = pd.Series(get_protected_values(df, "race1", ga_label), name="group_a")
+            group_b = pd.Series(get_protected_values(df, "race1", gb_label), name="group_b")
+
+        elif protected_attribute == "gender":
+            ga_label = "Female"
+            gb_label = "Male"
+            group_a = pd.Series(get_protected_values(df, "gender", ga_label), name="group_a")
+            group_b = pd.Series(get_protected_values(df, "gender", gb_label), name="group_b")
+        else:
+            raise ValueError("The protected attribute must be one of: race or gender")
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
@@ -155,50 +151,51 @@ def load_student_multiclass_dataset(
     df = df.dropna()
     y = convert_float_to_categorical(df[output_column], 3)
 
-    for col in ["sex", "address"]:
-        df[col] = df[col].apply(lambda x: x.replace("'", ""))
-
-    for col in df.select_dtypes(include="object").columns:
-        df[col] = df[col].astype("category")
-
     p_attrs = df[sensitive_attributes]
+    X = df.drop(drop_columns, axis=1)
+
     if preprocessed:
-        if protected_attribute is not None:
-            if protected_attribute == "sex":
-                ga_label = "F"
-                gb_label = "M"
-                group_a = pd.Series(df["sex"] == ga_label, name="group_a")
-                group_b = ~group_a
-            elif protected_attribute == "address":
-                ga_label = "U"
-                gb_label = "M"
-                group_a = pd.Series(df["address"] == ga_label, name="group_a")
-                group_b = ~group_a
-            else:
-                raise ValueError("The protected attribute must be one sex or address")
+        for col in X.select_dtypes(include="object").columns:
+            X[col] = X[col].astype("category")
 
-        for col in df.select_dtypes(include=["category"]):
-            df[col] = pd.factorize(df[col])[0]
+        for col in X.select_dtypes(include=["category"]):
+            X[col] = pd.factorize(X[col])[0]
 
-        df = df.drop(drop_columns, axis=1)
-        df = pd.get_dummies(df, columns=df.columns[df.dtypes == "category"])
-        df = df.reset_index(drop=True)
-        X = df.astype(float)
+        X = pd.get_dummies(X, columns=X.columns[X.dtypes == "category"])
+        X = X.reset_index(drop=True).astype(float)
         y = y.reset_index(drop=True)
-        if protected_attribute is not None:
-            metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
-            return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
-        return Dataset(X=X, y=y, p_attrs=p_attrs)
 
-    X = df.drop(columns=drop_columns)
+    if protected_attribute is not None:
+        for col in ["sex", "address"]:
+            df[col] = df[col].apply(lambda x: x.replace("'", ""))
+
+        if protected_attribute == "sex":
+            ga_label = "F"
+            gb_label = "M"
+            group_a = pd.Series(df["sex"] == ga_label, name="group_a")
+            group_b = ~group_a
+        elif protected_attribute == "address":
+            ga_label = "U"
+            gb_label = "M"
+            group_a = pd.Series(df["address"] == ga_label, name="group_a")
+            group_b = ~group_a
+        else:
+            raise ValueError("The protected attribute must be one sex or address")
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
 def load_student_dataset(
-    target: Literal["G1", "G2", "G3"] = "G3",
+    target: Union[Literal["G1", "G2", "G3"],None] = None,
     preprocessed: bool = True,
     protected_attribute: Union[Literal["sex", "address"], None] = None,
 ):
+    if target is None:
+        target = "G3"
+
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
     bunch = load_student()
@@ -213,30 +210,30 @@ def load_student_dataset(
     df = df.dropna()
     y = df[target]
     p_attrs = df[sensitive_attributes]
-    if preprocessed:
-        if protected_attribute is not None:
-            if protected_attribute == "sex":
-                ga_label = "'F'"
-                gb_label = "'M'"
-                group_a = pd.Series(df["sex"] == "'F'", name="group_a")
-                group_b = pd.Series(df["sex"] == "'M'", name="group_b")
-            else:
-                raise ValueError("The protected attribute doesn't exist or not implemented")
 
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "F"
+            gb_label = "M"
+            group_a = pd.Series(df["sex"] == "F", name="group_a")
+            group_b = pd.Series(df["sex"] == "M", name="group_b")
+        else:
+            raise ValueError("The protected attribute doesn't exist or not implemented")
+    df = df.drop(drop_columns, axis=1)
+
+    if preprocessed:
         for col in df.select_dtypes(include=["category"]):
             df[col] = pd.factorize(df[col])[0]
-        df = df.drop(drop_columns, axis=1)
         df = pd.get_dummies(df, columns=df.columns[df.dtypes == "category"])
         df = df.reset_index(drop=True)
         X = df.astype(float)
         y = y.reset_index(drop=True)
+    else:
+        X = df
 
-        if protected_attribute is not None:
-            metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
-            return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
-        return Dataset(X=X, y=y, p_attrs=p_attrs)
-
-    X = df.drop(columns=drop_columns)
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
@@ -258,10 +255,9 @@ def load_lastfm_dataset():
     """
     bunch = load_last_fm()
     df = bunch["frame"]
-    protected_attribute = "sex"
     user_column = "user"
     item_column = "artist"
-
+    protected_attribute = "sex"
     from holisticai.utils import recommender_formatter
 
     random_state = np.random.RandomState(42)
@@ -280,7 +276,7 @@ def load_lastfm_dataset():
     return Dataset(data_pivot=df_pivot, p_attr=pd.Series(p_attr))
 
 
-def load_us_crime_dataset():
+def load_us_crime_dataset(preprocessed=True, protected_attribute: Union[Literal["race"], None]=None):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and \
     protected group B as numerical arrays or as dataframe if needed
@@ -299,22 +295,39 @@ def load_us_crime_dataset():
     """
     min_nonan_values = 1000
     data = load_us_crime()
-    protected_attribute = "racePctWhite"
+    protected_attributes = ['racePctWhite']
+    mapping_name2column = {'race':"racePctWhite"}
+    protected_attribute_column = mapping_name2column.get(protected_attribute)
     output_variable = "ViolentCrimesPerPop"
     df = pd.concat([data["data"], data["target"]], axis=1)
     df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < min_nonan_values]]
     df = df.dropna()
+    p_attrs = df[protected_attributes]
     threshold = 0.5
-    group_a = pd.Series(df[protected_attribute] > threshold, name="group_a")
-    group_b = pd.Series(~group_a, name="group_b")
     y = df[output_variable]
-    remove_columns = [protected_attribute, output_variable]
-    x = df.drop(columns=remove_columns)
-    numeric_features = x.select_dtypes(include=[np.number]).columns
-    return Dataset(X=x[numeric_features], y=y, group_a=group_a, group_b=group_b)
+    remove_columns = [*protected_attributes, output_variable]
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        numeric_features = X.select_dtypes(include=[np.number]).columns
+        X = X[numeric_features]
+
+    if protected_attribute is not None:
+        if protected_attribute == "race":
+            ga_label = f"racePctWhite>{threshold}"
+            gb_label = f"racePctWhite<={threshold}"
+            group_a = pd.Series(df[protected_attribute_column] > threshold, name="group_a")
+            group_b = pd.Series(~group_a, name="group_b")
+        else:
+            raise ValueError(f"The protected attribute doesn't exist or not implemented. Please use: {protected_attributes}")
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_us_crime_multiclass_dataset():
+def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Union[Literal["race"], None]=None):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -332,23 +345,40 @@ def load_us_crime_multiclass_dataset():
     """
     min_nonan_values = 1000
     data = load_us_crime()
-    protected_attribute = "racePctWhite"
+    protected_attributes = ['racePctWhite']
+    mapping_name2column = {'race':"racePctWhite"}
+    protected_attribute_column = mapping_name2column.get(protected_attribute)
     output_column = "ViolentCrimesPerPop"
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < min_nonan_values]]
-    df = df.dropna()
-    threshold = 0.5
-    group_a = pd.Series(df[protected_attribute] > threshold, name="group_a")
-    group_b = pd.Series(~group_a, name="group_b")
-    p_attr = pd.Series([1 if i else 0 for i in group_a])
+    remove_columns = [*protected_attributes, output_column]
     y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3)).astype("category")
-    remove_columns = [protected_attribute, output_column]
-    x = df.drop(columns=remove_columns)
-    numeric_features = x.select_dtypes(include=[np.number]).columns
-    return Dataset(X=x[numeric_features], y=y_cat, group_a=group_a, group_b=group_b, p_attr=p_attr)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        numeric_features = X.select_dtypes(include=[np.number]).columns
+        X = X[numeric_features]
+        df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < min_nonan_values]]
+        df = df.dropna()
+
+    p_attrs = df[protected_attributes]
+
+    if protected_attribute is not None:
+        if protected_attribute == 'race':
+            threshold = 0.5
+            ga_label = f"racePctWhite>{threshold}"
+            gb_label = f"racePctWhite<={threshold}"
+            group_a = pd.Series(df[protected_attribute_column] > threshold, name="group_a")
+            group_b = pd.Series(~group_a, name="group_b")
+        else:
+            raise ValueError(f"The protected attribute doesn't exist or not implemented. Please use: {protected_attributes}")
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y_cat, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y_cat, p_attrs=p_attrs)
 
 
-def load_clinical_records_dataset(preprocessed: bool = True, protected_attribute: Union[Literal["sex"], None] = None):
+def load_clinical_records_dataset(protected_attribute: Union[Literal["sex"], None] = None):
     """
     Processes the heart dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -370,25 +400,22 @@ def load_clinical_records_dataset(preprocessed: bool = True, protected_attribute
     drop_columns = ["age", "sex", "DEATH_EVENT"]
     p_attrs = df[protected_attributes]
     df = df.dropna().reset_index(drop=True)
-    if preprocessed:
-        if protected_attribute is not None:
-            if protected_attribute == "sex":
-                ga_label = 0
-                gb_label = 1
-                group_a = pd.Series(df[protected_attribute] == ga_label, name="group_a")
-                group_b = pd.Series(df[protected_attribute] == gb_label, name="group_b")
-            else:
-                raise ValueError("The protected attribute doesn't exist or not implemented")
-        y = df[output_variable]
-        X = df.drop(columns=drop_columns)
-        if protected_attribute is not None:
-            metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
-            return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
-        return Dataset(X=X, y=y, p_attrs=p_attrs)
-
+    X = df.drop(columns=drop_columns)
     y = df[output_variable]
-    x = df.drop(columns=drop_columns)
-    return Dataset(X=x, y=y, p_attrs=p_attrs)
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = 0
+            gb_label = 1
+            group_a = pd.Series(df[protected_attribute] == ga_label, name="group_a")
+            group_b = pd.Series(df[protected_attribute] == gb_label, name="group_b")
+        else:
+            raise ValueError("The protected attribute doesn't exist or not implemented. Please use: sex")
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
 ProcessedDatasets = Literal[
@@ -403,7 +430,55 @@ ProcessedDatasets = Literal[
 ]
 
 
-def load_dataset(dataset_name: ProcessedDatasets, **kargs) -> Dataset:
+@overload
+def load_dataset(
+    dataset_name: Literal['adult'],
+    protected_attribute: Union[Literal["race", "sex"], None] = None,
+    preprocessed: bool = True): ...
+
+@overload
+def load_dataset(
+    dataset_name: Literal['law_school'],
+    protected_attribute: Union[Literal["race", "gender"], None] = None,
+    preprocessed: bool = True
+):...
+
+@overload
+def load_dataset(
+    dataset_name: Literal['student_multiclass'],
+    protected_attribute: Union[Literal["sex", "address"], None] = None,
+    preprocessed: bool=True
+):...
+
+@overload
+def load_dataset(
+    dataset_name: Literal['student'],
+    target: Union[Literal["G1", "G2", "G3"],None] = None,
+    preprocessed: bool = True,
+    protected_attribute: Union[Literal["sex", "address"], None] = None,
+):...
+@overload
+def load_dataset(
+    dataset_name: Literal['lastfm'],
+):...
+@overload
+def load_dataset(
+    dataset_name: Literal['us_crime'],
+    preprocessed: bool=True,
+    protected_attribute: Union[Literal["race"], None]=None):...
+@overload
+def load_dataset(
+    dataset_name: Literal['us_crime_multiclass'],
+    preprocessed: bool=True,
+    protected_attribute: Union[Literal["race"], None]=None): ...
+@overload
+def load_dataset(
+    dataset_name: Literal['clinical_records'],
+    protected_attribute: Union[Literal["sex"], None] = None):...
+
+
+
+def load_dataset(dataset_name: ProcessedDatasets, preprocessed: bool=True, protected_attribute: Union[str,None]=None, target: Union[str,None] =None) -> Dataset:
     """
     Load a specific dataset based on the given dataset name.
 
@@ -411,8 +486,10 @@ def load_dataset(dataset_name: ProcessedDatasets, **kargs) -> Dataset:
     ----------
     dataset_name: ProcessedDatasets
         The name of the dataset to load. The list of supported datasets are here: :ref:`processed_datasets`.
-    kargs:
-        Additional keyword arguments to pass to the dataset loading functions.
+    preprocessed: (bool, Optional)
+        Whether to return the preprocessed dataset (X,y) or not.
+    protected_attribute: (str, Optional)
+        The protected attribute to use for the dataset.
 
     Returns
     -------
@@ -424,19 +501,19 @@ def load_dataset(dataset_name: ProcessedDatasets, **kargs) -> Dataset:
         If the specified dataset name is not supported.
     """
     if dataset_name == "adult":
-        return load_adult_dataset(**kargs)
+        return load_adult_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "law_school":
-        return load_law_school_dataset(**kargs)
+        return load_law_school_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "student_multiclass":
-        return load_student_multiclass_dataset(**kargs)
+        return load_student_multiclass_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "student":
-        return load_student_dataset(**kargs)
+        return load_student_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute, target=target)
     if dataset_name == "lastfm":
         return load_lastfm_dataset()
     if dataset_name == "us_crime":
-        return load_us_crime_dataset()
+        return load_us_crime_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "us_crime_multiclass":
-        return load_us_crime_multiclass_dataset()
+        return load_us_crime_multiclass_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "clinical_records":
-        return load_clinical_records_dataset(**kargs)
+        return load_clinical_records_dataset(protected_attribute=protected_attribute)
     raise NotImplementedError
