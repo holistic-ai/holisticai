@@ -54,14 +54,13 @@ def format_function_predict_proba(learning_task, predict_proba_fn):
     callable
         The formatted predict_proba function.
     """
-    match learning_task:
-        case "binary_classification":
+    if learning_task == "binary_classification":
 
-            def forward(x: np.ndarray, feature_names: list[str]):
-                x_df = x_array_to_df(x, feature_names=feature_names)
-                score = np.array(predict_proba_fn(x_df))
-                if score.ndim == 2:
-                    return score
-                return np.stack([1 - score, score], axis=1)
+        def forward(x: np.ndarray, feature_names: list[str]):
+            x_df = x_array_to_df(x, feature_names=feature_names)
+            score = np.array(predict_proba_fn(x_df))
+            if score.ndim == 2:
+                return score
+            return np.stack([1 - score, score], axis=1)
 
     return forward
