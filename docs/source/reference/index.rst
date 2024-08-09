@@ -31,6 +31,12 @@ Below is a list of modules in ``holisticai``:
 
         Metrics and mitigation strategies for security in various learning tasks.
 
+    .. grid-item-card:: Robustness
+        :link: robustness/index.html
+        :shadow: md
+
+        Metrics and attackers for evaluating the robustness of machine learning models.
+
     .. grid-item-card:: Pipeline
         :link: pipeline.html
         :shadow: md
@@ -53,3 +59,4 @@ Below is a list of modules in ``holisticai``:
    explainability/index
    pipeline
    datasets
+   robustness
