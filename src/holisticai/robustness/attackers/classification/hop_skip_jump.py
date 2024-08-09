@@ -7,26 +7,26 @@ predictions. It is an advanced version of the Boundary attack.
 
 from __future__ import annotations
 
-from typing import Callable, Literal, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 from holisticai.robustness.attackers.classification.commons import x_array_to_df, x_to_nd_array
-from numpy.typing import ArrayLike, NDArray
-from pydantic import BaseModel
 
 
-class HopSkipJump(BaseModel):
+class HopSkipJump:
     """
     Implementation of the HopSkipJump attack from Jianbo et al. (2019). This is a powerful black-box attack that
     only requires final class prediction, and is an advanced version of the boundary attack.
 
     Parameters
     ----------
+    name : str, optional
+        The name of the attack.
     batch_size : int, optional
         Batch size for the attack.
     targeted : bool, optional
-        Indicates whether the attack is targeted or not.
+        Indicates whether the attack is targeted or not. If True, the positive ground truth is used as the target.
     norm : int, float, str, optional
         The norm of the attack. Possible values: "inf", np.inf or 2.
     max_iter : int, optional
@@ -39,16 +39,12 @@ class HopSkipJump(BaseModel):
         The number of initial samples.
     verbose : bool, optional
         Verbosity mode.
-    predictor : Callable[[NDArray], NDArray|ArrayLike], optional
-        The model's prediction function.
-    input_shape : list, optional
-        The shape of the input data.
+    predictor : callable, optional
+        The model's prediction function. The default is None.
     input_size : int, optional
         The size of the input data.
     theta : float, optional
         The binary search threshold.
-    feature_names : list, optional
-        The feature names.
     curr_iter : int, optional
         The current iteration.
 
@@ -57,32 +53,35 @@ class HopSkipJump(BaseModel):
     .. [1] Chen, J., Jordan, M. I., & Wainwright, M. J. (2019). HopSkipJumpAttack: A query-efficient decision-based attack. In 2020 ieee symposium on security and privacy (sp) (pp. 1277-1294). IEEE.
     """
 
-    name: Literal["HSJ"] = "HSJ"
-
-    batch_size: int = 64
-    targeted: bool = False
-    norm: Union[int, float, str] = 2
-    max_iter: int = 50
-    max_eval: int = 10000
-    init_eval: int = 100
-    init_size: int = 100
-    verbose: bool = True
-    predictor: Callable[[NDArray], NDArray | ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
-    input_shape: list = []
-    input_size: int = 0
-    theta: float = 0.0
-    feature_names: list = []
-    curr_iter: int = 0
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        # Set binary search threshold
-        self.input_size = np.prod(self.input_shape)
-        if self.norm == 2:
-            self.theta = 0.01 / np.sqrt(self.input_size)
-        else:
-            self.theta = 0.01 / self.input_size
+    def __init__(
+        self,
+        name="HSJ",
+        batch_size=64,
+        targeted=False,
+        norm=2,
+        max_iter=50,
+        max_eval=10000,
+        init_eval=100,
+        init_size=100,
+        verbose=True,
+        predictor=None,
+        input_size=0,
+        theta=0.0,
+        curr_iter=0,
+    ):
+        self.name = name
+        self.batch_size = batch_size
+        self.targeted = targeted
+        self.norm = norm
+        self.max_iter = max_iter
+        self.max_eval = max_eval
+        self.init_eval = init_eval
+        self.init_size = init_size
+        self.verbose = verbose
+        self.predictor = predictor
+        self.input_size = input_size
+        self.theta = theta
+        self.curr_iter = curr_iter
 
     def predict(self, x: np.ndarray):
         """
@@ -124,6 +123,13 @@ class HopSkipJump(BaseModel):
         pd.DataFrame
             The adversarial examples.
         """
+
+        self.input_shape = tuple(x_df.shape[1:])
+        self.input_size = np.prod(self.input_shape)
+        if self.norm == 2:
+            self.theta = 0.01 / np.sqrt(self.input_size)
+        else:
+            self.theta = 0.01 / self.input_size
 
         self.feature_names = list(x_df.columns)
         x = x_to_nd_array(x_df)

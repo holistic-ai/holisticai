@@ -8,28 +8,30 @@ gradients.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
 from holisticai.robustness.attackers.classification.commons import to_categorical, x_array_to_df, x_to_nd_array
-from numpy.typing import ArrayLike, NDArray
-from pydantic import BaseModel, ConfigDict
 from scipy.ndimage import zoom
 
+BATCH_SIZE = 1
 
-class ZooAttack(BaseModel):
+
+class ZooAttack:
     """
     The black-box zeroth-order optimization attack from Pin-Yu Chen et al. (2018). This attack is a variant of the
     C&W attack which uses ADAM coordinate descent to perform numerical estimation of gradients.
 
     Parameters
     ----------
+    name : str, optional
+        The name of the attack. The default is "Zoo".
     confidence : float, optional
-        Confidence of adversarial examples. A higher value produces examples that are farther away, but more strongly
+        Confidence of adversarial examples. A higher value produces examples that are farther away, but more strongly\\
         classified as adversarial. The default is 0.0.
     targeted : bool, optional
-        Indicates whether the attack is targeted. The default is False.
+        Indicates whether the attack is targeted. The default is False. If True, the positive ground truth is used as the target.
     learning_rate : float, optional
         The learning rate for the ADAM optimizer. The default is 1e-2.
     max_iter : int, optional
@@ -46,22 +48,14 @@ class ZooAttack(BaseModel):
         Indicates whether to use importance sampling. The default is False.
     nb_parallel : int, optional
         The number of parallel coordinates to update. The default is 1.
-    batch_size : int, optional
-        The batch size. The default is 1.
     variable_h : float, optional
         The variable h. The default is 0.2.
     verbose : bool, optional
         Indicates whether to print verbose output. The default is True.
     input_is_feature_vector : bool, optional
         Indicates whether the input is a feature vector. The default is False.
-    clip_values : tuple, optional
-        The minimum and maximum values for clipping the input. The default is (0, 1).
-    predict_proba_fn : Callable[[NDArray, list], NDArray|ArrayLike], optional
-        The function used to predict the probabilities of the input. The default is an empty numpy array.
-    predict_proba : Callable[[NDArray], NDArray|ArrayLike], optional
-        The function used to predict the probabilities of the input. The default is an empty numpy array.
-    input_shape : tuple, optional
-        The shape of the input. The default is an empty tuple.
+    predict_proba_fn : callable, optional
+        The function used to predict the probabilities of the input. The default is None.
     input_size : int, optional
         The size of the input. The default is 0.
     nb_classes : int, optional
@@ -72,44 +66,63 @@ class ZooAttack(BaseModel):
         The variance of the ADAM optimizer. The default is None.
     adam_epochs : Optional[NDArray|ArrayLike|None], optional
         The epochs of the ADAM optimizer. The default is None.
-
-    References
-    ----------
-    .. [1] Pin-Yu Chen, Yash Sharma, Huan Zhang, Jinfeng Yi, and Cho-Jui Hsieh. "Zoo: Zeroth order optimization based\\
-              black-box attacks to deep neural networks without training substitute models." In Proceedings of the 10th\\
-                ACM Workshop on Artificial Intelligence and Security, pp. 15-26. 2017.
     """
 
-    name: Literal["Zoo"] = "Zoo"
+    def __init__(
+        self,
+        name="Zoo",
+        confidence=0.0,
+        targeted=False,
+        learning_rate=1e-2,
+        max_iter=20,
+        binary_search_steps=10,
+        initial_const=1e-3,
+        abort_early=True,
+        use_resize=False,
+        use_importance=False,
+        nb_parallel=1,
+        variable_h=0.2,
+        verbose=True,
+        input_is_feature_vector=False,
+        predict_proba_fn=None,
+        input_size=0,
+        nb_classes=2,
+        adam_mean=None,
+        adam_var=None,
+        adam_epochs=None,
+    ):
+        self.name = name
+        self.confidence = confidence
+        self.targeted = targeted
+        self.learning_rate = learning_rate
+        self.max_iter = max_iter
+        self.binary_search_steps = binary_search_steps
+        self.initial_const = initial_const
+        self.abort_early = abort_early
+        self.use_resize = use_resize
+        self.use_importance = use_importance
+        self.nb_parallel = nb_parallel
+        self.batch_size = BATCH_SIZE
+        self.variable_h = variable_h
+        self.verbose = verbose
+        self.input_is_feature_vector = input_is_feature_vector
+        self.predict_proba_fn = predict_proba_fn
+        self.input_size = input_size
+        self.nb_classes = nb_classes
+        self.adam_mean = adam_mean
+        self.adam_var = adam_var
+        self.adam_epochs = adam_epochs
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    confidence: float = 0.0
-    targeted: bool = False
-    learning_rate: float = 1e-2
-    max_iter: int = 20
-    binary_search_steps: int = 10
-    initial_const: float = 1e-3
-    abort_early: bool = True
-    use_resize: bool = False
-    use_importance: bool = False
-    nb_parallel: int = 1
-    batch_size: int = 1
-    variable_h: float = 0.2
-    verbose: bool = True
-    input_is_feature_vector: bool = False
-    clip_values: tuple = (0, 1)
-    predict_proba_fn: Callable[[NDArray, list], NDArray | ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
-    predict_proba: Callable[[NDArray], NDArray | ArrayLike] = lambda x: np.ndarray([])  # noqa: ARG005
-    input_shape: tuple = ()
-    input_size: int = 0
-    nb_classes: int = 2
-    adam_mean: Optional[NDArray | ArrayLike | None] = None
-    adam_var: Optional[NDArray | ArrayLike | None] = None
-    adam_epochs: Optional[NDArray | ArrayLike | None] = None
+    def _initialize_vars(self, x: np.ndarray) -> None:
+        """
+        Initialize the variables.
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
+        Parameters
+        ----------
+        x : np.ndarray
+            The input samples.
+        """
+        self.input_shape = tuple(x.shape[1:])
         self.input_size = np.prod(self.input_shape)
         if len(self.input_shape) == 1:
             self.input_is_feature_vector = True
@@ -132,10 +145,7 @@ class ZooAttack(BaseModel):
             self.use_importance = False
 
         if self.use_resize:
-            if not self.channels_first:
-                dims = (self.batch_size, self._init_size, self._init_size, self.input_shape[-1])
-            else:  # pragma: no cover
-                dims = (self.batch_size, self.input_shape[0], self._init_size, self._init_size)
+            dims = (self.batch_size, self.input_shape[0], self._init_size, self._init_size)
             self._current_noise = np.zeros(dims, dtype=np.float32)
         else:
             self._current_noise = np.zeros((self.batch_size, *self.input_shape), dtype=np.float32)
@@ -197,6 +207,7 @@ class ZooAttack(BaseModel):
         pd.DataFrame
             The adversarial samples.
         """
+        self._initialize_vars(x_df)
         feature_names = list(x_df.columns)
         self.predict_proba = lambda x: self.predict_proba_fn(x, feature_names)
 
