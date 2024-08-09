@@ -50,11 +50,7 @@ def test_hsj(categorical_dataset):
 
     proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=[0, 1])
 
-    kargs = {
-        "predictor": proxy.predict,
-        "input_shape": tuple(X_test.shape[1:]),
-    }
-    hsj_attacker = HopSkipJump(name="HSJ", **kargs)
+    hsj_attacker = HopSkipJump(name="HSJ", predictor=proxy.predict)
 
     hsj_adv_x = hsj_attacker.generate(pd.DataFrame(X_test, columns=feature_names))
     y_adv_pred = proxy.predict(hsj_adv_x)
@@ -91,11 +87,7 @@ def test_zoo(categorical_dataset):
 
     predict_proba_fn = format_function_predict_proba(proxy.learning_task, proxy.predict_proba)  # type: ignore
 
-    kargs = {
-        "predict_proba_fn": predict_proba_fn,
-        "input_shape": tuple(X_test.shape[1:]),
-    }
-    zoo_attacker = ZooAttack(name="Zoo", **kargs)
+    zoo_attacker = ZooAttack(name="Zoo", predict_proba_fn=predict_proba_fn)
 
     zoo_adv_x = zoo_attacker.generate(pd.DataFrame(X_test, columns=feature_names))
 
