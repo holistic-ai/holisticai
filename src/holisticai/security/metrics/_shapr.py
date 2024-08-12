@@ -152,7 +152,7 @@ def shapr_score(
     train_size=1.0,
 ) -> jnp.ndarray:
     """
-    Compute the SHAPr membership privacy risk metric for the given classifier and training set.
+    Compute the SHAPr membership privacy risk metric [1]_ for the given classifier and training set.
 
     Parameters
     ----------

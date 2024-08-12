@@ -18,8 +18,6 @@
     FairletClusteringPreprocessing
     DisparateImpactRemover
 
-
-
 **In-processing**
 
 .. autosummary:: 
@@ -39,7 +37,6 @@
     BlindSpotAwareMF
     PopularityPropensityMF
     FairRec
-
 
 **Post-processing**
 

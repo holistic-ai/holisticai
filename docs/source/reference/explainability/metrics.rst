@@ -17,6 +17,7 @@
     position_parity
     rank_alignment
     spread_ratio
+    spread_divergence
 
 **Local Feature Importance**
 

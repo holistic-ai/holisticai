@@ -44,8 +44,7 @@ class SpreadDivergence(ImportanceSpread):
 
 def spread_ratio(feature_importance: Importances):
     """
-    Calculates the spread ratio of the given feature importance.
-    The spread ratio measures the degree of evenness or concentration in the distribution of feature importance values.
+    The spread ratio, ranging from 0 to 1, measures the degree of evenness or concentration in the distribution of feature importance values.
     A higher spread ratio indicates a more evenly distributed feature importance, while a lower spread ratio indicates a more concentrated feature importance.
     A lower ratio concentrates the importances and facilitates interpretability.
 

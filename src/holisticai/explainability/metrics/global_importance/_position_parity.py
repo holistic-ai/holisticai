@@ -19,10 +19,7 @@ class PositionParity:
 
 def position_parity(conditional_feature_importance: ConditionalImportances, ranked_feature_importance: Importances):
     """
-    Calculates the position parity metric.
-
-    This metric measures the difference between the conditional feature importance and the ranked feature importance.
-    It quantifies how much the ranking of feature importance changes when considering conditional importance.
+    This metric, ranging from 0 to 1, measures how well the top feature importances (>80%) maintain their ranking when considering conditional importance for classes (classification) or quantiles (regression).
 
     Parameters
     ----------
