@@ -39,13 +39,13 @@ To compute the Explainability Ease Score, follow these steps:
 Mathematical Representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let \( f_{x''} \) denote the second derivative of the partial dependence curve for feature \( x \), computed over \( q \) points in the domain of \( x \). The Explainability Ease Score is given by:
+Let :math:`f_{x''}` denote the second derivative of the partial dependence curve for feature :math:`x`, computed over :math:`q` points in the domain of :math:`x`. The Explainability Ease Score is given by:
 
 .. math::
 
    E_{x} := \| \vec{v_{x}} \|, \quad \text{where} \quad \vec{v_{x}} := \left\{ |f_{x''}(x_{1})|, |f_{x''}(x_{2})|, \ldots, |f_{x''}(x_{q})| \right\}
 
-The score for each feature is then computed based on the similarity of the slopes in different sections of the partial dependence curve. Let \( S_i \) be the slope of section \( i \), and \( \cos(S_i, S_{i+1}) \) be the cosine similarity between consecutive sections. The feature score is computed as:
+The score for each feature is then computed based on the similarity of the slopes in different sections of the partial dependence curve. Let :math:`S_i` be the slope of section :math:`i`, and :math:`\cos(S_i, S_{i+1})` be the cosine similarity between consecutive sections. The feature score is computed as:
 
 .. math::
 
