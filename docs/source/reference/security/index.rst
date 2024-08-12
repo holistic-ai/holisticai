@@ -31,4 +31,5 @@ Below is a list of modules in ``holisticai``:
    :hidden:
 
    metrics
+   mitigation
    plots

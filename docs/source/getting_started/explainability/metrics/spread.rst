@@ -22,7 +22,7 @@ Methodology
 Mathematical Representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let \( I \) denote the list of feature importance values, and \( \alpha \) be the specified threshold. The filtered feature importance list \( I_\alpha \) is given by:
+Let \( I \) denote the list of feature importance values, and \( \alpha \) be the specified threshold. The filtered feature importance list :math:`\( I_\alpha \)` is given by:
 
 .. math::
 
@@ -73,7 +73,7 @@ Methodology
    - where \( D_{KL} \) is the Kullback-Leibler divergence, \( P \) is the normalized feature importance distribution, \( Q \) is the uniform distribution, and \( M = \frac{1}{2}(P + Q) \).
 
 Mathematical Representation
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let \( P \) denote the normalized feature importance vector and \( Q \) denote the uniform distribution vector. The Jensen–Shannon Divergence \( JSD \) is given by:
 

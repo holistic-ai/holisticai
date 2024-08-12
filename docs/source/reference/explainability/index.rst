@@ -1,8 +1,8 @@
 .. _explainability_api:
 
-=============
+==============
 Explainability
-=============
+==============
 
 Explainability in machine learning refers to the ability to understand and interpret the decisions and predictions made by AI models. It is crucial for ensuring transparency, trust, and accountability in AI systems.
 

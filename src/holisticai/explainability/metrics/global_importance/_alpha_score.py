@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from holisticai.utils import Importances
-from pydantic import BaseModel
 
 
 def calculate_alpha_importance(feature_importance: Importances, alpha=0.8):
@@ -27,14 +26,15 @@ def calculate_alpha_importance(feature_importance: Importances, alpha=0.8):
     return len_alpha / len_100
 
 
-class AlphaScore(BaseModel):
+class AlphaScore:
     """
     Represents the Fourth Fifths metric.
     """
-
     reference: int = 0
     name: str = "Alpha Importance Score"
-    alpha: float = 0.8
+    
+    def __init__(self, alpha: float = 0.8):
+        self.alpha = alpha    
 
     def __call__(self, feature_importances: Importances):
         """

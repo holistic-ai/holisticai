@@ -12,6 +12,6 @@ In the realm of machine learning and data science, security risks pose significa
 
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
    mitigation/anonymize

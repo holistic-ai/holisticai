@@ -352,13 +352,15 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Uni
     df = pd.concat([data["data"], data["target"]], axis=1)
     remove_columns = [*protected_attributes, output_column]
     y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3)).astype("category")
+    df = df.dropna().reset_index(drop=True)
     X = df.drop(columns=remove_columns)
+    
 
     if preprocessed:
         numeric_features = X.select_dtypes(include=[np.number]).columns
         X = X[numeric_features]
-        df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < min_nonan_values]]
-        df = df.dropna()
+        #df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < min_nonan_values]]
+        #df = df.dropna()
 
     p_attrs = df[protected_attributes]
 

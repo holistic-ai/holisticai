@@ -84,6 +84,7 @@ author = "Holistic AI"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
@@ -91,13 +92,30 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     'sphinx.ext.viewcode',
+    "sphinx.ext.doctest",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.linkcode",
+    "sphinx.ext.mathjax",
+    "sphinx_gallery.gen_gallery",
+    "sphinx_autodoc_typehints",
     "nbsphinx",
     "sphinx_copybutton",
     "sphinx_design",
+    "sphinx_prompt"
+    "numpydoc",
+    "matplotlib.sphinxext.plot_directive",
     "sphinx_togglebutton",
     "sphinxcontrib.youtube",
-    'sphinx.ext.mathjax',
 ]
+
+intersphinx_mapping = {
+    "python3": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "sklearn": ("https://scikit-learn.org/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None)
+}
 
 nbsphinx_allow_errors = True  # Permitir errores en los notebooks
 nbsphinx_execute = 'never'  # Puede ser 'auto', 'always', o 'never'
@@ -122,6 +140,7 @@ exclude_patterns = [
     "generated/*",
     ".ipynb_checkpoints",
 ]
+
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -149,12 +168,20 @@ html_theme_options = {
 #    "announcement": "Visit our website and <a href='https://www.holisticai.com/demo'>schedule a demo</a> with our experts to find out how Holistic AI can help you shield against AI risks.",
     "icon_links": [
         {
+            "name": "GitHub",
+            "url": "https://github.com/holistic-ai/holisticai",
+            "icon": "fa-brands fa-github",
+        },
+        {
             "name": "Community",
             "url": "https://join.slack.com/t/holisticaicommunity/shared_invite/zt-2jamouyrn-BrMfeoBZIHT8HbLzB3P9QQ",  # required
             "icon": "fa-brands fa-slack",
             "type": "fontawesome",
         }
    ],
+   "navbar_start": ["navbar-logo", "version-switcher"],
+   "navbar_persistent": [],
+    "header_links_before_dropdown": 7,
 }
 
 import os

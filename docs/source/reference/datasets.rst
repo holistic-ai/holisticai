@@ -1,40 +1,40 @@
-.. _datasets:
+:py:mod:`holisticai.datasets`
+=============================
 
-Datasets
-========
+.. automodule:: holisticai.datasets
+    :no-members:
+    :no-inherited-members:
 
-`holisticai.datasets` is a python module which contains loading functions for loading some useful datasets.
-
-
-.. _datasets_objects:
-Dataset Objects
----------------
+**Dataset Objects**
 
 .. autosummary::
+    :nosignatures:
+    :template: class.rst
     :toctree: .generated/
     
-    holisticai.datasets.Dataset
-    holisticai.datasets.DatasetDict
-    holisticai.datasets.GroupByDataset
-    holisticai.datasets.DataLoader
+    Dataset
+    DatasetDict
+    GroupByDataset
+    DataLoader
 
-.. _dataset_loading_functions:
-Dataset Loading Functions
--------------------------
+**Dataset Loading Functions**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
 
-    holisticai.datasets.load_dataset
+    load_dataset
 
-.. _raw_datasets:
-Raw Datasets
-------------
+**Raw Datasets**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
-    holisticai.datasets.load_adult
-    holisticai.datasets.load_last_fm
-    holisticai.datasets.load_law_school
-    holisticai.datasets.load_student
-    holisticai.datasets.load_us_crime
+
+    load_adult
+    load_last_fm
+    load_law_school
+    load_student
+    load_us_crime

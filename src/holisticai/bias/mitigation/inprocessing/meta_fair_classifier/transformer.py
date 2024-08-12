@@ -9,7 +9,7 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 
 class MetaFairClassifier(BMImp):
     """
-    The meta algorithm here takes the fairness metric as part of the input\
+    The meta algorithm [1]_ takes the fairness metric as part of the input\
     and returns a classifier optimized w.r.t. that fairness metric.\
     The algorithm support only binary protected groups -> group_a = 1 - group_b
 

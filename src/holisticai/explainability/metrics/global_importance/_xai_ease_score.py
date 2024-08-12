@@ -3,8 +3,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from holisticai.utils import Importances, PartialDependence
-from pydantic import BaseModel
-
 
 def compute_feature_scores(data, threshold):
     scores = [
@@ -67,7 +65,7 @@ def compare_tangents(points):
     return similarities, few_points
 
 
-class XAIEaseAnnotator(BaseModel):
+class XAIEaseAnnotator:
     threshold: float = 0
     levels: list[str] = ["Hard", "Medium", "Easy"]
 
@@ -90,7 +88,7 @@ class XAIEaseAnnotator(BaseModel):
         return score_data
 
 
-class XAIEaseScore(BaseModel):
+class XAIEaseScore:
     """
     Class for computing the XAI Ease Score.
 
@@ -111,8 +109,10 @@ class XAIEaseScore(BaseModel):
 
     reference: float = 1.0
     name: str = "XAI Ease Score"
-    detailed: bool = False
     annotator: XAIEaseAnnotator = XAIEaseAnnotator()
+
+    def __init__(self, detailed: bool = False):
+        self.detailed = detailed
 
     def compute_xai_ease_score(self, score_data):
         """

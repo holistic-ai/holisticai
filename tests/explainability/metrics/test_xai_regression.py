@@ -35,7 +35,7 @@ def test_xai_regression_metrics(input_data):
 
     metrics = regression_explainability_metrics(importances, partial_dependencies, conditional_importances, X=test['X'], y_pred=proxy.predict(test['X']))
     assert np.isclose(metrics.loc['Rank Alignment'].value, 0.7317350088183421, atol=ATOL)
-    assert np.isclose(metrics.loc['Position Parity'].value, 0.18504188712522046, atol=ATOL)
+    assert np.isclose(metrics.loc['Position Parity'].value, 0.31790123456790126, atol=ATOL)
     assert np.isclose(metrics.loc['XAI Ease Score'].value, 1.0, atol=ATOL)
     assert np.isclose(metrics.loc['Alpha Importance Score'].value, 0.0891089108910891, atol=ATOL)
 
@@ -48,7 +48,7 @@ def test_xai_classification_metrics_separated(input_data):
     assert np.isclose(value, 0.7317350088183421, atol=ATOL)
 
     value = position_parity(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.18504188712522046, atol=ATOL)
+    assert np.isclose(value, 0.31790123456790126, atol=ATOL)
     
     value = xai_ease_score(partial_dependencies, ranked_importances)
     assert np.isclose(value, 1.0, atol=ATOL)

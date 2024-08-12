@@ -9,7 +9,7 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class MLDebiaser(BMPost):
     """
-    MLDebiaser postprocessing debias predictions w.r.t. the sensitive class in\
+    MLDebiaser postprocessing [1]_ debias predictions w.r.t. the sensitive class in\
     each demographic group. This procedure takes as input a vector y and solves\
     the optimization problem subject to the statistical parity constraint. This\
     bias mitigation can be used for classification (binary and multiclass).

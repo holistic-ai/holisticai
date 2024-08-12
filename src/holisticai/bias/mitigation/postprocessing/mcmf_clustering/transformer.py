@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class MCMF(BMPost):
     """
-    Minimal Cluster Modification for Fairnes (MCMF) is focused on the minimal change it so that the clustering is still\
+    Minimal Cluster Modification for Fairnes (MCMF) [1]_ is focused on the minimal change it so that the clustering is still\
     of good quality and fairer.
 
     Parameters

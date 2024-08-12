@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import numpy as np
 from holisticai.utils import ConditionalImportances, Importances
-from pydantic import BaseModel
 
 
-class PositionParity(BaseModel):
+class PositionParity:
     name: str = "Position Parity"
     reference: float = 1.0
 

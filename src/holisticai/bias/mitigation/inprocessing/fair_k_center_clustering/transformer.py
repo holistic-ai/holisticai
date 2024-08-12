@@ -23,7 +23,7 @@ STRATEGIES_CATALOG = {
 class FairKCenterClustering(BaseEstimator, BMImp):
     """Fair K-Center Clustering
 
-    Fair K-Center Clustering inprocessing bias mitigation implements an approximation algorithm\
+    Fair K-Center Clustering [1]_ inprocessing bias mitigation implements an approximation algorithm\
     for the k-centers problem under the fairness contraint with running time linear in the\
     size of the dataset and k (number of cluster).
 

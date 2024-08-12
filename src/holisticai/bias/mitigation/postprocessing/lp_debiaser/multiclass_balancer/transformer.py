@@ -10,7 +10,7 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class LPDebiaserMulticlass(BMPost):
     """
-    Linear Programming Debiaser is a postprocessing algorithms designed to debias pretrained classifiers.\
+    Linear Programming Debiaser [1]_ is a postprocessing algorithms designed to debias pretrained classifiers.\
     The algorithm use constraints such as Equalized Odds and Equalized Opportunity.\
     This technique extends LPDebiaserBinary for multiclass classification.
 

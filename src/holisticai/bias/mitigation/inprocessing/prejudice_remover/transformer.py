@@ -14,7 +14,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
     """Prejudice Remover
 
-    Prejudice remover is an in-processing technique that adds a\
+    Prejudice remover [1]_ is an in-processing technique that adds a\
     discrimination-aware regularization term to the learning objective.
 
     Parameters

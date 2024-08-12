@@ -1,12 +1,12 @@
 Feature Permutation-Based Metric
-========================
+================================
 
 .. contents:: Table of Contents
    :local:
    :depth: 1
 
 Explainability Ease Score Metric
---------------
+--------------------------------
 
 The Explainability Ease Score (E) metric evaluates the simplicity of interpreting the partial dependence curve of a feature. This metric quantifies how easily these curves can be interpreted, facilitating better model explainability and transparency.
 

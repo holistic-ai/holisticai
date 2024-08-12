@@ -23,9 +23,7 @@ CLUSTERING_CATALOG = {"KCenters": KCenters, "KMedoids": KMedoids}
 
 
 class FairletClustering(BaseEstimator, BMImp):
-    """Fairlet Clustering
-
-    Fairlet Clustering inprocessing bias mitigation works in two steps:
+    """Fairlet Clustering [1]_ inprocessing bias mitigation works in two steps:
 
     (1) The pointset is partitioned into subsets called fairlets that satisfy\
     the fairness requirement and approximately preserve the k-median objective.
