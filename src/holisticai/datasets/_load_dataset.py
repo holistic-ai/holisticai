@@ -1,7 +1,5 @@
 from __future__ import annotations
-
-from typing import Literal, Union, overload
-
+from typing import Literal, Union
 import numpy as np
 import pandas as pd
 
@@ -432,54 +430,6 @@ ProcessedDatasets = Literal[
 ]
 
 
-@overload
-def load_dataset(
-    dataset_name: Literal['adult'],
-    protected_attribute: Union[Literal["race", "sex"], None] = None,
-    preprocessed: bool = True): ...
-
-@overload
-def load_dataset(
-    dataset_name: Literal['law_school'],
-    protected_attribute: Union[Literal["race", "gender"], None] = None,
-    preprocessed: bool = True
-):...
-
-@overload
-def load_dataset(
-    dataset_name: Literal['student_multiclass'],
-    protected_attribute: Union[Literal["sex", "address"], None] = None,
-    preprocessed: bool=True
-):...
-
-@overload
-def load_dataset(
-    dataset_name: Literal['student'],
-    target: Union[Literal["G1", "G2", "G3"],None] = None,
-    preprocessed: bool = True,
-    protected_attribute: Union[Literal["sex", "address"], None] = None,
-):...
-@overload
-def load_dataset(
-    dataset_name: Literal['lastfm'],
-):...
-@overload
-def load_dataset(
-    dataset_name: Literal['us_crime'],
-    preprocessed: bool=True,
-    protected_attribute: Union[Literal["race"], None]=None):...
-@overload
-def load_dataset(
-    dataset_name: Literal['us_crime_multiclass'],
-    preprocessed: bool=True,
-    protected_attribute: Union[Literal["race"], None]=None): ...
-@overload
-def load_dataset(
-    dataset_name: Literal['clinical_records'],
-    protected_attribute: Union[Literal["sex"], None] = None):...
-
-
-
 def load_dataset(dataset_name: ProcessedDatasets, preprocessed: bool=True, protected_attribute: Union[str,None]=None, target: Union[str,None] =None) -> Dataset:
     """
     Load a specific dataset based on the given dataset name.
@@ -489,9 +439,10 @@ def load_dataset(dataset_name: ProcessedDatasets, preprocessed: bool=True, prote
     dataset_name: ProcessedDatasets
         The name of the dataset to load. The list of supported datasets are here: :ref:`processed_datasets`.
     preprocessed: (bool, Optional)
-        Whether to return the preprocessed dataset (X,y) or not.
+        Whether to return the preprocessed X and y.
     protected_attribute: (str, Optional)
-        The protected attribute to use for the dataset.
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b. 
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
 
     Returns
     -------

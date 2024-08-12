@@ -95,15 +95,15 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.linkcode",
+    #"sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
-    "sphinx_gallery.gen_gallery",
-    "sphinx_autodoc_typehints",
+    #"sphinx_gallery.gen_gallery",
+    #"sphinx_autodoc_typehints",
     "nbsphinx",
     "sphinx_copybutton",
     "sphinx_design",
-    "sphinx_prompt"
-    "numpydoc",
+    #"sphinx_prompt",
+    #"numpydoc",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_togglebutton",
     "sphinxcontrib.youtube",
@@ -180,8 +180,16 @@ html_theme_options = {
         }
    ],
    "navbar_start": ["navbar-logo", "version-switcher"],
-   "navbar_persistent": [],
-    "header_links_before_dropdown": 7,
+   "header_links_before_dropdown": 7,
+   "navbar_persistent":[],
+   
+   "search_bar_text": "Search...",
+   "primary_sidebar_end": ["search-field.html"],
+    
+}
+
+html_sidebars = {
+    "**": ["search-field.html", "sidebar-nav-bs.html"]
 }
 
 import os
