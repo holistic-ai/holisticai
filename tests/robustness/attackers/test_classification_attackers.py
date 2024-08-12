@@ -2,9 +2,8 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-import pandas as pd
-
 from holisticai.datasets import load_dataset
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from holisticai.robustness.attackers import HopSkipJump, ZooAttack
@@ -27,76 +26,59 @@ def categorical_dataset():
     top_10_features = correlations.head(10).index.tolist()
     train['X'] = train['X'][top_10_features]
     test['X'] = test['X'][top_10_features]
-    return train['X'], test['X'], train['y'], test['y']
+    return train, test
 
 
 def test_hsj(categorical_dataset):
-    train_X, test_X, train_y, test_y = categorical_dataset
+    train, test = categorical_dataset
 
     # Standardize data and fit model
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(train_X)
+    pipe = Pipeline([('scaler', StandardScaler()), ('lr', LogisticRegression())])
+    pipe.fit(train['X'], train['y'])
 
-    X_test = scaler.transform(test_X)
-    feature_names = list(test_X.columns)
+    y_pred = pipe.predict(test['X'])
+    baseline_accuracy = accuracy_score(test['y'], y_pred)
 
-    y_train = train_y
-    y_test = test_y
-
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    baseline_accuracy = accuracy_score(y_test, y_pred)
-
-    proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=[0, 1])
+    proxy = BinaryClassificationProxy(predict=pipe.predict, predict_proba=pipe.predict_proba, classes=[0, 1])
 
     hsj_attacker = HopSkipJump(name="HSJ", predictor=proxy.predict)
 
-    hsj_adv_x = hsj_attacker.generate(pd.DataFrame(X_test, columns=feature_names))
+    hsj_adv_x = hsj_attacker.generate(test['X'])
     y_adv_pred = proxy.predict(hsj_adv_x)
 
-    hsj_accuracy = adversarial_accuracy(y_test, y_pred, y_adv_pred)
-    hsj_robustness = empirical_robustness(X_test, hsj_adv_x, y_pred, y_adv_pred, norm=2)
+    hsj_accuracy = adversarial_accuracy(test['y'], y_pred, y_adv_pred)
+    hsj_robustness = empirical_robustness(test['X'], hsj_adv_x, y_pred, y_adv_pred, norm=2)
+
 
     # This test should pass when both dataframes are different
-    assert not hsj_adv_x.equals(pd.DataFrame(X_test, columns=feature_names))
+    assert not hsj_adv_x.equals(test['X'])
     # This test should pass when both accuracies are different
     assert hsj_accuracy != baseline_accuracy
     # This test should pass when the robustness is greater than 0
     assert hsj_robustness > 0
 
 def test_zoo(categorical_dataset):
-    train_X, test_X, train_y, test_y = categorical_dataset
+    train, test = categorical_dataset
 
     # Standardize data and fit model
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(train_X)
+    pipe = Pipeline([('scaler', StandardScaler()), ('lr', LogisticRegression())])
+    pipe.fit(train['X'], train['y'])
 
-    X_test = scaler.transform(test_X)
-    feature_names = list(test_X.columns)
+    y_pred = pipe.predict(test['X'])
+    baseline_accuracy = accuracy_score(test['y'], y_pred)
 
-    y_train = train_y
-    y_test = test_y
+    proxy = BinaryClassificationProxy(predict=pipe.predict, predict_proba=pipe.predict_proba, classes=[0, 1])
 
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    baseline_accuracy = accuracy_score(y_test, y_pred)
+    zoo_attacker = ZooAttack(name="Zoo", proxy=proxy)
 
-    proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=[0, 1])
-
-    predict_proba_fn = format_function_predict_proba(proxy.learning_task, proxy.predict_proba)  # type: ignore
-
-    zoo_attacker = ZooAttack(name="Zoo", predict_proba_fn=predict_proba_fn)
-
-    zoo_adv_x = zoo_attacker.generate(pd.DataFrame(X_test, columns=feature_names))
+    zoo_adv_x = zoo_attacker.generate(test['X'])
 
     y_adv_pred = proxy.predict(zoo_adv_x)
-    zoo_accuracy = adversarial_accuracy(y_test, y_pred, y_adv_pred)
-    zoo_robustness = empirical_robustness(X_test, zoo_adv_x, y_pred, y_adv_pred, norm=2)
+    zoo_accuracy = adversarial_accuracy(test['y'], y_pred, y_adv_pred)
+    zoo_robustness = empirical_robustness(test['X'], zoo_adv_x, y_pred, y_adv_pred, norm=2)
 
     # This test should pass when both dataframes are different
-    assert not zoo_adv_x.equals(pd.DataFrame(X_test, columns=feature_names))
+    assert not zoo_adv_x.equals(test['X'])
     # This test should pass when both accuracies are different
     assert zoo_accuracy != baseline_accuracy
     # This test should pass when the robustness is greater than 0
