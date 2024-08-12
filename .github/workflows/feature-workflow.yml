@@ -6,12 +6,15 @@ on:
       - 'feature/*'
       - 'bugfix/*'
     paths-ignore:
-        - '**.md'
-        - '**.rst'
+      - '**.md'
+      - '**.rst'
 
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
 
 jobs:
   build:
