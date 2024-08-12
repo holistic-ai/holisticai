@@ -10,9 +10,7 @@ from sklearn.base import BaseEstimator
 
 
 class VariationalFairClustering(BaseEstimator, BMImp):
-    """Variational Fair Clustering
-
-    Variational Fair Clustering helps you to find clusters with specified proportions\
+    """Variational Fair Clustering [1]_ helps you to find clusters with specified proportions\
     of different demographic groups pertaining to a sensitive attribute of the dataset\
     (group_a and group_b) for any well-known clustering method such as K-means, K-median\
     or Spectral clustering (Normalized cut).

@@ -22,7 +22,7 @@ Methodology
 Mathematical Representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let \( I \) denote the list of feature importance values, and \( \alpha \) be the specified threshold. The filtered feature importance list \( I_\alpha \) is given by:
+Let :math:`I` denote the list of feature importance values, and :math:`\alpha` be the specified threshold. The filtered feature importance list :math:`I_\alpha` is given by:
 
 .. math::
 
@@ -53,8 +53,8 @@ Methodology
 ~~~~~~~~~~~~~~
 
 1. **Normalize Feature Importance**:
-   - For a given set of features \( F = [F_1, F_2, \ldots, F_n] \), normalize the feature importance using a normalization function \( N \) such that the sum of the normalized feature importance values equals 1.
-   - Mathematically, for each feature \( F_i \), the normalized feature importance \( P(F_i) \) is given by:
+   - For a given set of features :math:`F = [F_1, F_2, \ldots, F_n]`, normalize the feature importance using a normalization function :math:`N` such that the sum of the normalized feature importance values equals 1.
+   - Mathematically, for each feature :math:`F_i`, the normalized feature importance :math:`P(F_i)` is given by:
    
      .. math::
 
@@ -70,10 +70,10 @@ Methodology
         JSD(P \| Q) = \frac{1}{2} D_{KL}(P \| M) + \frac{1}{2} D_{KL}(Q \| M)
 
 
-   - where \( D_{KL} \) is the Kullback-Leibler divergence, \( P \) is the normalized feature importance distribution, \( Q \) is the uniform distribution, and \( M = \frac{1}{2}(P + Q) \).
+   - where :math:`D_{KL}` is the Kullback-Leibler divergence, :math:`P` is the normalized feature importance distribution, :math:`Q` is the uniform distribution, and :math:`M = \frac{1}{2}(P + Q)`.
 
 Mathematical Representation
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Let \( P \) denote the normalized feature importance vector and \( Q \) denote the uniform distribution vector. The Jensen–Shannon Divergence \( JSD \) is given by:
 

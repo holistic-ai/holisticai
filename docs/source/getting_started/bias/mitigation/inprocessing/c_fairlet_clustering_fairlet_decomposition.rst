@@ -1,5 +1,5 @@
 Fairlet Decomposition Method
-------------------------------
+-----------------------------
 
 .. note::
     **Learning tasks:** Clustering.

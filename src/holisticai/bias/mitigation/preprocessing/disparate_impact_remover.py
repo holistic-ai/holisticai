@@ -8,7 +8,7 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class DisparateImpactRemover(BMPre):
     """
-    Disparate impact remover edits feature values to increase group fairness
+    Disparate impact remover [1]_ edits feature values to increase group fairness
     while preserving rank-ordering within groups.
 
     Parameters

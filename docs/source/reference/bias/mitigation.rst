@@ -1,63 +1,59 @@
-Mitigation
-==========
+:py:mod:`holisticai.bias.mitigation`
+====================================
 
-`holisticai.bias.mitigation` is a python module mitigating *bias* in algorithms. Our classes cover *pre-processing*, *in-processing* and *post-processing*.
+.. automodule:: holisticai.bias.mitigation
+    :no-members:
+    :no-inherited-members:
 
-.. _bias_preprocessing:
+**Pre-processing**
 
-Pre-processing
---------------
+.. autosummary:: 
+    :nosignatures:
+    :template: class.rst
+    :toctree: .generated/
+
+    Reweighing
+    LearningFairRepresentation
+    CorrelationRemover
+    FairletClusteringPreprocessing
+    DisparateImpactRemover
+
+**In-processing**
 
 .. autosummary:: 
     :toctree: .generated/
     :nosignatures:
+    :template: class.rst
 
-    holisticai.bias.mitigation.Reweighing
-    holisticai.bias.mitigation.LearningFairRepresentation
-    holisticai.bias.mitigation.CorrelationRemover
-    holisticai.bias.mitigation.FairletClusteringPreprocessing
-    holisticai.bias.mitigation.DisparateImpactRemover
+    ExponentiatedGradientReduction
+    GridSearchReduction
+    MetaFairClassifier
+    PrejudiceRemover
+    FairKCenterClustering
+    FairKMedianClustering
+    FairletClustering
+    VariationalFairClustering
+    FairScoreClassifier
+    BlindSpotAwareMF
+    PopularityPropensityMF
+    FairRec
 
-.. _bias_inprocessing:
-
-In-processing
---------------
-
-.. autosummary:: 
-    :toctree: .generated/
-    :nosignatures:
-
-    holisticai.bias.mitigation.ExponentiatedGradientReduction
-    holisticai.bias.mitigation.GridSearchReduction
-    holisticai.bias.mitigation.MetaFairClassifier
-    holisticai.bias.mitigation.PrejudiceRemover
-    holisticai.bias.mitigation.FairKCenterClustering
-    holisticai.bias.mitigation.FairKMedianClustering
-    holisticai.bias.mitigation.FairletClustering
-    holisticai.bias.mitigation.VariationalFairClustering
-    holisticai.bias.mitigation.FairScoreClassifier
-    holisticai.bias.mitigation.BlindSpotAwareMF
-    holisticai.bias.mitigation.PopularityPropensityMF
-    holisticai.bias.mitigation.FairRec
-
-.. _bias_postprocessing:
-
-Post-processing
----------------
+**Post-processing**
 
 .. autosummary:: 
     :toctree: .generated/
     :nosignatures:
+    :template: class.rst
     
-    holisticai.bias.mitigation.CalibratedEqualizedOdds
-    holisticai.bias.mitigation.EqualizedOdds
-    holisticai.bias.mitigation.RejectOptionClassification
-    holisticai.bias.mitigation.LPDebiaserBinary
-    holisticai.bias.mitigation.LPDebiaserMulticlass
-    holisticai.bias.mitigation.MLDebiaser
-    holisticai.bias.mitigation.PluginEstimationAndCalibration
-    holisticai.bias.mitigation.WassersteinBarycenter
-    holisticai.bias.mitigation.DebiasingExposure
-    holisticai.bias.mitigation.FairTopK
-    holisticai.bias.mitigation.MCMF
-    holisticai.bias.mitigation.DisparateImpactRemoverRS
+    CalibratedEqualizedOdds
+    EqualizedOdds
+    RejectOptionClassification
+    LPDebiaserBinary
+    LPDebiaserMulticlass
+    MLDebiaser
+    PluginEstimationAndCalibration
+    WassersteinBarycenter
+    DebiasingExposure
+    FairTopK
+    MCMF
+    DisparateImpactRemoverRS

@@ -1,68 +1,61 @@
+:py:mod:`holisticai.bias.plots`
+=================================
 
-=====
-Plots
-=====
-
-`holisticai.bias.plots` implements the visualizations for **bias** tasks.
+.. automodule:: holisticai.bias.plots
+    :no-members:
+    :no-inherited-members:
 
 
-.. _classification:
-
-Binary Classification Plots
-----------------------
+**Binary Classification Plots**
 
 .. autosummary::
     :toctree: .generated/
     
-    holisticai.bias.plots.abroca_plot
+    abroca_plot
 
-.. _multiclass:
-
-Multiclass Classification Plots
-----------------------
+**Multiclass Classification Plots**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
     
-    holisticai.bias.plots.accuracy_bar_plot
-    holisticai.bias.plots.frequency_plot
-    holisticai.bias.plots.disparate_impact_plot
-    holisticai.bias.plots.frequency_matrix_plot
-    holisticai.bias.plots.statistical_parity_plot
+    accuracy_bar_plot
+    frequency_plot
+    disparate_impact_plot
+    frequency_matrix_plot
+    statistical_parity_plot
 
-.. _regression:
-
-Regression Plots
-----------------------
+**Regression Plots**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
     
-    holisticai.bias.plots.disparate_impact_curve
-    holisticai.bias.plots.mae_bar_plot
-    holisticai.bias.plots.rmse_bar_plot
-    holisticai.bias.plots.statistical_parity_curve
-    holisticai.bias.plots.success_rate_curve
-    holisticai.bias.plots.success_rate_curves
+    disparate_impact_curve
+    mae_bar_plot
+    rmse_bar_plot
+    statistical_parity_curve
+    success_rate_curve
+    success_rate_curves
 
-.. _recommender:
-
-Recommender Plots
-----------------------
+**Recommender Plots**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
     
-    holisticai.bias.plots.exposure_diff_plot
-    holisticai.bias.plots.exposure_ratio_plot
-    holisticai.bias.plots.long_tail_plot
+    exposure_diff_plot
+    exposure_ratio_plot
+    long_tail_plot
 
-.. _report:
-
-Report Plots
-----------------------
+**Report Plots**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
     
-    holisticai.bias.plots.bias_metrics_report
+    bias_metrics_report

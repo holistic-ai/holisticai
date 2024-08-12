@@ -12,7 +12,7 @@ from sklearn.base import BaseEstimator
 class FairKMedianClustering(BaseEstimator, BMImp):
     """Fair K-Median Clustering
 
-    Fair K-median clustering inprocessing bias mitigation is an approximation algorithm for\
+    Fair K-median clustering [1]_ inprocessing bias mitigation is an approximation algorithm for\
     group representative k-median clustering. The fair k-median method addresses fairness in clustering \
     by ensuring equitable representation across different demographic groups. It involves bundling, \
     matching and sampling. This method aims to minimize bias and provide fair clustering solutions.

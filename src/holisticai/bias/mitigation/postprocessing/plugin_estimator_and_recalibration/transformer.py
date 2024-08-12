@@ -9,7 +9,7 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 class PluginEstimationAndCalibration(BMPost):
     """
-    Plugin Estimation and Calibration postprocessing optimizes over calibrated regressor outputs via a\
+    Plugin Estimation and Calibration postprocessing [1]_ optimizes over calibrated regressor outputs via a\
     smooth optimization. The rates of convergence of the proposed estimator were derived in terms of\
     the risk and fairness constraint.
 

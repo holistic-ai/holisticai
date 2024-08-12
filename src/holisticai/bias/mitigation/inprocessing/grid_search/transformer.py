@@ -12,9 +12,7 @@ from sklearn.base import BaseEstimator, clone
 
 
 class GridSearchReduction(BaseEstimator, BMImp):
-    """Grid Search Reduction
-
-    Grid search technique can be used for fair classification or fair regression.
+    """Grid Search Reduction technique can be used for fair classification or fair regression.
 
     (1) For classification it reduces fair classification to a sequence of cost-sensitive classification problems,\
     returning the deterministic classifier with the lowest empirical error subject to fair classification constraints among the\

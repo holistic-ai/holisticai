@@ -80,7 +80,7 @@ class ObjectiveFunction:
 
 class LearningFairRepresentation(BMPreprocessing):
     """
-    Learning fair representations finds a latent representation which encodes the data well\
+    Learning fair representations [1]_ finds a latent representation which encodes the data well\
     while obfuscates information about protected attributes [1].
 
     Parameters

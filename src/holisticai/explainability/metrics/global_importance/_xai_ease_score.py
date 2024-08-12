@@ -3,7 +3,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from holisticai.utils import Importances, PartialDependence
-from pydantic import BaseModel
 
 
 def compute_feature_scores(data, threshold):
@@ -67,7 +66,7 @@ def compare_tangents(points):
     return similarities, few_points
 
 
-class XAIEaseAnnotator(BaseModel):
+class XAIEaseAnnotator:
     threshold: float = 0
     levels: list[str] = ["Hard", "Medium", "Easy"]
 
@@ -90,7 +89,7 @@ class XAIEaseAnnotator(BaseModel):
         return score_data
 
 
-class XAIEaseScore(BaseModel):
+class XAIEaseScore:
     """
     Class for computing the XAI Ease Score.
 
@@ -111,8 +110,10 @@ class XAIEaseScore(BaseModel):
 
     reference: float = 1.0
     name: str = "XAI Ease Score"
-    detailed: bool = False
     annotator: XAIEaseAnnotator = XAIEaseAnnotator()
+
+    def __init__(self, detailed: bool = False):
+        self.detailed = detailed
 
     def compute_xai_ease_score(self, score_data):
         """
@@ -165,11 +166,9 @@ class XAIEaseScore(BaseModel):
 
 def xai_ease_score(partial_dependence: PartialDependence, ranked_feature_importance: Importances):
     """
-    Calculates the XAI Ease Score metric.
-
-    This metric measures the ease of explaining a model's predictions using partial dependence plots
-    and ranked feature importance. The XAI Ease Score takes into account the similarity between regions
-    of the partial dependence plots of different features and assigns scores based on the similarity values.
+    This metric, ranging from 0 to 1, measures the ease of explaining a model's predictions for the top feature importances (>80%) \
+    using partial dependence plots. The XAI Ease Score considers the similarity between regions of the partial dependence plots \
+    for different features and assigns scores based on these similarity values.
 
     Parameters
     ----------

@@ -1,5 +1,5 @@
-Security in Machine Learning Models
-===================================
+Security
+========
 
 .. contents:: Table of Contents
    :local:
@@ -27,7 +27,7 @@ Measuring and Mitigation
 ------------------------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     metrics
     mitigation

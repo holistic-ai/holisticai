@@ -32,7 +32,7 @@ def is_numeric(df):
 class AdversarialDebiasing(BMImp):
     """Adversarial Debiasing
 
-    Adversarial debiasing learns a classifier to maximize prediction accuracy and simultaneously reduce an
+    Adversarial debiasing [1]_ learns a classifier to maximize prediction accuracy and simultaneously reduce an
     adversary's ability to determine the protected attribute from the predictions. This approach leads to a fair classifier as the
     predictions cannot carry any group discrimination information that the adversary can exploit.
 
