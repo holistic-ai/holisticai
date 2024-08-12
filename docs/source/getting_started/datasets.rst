@@ -18,6 +18,14 @@ Raw datasets are the initial data collected from the original sources. These dat
     :file: raw_datasets.csv
     :widths: 7, 7, 15
 
+For example, if we want to load the Adult dataset, we can use the following code:
+
+.. code-block:: python
+
+   from holisticai.datasets import load_adult
+    
+    data, target = load_adult(return_X_y=True)
+
 .. _processed_datasets:
 
 Processed Datasets
