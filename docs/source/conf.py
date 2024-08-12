@@ -161,7 +161,6 @@ html_static_path = ["_static"]
 # Theme options
 html_theme_options = {
     "logo": {"image_dark": "https://assets-global.website-files.com/6305e5d42c283515c3e71b8c/63d771efd50a073bd66193f0_Holistic-AI-Logo-Horizontal-Dark.svg"},
-    "github_url": "https://github.com/holistic-ai/holisticai",
     "twitter_url": "https://twitter.com/holistic_ai",
     "show_version_warning_banner": True,
     "secondary_sidebar_items": [],
@@ -179,17 +178,6 @@ html_theme_options = {
             "type": "fontawesome",
         }
    ],
-   "navbar_start": ["navbar-logo", "version-switcher"],
-   "header_links_before_dropdown": 7,
-   "navbar_persistent":[],
-   
-   "search_bar_text": "Search...",
-   "primary_sidebar_end": ["search-field.html"],
-    
-}
-
-html_sidebars = {
-    "**": ["search-field.html", "sidebar-nav-bs.html"]
 }
 
 import os
@@ -200,24 +188,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-# make copy of notebooks in docs folder, as they must be here for sphinx to
-# pick them up properly.
-
-# Uncomment when tutorials folder is present
-"""
-NOTEBOOKS_DIR = os.path.abspath("tutorials")
-if os.path.exists(NOTEBOOKS_DIR):
-    import warnings
-
-    warnings.warn("tutorials directory exists, replacing...")
-    shutil.rmtree(NOTEBOOKS_DIR)
-shutil.copytree(
-    os.path.abspath("../tutorials"),
-    NOTEBOOKS_DIR,
-)
-if os.path.exists(NOTEBOOKS_DIR + "/local_scratch"):
-    shutil.rmtree(NOTEBOOKS_DIR + "/local_scratch")
-"""
 
 # Custom css
 html_css_files = [
