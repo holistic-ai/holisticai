@@ -36,6 +36,6 @@ import importlib.util
 
 torch_spec = importlib.util.find_spec("torch")
 if torch_spec is not None:
-    from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.torch.transformer import AdversarialDebiasing
+    from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.transformer import AdversarialDebiasing
 
     __all__ += ["AdversarialDebiasing"]

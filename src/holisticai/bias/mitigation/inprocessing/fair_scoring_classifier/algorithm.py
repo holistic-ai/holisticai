@@ -7,9 +7,8 @@ import numpy as np
 from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.utils import (
     get_class_count,
     get_class_indexes,
-    get_initial_solution,
 )
-from scipy.optimize import minimize
+from scipy.optimize import Bounds, LinearConstraint, milp
 
 logger = logging.getLogger(__name__)
 
@@ -93,81 +92,170 @@ class FairScoreClassifierAlgorithm:
         class_indexes : list
             The indexes of each class.
         """
-        N = len(X)  # Number of samples in the dataset
-        L = len(y[0])  # Number of labels in the dataset
-        D = len(X[0])  # Number of features for a sample in the dataset
+        N, D = X.shape  # Number of samples, features
+        _, L = y.shape  # Number of labels
         gamma = 0.01  # Margin parameter
-        M = self.lambda_bound * D + 1  # Get an upper bound on the max score
+        M = self.lambda_bound * D + 1  # Upper bound on the max score
 
         if "ba" in self.objectives:
-            N_class = get_class_count(y)  # Get the number of samples in each class
-            class_indexes = get_class_indexes(y)  # Get the indexes of each class
+            N_class = np.sum(y, axis=0)  # Get the number of samples in each class
+            class_indexes = [np.where(y[:, i] == 1)[0] for i in range(L)]  # Get the indexes of each class
 
-        maj, _ = get_initial_solution(y)  # Get the majority class index
-
-        l = np.zeros((L, D))  # Initialize lambda matrix
-        z = np.zeros(N)  # Loss variable
-
-        constraints = []
-
-        if "a" in self.objectives or "ba" in self.objectives:
-            for i in range(N):  # Constraint z to model misclassifications
-                for index in range(L):
-                    if y[i][index] == 1:
-                        for offset in range(1, L):
-                            constraint = {
-                                "type": "ineq",
-                                "fun": lambda l_flat: M * z[i]
-                                + np.dot(l_flat[index * D : (index + 1) * D], X[i])
-                                - gamma * index
-                                - np.dot(l_flat[((index + offset) % L) * D : ((index + offset) % L + 1) * D], X[i])
-                                - gamma * ((index + offset) % L),
-                            }
-                            constraints.append(constraint)
+        # Define variables
+        num_lambda_vars = L * D
+        l = np.arange(num_lambda_vars)
+        z = np.arange(num_lambda_vars, num_lambda_vars + N)
 
         if "s" in self.constraints:
-            alpha = np.zeros((L, D))  # Alpha matrix
-            for index in range(L):  # Constraint alpha to model non-zero lambda coefficients
-                for j in range(D):
-                    constraints.append(
-                        {
-                            "type": "ineq",
-                            "fun": lambda l_flat: self.lambda_bound * alpha[index][j] - l_flat[index * D + j],
-                        }
-                    )
-                    constraints.append(
-                        {
-                            "type": "ineq",
-                            "fun": lambda l_flat: l_flat[index * D + j] + self.lambda_bound * alpha[index][j],
-                        }
-                    )
+            alpha = np.arange(z[-1] + 1, z[-1] + 1 + num_lambda_vars)
 
-        def objective_function(l_flat):
-            l = l_flat.reshape(L, D)  # noqa: F841
-            if "a" in self.objectives and "s" not in self.constraints:
-                return (1 / N) * np.sum(z)  # Minimize loss
-            if "ba" in self.objectives and "s" not in self.constraints:
-                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(
-                    N_class
-                )  # Minimize balanced loss
-            if "a" in self.objectives and "s" in self.constraints:
-                return (1 / N) * np.sum(z) + (1 / (self.constraints["s"] * L * N)) * np.sum(
-                    alpha
-                )  # Minimize loss and alphas
-            if "ba" in self.objectives and "s" in self.constraints:
-                return np.sum([np.sum(z[indexes]) / N_class[i] for i, indexes in enumerate(class_indexes)]) / len(
-                    N_class
-                ) + (1 / (self.constraints["s"] * L * N)) * np.sum(alpha)  # Minimize balanced loss and alphas
-            return None
+        pos = np.array([]) # Initialize as an empty array
+        if any(c in self.constraints for c in ["omr", "sp", "pe", "eo", "eod"]):
+            pos = np.arange(alpha[-1] + 1 if "s" in self.constraints else z[-1] + 1, alpha[-1] + 1 + N * L if "s" in self.constraints else z[-1] + 1 + N * L)
 
-        l_flat = l.flatten()
-        sol = minimize(objective_function, l_flat, constraints=constraints)
+        # Define constraints
+        A = []
+        b = []
+        constraint_types = []
 
-        if sol.success:
-            l_lists = sol.x.reshape(L, D).tolist()
+        # Constraints for misclassifications
+        if "a" in self.objectives or "ba" in self.objectives:
+            for i in range(N):
+                for j in range(L):
+                    if y[i, j] == 1:
+                        for k in range(1, L):
+                            # Constraint for correct classification
+                            coeffs = np.zeros(len(l) + len(z))
+                            coeffs[l[j * D:(j + 1) * D]] = X[i]
+
+                            # Correct the indexing here:
+                            next_label_index = ((j + k) % L) * D
+                            coeffs[l[next_label_index:next_label_index + D]] = -X[i]
+
+                            coeffs[z[i]] = -M
+                            A.append(coeffs)
+                            b.append(-gamma * j - gamma * ((j + k) % L))
+                            constraint_types.append("leq")
+
+        # Constraints for non-zero lambda coefficients
+        if "s" in self.constraints:
+            for i in range(num_lambda_vars):
+                # Constraint: -lambda_bound * alpha <= l
+                coeffs = np.zeros(len(l) + len(z) + len(alpha))
+                coeffs[l[i]] = 1
+                coeffs[alpha[i]] = self.lambda_bound
+                A.append(coeffs)
+                b.append(0)
+                constraint_types.append("leq")
+
+                # Constraint: l <= lambda_bound * alpha
+                coeffs = np.zeros(len(l) + len(z) + len(alpha))
+                coeffs[l[i]] = -1
+                coeffs[alpha[i]] = self.lambda_bound
+                A.append(coeffs)
+                b.append(0)
+                constraint_types.append("leq")
+
+        # Constraints for positive classification
+        if any(c in self.constraints for c in ["omr", "sp", "pe", "eo", "eod"]):
+            for i in range(N):
+                for j in range(L):
+                    for k in range(1, L):
+                        # Constraint for positive classification
+                        coeffs = np.zeros(len(l) + len(z) + (len(alpha) if "s" in self.constraints else 0) + len(pos))
+                        coeffs[l[j * D:(j + 1) * D]] = X[i]
+                        coeffs[l[((j + k) % L) * D:((j + k + 1) % L) * D]] = -X[i]
+                        coeffs[pos[i * L + j]] = M
+                        A.append(coeffs)
+                        b.append(M - gamma * j + gamma * ((j + k) % L))
+                        constraint_types.append("leq")
+                # Constraint for one positive classification per sample
+                coeffs = np.zeros(len(l) + len(z) + (len(alpha) if "s" in self.constraints else 0) + len(pos))
+                coeffs[pos[i * L:(i + 1) * L]] = 1
+                A.append(coeffs)
+                b.append(1)
+                constraint_types.append("eq")
+
+        # Constraints for fairness
+        for label_index in self.fairness_labels:
+            for g in self.fairness_groups:
+                i_g = np.where(X[:, g] == 1)[0]
+                i_g_bar = np.where(X[:, g] == 0)[0]
+                N_g = len(i_g)
+                N_g_bar = len(i_g_bar)
+
+                if N_g == 0 or N_g_bar == 0:
+                    print("[WARNING] At least one of the protected groups is empty, skipping fairness constraints")  # noqa: T201
+                    continue
+
+                if "omr" in self.constraints:
+                    # Constraint for OMR
+                    coeffs = np.zeros(len(l) + len(z) + (len(alpha) if "s" in self.constraints else 0) + len(pos))
+                    coeffs[pos[i_g * L + label_index]] = 1 / N_g
+                    coeffs[pos[i_g_bar * L + label_index]] = -1 / N_g_bar
+                    A.append(coeffs)
+                    b.append(self.constraints['omr'])
+                    constraint_types.append("leq")
+
+                    A.append(-coeffs)
+                    b.append(self.constraints['omr'])
+                    constraint_types.append("leq")
+
+                if "sp" in self.constraints and N_g and N_g_bar:
+                    # Constraint for SP
+                    coeffs = np.zeros(len(l) + len(z) + (len(alpha) if "s" in self.constraints else 0) + len(pos))
+                    coeffs[pos[i_g * L + label_index]] = 1 / N_g
+                    coeffs[pos[i_g_bar * L + label_index]] = -1 / N_g_bar
+                    A.append(coeffs)
+                    b.append(self.constraints['sp'])
+                    constraint_types.append("leq")
+
+                    A.append(-coeffs)
+                    b.append(self.constraints['sp'])
+                    constraint_types.append("leq")
+
+                # Add constraints for other fairness metrics similarly...
+
+        # Define objective
+        c = np.zeros(len(l) + len(z) + (len(alpha) if "s" in self.constraints else 0) + len(pos))
+        if "a" in self.objectives:
+            c[z] = 1 / N
+        if "ba" in self.objectives:
+            for i, indexes in enumerate(class_indexes):
+                c[z[indexes]] += 1 / (N_class[i] * len(N_class))
+        if "s" in self.constraints:
+            c[alpha] = 1 / (self.constraints["s"] * L * N)
+
+        # Define bounds
+        bounds = [(None if i in l else (0, 1)) for i in range(len(c))]
+        if "s" in self.constraints:
+            bounds += [(0, 1) for _ in range(len(alpha))]
+        if any(c in self.constraints for c in ["omr", "sp", "pe", "eo", "eod"]):
+            bounds += [(0, 1) for _ in range(len(pos))]
+
+        # Define integrality constraints
+        integrality = np.zeros_like(c)
+        integrality[l] = 1
+        if "s" in self.constraints:
+            integrality[alpha] = 1
+        if any(c in self.constraints for c in ["omr", "sp", "pe", "eo", "eod"]):
+            integrality[pos] = 1
+
+        # Solve the MILP
+        res = milp(
+            c=c,
+            constraints=[LinearConstraint(A=A, lb=-np.inf, ub=b)],
+            bounds=Bounds(lb=-self.lambda_bound, ub=self.lambda_bound),
+            integrality=integrality,
+        )
+
+        l_lists = []
+        if res.success:
+            l_values = res.x[:num_lambda_vars]
+            for i in range(L):
+                l_lists.append(np.rint(l_values[i * D:(i + 1) * D]).astype(int).tolist())  # noqa: PERF401
         else:
             print("[ERROR] Found no solution for this configuration, you may want to soften your constraints")  # noqa: T201
-            l_lists = []
 
         return l_lists
 
