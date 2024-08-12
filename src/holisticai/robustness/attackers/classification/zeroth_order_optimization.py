@@ -12,7 +12,12 @@ from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
-from holisticai.robustness.attackers.classification.commons import to_categorical, x_array_to_df, x_to_nd_array
+from holisticai.robustness.attackers.classification.commons import (
+    format_function_predict_proba,
+    to_categorical,
+    x_array_to_df,
+    x_to_nd_array,
+)
 from scipy.ndimage import zoom
 
 BATCH_SIZE = 1
@@ -54,8 +59,8 @@ class ZooAttack:
         Indicates whether to print verbose output. The default is True.
     input_is_feature_vector : bool, optional
         Indicates whether the input is a feature vector. The default is False.
-    predict_proba_fn : callable, optional
-        The function used to predict the probabilities of the input. The default is None.
+    proxy : callable, optional
+        The model used to predict the probabilities of the input. The default is None.
     input_size : int, optional
         The size of the input. The default is 0.
     nb_classes : int, optional
@@ -84,7 +89,7 @@ class ZooAttack:
         variable_h=0.2,
         verbose=True,
         input_is_feature_vector=False,
-        predict_proba_fn=None,
+        proxy=None,
         input_size=0,
         nb_classes=2,
         adam_mean=None,
@@ -106,7 +111,7 @@ class ZooAttack:
         self.variable_h = variable_h
         self.verbose = verbose
         self.input_is_feature_vector = input_is_feature_vector
-        self.predict_proba_fn = predict_proba_fn
+        self.predict_proba_fn = format_function_predict_proba(proxy.learning_task, proxy.predict_proba)
         self.input_size = input_size
         self.nb_classes = nb_classes
         self.adam_mean = adam_mean
