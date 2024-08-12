@@ -162,7 +162,7 @@ def dataframe_to_level_dict_with_series(df, row_index):
 class DataLoader:
     """
     A class that represents a data loader for a dataset. This class is used to load the dataset in batches in a specific data type (jax, pandas, or numpy).
-    
+
     Parameters
     ----------
     dataset: Dataset
@@ -171,7 +171,7 @@ class DataLoader:
         The size of the batch.
     dtype: Literal["jax", "pandas", "numpy"]
         The data type to load the dataset in.
-    
+
     Example
     -------
 
@@ -179,10 +179,10 @@ class DataLoader:
     >>> dataset = load_dataset("adult")
     >>> dataloader = DataLoader(dataset, batch_size=32, dtype="jax")
     >>> for batch in dataloader:
-    ...      print(batch)
+    ...     print(batch)
     """
 
-    def __init__(self, dataset:Dataset, batch_size: int, dtype: Literal["jax", "pandas", "numpy"]):
+    def __init__(self, dataset: Dataset, batch_size: int, dtype: Literal["jax", "pandas", "numpy"]):
         self.batch_size = batch_size
         self.dataset = dataset
         self.dtype = dtype

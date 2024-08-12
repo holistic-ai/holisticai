@@ -1,4 +1,6 @@
-from typing import Callable, Union, Literal
+from __future__ import annotations
+
+from typing import Callable, Literal, Union
 
 import numpy as np
 import pandas as pd
@@ -8,10 +10,13 @@ from numpy.typing import ArrayLike
 class BinaryClassificationProxy:
     learning_task: Literal["binary_classification"] = "binary_classification"
 
-    def __init__(self, predict: Callable, predict_proba: Callable, classes: list = [0,1]):
+    def __init__(self, predict: Callable, predict_proba: Callable, classes: Union[list, None] = None):
+        if classes is None:
+            classes = [0, 1]
         self.predict = predict
         self.predict_proba = predict_proba
         self.classes = classes
+
 
 class MultiClassificationProxy:
     learning_task: Literal["multi_classification"] = "multi_classification"
@@ -21,13 +26,16 @@ class MultiClassificationProxy:
         self.predict_proba = predict_proba
         self.clases = classes
 
+
 class RegressionProxy:
     learning_task: Literal["regression"] = "regression"
 
     def __init__(self, predict: Callable):
         self.predict = predict
 
+
 ModelProxy = Union[BinaryClassificationProxy, MultiClassificationProxy, RegressionProxy]
+
 
 def create_proxy(**kargs) -> ModelProxy:
     task = kargs.get("learning_task")
@@ -41,7 +49,9 @@ def create_proxy(**kargs) -> ModelProxy:
 
 
 class Importances:
-    def __init__(self, values: ArrayLike, feature_names: ArrayLike, extra_attrs: dict = {}):
+    def __init__(self, values: ArrayLike, feature_names: ArrayLike, extra_attrs: Union[dict, None] = None):
+        if extra_attrs is None:
+            extra_attrs = {}
         self.values = values
         self.feature_names = feature_names
         self.extra_attrs = extra_attrs

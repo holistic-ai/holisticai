@@ -30,11 +30,12 @@ class AlphaScore:
     """
     Represents the Fourth Fifths metric.
     """
+
     reference: int = 0
     name: str = "Alpha Importance Score"
-    
+
     def __init__(self, alpha: float = 0.8):
-        self.alpha = alpha    
+        self.alpha = alpha
 
     def __call__(self, feature_importances: Importances):
         """
