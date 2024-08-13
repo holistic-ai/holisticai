@@ -91,8 +91,10 @@ dependencies = [
 ]
 
 [tool.hatch.envs.sphinx.scripts]
-foo = ["which sphinx-build"]
 build = ["sphinx-build -b html docs/source docs/build"]
+tutorials = ["python docs/run_tutorials.py"]
+
+
 
 [tool.hatch.envs.testing]
 dependencies = [
@@ -124,7 +126,6 @@ foo = ["which python"]
 
 [tool.hatch.envs.default]
 env-vars = { PYTHONPATH = "src" }
-
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/holisticai"]

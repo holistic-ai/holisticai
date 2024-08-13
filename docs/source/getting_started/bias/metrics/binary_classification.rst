@@ -20,24 +20,23 @@ where :math:`TP_{g}` is the number of true positives in group :math:`g` and :mat
 
 We will refer to the success rate for the unprivileged group as :math:`SR_{b}` and the success rate for the privileged group as :math:`SR_{a}`. We can then define the following metrics.
 
-1. **Disparate Impact (DI):** measures the ratio of success rates. 
+**Disparate Impact (DI):** measures the ratio of success rates. The ideal value is 1. 
 
-    The ideal value is 1. The acceptable range is [0.8, 1.2]. Values below 0.8 are unfair towards group_a. Values above 1.2 are unfair towards group_b.
+    The acceptable range is [0.8, 1.2]. Values below 0.8 are unfair towards group_a. Values above 1.2 are unfair towards group_b.
 
 .. math::
     DI = \frac{SR_{b}}{SR_{a}}
 
-2. **Statistical Parity (SP):** measures the difference between success rates. A negative value means that the unprivileged group_b is unfavoured. 
+**Statistical Parity (SP):** measures the difference between success rates. 
 
-    Ideal value is 0. Negative values are unfair towards group b.
+    A negative value means that the unprivileged group_b is unfavoured. Ideal value is 0. Negative values are unfair towards group b.
 
 .. math::
     SP = SR_{b} - SR_{a}
 
-3. **Cohen's D (CD):** measures the effect size of the difference between success rates. 
+**Cohen's D (CD):** measures the effect size of the difference between success rates. 
 
-    Ideal value is 0. Positive values are unfair towards group b. 
-    Reference values: 0.2 is considered a small effect size, 0.5 is considered medium, 0.8 is considered large.
+    Ideal value is 0. Positive values are unfair towards group b. Reference values: 0.2 is considered a small effect size, 0.5 is considered medium, 0.8 is considered large.
 
 .. math::
     CD = \frac{SR_{b} - SR_{a}}{poolStd}
@@ -49,14 +48,14 @@ where :math:`poolStd` is the pooled standard deviation of the success rates, def
 
 where :math:`n_{a}` and :math:`n_{b}` are the number of samples in groups :math:`a` and :math:`b`, respectively, and :math:`\sigma^{2}_{a}` and :math:`\sigma^{2}_{b}` are the variances of the success rates in groups :math:`a` and :math:`b`, respectively.
 
-4. **2-SD Rule:** measures the difference between success rates in terms of standard deviations. 
+**2-SD Rule:** measures the difference between success rates in terms of standard deviations. 
 
     The ideal value is 0. Positive values are unfair towards group b.
 
 .. math::
     2-SD = \frac{SR_{b} - SR_{a}}{\sqrt{\frac{SR_{a}(1 - SR_{a})}{n_{a}} + \frac{SR_{b}(1 - SR_{b})}{n_{b}}}}
 
-5. **Four-Fifths Rule:** measures the ratio of success rates. 
+**Four-Fifths Rule:** measures the ratio of success rates. 
 
     The ideal value is 1. Values below 0.8 and above 1.2 are considered unfair towards group_b.
 
@@ -74,14 +73,16 @@ The idea of equality of opportunity metrics, is to compare true positives and/or
 
 where :math:`FN_{g}` is the number of false negatives in group :math:`g`.
 
-1. **Equality of Opportunity Difference:** measures the difference between true positive rates. Ideal value: 0 and Fair area: [-0.1, 0.1]
+**Equality of Opportunity Difference:** measures the difference between true positive rates. 
+
+    Ideal value: 0 and Fair area: [-0.1, 0.1]
 
 .. math::
     EOD = TPR_{b} - TPR_{a}
 
 where :math:`TPR_{g}` is the true positive rate of group :math:`g`.
 
-2. **False Positive Rate Difference:** measures the difference between false positive rates. :
+**False Positive Rate Difference:** measures the difference between false positive rates. 
 
     The ideal value is 0. Positive values are unfair towards group b.
 
@@ -91,13 +92,15 @@ where :math:`TPR_{g}` is the true positive rate of group :math:`g`.
 where :math:`FPR_{g}` is the false positive rate of group :math:`g`.
 
 
-3. **Average Odds Difference** measures the average of the difference between true positive rates and false positive rates. Ideal value: 0 and Fair area: [-0.1, 0.1]
+**Average Odds Difference** measures the average of the difference between true positive rates and false positive rates. 
+
+    Ideal value: 0 and Fair area: [-0.1, 0.1]
 
 .. math::
     AOD = \frac{1}{2}[(TPR_{b} - TPR_{a}) + (FPR_{b} - FPR_{a})]
 
 
-4. **Accuracy Difference:** measures the difference between accuracy rates. 
+**Accuracy Difference:** measures the difference between accuracy rates. 
 
     The ideal value is 0. Positive values are unfair towards group b.
 
