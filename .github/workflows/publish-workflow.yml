@@ -67,6 +67,11 @@ jobs:
                     "title": "Repository",
                     "value": "https://github.com/${{ github.repository }}",
                     "short": false
+                  },
+                  {
+                    "title": "Documentation",
+                    "value": "https://holisticai.readthedocs.io/en/latest/",
+                    "short": false
                   }
                 ]
               }
