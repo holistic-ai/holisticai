@@ -1,15 +1,15 @@
 FairRec
------------
+-------
 
 .. note::
     **Learning tasks:** Recommendation systems.
 
 Introduction
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 FairRec is an algorithm designed to ensure two-sided fairness in personalized recommendation systems on two-sided platforms. It aims to balance the interests of both producers and customers by guaranteeing a minimum exposure for producers and ensuring that customers receive recommendations that are envy-free up to one item (EF1).
 
 Description
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 The FairRec algorithm addresses the problem of fair allocation in the context of recommendation systems. The goal is to allocate products to customers in a way that ensures fairness for both producers and customers. The main characteristics of FairRec include:
 
 - **Producer Fairness**: Ensuring that each producer receives a minimum level of exposure, which is at least their maximin share (MMS) of exposure.

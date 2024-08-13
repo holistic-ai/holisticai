@@ -24,13 +24,13 @@ def categorical_dataset():
 
 @pytest.fixture
 def regression_dataset():
-    dataset = load_dataset("us_crime")
+    dataset = load_dataset("us_crime", protected_attribute='race')
     dataset = dataset.groupby('group_a').sample(SHARD_SIZE, random_state=42)
     return dataset.train_test_split(test_size=0.2, random_state=0)
 
 @pytest.fixture
 def multiclass_dataset():
-    dataset = load_dataset("us_crime_multiclass")
+    dataset = load_dataset("us_crime_multiclass", protected_attribute='race')
     dataset = dataset.groupby(['y','group_a']).sample(SHARD_SIZE, random_state=42)
     dataset = dataset.map(lambda sample: {'stratify': str(sample['y']) + str(sample['group_a'])}, vectorized=False)
     return dataset.train_test_split(test_size=0.2, stratify=dataset['stratify'], random_state=0)

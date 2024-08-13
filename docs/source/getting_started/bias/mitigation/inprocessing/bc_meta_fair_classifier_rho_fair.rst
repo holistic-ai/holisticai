@@ -1,15 +1,15 @@
 ρ-Fair Method
------------------
+-------------
 
 .. note::
     **Learning tasks:** Binary classification.
 
 Introduction
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 The ρ-Fair method is designed to address fairness in machine learning classification tasks. It aims to ensure that the classifier's performance is equitable across different groups defined by sensitive attributes. This method is significant as it provides a structured approach to mitigate biases and ensure fairness in predictive models.
 
 Description
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 The ρ-Fair method involves reducing the fairness problem to a series of Group-Fair problems, which are easier to solve. The main characteristics of the method include:
 
 - **Problem Definition**: The goal is to find a classifier :math:`f` that minimizes prediction error while satisfying fairness constraints defined by a parameter :math:`\tau \in [0,1]`.
@@ -22,5 +22,5 @@ The ρ-Fair method involves reducing the fairness problem to a series of Group-F
   4. **Select Optimal Classifier**: Choose the classifier that minimizes the prediction error.
 
 References
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~
 1. Celis, L. Elisa, et al. "Classification with fairness constraints: A meta-algorithm with provable guarantees." Proceedings of the conference on fairness, accountability, and transparency. 2019.

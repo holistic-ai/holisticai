@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import numpy as np
 from holisticai.utils import ConditionalImportances, Importances
-from pydantic import BaseModel
 
 
-class RankAlignment(BaseModel):
+class RankAlignment:
     name: str = "Rank Alignment"
     reference: float = 1.0
 

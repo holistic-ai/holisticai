@@ -14,7 +14,7 @@ from sklearn.base import BaseEstimator, ClassifierMixin, clone
 class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
     """Exponentiated gradient reduction
 
-    Exponentiated gradient reduction is an in-processing technique that reduces\
+    Exponentiated gradient reduction [1]_ is an in-processing technique that reduces\
     fair classification to a sequence of cost-sensitive classification problems,\
     returning a randomized classifier with the lowest empirical error subject to\
     fair classification constraints.

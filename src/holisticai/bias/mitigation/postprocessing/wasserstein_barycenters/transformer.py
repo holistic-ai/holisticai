@@ -6,7 +6,7 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 class WassersteinBarycenter(BMPost):
     """
     Fair Regression with Wasserstein Barycenters learning a real-valued function that\
-    satisfies the Demographic Parity constraint. The strategy founds the optimal fair\
+    satisfies the Demographic Parity constraint [1]_ . The strategy founds the optimal fair\
     predictor computing the Wasserstein barycenter of the distributions induced by the\
     standard regression function on the sensitive groups.
 

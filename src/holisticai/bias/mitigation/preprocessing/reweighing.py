@@ -10,7 +10,7 @@ from holisticai.utils.transformers.bias import SensitiveGroups
 
 class Reweighing(BMPre):
     """
-    Reweighing preprocessing weights the examples in each group-label combination to ensure fairness before\
+    Reweighing preprocessing [1]_ weights the examples in each group-label combination to ensure fairness before\
     classification.
 
     References

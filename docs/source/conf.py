@@ -84,6 +84,7 @@ author = "Holistic AI"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
@@ -91,13 +92,30 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     'sphinx.ext.viewcode',
+    "sphinx.ext.doctest",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
+    #"sphinx.ext.linkcode",
+    "sphinx.ext.mathjax",
+    #"sphinx_gallery.gen_gallery",
+    #"sphinx_autodoc_typehints",
     "nbsphinx",
     "sphinx_copybutton",
     "sphinx_design",
+    #"sphinx_prompt",
+    #"numpydoc",
+    "matplotlib.sphinxext.plot_directive",
     "sphinx_togglebutton",
     "sphinxcontrib.youtube",
-    'sphinx.ext.mathjax',
 ]
+
+intersphinx_mapping = {
+    "python3": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "sklearn": ("https://scikit-learn.org/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None)
+}
 
 nbsphinx_allow_errors = True  # Permitir errores en los notebooks
 nbsphinx_execute = 'never'  # Puede ser 'auto', 'always', o 'never'
@@ -123,6 +141,7 @@ exclude_patterns = [
     ".ipynb_checkpoints",
 ]
 
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -142,12 +161,16 @@ html_static_path = ["_static"]
 # Theme options
 html_theme_options = {
     "logo": {"image_dark": "https://assets-global.website-files.com/6305e5d42c283515c3e71b8c/63d771efd50a073bd66193f0_Holistic-AI-Logo-Horizontal-Dark.svg"},
-    "github_url": "https://github.com/holistic-ai/holisticai",
     "twitter_url": "https://twitter.com/holistic_ai",
     "show_version_warning_banner": True,
     "secondary_sidebar_items": [],
 #    "announcement": "Visit our website and <a href='https://www.holisticai.com/demo'>schedule a demo</a> with our experts to find out how Holistic AI can help you shield against AI risks.",
     "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/holistic-ai/holisticai",
+            "icon": "fa-brands fa-github",
+        },
         {
             "name": "Community",
             "url": "https://join.slack.com/t/holisticaicommunity/shared_invite/zt-2jamouyrn-BrMfeoBZIHT8HbLzB3P9QQ",  # required
@@ -165,24 +188,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-# make copy of notebooks in docs folder, as they must be here for sphinx to
-# pick them up properly.
-
-# Uncomment when tutorials folder is present
-"""
-NOTEBOOKS_DIR = os.path.abspath("tutorials")
-if os.path.exists(NOTEBOOKS_DIR):
-    import warnings
-
-    warnings.warn("tutorials directory exists, replacing...")
-    shutil.rmtree(NOTEBOOKS_DIR)
-shutil.copytree(
-    os.path.abspath("../tutorials"),
-    NOTEBOOKS_DIR,
-)
-if os.path.exists(NOTEBOOKS_DIR + "/local_scratch"):
-    shutil.rmtree(NOTEBOOKS_DIR + "/local_scratch")
-"""
 
 # Custom css
 html_css_files = [

@@ -1,10 +1,13 @@
-Mitigation
-==========
+:py:mod:`holisticai.security.mitigation`
+========================================
 
-`holisticai.security.mitigation` is a python module to mitigate *security* risk in algorithms. Mitigation strategies are included for *classification* and *regression* tasks.
-
+.. automodule:: holisticai.security.mitigation
+    :no-members:
+    :no-inherited-members:
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
 
     holisticai.security.mitigation.Anonymize

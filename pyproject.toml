@@ -83,7 +83,7 @@ dependencies = [
   "pandas",
   "numpy==1.26",
   "pybind11>=2.12",
-  "pydantic",
+
   "jax",
   "jaxopt",
   "optax",
@@ -92,7 +92,7 @@ dependencies = [
 
 [tool.hatch.envs.sphinx.scripts]
 foo = ["which sphinx-build"]
-build = ["PYTHONPATH=./src sphinx-build -b html docs/source docs/build"]
+build = ["sphinx-build -b html docs/source docs/build"]
 
 [tool.hatch.envs.testing]
 dependencies = [
@@ -111,7 +111,6 @@ dependencies = [
   "shap>=0.42.1",
   "ipykernel>=6.25.2",
   "ruff",
-  "pydantic",
   "jax",
   "jaxopt",
   "optax",

@@ -79,8 +79,6 @@ def get_partial_dependence(
 
 
 class SKLearnModel:
-    # Skip pydantic Basemodel (necessary for validation)
-
     def __init__(self, predict, predict_proba, fit, score, classes, estimator_type):
         self.predict = predict
         self.fit = fit

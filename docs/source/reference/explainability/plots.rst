@@ -1,37 +1,34 @@
+:py:mod:`holisticai.explainability.plots`
+===========================================
 
-=====
-Plots
-=====
-
-`holisticai.explainability.plots` implements the visualizations for **explainability** tasks.
+.. automodule:: holisticai.explainability.plots
+    :no-members:
+    :no-inherited-members:
 
 
-.. _xai_feature_importance:
-
-Feature Importance
-------------------
+**Feature Importance**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
     
-    holisticai.explainability.plots.plot_feature_importance
+    plot_feature_importance
 
-.. _xai_partial_dependencies:
-
-Partial Dependencies
---------------------
+**Partial Dependencies**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
     
-    holisticai.explainability.plots.plot_partial_dependence
+    plot_partial_dependence
 
-.. _xai_tree_surrogates:
-
-Surrogate
----------
+**Surrogate**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
     
-    holisticai.explainability.plots.plot_surrogate
+    plot_surrogate

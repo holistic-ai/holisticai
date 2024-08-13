@@ -1,10 +1,14 @@
-Metrics
-=======
+:py:mod:`holisticai.security.metrics`
+=====================================
 
-`holisticai.security.metrics` is a python module measuring *security* in algorithms. Metrics are included for *classification*, *regression*, *clustering*, *recommender* and *multiclass* tasks.
+.. automodule:: holisticai.security.metrics
+    :no-members:
+    :no-inherited-members:
 
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
 
     holisticai.security.metrics.k_anonymity

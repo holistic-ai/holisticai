@@ -6,6 +6,8 @@
 
 **/.DS_Store
 
+**/generated/
+
 dist/
 
 .python-version

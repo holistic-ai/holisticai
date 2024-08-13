@@ -6,7 +6,7 @@ from holisticai.bias.mitigation.postprocessing.debiasing_exposure.algorithm_util
 
 class DebiasingExposure:
     """
-    Disparate Exposure Learning to Rank (DELTR) incorporates a measure of performance and a measure\
+    Disparate Exposure Learning to Rank (DELTR) [1]_ incorporates a measure of performance and a measure\
     of disparate exposure into its loss function. Trains a linear model based on performance and\
     fairness for a protected group.
 

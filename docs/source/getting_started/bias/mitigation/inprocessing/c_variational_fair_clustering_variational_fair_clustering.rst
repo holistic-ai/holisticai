@@ -1,15 +1,15 @@
 Variational Fair Clustering
------------------
+---------------------------
 
 .. note::
     **Learning tasks:** Clustering.
 
 Introduction
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 The Variational Fair Clustering method integrates a Kullback-Leibler (KL) fairness term with a variety of clustering objectives, including prototype-based and graph-based methods. This approach allows for controlling the trade-off between fairness and clustering quality, providing a scalable solution with convergence guarantees. Unlike existing combinatorial and spectral methods, this variational framework does not require eigenvalue decomposition, making it suitable for large-scale datasets.
 
 Description
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
 The problem involves assigning :math:`N` data points to :math:`K` clusters while ensuring that the clusters are balanced with respect to :math:`J` different demographic groups. The method introduces a fairness term based on the Kullback-Leibler (KL) divergence to measure the deviation from a target demographic distribution within each cluster.
 
 - **Problem Definition:**
@@ -38,5 +38,5 @@ The problem involves assigning :math:`N` data points to :math:`K` clusters while
      - Assign each data point to the cluster with the highest probability.
 
 References
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~
 1. Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI Conference on Artificial Intelligence. Vol. 35. No. 12. 2021.

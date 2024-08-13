@@ -15,7 +15,7 @@ from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 class FairTopK(BMPost):
     """
-    Fair Top K bias mitigation can be used for Recommender Systems.\
+    Fair Top K bias mitigation [1]_ can be used for Recommender Systems.\
     The strategy extends group fairness definition using the standard notion of protected groups\
     and is based on ensuring that the proportion of protected candidates in every prefix of the top-k\
     ranking.

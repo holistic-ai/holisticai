@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Literal, Union
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -160,7 +160,29 @@ def dataframe_to_level_dict_with_series(df, row_index):
 
 
 class DataLoader:
-    def __init__(self, dataset, batch_size, dtype):
+    """
+    A class that represents a data loader for a dataset. This class is used to load the dataset in batches in a specific data type (jax, pandas, or numpy).
+
+    Parameters
+    ----------
+    dataset: Dataset
+        The dataset to load.
+    batch_size: int
+        The size of the batch.
+    dtype: Literal["jax", "pandas", "numpy"]
+        The data type to load the dataset in.
+
+    Example
+    -------
+
+    >>> from holisticai.datasets import load_dataset
+    >>> dataset = load_dataset("adult")
+    >>> dataloader = DataLoader(dataset, batch_size=32, dtype="jax")
+    >>> for batch in dataloader:
+    ...     print(batch)
+    """
+
+    def __init__(self, dataset: Dataset, batch_size: int, dtype: Literal["jax", "pandas", "numpy"]):
         self.batch_size = batch_size
         self.dataset = dataset
         self.dtype = dtype

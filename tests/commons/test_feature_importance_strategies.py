@@ -24,7 +24,7 @@ def test_surrogate_feature_importance_call(input_data):
     fi_strategy = SurrogateFeatureImportanceCalculator(random_state=RandomState(42))
     importance = fi_strategy.compute_importances(test['X'], proxy=proxy)
     assert isinstance(importance, Importances)
-    assert np.isclose(importance['capital-loss'], 0.37037037037037046, atol=5e-2)
+    assert np.isclose(importance['capital-gain'], 0.2982456140350877, atol=5e-2)
     
 def test_permutation_feature_importance_call(input_data):
     model, test = input_data

@@ -11,9 +11,7 @@ from sklearn.base import BaseEstimator
 
 
 class FairScoreClassifier(BaseEstimator, BMImp):
-    """Fair Score Classifier
-
-    Generates a classification model that integrates fairness constraints for multiclass classification. This algorithm\
+    """Fair Score Classifier [1]_ generates a classification model that integrates fairness constraints for multiclass classification. This algorithm\
     returns a matrix of lambda coefficients that scores a given input vector. The higher the score, the higher the probability\
     of the input vector to be classified as the majority class.
 

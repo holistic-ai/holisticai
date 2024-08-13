@@ -1,11 +1,13 @@
-.. _pipeline
+:py:mod:`holisticai.pipeline`
+============================
 
-Pipeline
---------
-
-`holisticai.pipeline` is a python module for creating Pipeline objects.
+.. automodule:: holisticai.pipeline
+    :no-members:
+    :no-inherited-members:
 
 .. autosummary::
+    :nosignatures:
+    :template: class.rst
     :toctree: .generated/
     
-    holisticai.pipeline.Pipeline
+    Pipeline

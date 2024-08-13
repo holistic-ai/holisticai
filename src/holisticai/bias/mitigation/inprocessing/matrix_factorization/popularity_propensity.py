@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class PopularityPropensityMF(BMImp, RecommenderSystemBase):
-    """Popularity Propensity Matrix Factorization
-
-    Popularity Propensity Matrix Factorization address selection biases in recommender systems \
+    """Popularity Propensity Matrix Factorization [1]_ address selection biases in recommender systems \
     by using causal inference techniques to provide unbiased performance estimators \
     and improve prediction accuracy. This method estimates the probability (propensity) \
     that a user will rate an item and adjusts the training and evaluation processes accordingly.

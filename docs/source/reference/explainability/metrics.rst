@@ -1,30 +1,30 @@
-Metrics
-=======
+:py:mod:`holisticai.explainability.metrics`
+===========================================
 
-`holisticai.explainability.metrics` is a python module measuring *bias* in algorithms. Metrics are included for *classification*, *regression*, *clustering*, *recommender* and *multiclass* tasks.
+.. automodule:: holisticai.explainability.metrics
+    :no-members:
+    :no-inherited-members:
 
-.. _global_feature_importance:
-
-Global Feature Importance
--------------------------
-
-.. autosummary::
-    :toctree: .generated/
-
-    holisticai.explainability.metrics.alpha_score
-    holisticai.explainability.metrics.xai_ease_score
-    holisticai.explainability.metrics.position_parity
-    holisticai.explainability.metrics.rank_alignment
-    holisticai.explainability.metrics.spread_ratio
-
-
-.. _local_feature_importance:
-
-Local Feature Importance
-------------------------
+**Global Feature Importance**
 
 .. autosummary::
+    :nosignatures:
+    :template: function.rst
     :toctree: .generated/
 
-    holisticai.explainability.metrics.data_stability
-    holisticai.explainability.metrics.feature_stability
+    alpha_score
+    xai_ease_score
+    position_parity
+    rank_alignment
+    spread_ratio
+    spread_divergence
+
+**Local Feature Importance**
+
+.. autosummary::
+    :nosignatures:
+    :template: function.rst
+    :toctree: .generated/
+
+    data_stability
+    feature_stability
