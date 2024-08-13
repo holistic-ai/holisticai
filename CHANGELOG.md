@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] - 2024-08-13
+
+### 🚀 Features
+
+- Add metrics for robustness in binary classification (#191)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Dataset documentation and remove unused dependencies. (#192)
+- Update slack message (#193)
+
 ## [1.0.0] - 2024-08-01
 
 ### 🐛 Bug Fixes
