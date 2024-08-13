@@ -113,6 +113,12 @@ The following tools are available to support the construction and deployment of 
     :padding: 2 2 0 0
     :class-container: sd-text-center
 
+    .. grid-item-card:: Robustness
+        :link: robustness/index.html
+        :shadow: md
+
+        Metrics and attackers for evaluating the robustness of machine learning models.
+
     .. grid-item-card:: Pipeline
         :link: pipeline.html
         :shadow: md
@@ -133,3 +139,4 @@ The following tools are available to support the construction and deployment of 
 
    pipeline
    datasets
+   robustness

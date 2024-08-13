@@ -11,4 +11,6 @@ This gallery contains a collection of examples that demonstrate the usage of ``h
 
     Bias <tutorials/bias>
 
-    Explainability <tutorials/xai>
+    Explainability <tutorials/explainability>
+
+    Robustness <tutorials/robustness>
