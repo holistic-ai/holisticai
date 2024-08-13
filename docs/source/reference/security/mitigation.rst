@@ -10,4 +10,4 @@
     :template: function.rst
     :toctree: .generated/
 
-    holisticai.security.mitigation.Anonymize
+    Anonymize

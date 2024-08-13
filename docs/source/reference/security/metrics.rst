@@ -11,8 +11,8 @@
     :template: function.rst
     :toctree: .generated/
 
-    holisticai.security.metrics.k_anonymity
-    holisticai.security.metrics.l_diversity
-    holisticai.security.metrics.shapr_score
-    holisticai.security.metrics.data_minimization_score
-    holisticai.security.metrics.attribute_attack_score
+    k_anonymity
+    l_diversity
+    shapr_score
+    data_minimization_score
+    attribute_attack_score
