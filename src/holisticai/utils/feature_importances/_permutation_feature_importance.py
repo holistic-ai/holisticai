@@ -5,9 +5,9 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
+from joblib import Parallel, delayed
 from numpy.random import RandomState
 from sklearn.metrics import accuracy_score, mean_squared_error
-from sklearn.utils.parallel import Parallel, delayed
 
 from holisticai.datasets import Dataset
 from holisticai.utils._definitions import ConditionalImportances, Importances, ModelProxy

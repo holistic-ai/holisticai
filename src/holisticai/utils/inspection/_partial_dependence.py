@@ -4,9 +4,9 @@ import numbers
 
 import numpy as np
 import pandas as pd
+from joblib import Parallel, delayed
 from sklearn.inspection import partial_dependence
 from sklearn.metrics import accuracy_score, r2_score
-from sklearn.utils.parallel import Parallel, delayed
 
 from holisticai.utils._definitions import ModelProxy, PartialDependence
 

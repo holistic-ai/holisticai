@@ -3,7 +3,7 @@ from typing import Any
 
 import pandas as pd
 from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
-from sklearn.utils.parallel import Parallel, delayed
+from joblib import Parallel, delayed
 
 
 class GridSearchAlgorithm:
