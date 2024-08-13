@@ -26,7 +26,6 @@ docs/source/metrics/.generated
 **/.generated/
 .generated/
 docs/source/explainability/.generated
-docs/source/gallery/tutorials/*/
 
 mlruns/
 mlartifacts/
