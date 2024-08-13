@@ -12,7 +12,7 @@
 .. autosummary::
    :nosignatures:
    :template: function.rst
-   :toctree: generated/
+   :toctree: .generated/
 
     abroca
     accuracy_diff

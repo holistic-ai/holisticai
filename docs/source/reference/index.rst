@@ -8,6 +8,37 @@ This page provides an overview of all public objects, functions, and methods in 
 
 Below is a list of key modules in ``holisticai``:
 
+Tools
+-----
+
+The following tools are available to support the construction and deployment of machine learning solutions:
+
+.. grid:: 3 3 3 3
+    :gutter: 4
+    :padding: 2 2 0 0
+    :class-container: sd-text-center
+
+    .. grid-item-card:: Pipeline
+        :link: pipeline.html
+        :shadow: md
+
+        A framework for building and deploying machine learning pipelines.
+
+    .. grid-item-card:: Datasets
+        :link: datasets.html
+        :shadow: md
+
+        Datasets for experimentation and testing.
+
+.. If you update this toctree, also update the manual toctree in the
+.. main index.rst.template
+
+.. toctree::
+   :hidden:
+
+   pipeline
+   datasets
+
 Bias
 ----
 
@@ -98,45 +129,39 @@ Security in machine learning involves practices and measures to protect AI model
 
 .. toctree::
    :hidden:
+   :maxdepth: 3
 
    security/metrics
    security/mitigation
 
 
-Tools
------
+Robustness
+----------
 
-The following tools are available to support the construction and deployment of machine learning solutions:
+Robustness in machine learning refers to the ability of AI models to perform well under various conditions, including noisy data, adversarial attacks, and distribution shifts. Enhancing robustness is essential for ensuring the reliability, generalization, and resilience of AI systems.
 
 .. grid:: 3 3 3 3
     :gutter: 4
     :padding: 2 2 0 0
     :class-container: sd-text-center
 
-    .. grid-item-card:: Robustness
-        :link: robustness/index.html
+    .. grid-item-card:: Metrics
+        :link: robustness/metrics.html
         :shadow: md
 
-        Metrics and attackers for evaluating the robustness of machine learning models.
+        Metrics to evaluate the stability and robustness of models in various learning tasks.
 
-    .. grid-item-card:: Pipeline
-        :link: pipeline.html
+    .. grid-item-card:: Attackers
+        :link: robustness/attackers.html
         :shadow: md
 
-        A framework for building and deploying machine learning pipelines.
-
-    .. grid-item-card:: Datasets
-        :link: datasets.html
-        :shadow: md
-
-        Datasets for experimentation and testing.
-
-.. If you update this toctree, also update the manual toctree in the
-.. main index.rst.template
+        Techniques and strategies to simulate adversarial attacks and test model robustness.
 
 .. toctree::
    :hidden:
+   :maxdepth: 3
 
-   pipeline
-   datasets
-   robustness
+   robustness/metrics
+   robustness/attackers
+
+
