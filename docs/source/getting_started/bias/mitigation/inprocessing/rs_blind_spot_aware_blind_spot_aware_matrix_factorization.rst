@@ -26,6 +26,26 @@ The method can be described as follows:
    - Modify the cost function to include a term that penalizes the blind spot.
    - Use stochastic gradient descent to update the user and item latent factors.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+The Blind Spot Aware Matrix Factorization method can be used as follows:
+
+.. code-block:: python
+
+  # Import the mitigator
+  from holisticai.bias.mitigation import BlindSpotAwareMF
+
+  # Create a BlindSpotAwareMF instance
+  mitigator = BlindSpotAwareMF(**kargs)
+
+  # Fit the mitigator on the training data
+  mitigator.fit(data_matrix)
+
+You can find an extended example of using the Blind Spot Aware Matrix Factorization method in the following `tutorial <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/examples/example_lastfm.html#Inprocessing:-Blind-spot-aware-method>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.BlindSpotAwareMF`.
+
 References
 ~~~~~~~~~~
 1. Sun, Wenlong, et al. "Debiasing the human-recommender system feedback loop in collaborative filtering." Companion Proceedings of The 2019 World Wide Web Conference. 2019.

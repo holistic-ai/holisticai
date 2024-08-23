@@ -20,6 +20,26 @@ The algorithm operates in two phases:
 1. **First Phase**: Ensures EF1 among all customers and tries to provide a minimum guarantee on the exposure of the producers.
 2. **Second Phase**: Ensures that exactly k products are allocated to each customer while maintaining EF1 for customers.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+The FairRec method can be used as follows:
+
+.. code-block:: python
+
+  # Import the mitigator
+  from holisticai.bias.mitigation import FairRec
+
+  # Create a FairRec instance
+  mitigator = FairRec(**kargs)
+
+  # Fit the mitigator on the training data
+  mitigator.fit(data_matrix)
+
+You can find an extended example of using the FairRec method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/demos/inprocessing.html#Method:-Two-sided-fairness>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairRec`.
+
 References
 ~~~~~~~~~~~~~~~~
 1. Patro, Gourab K., et al. "Fairrec: Two-sided fairness for personalized recommendations in two-sided platforms." Proceedings of The Web Conference 2020. 2020.

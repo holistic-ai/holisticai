@@ -21,6 +21,29 @@ The ρ-Fair method involves reducing the fairness problem to a series of Group-F
   3. **Compute Classifiers**: Solve the Group-Fair problem for each interval to obtain a set of classifiers.
   4. **Select Optimal Classifier**: Choose the classifier that minimizes the prediction error.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+The Meta Fair Classifier method can be used as follows:
+
+.. code-block:: python
+
+  # Import the mitigator
+  from holisticai.bias.mitigation import MetaFairClassifier
+
+  # Create a MetaFairClassifier instance
+  mitigator = MetaFairClassifier(**kargs)
+
+  # Fit the mitigator on the training data
+  mitigator.fit(train_data, y_data, group_a, group_b)
+
+  # Predict using the mitigator on the test data
+  test_data_transformed = mitigator.predict(test_data)
+
+You can find an extended example of using the Meta Fair Classifier method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/inprocessing.html#4.-Meta-Fair-Classifier>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.MetaFairClassifier`.
+
 References
 ~~~~~~~~~~
 1. Celis, L. Elisa, et al. "Classification with fairness constraints: A meta-algorithm with provable guarantees." Proceedings of the conference on fairness, accountability, and transparency. 2019.

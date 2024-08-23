@@ -22,6 +22,29 @@ The EG reduction method addresses the problem of fair classification by transfor
   4. **Exponentiated Gradient Updates:** Use the exponentiated gradient algorithm to update the Lagrange multipliers, ensuring that they remain non-negative and sum to a bounded value.
   5. **Best Response Calculation:** At each iteration, calculate the best response of the classifier and the Lagrange multipliers.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+The Exponentiated Gradient Reduction method can be used as follows:
+
+.. code-block:: python
+
+  # Import the mitigator
+  from holisticai.bias.mitigation import ExponentiatedGradientReduction
+
+  # Create a ExponentiatedGradientReduction instance
+  mitigator = ExponentiatedGradientReduction(**kargs)
+
+  # Fit the mitigator on the training data
+  mitigator.fit(train_data, y_data, group_a, group_b)
+
+  # Predict using the mitigator on the test data
+  test_data_transformed = mitigator.predict(test_data)
+
+You can find an extended example of using the Exponentiated Gradient Reduction method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/inprocessing.html#2.-Exponentiated-Gradient>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.ExponentiatedGradientReduction`.
+
 References
 ~~~~~~~~~~
 1. Agarwal, A., Beygelzimer, A., Dudik, M., Langford, J., & Wallach, H. (2018). A reductions approach to fair classification. In Advances in Neural Information Processing Systems (pp. 656-666).

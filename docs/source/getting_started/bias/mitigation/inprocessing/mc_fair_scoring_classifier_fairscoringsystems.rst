@@ -1,4 +1,4 @@
-FAIRScoringSystems
+FAIR Scoring System
 ------------------
 
 .. note::
@@ -6,11 +6,11 @@ FAIRScoringSystems
 
 Introduction
 ~~~~~~~~~~~~
-FAIRScoringSystems is a Mixed Integer Linear Programming (MILP) framework designed to generate optimal scoring systems for multi-class classification tasks. The method ensures that the resulting models are interpretable, fair, and sparse. It incorporates fairness constraints to mitigate biases against protected groups and sparsity constraints to enhance model interpretability.
+FAIR Scoring Classifier System is a Mixed Integer Linear Programming (MILP) framework designed to generate optimal scoring systems for multi-class classification tasks. The method ensures that the resulting models are interpretable, fair, and sparse. It incorporates fairness constraints to mitigate biases against protected groups and sparsity constraints to enhance model interpretability.
 
 Description
 ~~~~~~~~~~~
-FAIRScoringSystems extends the Supersparse Linear Integer Model (SLIM) framework to handle multi-class classification problems. The method generates one scoring system for each class in a one-vs-all manner. The primary goal is to maximize classification accuracy while adhering to user-defined fairness and sparsity constraints.
+FAIR Scoring Classifier System extends the Supersparse Linear Integer Model (SLIM) framework to handle multi-class classification problems. The method generates one scoring system for each class in a one-vs-all manner. The primary goal is to maximize classification accuracy while adhering to user-defined fairness and sparsity constraints.
 
 - **Problem Definition**: The method aims to create scoring systems that are both accurate and fair, ensuring that the classification does not disproportionately disadvantage any protected group.
 - **Main Characteristics**:
@@ -43,6 +43,29 @@ FAIRScoringSystems extends the Supersparse Linear Integer Model (SLIM) framework
   5. **Solve MILP**:
 
      - Use an off-the-shelf MILP solver to find the optimal scoring systems.
+
+Basic Usage
+~~~~~~~~~~~~~~
+
+The FAIR Scoring Classifier System method can be used as follows:
+
+.. code-block:: python
+
+  # Import the mitigator
+  from holisticai.bias.mitigation import FairScoreClassifier
+
+  # Create a FairScoreClassifier instance
+  mitigator = FairScoreClassifier(**kargs)
+
+  # Fit the mitigator on the training data
+  mitigator.fit(train_data, y_data, group_a, group_b)
+
+  # Predict using the mitigator on the test data
+  test_data_transformed = mitigator.predict(test_data, group_a, group_b)
+
+You can find an extended example of using the FAIR Scoring Classifier System method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/multi_classification/demos/inprocessing.html#1.-Fair-Scoring-Classifier>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairScoreClassifier`.
 
 References
 ~~~~~~~~~~~~~~~~

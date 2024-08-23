@@ -37,6 +37,29 @@ The problem involves assigning :math:`N` data points to :math:`K` clusters while
 
      - Assign each data point to the cluster with the highest probability.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+The Variational Fair Clustering method can be used as follows:
+
+.. code-block:: python
+
+  # Import the mitigator
+  from holisticai.bias.mitigation import VariationalFairClustering
+
+  # Create a VariationalFairClustering instance
+  mitigator = VariationalFairClustering(**kargs)
+
+  # Fit the mitigator on the training data
+  mitigator.fit(train_data, group_a, group_b)
+
+  # Predict using the mitigator on the test data
+  test_data_transformed = mitigator.predict(test_data, group_a, group_b)
+
+You can find an extended example of using the Variational Fair Clustering method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#1.-Variational-Fair-Clustering>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.VariationalFairClustering`.
+
 References
 ~~~~~~~~~~
 1. Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI Conference on Artificial Intelligence. Vol. 35. No. 12. 2021.
