@@ -37,6 +37,8 @@
     BlindSpotAwareMF
     PopularityPropensityMF
     FairRec
+    AdversarialDebiasing
+    DebiasingLearningMF
 
 **Post-processing**
 
