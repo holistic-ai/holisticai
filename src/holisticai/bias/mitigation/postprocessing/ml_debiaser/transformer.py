@@ -40,6 +40,13 @@ class MLDebiaser(BMPost):
     verbose : bool
         The verbosity of the optimization algorithm.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import MLDebiaser
+    >>> mitigator = MLDebiaser()
+    >>> mitigator.fit(y_proba, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(y_proba, group_a, group_b)
+
     References
     ---------
         .. [1] Alabdulmohsin, Ibrahim M., and Mario Lucic. "A near-optimal algorithm for debiasing\

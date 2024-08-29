@@ -23,6 +23,13 @@ class EqualizedOdds(BMPost):
     seed : int
         Random seed for repeatability.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import EqualizedOdds
+    >>> mitigator = EqualizedOdds(**params)
+    >>> mitigator.fit(y, y_pred, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(y_pred, group_a, group_b)
+
     References
     ----------
         .. [1] Hardt, Moritz, Eric Price, and Nati Srebro. "Equality of opportunity in supervised learning."\

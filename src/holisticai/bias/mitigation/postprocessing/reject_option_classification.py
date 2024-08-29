@@ -47,6 +47,13 @@ class RejectOptionClassification(BMPost):
     verbose : int
         If >0, will show progress percentage.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import RejectOptionClassification
+    >>> mitigator = RejectOptionClassification(**params)
+    >>> mitigator.fit(y, y_proba, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(y_pred, y_proba, group_a, group_b)
+
     References
     ----------
         .. [1] Kamiran, Faisal, Asim Karim, and Xiangliang Zhang. "Decision theory for discrimination-aware classification."\

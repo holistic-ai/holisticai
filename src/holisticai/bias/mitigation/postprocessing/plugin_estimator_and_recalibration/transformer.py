@@ -21,6 +21,13 @@ class PluginEstimationAndCalibration(BMPost):
     beta : float
         The regularization parameter
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import PluginEstimationAndCalibration
+    >>> mitigator = PluginEstimationAndCalibration()
+    >>> mitigator.fit_transform(y_pred, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(y_pred, group_a, group_b)
+
     References
     ----------
         .. [1] Chzhen, Evgenii, et al. "Fair regression via plug-in estimator and recalibration with statistical\

@@ -31,6 +31,13 @@ class MCMF(BMPost):
     verbose : int
         If > 0 , then print logs.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import MCMF
+    >>> mitigator = MCMF(**params)
+    >>> mitigator.fit_transform(X, y_pred, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(X, y_pred, group_a, group_b)
+
     References
     ----------
         .. [1] Davidson, Ian, and S. S. Ravi. "Making existing clusterings fairer: Algorithms, complexity results and insights."\

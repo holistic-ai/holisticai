@@ -28,6 +28,12 @@ class DisparateImpactRemoverRS(BMPos):
     verbose : int
         If > 0, print progress.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import DisparateImpactRemoverRS
+    >>> mitigator = DisparateImpactRemoverRS(**params)
+    >>> new_rankings = mitigator.transform(rankings)
+
     References
     ----------
         .. [1] Feldman, Michael, et al. "Certifying and removing disparate impact."\
