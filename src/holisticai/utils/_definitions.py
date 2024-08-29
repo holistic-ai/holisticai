@@ -140,9 +140,6 @@ class LocalImportances:
         # Concatenate the data and cond parts
         new_data = pd.concat([data, other_data], axis=0).reset_index(drop=True)
         new_serie = pd.Series(pd.concat([serie, other_serie], ignore_index=True))
-        # new_data = pd.concat([new_data_dataframe, new_data_serie], axis=1)
-        # new_data.columns = pd.MultiIndex.from_tuples(
-        #    [("DataFrame", col) for col in new_data_dataframe.columns] + [("Serie", new_data_serie.name)]
 
         # Create a new instance of LocalImportances with the concatenated data
         return LocalImportances(data=new_data, cond=new_serie)
