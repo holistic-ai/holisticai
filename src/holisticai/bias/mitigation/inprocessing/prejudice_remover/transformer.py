@@ -45,7 +45,14 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
             Log progress if value > 0.
 
         print_interval : int
-        Each `print_interval` steps print information.
+            Each `print_interval` steps print information.
+
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import PrejudiceRemover
+    >>> mitigator = PrejudiceRemover(**params)
+    >>> mitigator.fit(train_data, y, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data)
 
     References
     ----------

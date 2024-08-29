@@ -47,23 +47,7 @@ Description
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The Learning Fair Representation method can be used as follows:
-
-.. code-block:: python
-
-  # Import the method
-  from holisticai.bias.mitigation import LearningFairRepresentation
-
-  # Create a LearningFairRepresentation instance
-  mitigator = LearningFairRepresentation(**kargs)
-
-  # Transform the training data using the LearningFairRepresentation instance
-  train_data_transformed = mitigator.fit_transform(train_data, group_a, group_b)
-
-  # Transform the test data using the LearningFairRepresentation instance
-  test_data_transformed = mitigator.transform(test_data, group_a, group_b)
-
-You can find an extended example of using the Learning Fair Representation method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/preprocessing.html#3.-Learning-Fair-Representations>`_.
+You can find an example of using the Learning Fair Representation method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/preprocessing.html#3.-Learning-Fair-Representations>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.LearningFairRepresentation`.
 

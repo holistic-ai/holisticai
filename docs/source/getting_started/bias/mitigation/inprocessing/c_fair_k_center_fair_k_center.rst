@@ -22,23 +22,7 @@ The method involves a recursive algorithm that handles the fairness constraints 
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The Fair k-Center Clustering method can be used as follows:
-
-.. code-block:: python
-
-  # Import the mitigator
-  from holisticai.bias.mitigation import FairKCenterClustering
-
-  # Create a FairKCenterClustering instance
-  mitigator = FairKCenterClustering(**kargs)
-
-  # Fit the mitigator on the training data
-  mitigator.fit(train_data, group_a, group_b)
-
-  # Predict using the mitigator on the test data
-  test_data_transformed = mitigator.predict(test_data, group_a, group_b)
-
-You can find an extended example of using the Fair k-Center Clustering method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#2.-Fair-K-Center>`_.
+You can find an example of using the Fair k-Center Clustering method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#2.-Fair-K-Center>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairKCenterClustering`.
 

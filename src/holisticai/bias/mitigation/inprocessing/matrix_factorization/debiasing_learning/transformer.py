@@ -52,6 +52,12 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
         verbose : int
             If >0, will show progress percentage.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import DebiasingLearningMF
+    >>> mitigator = DebiasingLearningMF(**params)
+    >>> mitigator.fit(data_matrix)
+
     References
     ----------
         .. [1] Schnabel, Tobias, et al. "Recommendations as treatments: Debiasing learning\

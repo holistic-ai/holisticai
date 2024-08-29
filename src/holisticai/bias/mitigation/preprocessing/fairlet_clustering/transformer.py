@@ -43,6 +43,12 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
     seed : int, optional
         Random seed. Default is None.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import FairletClusteringPreprocessing
+    >>> mitigator = FairletClusteringPreprocessing()
+    >>> train_data_transformed = mitigator.fit_transform(train_data, group_a, group_b)
+
     References
     ----------
     .. [1] `Backurs, Arturs, et al. "Scalable fair clustering." International Conference on

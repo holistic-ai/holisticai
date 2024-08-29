@@ -47,23 +47,7 @@ FAIR Scoring Classifier System extends the Supersparse Linear Integer Model (SLI
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The FAIR Scoring Classifier System method can be used as follows:
-
-.. code-block:: python
-
-  # Import the mitigator
-  from holisticai.bias.mitigation import FairScoreClassifier
-
-  # Create a FairScoreClassifier instance
-  mitigator = FairScoreClassifier(**kargs)
-
-  # Fit the mitigator on the training data
-  mitigator.fit(train_data, y_data, group_a, group_b)
-
-  # Predict using the mitigator on the test data
-  test_data_transformed = mitigator.predict(test_data, group_a, group_b)
-
-You can find an extended example of using the FAIR Scoring Classifier System method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/multi_classification/demos/inprocessing.html#1.-Fair-Scoring-Classifier>`_.
+You can find an example of using the FAIR Scoring Classifier System method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/multi_classification/demos/inprocessing.html#1.-Fair-Scoring-Classifier>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairScoreClassifier`.
 

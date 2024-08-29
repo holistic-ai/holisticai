@@ -32,23 +32,30 @@ class FairletClustering(BaseEstimator, BMImp):
 
     Parameters
     ----------
-        n_clusters : int
-            The number of clusters to form as well as the number of centroids to generate.
+    n_clusters : int
+        The number of clusters to form as well as the number of centroids to generate.
 
-        decomposition : str
-            Fairlet decomposition strategy, available: Vanilla, Scalable
+    decomposition : str
+        Fairlet decomposition strategy, available: Vanilla, Scalable
 
-        clustering_model : str
-            specified lambda parameter
+    clustering_model : str
+        specified lambda parameter
 
-        p : int
-            fairlet decomposition parameter for Vanilla and Scalable strategy
+    p : int
+        fairlet decomposition parameter for Vanilla and Scalable strategy
 
-        q : int
-            fairlet decomposition parameter for Vanilla and Scalable strategy
+    q : int
+        fairlet decomposition parameter for Vanilla and Scalable strategy
 
-        seed : int
-            Random seed.
+    seed : int
+        Random seed.
+
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import FairletClustering
+    >>> mitigator = FairletClustering(**params)
+    >>> mitigator.fit(train_data, group_a, group_b)
+    >>> train_data_transformed = mitigator.predict(train_data)
 
     References
     ---------

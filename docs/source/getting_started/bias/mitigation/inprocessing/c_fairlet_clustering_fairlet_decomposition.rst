@@ -31,23 +31,7 @@ The method consists of three main steps:
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The Fairlet Decomposition method can be used as follows:
-
-.. code-block:: python
-
-  # Import the mitigator
-  from holisticai.bias.mitigation import FairletClustering
-
-  # Create a FairletClustering instance
-  mitigator = FairletClustering(**kargs)
-
-  # Fit the mitigator on the training data
-  mitigator.fit(train_data, group_a, group_b)
-
-  # Predict using the mitigator on the test data
-  test_data_transformed = mitigator.predict(test_data)
-
-You can find an extended example of using the Fairlet Decomposition method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#4.-Fairlet>`_.
+You can find an example of using the Fairlet Decomposition method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#4.-Fairlet>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairletClustering`.
 

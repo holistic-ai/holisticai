@@ -23,20 +23,7 @@ The algorithm operates in two phases:
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The FairRec method can be used as follows:
-
-.. code-block:: python
-
-  # Import the mitigator
-  from holisticai.bias.mitigation import FairRec
-
-  # Create a FairRec instance
-  mitigator = FairRec(**kargs)
-
-  # Fit the mitigator on the training data
-  mitigator.fit(data_matrix)
-
-You can find an extended example of using the FairRec method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/demos/inprocessing.html#Method:-Two-sided-fairness>`_.
+You can find an example of using the FairRec method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/demos/inprocessing.html#Method:-Two-sided-fairness>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairRec`.
 

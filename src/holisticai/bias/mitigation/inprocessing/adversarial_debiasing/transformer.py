@@ -40,64 +40,57 @@ class AdversarialDebiasing(BMImp):
 
     Parameters
     ----------
-        features_dim: int
-            Number of input feature X: (n_samples, features_dim)
+    features_dim: int
+        Number of input feature X: (n_samples, features_dim)
 
-        keep_prob: float
-            Dropout parameter for classifier
+    keep_prob: float
+        Dropout parameter for classifier
 
-        hidden_size: int
-            Number of neurons on hidden layer
+    hidden_size: int
+        Number of neurons on hidden layer
 
-        batch_size: int
-            Numer of examples used for each iteration
+    batch_size: int
+        Numer of examples used for each iteration
 
-        shuffle: bool
-            Shuffle data after each epoch
+    shuffle: bool
+        Shuffle data after each epoch
 
-        epochs: int
-            Number of epochs
+    epochs: int
+        Number of epochs
 
-        initial_lr: float
-            Initial Learning Rate
+    initial_lr: float
+        Initial Learning Rate
 
-        use_debias: bool
-            If False Train a simple classifier
+    use_debias: bool
+        If False Train a simple classifier
 
-        adversary_loss_weight: float
-            Adversarial Loss importance
+    adversary_loss_weight: float
+        Adversarial Loss importance
 
-        verbose : int
-            Log progress if value > 0.
+    verbose : int
+        Log progress if value > 0.
 
-        print_interval : int
-            Each `print_interval` steps print information.
+    print_interval : int
+        Each `print_interval` steps print information.
 
-        device: str
-            pytorch paramter ("cpu", "cuda")
+    device: str
+        pytorch paramter ("cpu", "cuda")
 
-        seed: int
-            seed for random state
+    seed: int
+        seed for random state
 
-    Methods
-    -------
-        fit(X, y_true, group_a, group_b)
-            Fit model using Adversarial Debiasing.
-
-        predict(X)
-            Predict the closest cluster each sample in X belongs to.
-
-        predict_proba(X)
-            Predict the probability of each sample in X belongs to each class.
-
-        predict_score(X)
-            Predict the probability of each sample in X belongs to the positive class.
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation.inprocessing import AdversarialDebiasing
+    >>> mitigator = AdversarialDebiasing(**params)
+    >>> mitigator.fit(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data)
 
     References
     ----------
-        [1] B. H. Zhang, B. Lemoine, and M. Mitchell, "Mitigating Unwanted
-        Biases with Adversarial Learning," AAAI/ACM Conference on Artificial
-        Intelligence, Ethics, and Society, 2018.
+    [1] B. H. Zhang, B. Lemoine, and M. Mitchell, "Mitigating Unwanted
+    Biases with Adversarial Learning," AAAI/ACM Conference on Artificial
+    Intelligence, Ethics, and Society, 2018.
     """
 
     def __init__(

@@ -29,6 +29,16 @@ class FairScoreClassifier(BaseEstimator, BMImp):
         time_limit : int
             The time limit for the optimization algorithm.
 
+        verbose : int
+            If >0, will show progress percentage.
+
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import FairScoreClassifier
+    >>> mitigator = FairScoreClassifier(**params)
+    >>> mitigator.fit(train_data, y, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data, group_a, group_b)
+
     References:
         .. [1] Julien Rouzot, Julien Ferry, Marie-José Huguet. Learning Optimal Fair Scoring Systems for Multi-\
         Class Classification. ICTAI 2022 - The 34th IEEE International Conference on Tools with Artificial\

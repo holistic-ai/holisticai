@@ -21,23 +21,7 @@ The fair k-median method involves several key steps to ensure fairness in cluste
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The Fair k-Median method can be used as follows:
-
-.. code-block:: python
-
-  # Import the mitigator
-  from holisticai.bias.mitigation import FairKMedianClustering
-
-  # Create a FairKMedianClustering instance
-  mitigator = FairKMedianClustering(**kargs)
-
-  # Fit the mitigator on the training data
-  mitigator.fit(train_data, group_a, group_b)
-
-  # Predict using the mitigator on the test data
-  test_data_transformed = mitigator.predict(test_data, group_a, group_b)
-
-You can find an extended example of using the Fair k-Median method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#3.-Fair-K-Median>`_.
+You can find an example of using the Fair k-Median method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#3.-Fair-K-Median>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairKMedianClustering`.
 

@@ -56,6 +56,13 @@ class GridSearchReduction(BaseEstimator, BMImp):
         verbose : int
             If >0, will show progress percentage.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import GridSearchReduction
+    >>> mitigator = GridSearchReduction(**params)
+    >>> mitigator.fit(train_data, y, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data)
+
     References
     ----------
         .. [1] Agarwal, Alekh, et al. "A reductions approach to fair classification."\

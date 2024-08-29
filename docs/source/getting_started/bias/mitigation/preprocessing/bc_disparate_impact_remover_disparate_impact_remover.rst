@@ -41,23 +41,7 @@ Description
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The Disparate Impact Remover method can be used as follows:
-
-.. code-block:: python
-
-  # Import the method
-  from holisticai.bias.mitigation import DisparateImpactRemover
-
-  # Create a DisparateImpactRemover instance
-  mitigator = DisparateImpactRemover()
-
-  # Transform the training data using the DisparateImpactRemover instance
-  train_data_transformed = mitigator.fit_transform(train_data, group_a, group_b)
-
-  # Transform the test data using the DisparateImpactRemover instance
-  test_data_transformed = mitigator.transform(test_data, group_a, group_b)
-
-You can find an extended example of using the DisparateImpactRemover method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/preprocessing.html#2.-Disparate-Impact-Remover>`_.
+You can find an example of using the DisparateImpactRemover method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/preprocessing.html#2.-Disparate-Impact-Remover>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.DisparateImpactRemover`.
 

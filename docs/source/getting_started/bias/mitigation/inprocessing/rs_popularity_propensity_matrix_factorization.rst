@@ -47,20 +47,7 @@ Description
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The Matrix Factorization with Propensity Scoring method can be used as follows:
-
-.. code-block:: python
-
-  # Import the mitigator
-  from holisticai.bias.mitigation import PopularityPropensityMF
-
-  # Create a PopularityPropensityMF instance
-  mitigator = PopularityPropensityMF(**kargs)
-
-  # Fit the mitigator on the training data
-  mitigator.fit(data_matrix)
-
-You can find an extended example of using the Matrix Factorization with Propensity Scoring method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/demos/inprocessing.html#Method:-Popularity-propensity>`_.
+You can find an example of using the Matrix Factorization with Propensity Scoring method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/demos/inprocessing.html#Method:-Popularity-propensity>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.PopularityPropensityMF`.
 

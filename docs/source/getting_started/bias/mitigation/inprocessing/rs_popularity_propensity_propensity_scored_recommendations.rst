@@ -22,20 +22,7 @@ The main characteristics of the method include:
 Basic Usage
 ~~~~~~~~~~~~~~
 
-The propensity-scored recommendations method can be used as follows:
-
-.. code-block:: python
-
-  # Import the mitigator
-  from holisticai.bias.mitigation import DebiasingLearningMF
-
-  # Create a DebiasingLearningMF instance
-  mitigator = DebiasingLearningMF(**kargs)
-
-  # Fit the mitigator on the training data
-  mitigator.fit(data_matrix)
-
-You can find an extended example of using the propensity-scored recommendations method in the following `tutorial <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/examples/example_lastfm.html#Inprocessing:-Debiasing-Learning-Method>`_.
+You can find an example of using the propensity-scored recommendations method in the following `tutorial <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/examples/example_lastfm.html#Inprocessing:-Debiasing-Learning-Method>`_.
 
 Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.DebiasingLearningMF`.
 
