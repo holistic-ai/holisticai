@@ -14,7 +14,6 @@ from holisticai.utils.feature_importances import group_mask_samples_by_learning_
 def compute_shap_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: Union[pd.Series, None] = None,
     max_samples: Union[int, None] = None,
     random_state: Union[RandomState, None] = None,
 ) -> LocalImportances:
@@ -47,15 +46,12 @@ class SHAPImportanceCalculator:
         try:
             import shap  # type: ignore
         except ImportError:
-            raise ImportError(
-                "SHAP is not installed. Please install it using 'pip install shap'"
-            ) from None
+            raise ImportError("SHAP is not installed. Please install it using 'pip install shap'") from None
 
         masker = shap.maskers.Independent(X)  # type: ignore
         self.explainer = shap.Explainer(proxy.predict, masker=masker)
 
     def compute_importances(self, ds: Dataset, proxy: ModelProxy):
-
         X = pd.DataFrame(ds["X"].astype(np.float64))
         self.initialize_explainer(X, proxy)
         shap_values = self.explainer(X)
@@ -63,4 +59,3 @@ class SHAPImportanceCalculator:
         data = np.abs(shap_values.values)
         data = data / data.sum(axis=1)[:, None]
         return pd.DataFrame(data=data, columns=X.columns)
-

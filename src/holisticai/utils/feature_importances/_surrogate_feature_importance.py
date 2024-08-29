@@ -16,6 +16,7 @@ metric_scores = {
     "multi_classification": accuracy_score,
 }
 
+
 @overload
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
@@ -41,10 +42,10 @@ def compute_surrogate_feature_importance(
     X: pd.DataFrame,
     y: Union[pd.Series, None] = None,
     random_state: Union[RandomState, int, None] = None,
-    importance_type: Literal["conditional","standard"] = "conditional",
+    importance_type: Literal["conditional", "standard"] = "conditional",
 ) -> Union[Importances, ConditionalImportances]:
     pfi = SurrogateFeatureImportanceCalculator(random_state=random_state)
-    if importance_type=="conditional":
+    if importance_type == "conditional":
         if y is None:
             raise ValueError("y must be provided when conditional=True")
         sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
@@ -80,9 +81,7 @@ class SurrogateFeatureImportanceCalculator:
             dt = DecisionTreeRegressor(max_depth=3, random_state=self.random_state)
             return dt.fit(X, y)
 
-        raise ValueError(
-            "model_type must be either 'binary_classification', 'multi_classification' or 'regression'"
-        )
+        raise ValueError("model_type must be either 'binary_classification', 'multi_classification' or 'regression'")
 
     def compute_importances(self, X: pd.DataFrame, proxy: ModelProxy) -> Importances:
         """
@@ -103,9 +102,7 @@ class SurrogateFeatureImportanceCalculator:
         feature_importances = pd.DataFrame.from_dict(
             {"Variable": feature_names, "Importance": importances}
         ).sort_values("Importance", ascending=False)
-        feature_importances["Importance"] = (
-            feature_importances["Importance"] / feature_importances["Importance"].sum()
-        )
+        feature_importances["Importance"] = feature_importances["Importance"] / feature_importances["Importance"].sum()
 
         feature_names = list(feature_importances["Variable"].values)
         importances = np.array(feature_importances["Importance"].values)

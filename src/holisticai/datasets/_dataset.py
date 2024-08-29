@@ -39,9 +39,7 @@ class DatasetDict(dict):
         return self.datasets[key]
 
     def __repr__(self):
-        datasets_repr = ",\n    ".join(
-            f"{name}: {dataset}" for name, dataset in self.datasets.items()
-        )
+        datasets_repr = ",\n    ".join(f"{name}: {dataset}" for name, dataset in self.datasets.items())
         return f"DatasetDict({{\n    {datasets_repr}\n}})"
 
     def _repr_html_(self):
@@ -80,9 +78,7 @@ class GroupByDataset:
     def __init__(self, groupby_obj):
         self.groupby_obj = groupby_obj
         self.grouped_names = [feature for feature, _ in self.groupby_obj.keys]
-        self.features = (
-            self.groupby_obj.obj.columns.get_level_values("features").unique().tolist()
-        )
+        self.features = self.groupby_obj.obj.columns.get_level_values("features").unique().tolist()
         self.ngroups = self.groupby_obj.ngroups
         self.random_state = np.random.RandomState()
 
@@ -95,9 +91,7 @@ class GroupByDataset:
         if random_state is None:
             random_state = self.random_state
         return Dataset(
-            self.groupby_obj.apply(
-                lambda x: sample_n(x, n, random_state=random_state)
-            ).reset_index(drop=True)
+            self.groupby_obj.apply(lambda x: sample_n(x, n, random_state=random_state)).reset_index(drop=True)
         )
 
     def __iter__(self):
@@ -136,9 +130,7 @@ class GroupByDataset:
         return generate_html_for_generic_object(obj, feature_columns=5)
 
 
-def dataframe_to_level_dict_with_series(
-    df: pd.DataFrame, row_index: int
-) -> pd.DataFrame:
+def dataframe_to_level_dict_with_series(df: pd.DataFrame, row_index: int) -> pd.DataFrame:
     """
     Converts a DataFrame with two-level columns into a dictionary where:
     - Level 0 names become dictionary keys.
@@ -153,10 +145,7 @@ def dataframe_to_level_dict_with_series(
         dict: The resulting dictionary with level 0 keys and DataFrames as values.
     """
     num_levels = 2
-    if (
-        not isinstance(df.columns, pd.MultiIndex)
-        or len(df.columns.levels) != num_levels
-    ):
+    if not isinstance(df.columns, pd.MultiIndex) or len(df.columns.levels) != num_levels:
         msg = "DataFrame must have MultiIndex columns with two levels."
         raise ValueError(msg)
 
@@ -207,9 +196,7 @@ class DataLoader:
     def batched(self):
         def batch_generator(batch_size):
             for i in range(self.num_batches):
-                batch = Dataset(
-                    self.dataset.data.iloc[i * batch_size : (i + 1) * batch_size]
-                )
+                batch = Dataset(self.dataset.data.iloc[i * batch_size : (i + 1) * batch_size])
                 yield batch
 
         if self.dtype == "jax":
@@ -286,9 +273,7 @@ class Dataset:
 
         features_values = self.data.columns.get_level_values("features")
         features_counts = features_values.value_counts()
-        self.features_is_series = {
-            key: (value == 1) for key, value in features_counts.items()
-        }
+        self.features_is_series = {key: (value == 1) for key, value in features_counts.items()}
 
     def __init__(self, _data: pd.DataFrame | None = None, _metadata=None, **kargs):
         if _data is None:
@@ -297,9 +282,7 @@ class Dataset:
                 if isinstance(value, pd.DataFrame):
                     data[name] = value.reset_index(drop=True)
                 elif isinstance(value, pd.Series):
-                    data[name] = pd.Series(
-                        value.reset_index(drop=True), name=name
-                    ).astype(value.dtype)
+                    data[name] = pd.Series(value.reset_index(drop=True), name=name).astype(value.dtype)
                 else:
                     msg = f"Variable '{name}' is of type {type(value)}, but only pd.DataFrame and pd.Series are supported."
                     raise TypeError(msg)
@@ -314,15 +297,11 @@ class Dataset:
 
     def remove_columns(self, columns: str | list):
         """Returns a new dataset with the given columns removed."""
-        return Dataset(
-            self.data.drop(columns, level=0, axis=1), _metadata=self._metadata
-        )
+        return Dataset(self.data.drop(columns, level=0, axis=1), _metadata=self._metadata)
 
     def rename(self, renames):
         """Returns a new dataset with renamed columns."""
-        return Dataset(
-            self.data.rename(columns=renames, level=0), _metadata=self._metadata
-        )
+        return Dataset(self.data.rename(columns=renames, level=0), _metadata=self._metadata)
 
     def select(self, indices: Iterable):
         """Returns a new dataset with selected rows based on the given indices."""
@@ -373,10 +352,7 @@ class Dataset:
         if vectorized:
 
             def fnw_(row):
-                ds = {
-                    level: row.xs(level, axis=1, level="features")
-                    for level in row.columns.levels[0]
-                }
+                ds = {level: row.xs(level, axis=1, level="features") for level in row.columns.levels[0]}
                 return fn(ds)
 
             new_data = fnw_(self.data)
@@ -392,16 +368,10 @@ class Dataset:
                 for upper in row.index.levels[0]:
                     sub_row = row[upper]
                     if isinstance(sub_row, pd.Series):
-                        result[upper] = (
-                            sub_row.to_dict() if len(sub_row) > 1 else sub_row.item()
-                        )
+                        result[upper] = sub_row.to_dict() if len(sub_row) > 1 else sub_row.item()
                     elif isinstance(sub_row, pd.DataFrame):
                         sub_row = sub_row.squeeze()
-                        result[upper] = (
-                            sub_row.to_dict()
-                            if len(sub_row) > 1
-                            else sub_row.squeeze().item()
-                        )
+                        result[upper] = sub_row.to_dict() if len(sub_row) > 1 else sub_row.squeeze().item()
                 return fn(result)
 
             updated_data = self.data.apply(fnw_, axis=1, result_type="expand")
@@ -412,9 +382,7 @@ class Dataset:
             )
             updated_data.columns = new_columns
         self.data.update(updated_data)
-        new_col_data: pd.DataFrame = pd.DataFrame(
-            updated_data[updated_data.columns.difference(self.data.columns)]
-        )
+        new_col_data: pd.DataFrame = pd.DataFrame(updated_data[updated_data.columns.difference(self.data.columns)])
         new_data = pd.concat([self.data, new_col_data], axis=1)
         return Dataset(new_data, _metadata=self._metadata)
 
@@ -489,9 +457,7 @@ def concatenate_datasets(part_datasets: list[Dataset]):
     features = part_datasets[0].features
     return Dataset(
         **{
-            feat: pd.concat(
-                [p[feat].to_frame() for p in part_datasets], axis=0
-            ).reset_index(drop=True)
+            feat: pd.concat([p[feat].to_frame() for p in part_datasets], axis=0).reset_index(drop=True)
             for feat in features
         }
     )
@@ -520,9 +486,7 @@ def apply_fn_to_multilevel_df(df, fn):
     return result_df
 
 
-def sample_n(
-    group: pd.DataFrame, n: int, random_state: Union[RandomState, None] = None
-) -> pd.DataFrame:
+def sample_n(group: pd.DataFrame, n: int, random_state: Union[RandomState, None] = None) -> pd.DataFrame:
     if len(group) < n:
         return group
     return group.sample(n=n, replace=False, random_state=random_state)

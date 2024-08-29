@@ -57,15 +57,11 @@ def compute_permutation_feature_importance(
     random_state: Union[RandomState, int, None] = None,
     importance_type: Literal["standard", "conditional"] = "standard",
 ) -> Union[Importances, ConditionalImportances]:
-    pfi = PermutationFeatureImportanceCalculator(
-        n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state
-    )
+    pfi = PermutationFeatureImportanceCalculator(n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state)
     if importance_type == "conditional":
         sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
         values = {
-            group_name: pfi.compute_importances(
-                Dataset(X=X.loc[indexes], y=y.loc[indexes]), proxy=proxy
-            )
+            group_name: pfi.compute_importances(Dataset(X=X.loc[indexes], y=y.loc[indexes]), proxy=proxy)
             for group_name, indexes in sample_groups.items()
         }
         return ConditionalImportances(values=values)
@@ -108,10 +104,7 @@ class PermutationFeatureImportanceCalculator:
                 scores.append(metric(y, predictor(X_permuted)))
             return np.array(scores)
 
-        if self.n_jobs == -1:
-            n_jobs = os.cpu_count()
-        else:
-            n_jobs = self.n_jobs
+        n_jobs = os.cpu_count() if self.n_jobs == -1 else self.n_jobs
 
         scores = list(
             Parallel(n_jobs=n_jobs)(
@@ -125,16 +118,12 @@ class PermutationFeatureImportanceCalculator:
                 for col_idx in range(n_features)
             )
         )
-        feature_importances = [
-            np.mean(np.abs(baseline_score - scores[col])) for col in range(n_features)
-        ]
+        feature_importances = [np.mean(np.abs(baseline_score - scores[col])) for col in range(n_features)]
         features = list(X.columns)
         feature_importances = pd.DataFrame.from_dict(
             {"Variable": features, "Importance": feature_importances}
         ).sort_values("Importance", ascending=False)
-        feature_importances["Importance"] = (
-            feature_importances["Importance"] / feature_importances["Importance"].sum()
-        )
+        feature_importances["Importance"] = feature_importances["Importance"] / feature_importances["Importance"].sum()
         feature_names = list(feature_importances["Variable"].values)
         importances = np.array(feature_importances["Importance"].values)
         return Importances(values=importances, feature_names=feature_names)

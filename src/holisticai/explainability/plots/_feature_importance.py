@@ -68,16 +68,18 @@ def plot_feature_importance(feature_importance: Importances, alpha=0.8, top_n=20
 def plot_local_importance_distribution(local_importances, ax=None, k=5, num_samples=10000, random_state=42, **kargs):
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=(10, 3))
-    densities = compute_importance_distribution(local_importances, k=k, num_samples=num_samples, random_state=random_state)
-    ax.hist(densities, bins=50, histtype='step', linewidth=1.5, **kargs)
-    ax.set_title('Probability Distribution (Histogram Outline)')
-    ax.set_xlabel('Feature Importance Entropy')
-    ax.set_ylabel('Frequency')
+    densities = compute_importance_distribution(
+        local_importances, k=k, num_samples=num_samples, random_state=random_state
+    )
+    ax.hist(densities, bins=50, histtype="step", linewidth=1.5, **kargs)
+    ax.set_title("Probability Distribution (Histogram Outline)")
+    ax.set_xlabel("Feature Importance Entropy")
+    ax.set_ylabel("Frequency")
     ax.grid()
     ax.legend()
 
-def plot_predictions_vs_interpretability(y_score, local_importances, ax=None, **kargs):
 
+def plot_predictions_vs_interpretability(y_score, local_importances, ax=None, **kargs):
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=(8, 5))
 
@@ -90,6 +92,6 @@ def plot_predictions_vs_interpretability(y_score, local_importances, ax=None, **
     ax.scatter(y_score, spread, alpha=0.3, **kargs)
 
     ax.grid(True)
-    ax.set_xlabel('Ouput Probability')
-    ax.set_ylabel('Jensen-Shannon Divergence')
-    ax.set_title('Higher value means more interpretability')
+    ax.set_xlabel("Ouput Probability")
+    ax.set_ylabel("Jensen-Shannon Divergence")
+    ax.set_title("Higher value means more interpretability")

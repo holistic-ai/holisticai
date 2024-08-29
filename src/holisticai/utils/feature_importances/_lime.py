@@ -33,7 +33,7 @@ def compute_lime_feature_importance(
 
     pfi = LIMEImportanceCalculator()
     data = pfi.compute_importances(ds, proxy)
-    #y_: pd.Series = pd.Series(ds["y"])
+    # y_: pd.Series = pd.Series(ds["y"])
     y_ = pd.Series(proxy.predict(ds["X"]))
     condition = group_mask_samples_by_learning_task(y_, proxy.learning_task)
     local_importances = LocalImportances(data=data, cond=condition)
@@ -48,9 +48,7 @@ class LIMEImportanceCalculator:
             import lime  # type: ignore
             import lime.lime_tabular  # type: ignore
         except ImportError:
-            raise ImportError(
-                "LIME is not installed. Please install it using 'pip install lime'"
-            ) from None
+            raise ImportError("LIME is not installed. Please install it using 'pip install lime'") from None
 
         if proxy.learning_task == "regression":
             self.explainer = lime.lime_tabular.LimeTabularExplainer(

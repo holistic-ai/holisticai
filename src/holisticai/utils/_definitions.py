@@ -73,9 +73,7 @@ class Importances:
         raise ValueError(f"Invalid index type: {type(idx)}")
 
     def select(self, idx: list[int]):
-        data = pd.DataFrame(
-            {"feature_names": self.feature_names, "values": self.values}
-        )
+        data = pd.DataFrame({"feature_names": self.feature_names, "values": self.values})
         new_data = data.loc[idx]
         feature_names = new_data["feature_names"].tolist()
         values = new_data["values"].values
@@ -100,9 +98,7 @@ class ConditionalImportances:
 
     @property
     def feature_names(self):
-        return {
-            name: importance.feature_names for name, importance in self.values.items()
-        }
+        return {name: importance.feature_names for name, importance in self.values.items()}
 
     def __iter__(self):
         return iter(self.values.items())
@@ -124,9 +120,7 @@ class LocalImportances:
 
     def conditional(self):
         values = {
-            str(group_name): LocalImportances(
-                data=pd.DataFrame(group_data["DataFrame"])
-            )
+            str(group_name): LocalImportances(data=pd.DataFrame(group_data["DataFrame"]))
             for group_name, group_data in self.data.groupby(("Serie", "condition"))
         }
         return LocalConditionalImportances(values=values)
@@ -136,20 +130,19 @@ class LocalImportances:
             raise TypeError("Both operands must be instances of LocalImportances")
 
         data = self.data.droplevel(0, axis=1)
-        serie = data['condition']
-        data.drop('condition', axis=1, inplace=True)
+        serie = data["condition"]
+        data.drop("condition", axis=1, inplace=True)
 
         other_data = other.data.droplevel(0, axis=1)
-        other_serie = other_data['condition']
-        other_data.drop('condition', axis=1, inplace=True)
+        other_serie = other_data["condition"]
+        other_data.drop("condition", axis=1, inplace=True)
 
         # Concatenate the data and cond parts
         new_data = pd.concat([data, other_data], axis=0).reset_index(drop=True)
         new_serie = pd.Series(pd.concat([serie, other_serie], ignore_index=True))
-        #new_data = pd.concat([new_data_dataframe, new_data_serie], axis=1)
-        #new_data.columns = pd.MultiIndex.from_tuples(
+        # new_data = pd.concat([new_data_dataframe, new_data_serie], axis=1)
+        # new_data.columns = pd.MultiIndex.from_tuples(
         #    [("DataFrame", col) for col in new_data_dataframe.columns] + [("Serie", new_data_serie.name)]
-
 
         # Create a new instance of LocalImportances with the concatenated data
         return LocalImportances(data=new_data, cond=new_serie)
@@ -173,16 +166,12 @@ class LocalConditionalImportances:
         self.values = values
 
     def to_global(self):
-        values = {
-            group_name: lfi.to_global() for group_name, lfi in self.values.items()
-        }
+        values = {group_name: lfi.to_global() for group_name, lfi in self.values.items()}
         return ConditionalImportances(values=values)
 
     @property
     def feature_names(self):
-        return {
-            name: importance.feature_names for name, importance in self.values.items()
-        }
+        return {name: importance.feature_names for name, importance in self.values.items()}
 
     def __len__(self):
         return len(self.values)
