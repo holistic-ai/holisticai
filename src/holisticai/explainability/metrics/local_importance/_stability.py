@@ -1,108 +1,54 @@
 import numpy as np
-from holisticai.explainability.metrics.global_importance._importance_spread import spread_divergence
-from holisticai.utils import Importances, LocalImportances
+from numpy.random import RandomState
+from scipy.spatial.distance import jensenshannon
+from sklearn.neighbors import NearestNeighbors
 
 
-class DataStability:
-    reference: int = 1
-    name: str = "Data Stability"
+def local_importances_to_numpy(local_importances, ranked_columns=None):
+    if ranked_columns is None:
+        local_importances = local_importances.data["DataFrame"].to_numpy()
+    else:
+        local_importances = local_importances.data["DataFrame"][ranked_columns].to_numpy()
+    #print(local_importances)
+    local_importances /= local_importances.sum(axis=1, keepdims=True)
+    return local_importances
 
-    def __call__(self, local_feature_importance: LocalImportances):
-        spreads = []
-        for weights in np.array(local_feature_importance.values):
-            from holisticai.utils import Importances
+def compute_importance_distribution(local_importances, k=5, num_samples=10000, random_state=None):
+    if isinstance(random_state,int) :
+        random_state = RandomState(random_state)
+    if random_state is None:
+        random_state = RandomState(42)
 
-            spread = spread_divergence(
-                Importances(values=weights, feature_names=local_feature_importance.feature_names)
-            )
-            spreads.append(spread)
-        instances_names = list(range(local_feature_importance.values.shape[0]))
-        data_divergence = Importances(values=spreads, feature_names=instances_names)
-        return spread_divergence(data_divergence)
+    num_samples = 10000
+    embeddings = local_importances_to_numpy(local_importances)
 
+    num_features = embeddings.shape[1]
+    alpha = 0.1
+    grid = np.array([random_state.dirichlet(alpha*np.ones(num_features)) for _ in range(num_samples)])
+    nbrs = NearestNeighbors(n_neighbors=k).fit(embeddings)
+    distances, _ = nbrs.kneighbors(grid)
+    densities = 1 / (distances[:, -1] + 1e-10)  # Evitar división por 0
+    densities /= densities.sum()
+    return densities
 
-def data_stability(local_feature_importance: LocalImportances):
-    """
-    Calculate the data stability score based on the local feature importances.
-    Data Stability measures the stability of the feature importance values across different instances.
-    Higher values indicate more stable feature importance values across instances.
-
-    Parameters
-    ----------
-    local_feature_importance : LocalImportances
-      The local feature importances calculated for each instance.
-
-    Returns
-    -------
-    float
-      The data stability score.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> from holisticai.explainability.commons import LocalImportances
-    >>> importances = pd.DataFrame(
-    ...     {
-    ...         "feature_1": [0.10, 0.20, 0.30],
-    ...         "feature_2": [0.10, 0.25, 0.35],
-    ...         "feature_3": [0.15, 0.20, 0.30],
-    ...     }
-    ... )
-    >>> local_importances = LocalImportances(importances)
-    >>> stability_score = data_stability(local_importances)
-    >>> print(stability_score)
-    """
-    ds = DataStability()
-    return ds(local_feature_importance)
+def feature_stability(local_feature_importance, strategy='variance', **kargs):
+    fs = FeatureStability()
+    return fs(local_feature_importance, strategy=strategy, **kargs)
 
 
 class FeatureStability:
     reference: int = 1
     name: str = "Feature Stability"
 
-    def __call__(self, local_feature_importance: LocalImportances):
-        transposed_data = np.array(local_feature_importance.values).T
-        transposed_data_norm = transposed_data / np.sum(transposed_data, axis=0)
-        spreads = []
-        instances_names = list(range(local_feature_importance.values.shape[0]))
-        for weights in transposed_data_norm:
-            spread = spread_divergence(Importances(values=weights, feature_names=instances_names))
-            spreads.append(spread)
-
-        feature_divergence = Importances(values=spreads, feature_names=local_feature_importance.feature_names)
-        return spread_divergence(feature_divergence)
-
-
-def feature_stability(local_feature_importance: LocalImportances):
-    """
-    Calculate the feature stability score based on the local feature importances.
-    Feature Stability measures the stability of the feature importance values across different features.
-    Higher values indicate more stable feature importance values across features.
-
-    Parameters
-    ----------
-    local_feature_importance : LocalImportances
-      The local feature importances calculated for each instance.
-
-    Returns
-    -------
-    float
-      The feature stability score.
-
-    Examples
-    --------
-    >>> import pandas as pd
-    >>> from holisticai.explainability.commons import LocalImportances
-    >>> importances = pd.DataFrame(
-    ...     {
-    ...         "feature_1": [0.10, 0.20, 0.30],
-    ...         "feature_2": [0.10, 0.25, 0.35],
-    ...         "feature_3": [0.15, 0.20, 0.30],
-    ...     }
-    ... )
-    >>> local_importances = LocalImportances(importances)
-    >>> stability_score = feature_stability(local_importances)
-    >>> print(stability_score)
-    """
-    fs = FeatureStability()
-    return fs(local_feature_importance)
+    def __call__(self, local_feature_importance, strategy='variance', **kargs):
+        densities = compute_importance_distribution(local_feature_importance, **kargs)
+        if strategy == 'variance':
+            jsd_std = np.std(densities)
+            jsd_max = np.max(densities)
+            stability = 1 - (jsd_std / jsd_max)
+            return stability
+        if strategy == 'entropy':
+            num_samples = len(densities)
+            feature_equal_weight = np.array([1.0 / num_samples] * num_samples)
+            return 1 - jensenshannon(densities, feature_equal_weight, base=2)
+        raise ValueError(f"Invalid strategy: {strategy}")

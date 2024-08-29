@@ -8,13 +8,13 @@ from numpy.random import RandomState
 
 from holisticai.datasets import Dataset
 from holisticai.utils import LocalImportances, ModelProxy
-from holisticai.utils.feature_importances import group_samples_by_learning_task
+from holisticai.utils.feature_importances import group_mask_samples_by_learning_task
 
 
 def compute_shap_feature_importance(
-    X: pd.DataFrame,
-    y: pd.Series,
     proxy: ModelProxy,
+    X: pd.DataFrame,
+    y: Union[pd.Series, None] = None,
     max_samples: Union[int, None] = None,
     random_state: Union[RandomState, None] = None,
 ) -> LocalImportances:
@@ -24,13 +24,18 @@ def compute_shap_feature_importance(
     if max_samples is None:
         max_samples = -1
 
-    ds = Dataset(X=X, y=y)
+    y_ = pd.Series(proxy.predict(X))
+    ds = Dataset(X=X, y=y_)
     if max_samples > 0:
         ds = ds.sample(n=max_samples, random_state=random_state)
 
     pfi = SHAPImportanceCalculator()
     data = pfi.compute_importances(ds, proxy)
-    condition = group_samples_by_learning_task(ds["y"], proxy.learning_task, return_group_mask=True)
+
+    condition = group_mask_samples_by_learning_task(
+        y_,
+        proxy.learning_task,
+    )
     local_importances = LocalImportances(data=data, cond=condition)
     return local_importances
 
@@ -40,18 +45,22 @@ class SHAPImportanceCalculator:
 
     def initialize_explainer(self, X: pd.DataFrame, proxy: ModelProxy):
         try:
-            import shap
+            import shap  # type: ignore
         except ImportError:
-            raise ImportError("SHAP is not installed. Please install it using 'pip install shap'") from None
+            raise ImportError(
+                "SHAP is not installed. Please install it using 'pip install shap'"
+            ) from None
 
-        masker = shap.maskers.Independent(X)
+        masker = shap.maskers.Independent(X)  # type: ignore
         self.explainer = shap.Explainer(proxy.predict, masker=masker)
 
     def compute_importances(self, ds: Dataset, proxy: ModelProxy):
-        X = ds["X"].astype(np.float64)
+
+        X = pd.DataFrame(ds["X"].astype(np.float64))
         self.initialize_explainer(X, proxy)
         shap_values = self.explainer(X)
 
         data = np.abs(shap_values.values)
         data = data / data.sum(axis=1)[:, None]
         return pd.DataFrame(data=data, columns=X.columns)
+

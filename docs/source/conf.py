@@ -80,8 +80,9 @@ source_suffix = {
     '.md': 'markdown',
 }
 
+
 nbsphinx_allow_errors = True  # Permitir errores en los notebooks
-nbsphinx_execute = 'never'  # Puede ser 'auto', 'always', o 'never'
+nbsphinx_execute = 'auto'  # Puede ser 'auto', 'always', o 'never'
 
 html_show_sourcelink = False
 # autodoc options

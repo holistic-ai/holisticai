@@ -1,5 +1,9 @@
+import numpy as np
+import pandas as pd
+from holisticai.explainability.metrics.local_importance import compute_importance_distribution
 from holisticai.utils import Importances
 from matplotlib import pyplot as plt
+from scipy.spatial.distance import jensenshannon
 
 
 def plot_feature_importance(feature_importance: Importances, alpha=0.8, top_n=20, ax=None):
@@ -59,3 +63,33 @@ def plot_feature_importance(feature_importance: Importances, alpha=0.8, top_n=20
         ax.set_title("Feature Importance")
 
     return ax
+
+
+def plot_local_importance_distribution(local_importances, ax=None, k=5, num_samples=10000, random_state=42, **kargs):
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(10, 3))
+    densities = compute_importance_distribution(local_importances, k=k, num_samples=num_samples, random_state=random_state)
+    ax.hist(densities, bins=50, histtype='step', linewidth=1.5, **kargs)
+    ax.set_title('Probability Distribution (Histogram Outline)')
+    ax.set_xlabel('Feature Importance Entropy')
+    ax.set_ylabel('Frequency')
+    ax.grid()
+    ax.legend()
+
+def plot_predictions_vs_interpretability(y_score, local_importances, ax=None, **kargs):
+
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(8, 5))
+
+    total_importances = local_importances.data["DataFrame"].to_numpy()
+    num_features = total_importances.shape[1]
+    feature_equal_weight = np.array([1.0 / num_features] * num_features)
+
+    spread = pd.Series([jensenshannon(i, feature_equal_weight, base=2) for i in total_importances])
+
+    ax.scatter(y_score, spread, alpha=0.3, **kargs)
+
+    ax.grid(True)
+    ax.set_xlabel('Ouput Probability')
+    ax.set_ylabel('Jensen-Shannon Divergence')
+    ax.set_title('Higher value means more interpretability')

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Callable, Literal, Union
 
-import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
 
@@ -10,7 +9,12 @@ from numpy.typing import ArrayLike
 class BinaryClassificationProxy:
     learning_task: Literal["binary_classification"] = "binary_classification"
 
-    def __init__(self, predict: Callable, predict_proba: Callable, classes: Union[list, None] = None):
+    def __init__(
+        self,
+        predict: Callable,
+        predict_proba: Callable,
+        classes: Union[list, None] = None,
+    ):
         if classes is None:
             classes = [0, 1]
         self.predict = predict
@@ -24,7 +28,7 @@ class MultiClassificationProxy:
     def __init__(self, predict: Callable, predict_proba: Callable, classes: list):
         self.predict = predict
         self.predict_proba = predict_proba
-        self.clases = classes
+        self.classes = classes
 
 
 class RegressionProxy:
@@ -49,25 +53,33 @@ def create_proxy(**kargs) -> ModelProxy:
 
 
 class Importances:
-    def __init__(self, values: ArrayLike, feature_names: ArrayLike, extra_attrs: Union[dict, None] = None):
+    def __init__(
+        self,
+        values: ArrayLike,
+        feature_names: list[str],
+        extra_attrs: Union[dict, None] = None,
+    ):
         if extra_attrs is None:
             extra_attrs = {}
         self.values = values
         self.feature_names = feature_names
         self.extra_attrs = extra_attrs
 
-    def __getitem__(self, idx: int | str | list[int]):
+    def __getitem__(self, idx: int | str) -> float:
         if isinstance(idx, int):
             return self.values[idx]
         if isinstance(idx, str):
             return self.values[self.feature_names.index(idx)]
-        if isinstance(idx, (np.ndarray, list)):
-            data = pd.DataFrame({"feature_names": self.feature_names, "values": self.values})
-            new_data = data.loc[idx]
-            feature_names = new_data["feature_names"].tolist()
-            values = new_data["values"].values
-            return Importances(values=values, feature_names=feature_names)
         raise ValueError(f"Invalid index type: {type(idx)}")
+
+    def select(self, idx: list[int]):
+        data = pd.DataFrame(
+            {"feature_names": self.feature_names, "values": self.values}
+        )
+        new_data = data.loc[idx]
+        feature_names = new_data["feature_names"].tolist()
+        values = new_data["values"].values
+        return Importances(values=values, feature_names=feature_names)
 
     def as_dataframe(self):
         return pd.DataFrame({"Variable": self.feature_names, "Importance": self.values})
@@ -75,11 +87,11 @@ class Importances:
     def __len__(self):
         return len(self.feature_names)
 
-    def top_alpha(self, alpha=0.8):
+    def top_alpha(self, alpha=0.8) -> Importances:
         feature_weight = self.values / self.values.sum()
         accum_feature_weight = feature_weight.cumsum()
         threshold = max(accum_feature_weight.min(), alpha)
-        return self[accum_feature_weight <= threshold]
+        return self.select(accum_feature_weight <= threshold)
 
 
 class ConditionalImportances:
@@ -88,7 +100,9 @@ class ConditionalImportances:
 
     @property
     def feature_names(self):
-        return {name: importance.feature_importance for name, importance in self.values.items()}
+        return {
+            name: importance.feature_names for name, importance in self.values.items()
+        }
 
     def __iter__(self):
         return iter(self.values.items())
@@ -110,20 +124,48 @@ class LocalImportances:
 
     def conditional(self):
         values = {
-            group_name: LocalImportances(data=group_data["DataFrame"])
+            str(group_name): LocalImportances(
+                data=pd.DataFrame(group_data["DataFrame"])
+            )
             for group_name, group_data in self.data.groupby(("Serie", "condition"))
         }
         return LocalConditionalImportances(values=values)
+
+    def __add__(self, other):
+        if not isinstance(other, LocalImportances):
+            raise TypeError("Both operands must be instances of LocalImportances")
+
+        data = self.data.droplevel(0, axis=1)
+        serie = data['condition']
+        data.drop('condition', axis=1, inplace=True)
+
+        other_data = other.data.droplevel(0, axis=1)
+        other_serie = other_data['condition']
+        other_data.drop('condition', axis=1, inplace=True)
+
+        # Concatenate the data and cond parts
+        new_data = pd.concat([data, other_data], axis=0).reset_index(drop=True)
+        new_serie = pd.Series(pd.concat([serie, other_serie], ignore_index=True))
+        #new_data = pd.concat([new_data_dataframe, new_data_serie], axis=1)
+        #new_data.columns = pd.MultiIndex.from_tuples(
+        #    [("DataFrame", col) for col in new_data_dataframe.columns] + [("Serie", new_data_serie.name)]
+
+
+        # Create a new instance of LocalImportances with the concatenated data
+        return LocalImportances(data=new_data, cond=new_serie)
 
     @property
     def feature_names(self):
         return self.data.columns.tolist()
 
     def to_global(self):
-        fip = self.data["DataFrame"].mean(axis=0).reset_index()
+        fip = pd.Series(self.data["DataFrame"].mean(axis=0)).reset_index()
         fip.columns = ["feature_names", "values"]
         fip.sort_values("values", ascending=False, inplace=True)
-        return Importances(values=fip["values"].values, feature_names=fip["feature_names"].tolist())
+        return Importances(
+            values=pd.Series(fip["values"]).values,
+            feature_names=fip["feature_names"].tolist(),
+        )
 
 
 class LocalConditionalImportances:
@@ -131,12 +173,16 @@ class LocalConditionalImportances:
         self.values = values
 
     def to_global(self):
-        values = {group_name: lfi.to_global() for group_name, lfi in self.values.items()}
+        values = {
+            group_name: lfi.to_global() for group_name, lfi in self.values.items()
+        }
         return ConditionalImportances(values=values)
 
     @property
     def feature_names(self):
-        return {name: importance.feature_names for name, importance in self.values.items()}
+        return {
+            name: importance.feature_names for name, importance in self.values.items()
+        }
 
     def __len__(self):
         return len(self.values)

@@ -12,7 +12,7 @@ from holisticai.explainability.metrics.global_importance import (
     XAIEaseScore,
 )
 from holisticai.explainability.metrics.global_importance._surrogate import surrogate_accuracy_score
-from holisticai.explainability.metrics.local_importance import DataStability, FeatureStability
+from holisticai.explainability.metrics.local_importance import FeatureStability
 from holisticai.utils import (
     ConditionalImportances,
     Importances,
@@ -61,10 +61,6 @@ def multiclass_explainability_metrics(
         results.append({"metric": "Surrogate Accuracy Score", "value": value, "reference": 1})
 
     if local_importances is not None:
-        metric = DataStability()
-        value = metric(local_importances)
-        results.append({"metric": metric.name, "value": value, "reference": metric.reference})
-
         metric = FeatureStability()
         value = metric(local_importances)
         results.append({"metric": metric.name, "value": value, "reference": metric.reference})

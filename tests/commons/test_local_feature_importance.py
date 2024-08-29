@@ -1,5 +1,4 @@
 from holisticai.utils import LocalImportances
-from holisticai.explainability.metrics import data_stability
 import pandas as pd
 import numpy as np
 
@@ -24,16 +23,6 @@ def test_local_feature_importance_to_global():
     local_importance = LocalImportances(data=data, cond= pd.Series([1, 2, 1, 2]))
     assert len(local_importance.to_global().values)==4
 
-
-def test_data_stability():
-    importances = pd.DataFrame({
-          "feature_1": [0.10, 0.20, 0.30],
-          "feature_2": [0.10, 0.25, 0.35],
-          "feature_3": [0.15, 0.20, 0.30]})
-    local_importances = LocalImportances(importances)
-    stability_score = data_stability(local_importances)
-    assert np.isclose(stability_score, 0.9900968679601143)
-
 def test_partial_dependence():
     from holisticai.utils import PartialDependence, Importances
     from holisticai.explainability.metrics.global_importance import xai_ease_score
@@ -46,3 +35,6 @@ def test_partial_dependence():
     feature_importance = Importances(values=np.array([0.5, 0.5]), feature_names=['feature1', 'feature2'])
     score = xai_ease_score(partial_dependence, feature_importance)
     assert score==0.5
+
+
+    
