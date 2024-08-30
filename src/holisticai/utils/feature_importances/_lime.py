@@ -9,7 +9,7 @@ from numpy.random import RandomState
 
 from holisticai.datasets import Dataset
 from holisticai.utils import LocalImportances, ModelProxy
-from holisticai.utils.feature_importances import group_samples_by_learning_task
+from holisticai.utils.feature_importances import group_mask_samples_by_learning_task
 
 warnings.filterwarnings("ignore")
 
@@ -33,7 +33,9 @@ def compute_lime_feature_importance(
 
     pfi = LIMEImportanceCalculator()
     data = pfi.compute_importances(ds, proxy)
-    condition = group_samples_by_learning_task(ds["y"], proxy.learning_task, return_group_mask=True)
+    # y_: pd.Series = pd.Series(ds["y"])
+    y_ = pd.Series(proxy.predict(ds["X"]))
+    condition = group_mask_samples_by_learning_task(y_, proxy.learning_task)
     local_importances = LocalImportances(data=data, cond=condition)
     return local_importances
 
@@ -43,8 +45,8 @@ class LIMEImportanceCalculator:
 
     def initialize_explainer(self, X: pd.DataFrame, proxy: ModelProxy):
         try:
-            import lime
-            import lime.lime_tabular
+            import lime  # type: ignore
+            import lime.lime_tabular  # type: ignore
         except ImportError:
             raise ImportError("LIME is not installed. Please install it using 'pip install lime'") from None
 
@@ -72,8 +74,9 @@ class LIMEImportanceCalculator:
         else:
             raise ValueError("Learning task must be regression or classification")
 
-    def compute_importances(self, ds: Dataset, proxy: ModelProxy) -> LocalImportances:
-        self.initialize_explainer(ds["X"], proxy)
+    def compute_importances(self, ds: Dataset, proxy: ModelProxy) -> pd.DataFrame:
+        X = pd.DataFrame(ds["X"].astype(np.float64))
+        self.initialize_explainer(X, proxy)
         importances = []
         for i in range(len(ds)):
             instance = ds["X"].iloc[i].values.reshape(1, -1)

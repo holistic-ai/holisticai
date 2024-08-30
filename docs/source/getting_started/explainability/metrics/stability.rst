@@ -3,80 +3,65 @@
 Stability Metrics
 =================
 
-The Data Stability and Feature Stability metrics are designed to evaluate the consistency of feature importance across different instances and features in a dataset. These metrics help quantify the robustness and reliability of feature importance, facilitating better model explainability and transparency.
+Feature Stability metrics are designed to evaluate the consistency of feature importance across different instances and features in a dataset. These metrics help quantify the robustness and reliability of feature importance, facilitating better model explainability and transparency.
 
 .. contents:: Table of Contents
    :local:
    :depth: 1
 
-Data Stability
-----------------------
-
-Methodology
-~~~~~~~~~~~
-The **Data Stability** metric evaluates the consistency of local feature importances across different instances. It measures how much the importances of features vary for different instances in a dataset.
-
-Mathematical Representation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Let :math:`\mathbf{I} = \{I_1, I_2, \ldots, I_n\}` be the set of local feature importances for \( n \) instances, where each \( I_i \) is a vector of feature importances.
-
-1. **Calculation of Spread Divergence:**
-
-.. math::
-
-   S_i = \text{spread_divergence}(I_i)
-
-2. **Calculation of Data Stability:**
-
-.. math::
-
-   \text{Data_Stability} = \text{spread_divergence}(\{S_i \mid i = 1, \ldots, n\})
-
-Interpretation
-~~~~~~~~~~~~~~~
-- **High value:** Indicates that the feature importances are consistent across instances. This suggests that the model has a uniform understanding of the data, facilitating interpretation and increasing confidence in the model's explanations.
-- **Low value:** Indicates that the feature importances vary significantly between instances. This can make the model harder to interpret and reduce confidence in its predictions.
-
-The **Data Stability** metric uses spread divergence to evaluate the stability of feature importances. This divergence measures the dispersion of importances across different instances, providing a quantitative measure of consistency.
-
-
 Feature Stability
 -----------------
 
 Methodology
-~~~~~~~~~~~~
+~~~~~~~~~~~
 The **Feature Stability** metric measures the stability of individual feature importances across different instances. It focuses on the consistency of the importance of a specific feature throughout the dataset.
 
 Mathematical Representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Let :math:`\mathbf{I} = \{I_1, I_2, \ldots, I_n\}` be the set of local feature importances for \( n \) instances, where each \( I_i \) is a vector of feature importances.
+Let :math:`\mathbf{I} = \{I_1, I_2, \ldots, I_n\}` be the set of local feature importances for :math:`n` instances, where each :math:`I_i` is a vector of feature importances.
 
-1. **Normalization and Transposition of Data:**
+1. **Normalization of Data:**
+   Each vector :math:`I_i` is normalized so that the sum of its elements equals 1:
 
-.. math::
+   .. math::
 
-   \mathbf{I}^T = \begin{pmatrix}
-   I_{1,1} & I_{1,2} & \cdots & I_{1,n} \\
-   I_{2,1} & I_{2,2} & \cdots & I_{2,n} \\
-   \vdots & \vdots & \ddots & \vdots \\
-   I_{m,1} & I_{m,2} & \cdots & I_{m,n}
-   \end{pmatrix}
+      I_{i,j} \leftarrow \frac{I_{i,j}}{\sum_{k=1}^{m} I_{i,k}} \quad \text{for } i = 1, 2, \ldots, n \text{ and } j = 1, 2, \ldots, m
 
-2. **Calculation of Spread Divergence for Each Feature:**
+   where :math:`m` is the number of features.
 
-.. math::
+2. **Computation of Importance Distributions:**
+   The importance distribution :math:`\mathbf{D}` of features is computed by finding the density distribution of feature importance vectors. This is done by evaluating the proximity of these vectors to a set of synthetic samples generated from a Dirichlet distribution:
 
-   S_j = \text{spread_divergence}(I_j^T)
+   .. math::
+
+      \mathbf{D} = \left( d_1, d_2, \ldots, d_{m} \right)
+
+   where :math:`d_j` represents the density estimate for feature :math:`j`.
 
 3. **Calculation of Feature Stability:**
+   Feature Stability is computed using one of the following strategies:
 
-.. math::
+   - **Variance Strategy:** 
+     The stability is determined by the ratio of the standard deviation to the maximum density:
 
-   \text{Feature_Stability} = \text{spread_divergence}(\{S_j \mid j = 1, \ldots, m\})
+     .. math::
+
+        \textrm{FS} = 1 - \frac{\sigma_D}{\max(D)}
+
+     where :math:`\sigma_D` represents the standard deviation of the density distribution :math:`\mathbf{D}`.
+
+   - **Entropy Strategy:**
+     Alternatively, the stability can be computed based on the Jensen-Shannon divergence between the distribution :math:`\mathbf{D}` and a uniform distribution:
+
+     .. math::
+
+        \textrm{FS} = 1 - \text{JSD}\left(\mathbf{D} \| \mathbf{U} \right)
+
+     where :math:`\mathbf{U}` is the uniform distribution, and :math:`\text{JSD}` denotes the Jensen-Shannon divergence.
 
 Interpretation
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 - **High value:** Indicates that the importance of a specific feature is consistent across instances. This suggests that the feature is robust and its relationship with the model's target is reliable.
 - **Low value:** Indicates that the importance of a feature varies significantly between instances. This may suggest that the feature is less reliable and its relationship with the model's target may be weak.
 
-The **Feature Stability** metric uses spread divergence to evaluate the stability of individual feature importances. This divergence measures the dispersion of the importances of each feature across different instances, providing a quantitative measure of their consistency.
+The **Feature Stability** metric provides a quantitative measure of the consistency of feature importances across different instances by evaluating the dispersion of these importances using either variance-based or entropy-based methods.

@@ -35,7 +35,7 @@ class DatasetDict(dict):
     def __init__(self, **datasets):
         self.datasets = datasets
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Dataset:
         return self.datasets[key]
 
     def __repr__(self):
@@ -130,7 +130,7 @@ class GroupByDataset:
         return generate_html_for_generic_object(obj, feature_columns=5)
 
 
-def dataframe_to_level_dict_with_series(df, row_index):
+def dataframe_to_level_dict_with_series(df: pd.DataFrame, row_index: int) -> pd.DataFrame:
     """
     Converts a DataFrame with two-level columns into a dictionary where:
     - Level 0 names become dictionary keys.
@@ -156,7 +156,7 @@ def dataframe_to_level_dict_with_series(df, row_index):
             data[level_0_name] = feature.iloc[row_index, 0]
         else:
             data[level_0_name] = feature.iloc[row_index]
-    return data
+    return pd.concat(data, axis=1)
 
 
 class DataLoader:
@@ -182,7 +182,12 @@ class DataLoader:
     ...     print(batch)
     """
 
-    def __init__(self, dataset: Dataset, batch_size: int, dtype: Literal["jax", "pandas", "numpy"]):
+    def __init__(
+        self,
+        dataset: Dataset,
+        batch_size: int,
+        dtype: Literal["jax", "pandas", "numpy"],
+    ):
         self.batch_size = batch_size
         self.dataset = dataset
         self.dtype = dtype
@@ -227,11 +232,18 @@ class DataLoader:
     def _repr_html_(self):
         obj = {
             "dtype": "DataLoader",
-            "attributes": {"Number of Batches": self.num_batches, "Batch Size": self.batch_size, "Type": self.dtype},
+            "attributes": {
+                "Number of Batches": self.num_batches,
+                "Batch Size": self.batch_size,
+                "Type": self.dtype,
+            },
             "nested_objects": [
                 {
                     "dtype": "Dataset",
-                    "attributes": {"Number of Rows": self.dataset.num_rows, "Features": self.dataset.features},
+                    "attributes": {
+                        "Number of Rows": self.dataset.num_rows,
+                        "Features": self.dataset.features,
+                    },
                 }
             ],
         }
@@ -265,20 +277,20 @@ class Dataset:
 
     def __init__(self, _data: pd.DataFrame | None = None, _metadata=None, **kargs):
         if _data is None:
-            self.data = {}
+            data = {}
             for name, value in kargs.items():
                 if isinstance(value, pd.DataFrame):
-                    self.data[name] = value.reset_index(drop=True)
+                    data[name] = value.reset_index(drop=True)
                 elif isinstance(value, pd.Series):
-                    self.data[name] = pd.Series(value.reset_index(drop=True), name=name).astype(value.dtype)
+                    data[name] = pd.Series(value.reset_index(drop=True), name=name).astype(value.dtype)
                 else:
                     msg = f"Variable '{name}' is of type {type(value)}, but only pd.DataFrame and pd.Series are supported."
                     raise TypeError(msg)
-            self.data = pd.concat(self.data, axis=1)
+            self.data: pd.DataFrame = pd.concat(data, axis=1)
             self.data.columns = self.data.columns.set_names(["features", "subfeatures"])
             self.data.reset_index(drop=True)
         else:
-            self.data = _data.reset_index(drop=True)
+            self.data: pd.DataFrame = _data.reset_index(drop=True)
         self.__update_metadata()
         self._metadata = _metadata
         self.random_state = np.random.RandomState()
@@ -301,7 +313,8 @@ class Dataset:
         if random_state is None:
             random_state = self.random_state
         return Dataset(
-            sample_n(self.data, n, random_state=random_state).reset_index(drop=True), _metadata=self._metadata
+            sample_n(self.data, n, random_state=random_state).reset_index(drop=True),
+            _metadata=self._metadata,
         )
 
     def filter(self, fn):
@@ -311,18 +324,19 @@ class Dataset:
             new_row = {k[0] if k[0] == k[1] else k: v for k, v in row.to_dict().items()}
             return fn(new_row)
 
-        new_datad = self.data[self.data.apply(fnw, axis=1)]
-        return Dataset(new_datad, _metadata=self._metadata)
+        mask: pd.Series = pd.Series(self.data.apply(fnw, axis=1))
+        new_data: pd.DataFrame = pd.DataFrame(self.data[mask])
+        return Dataset(new_data, _metadata=self._metadata)
 
     def groupby(self, key: list[str] | str):
         """Returns a new GroupByDataset object based on the given key."""
         if isinstance(key, list):
-            key = [(key[0], key[0]), (key[1], key[1])]
+            key_ = [(key[0], key[0]), (key[1], key[1])]
         elif isinstance(key, str):
-            key = [(key, key)]
+            key_ = [(key, key)]
         else:
             raise TypeError
-        return GroupByDataset(self.data.groupby(key, observed=True))
+        return GroupByDataset(self.data.groupby(key_, observed=True))
 
     def map(self, fn, vectorized=True):
         """Applies a function to the dataset and returns a new dataset.
@@ -337,18 +351,19 @@ class Dataset:
         """
         if vectorized:
 
-            def fnw(x):
-                ds = {level: x.xs(level, axis=1, level="features") for level in x.columns.levels[0]}
+            def fnw_(row):
+                ds = {level: row.xs(level, axis=1, level="features") for level in row.columns.levels[0]}
                 return fn(ds)
 
-            new_data = fnw(self.data)
+            new_data = fnw_(self.data)
             updated_data = pd.concat(new_data, axis=1)
             updated_data.columns = pd.MultiIndex.from_tuples(
-                [(key, key) for key, serie in new_data.items()], names=["features", "subfeatures"]
+                [(key, key) for key, serie in new_data.items()],
+                names=["features", "subfeatures"],
             )
         else:
 
-            def fnw(row):
+            def fnw_(row):
                 result = {}
                 for upper in row.index.levels[0]:
                     sub_row = row[upper]
@@ -359,21 +374,23 @@ class Dataset:
                         result[upper] = sub_row.to_dict() if len(sub_row) > 1 else sub_row.squeeze().item()
                 return fn(result)
 
-            updated_data = self.data.apply(fnw, axis=1, result_type="expand")
+            updated_data = self.data.apply(fnw_, axis=1, result_type="expand")
             updated_data = pd.DataFrame(updated_data)
             new_columns = pd.MultiIndex.from_tuples(
-                [(col, col) for col in updated_data.columns], names=["features", "subfeatures"]
+                [(col, col) for col in updated_data.columns],
+                names=["features", "subfeatures"],
             )
             updated_data.columns = new_columns
         self.data.update(updated_data)
-        new_data = pd.concat([self.data, updated_data[updated_data.columns.difference(self.data.columns)]], axis=1)
+        new_col_data: pd.DataFrame = pd.DataFrame(updated_data[updated_data.columns.difference(self.data.columns)])
+        new_data = pd.concat([self.data, new_col_data], axis=1)
         return Dataset(new_data, _metadata=self._metadata)
 
     def train_test_split(self, test_size=0.3, **kargs):
         """Splits the dataset into train and test datasets."""
         train_df, test_df = train_test_split(self.data, test_size=test_size, **kargs)
-        train = Dataset(train_df, _metadata=self._metadata)
-        test = Dataset(test_df, _metadata=self._metadata)
+        train = Dataset(_data=pd.DataFrame(train_df), _metadata=self._metadata)
+        test = Dataset(_data=pd.DataFrame(test_df), _metadata=self._metadata)
         return DatasetDict(train=train, test=test)
 
     def __len__(self):
@@ -386,14 +403,17 @@ class Dataset:
     def repr_info(self):
         return {
             "dtype": "Dataset",
-            "attributes": {"Number of Rows": self.num_rows, "Features": [" , ".join(self.features)]},
+            "attributes": {
+                "Number of Rows": self.num_rows,
+                "Features": [" , ".join(self.features)],
+            },
             "metadata": self._metadata,
         }
 
     def _repr_html_(self):
         return generate_html_for_generic_object(self.repr_info(), feature_columns=5)
 
-    def __getitem__(self, key: str | int | list):
+    def __getitem__(self, key: str | int | list) -> Union[pd.Series, pd.DataFrame]:
         """Returns a subset of the dataset based on the given key."""
         if isinstance(key, str):
             feature = self.data.xs(key, level="features", axis=1)
@@ -416,7 +436,7 @@ class Dataset:
         if not isinstance(key, str):
             raise TypeError("Key must be a string.")
 
-        feature_exists = key in self.data.columns.levels[0]
+        feature_exists = key in self.data.columns.get_level_values(0)
         existing_subfeatures = self.data[key].columns if feature_exists else []
         if feature_exists:
             self.data = self.data.drop(columns=key, level="features")
@@ -436,7 +456,10 @@ class Dataset:
 def concatenate_datasets(part_datasets: list[Dataset]):
     features = part_datasets[0].features
     return Dataset(
-        **{feat: pd.concat([p[feat] for p in part_datasets], axis=0).reset_index(drop=True) for feat in features}
+        **{
+            feat: pd.concat([p[feat].to_frame() for p in part_datasets], axis=0).reset_index(drop=True)
+            for feat in features
+        }
     )
 
 

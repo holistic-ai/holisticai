@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union
+from typing import Literal, Union, overload
 
 import numpy as np
 import pandas as pd
@@ -8,7 +8,7 @@ from numpy.random import RandomState
 from sklearn.metrics import accuracy_score, mean_squared_error
 
 from holisticai.utils import ConditionalImportances, Importances, ModelProxy
-from holisticai.utils.feature_importances import group_samples_by_learning_task
+from holisticai.utils.feature_importances import group_index_samples_by_learning_task
 
 metric_scores = {
     "binary_classification": accuracy_score,
@@ -17,19 +17,38 @@ metric_scores = {
 }
 
 
+@overload
+def compute_surrogate_feature_importance(
+    proxy: ModelProxy,
+    X: pd.DataFrame,
+    y: pd.Series,
+    random_state: Union[RandomState, int, None] = None,
+    importance_type: Literal["conditional"] = "conditional",
+) -> ConditionalImportances: ...
+
+
+@overload
+def compute_surrogate_feature_importance(
+    proxy: ModelProxy,
+    X: pd.DataFrame,
+    y: pd.Series,
+    random_state: Union[RandomState, int, None] = None,
+    importance_type: Literal["standard"] = "standard",
+) -> Importances: ...
+
+
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
     y: Union[pd.Series, None] = None,
     random_state: Union[RandomState, int, None] = None,
-    conditional: bool = False,
+    importance_type: Literal["conditional", "standard"] = "conditional",
 ) -> Union[Importances, ConditionalImportances]:
-    if conditional and y is None:
-        raise ValueError("y must be provided when conditional=True")
-
     pfi = SurrogateFeatureImportanceCalculator(random_state=random_state)
-    if conditional:
-        sample_groups = group_samples_by_learning_task(y, proxy.learning_task)
+    if importance_type == "conditional":
+        if y is None:
+            raise ValueError("y must be provided when conditional=True")
+        sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
         values = {
             group_name: pfi.compute_importances(X=X.loc[indexes], proxy=proxy)
             for group_name, indexes in sample_groups.items()
@@ -39,7 +58,11 @@ def compute_surrogate_feature_importance(
 
 
 class SurrogateFeatureImportanceCalculator:
-    def __init__(self, random_state: Union[RandomState, int, None] = None, importance_type: str = "global"):
+    def __init__(
+        self,
+        random_state: Union[RandomState, int, None] = None,
+        importance_type: str = "global",
+    ):
         if random_state is None:
             random_state = RandomState(42)
         self.random_state = random_state
@@ -83,4 +106,8 @@ class SurrogateFeatureImportanceCalculator:
 
         feature_names = list(feature_importances["Variable"].values)
         importances = np.array(feature_importances["Importance"].values)
-        return Importances(values=importances, feature_names=feature_names, extra_attrs={"surrogate": surrogate})
+        return Importances(
+            values=importances,
+            feature_names=feature_names,
+            extra_attrs={"surrogate": surrogate},
+        )
