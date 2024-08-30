@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2024-08-30
+
+### 📚 Documentation
+
+- Adding documentation for robustness metrics and attackers (#197)
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove data stability and improve feature stability (#204)
+
 ## [1.0.2] - 2024-08-13
 
 ### 🐛 Bug Fixes
