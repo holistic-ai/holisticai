@@ -18,6 +18,12 @@ class LPDebiaserBinary(BMPost):
     constraint : str
         Strategy used to evalute the cost function  The available contraints  are: "EqualizedOdds", "EqualizedOpportunity"
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import LPDebiaserBinary
+    >>> mitigator = LPDebiaserBinary()
+    >>> mitigator.fit(y, y_proba, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(y_pred, group_a, group_b)
     References
     ----------
         .. [1] Hardt, Moritz, Eric Price, and Nati Srebro. "Equality of opportunity in supervised learning."\

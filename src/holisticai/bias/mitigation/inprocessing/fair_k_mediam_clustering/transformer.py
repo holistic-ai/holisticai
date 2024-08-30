@@ -36,6 +36,13 @@ class FairKMedianClustering(BaseEstimator, BMImp):
         seed : int
             random seed.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import FairKMedianClustering
+    >>> mitigator = FairKMedianClustering(**params)
+    >>> mitigator.fit(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data, group_a, group_b)
+
     References
     ----------
         .. [1] Abbasi, Mohsen, Aditya Bhaskara, and Suresh Venkatasubramanian. "Fair clustering via\

@@ -43,6 +43,12 @@ class FairTopK(BMPost):
     score_col : str
         The name of the column in data that contains judgment values.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import FairTopK
+    >>> mitigator = FairTopK(**params)
+    >>> new_rankings = mitigator.transform(rankings)
+
     References
     ---------
     .. [1] Zehlike, Meike, et al. "Fa* ir: A fair top-k ranking algorithm." Proceedings of the 2017 ACM on\

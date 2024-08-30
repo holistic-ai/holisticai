@@ -24,6 +24,13 @@ class CalibratedEqualizedOdds(BMPost):
     seed: int
         A seed value for random number generators. This ensures reproducibility of results.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import CalibratedEqualizedOdds
+    >>> mitigator = CalibratedEqualizedOdds(**params)
+    >>> mitigator.fit(y, y_proba, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(y_pred, y_proba, group_a, group_b)
+
     References
     ----------
     .. [1] Pleiss, Geoff, et al. “On fairness and calibration.” Advances in neural information processing systems 30 (2017).

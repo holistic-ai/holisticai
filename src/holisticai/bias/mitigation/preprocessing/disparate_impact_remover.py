@@ -16,6 +16,13 @@ class DisparateImpactRemover(BMPre):
     repair_level : float, optional
         The amount of repair to be applied. It should be between 0.0 and 1.0. Default is 1.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import DisparateImpactRemover
+    >>> mitigator = DisparateImpactRemover()
+    >>> train_data_transformed = mitigator.fit_transform(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(test_data, group_a, group_b)
+
     References
     ----------
     .. [1] Feldman, Michael, et al. "Certifying and removing disparate impact."

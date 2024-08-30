@@ -13,6 +13,13 @@ class Reweighing(BMPre):
     Reweighing preprocessing [1]_ weights the examples in each group-label combination to ensure fairness before\
     classification.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import Reweighing
+    >>> mitigator = Reweighing()
+    >>> train_data_transformed = mitigator.fit_transform(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(test_data, group_a, group_b)
+
     References
     ----------
     .. [1] Kamiran, Faisal, and Toon Calders. "Data preprocessing techniques for classification\

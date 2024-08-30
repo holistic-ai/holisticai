@@ -69,6 +69,13 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
         seed: int
             seed for random initialization
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import ExponentiatedGradientReduction
+    >>> mitigator = ExponentiatedGradientReduction(**params)
+    >>> mitigator.fit(train_data, y_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data)
+
     References
     ---------
     .. [1] Agarwal, Alekh, et al. "A reductions approach to fair classification."

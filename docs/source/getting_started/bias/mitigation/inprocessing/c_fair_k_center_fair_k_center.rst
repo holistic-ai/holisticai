@@ -19,6 +19,13 @@ The method involves a recursive algorithm that handles the fairness constraints 
 3. **Fairness Adjustment**: Adjust the selected centers to ensure the required number of centers from each group.
 4. **Recursion**: If the fairness constraints are not met, recursively apply the algorithm to a subset of the data until the constraints are satisfied.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+You can find an example of using the Fair k-Center Clustering method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#2.-Fair-K-Center>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairKCenterClustering`.
+
 References
 ~~~~~~~~~~
 1. Kleindessner, Matthäus, Pranjal Awasthi, and Jamie Morgenstern. "Fair k-center clustering for data summarization." International Conference on Machine Learning. PMLR, 2019.

@@ -16,6 +16,13 @@ Grid search involves the following steps:
 2. **Best Response Calculation**: If :math:`\lambda^\dagger` is known, one can retrieve a best response via a reduction to cost-sensitive learning.
 3. **Grid Search**: When the number of constraints is small, a grid of values for :math:`\lambda` is considered. For each value, the best response is calculated, and the value with the desired tradeoff between accuracy and fairness is selected.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+You can find an example of using the Grid Search Reduction method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/inprocessing.html#3.-Grid-Search-Reduction>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.GridSearchReduction`.
+
 References
 ~~~~~~~~~~
 1. Agarwal, A., Beygelzimer, A., Dudik, M., Langford, J., & Wallach, H. (2018). A reductions approach to fair classification. In Advances in Neural Information Processing Systems (pp. 656-666).

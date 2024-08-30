@@ -40,6 +40,15 @@ Description
 
   6. **Evaluation**: The trained model is evaluated to ensure that it meets the desired fairness criteria. Metrics such as False Positive Rate (FPR) and False Negative Rate (FNR) are used to assess whether the model's predictions are unbiased with respect to the protected variable :math:`Z`.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+The Adversarial Debiasing method can be used as follows:
+
+You can find an example of using the Adversarial Debiasing method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/inprocessing.html#1.-Adversarial-Debiasing>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.AdversarialDebiasing`.
+
 References
 ~~~~~~~~~~~~~~
 1. B. H. Zhang, B. Lemoine, and M. Mitchell, "Mitigating Unwanted Biases with Adversarial Learning," AAAI/ACM Conference on Artificial Intelligence, Ethics, and Society, 2018.

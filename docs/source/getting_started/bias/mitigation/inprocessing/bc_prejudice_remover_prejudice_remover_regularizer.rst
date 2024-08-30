@@ -63,6 +63,12 @@ Description
 
   6. **Trade-off Efficiency**: The efficiency of the trade-off between prediction accuracy and prejudice removal is measured by the ratio :math:`PI/MI`, where :math:`MI` is the mutual information between the predicted and true labels.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+You can find an example of using the Prejudice Remover Regularizer method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/binary_classification/demos/inprocessing.html#5.-Prejudice-Remover>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.PrejudiceRemover`.
 
 References
 ~~~~~~~~~~~~~~~~

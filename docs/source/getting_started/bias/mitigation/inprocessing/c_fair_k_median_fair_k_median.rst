@@ -18,6 +18,13 @@ The fair k-median method involves several key steps to ensure fairness in cluste
 
 3. **Sampling**: Given the matching generated in the previous phase, the algorithm iterates over its members and considers the bundle volumes as probabilities to open :math:`k` centers in expectation. The centers picked in the sampling phase are returned as the final :math:`k` centers.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+You can find an example of using the Fair k-Median method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#3.-Fair-K-Median>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairKMedianClustering`.
+
 References
 ~~~~~~~~~~
 1. Abbasi, Mohsen, Aditya Bhaskara, and Suresh Venkatasubramanian. "Fair clustering via equitable group representations." Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency. 2021.

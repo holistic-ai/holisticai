@@ -38,6 +38,13 @@ class VariationalFairClustering(BaseEstimator, BMImp):
         verbose : bool
             If true , print metrics
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import VariationalFairClustering
+    >>> mitigator = VariationalFairClustering(**params)
+    >>> mitigator.fit(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data, group_a, group_b)
+
     References
     ----------
         .. [1] Ziko, Imtiaz Masud, et al. "Variational fair clustering." Proceedings of the AAAI\
