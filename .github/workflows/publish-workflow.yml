@@ -48,7 +48,7 @@ jobs:
 
       - name: Post to a Slack channel
         id: slack
-        uses: slackapi/slack-github-action@v1.26.0
+        uses: slackapi/slack-github-action@v1.27.0
         with:
           channel-id: "${{ vars.SLACK_CHANNEL_ID }}"
           payload: |
