@@ -126,7 +126,7 @@ def plot_surrogate(feature_importance: Importances, ax=None, **kargs):
 
     plot_tree(
         feature_importance.extra_attrs["surrogate"],
-        feature_names=feature_importance.values,
+        feature_names=feature_importance.feature_names,
         max_depth=3,
         ax=ax,
         **kargs,

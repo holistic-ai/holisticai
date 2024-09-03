@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Literal, Union, overload
+from typing import Literal, Optional, Union, overload
 
 import numpy as np
 import pandas as pd
 from numpy.random import RandomState
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error
 
 from holisticai.utils import ConditionalImportances, Importances, ModelProxy
@@ -21,7 +22,7 @@ metric_scores = {
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: pd.Series,
+    y: Optional[pd.Series],
     random_state: Union[RandomState, int, None] = None,
     importance_type: Literal["conditional"] = "conditional",
 ) -> ConditionalImportances: ...
@@ -31,7 +32,7 @@ def compute_surrogate_feature_importance(
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: pd.Series,
+    y: Optional[pd.Series] = None,
     random_state: Union[RandomState, int, None] = None,
     importance_type: Literal["standard"] = "standard",
 ) -> Importances: ...
@@ -40,14 +41,13 @@ def compute_surrogate_feature_importance(
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: Union[pd.Series, None] = None,
+    y: Optional[pd.Series] = None,
     random_state: Union[RandomState, int, None] = None,
     importance_type: Literal["conditional", "standard"] = "conditional",
 ) -> Union[Importances, ConditionalImportances]:
     pfi = SurrogateFeatureImportanceCalculator(random_state=random_state)
     if importance_type == "conditional":
-        if y is None:
-            raise ValueError("y must be provided when conditional=True")
+        y = pd.Series(proxy.predict(X)) if y is None else y
         sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
         values = {
             group_name: pfi.compute_importances(X=X.loc[indexes], proxy=proxy)
@@ -69,19 +69,33 @@ class SurrogateFeatureImportanceCalculator:
         self.importance_type = importance_type
 
     def create_surrogate_model(self, X: pd.DataFrame, y: pd.Series, learning_task: str):
+        best_tree = None
         if learning_task in ["binary_classification", "multi_classification"]:
-            from sklearn.tree import DecisionTreeClassifier
+            rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, max_depth=3)
+            rf.fit(X, y)
+            best_score = -np.inf
+            for tree in rf.estimators_:
+                predicciones = tree.predict(X)
+                score = metric_scores[learning_task](y, predicciones)
+                if score > best_score:
+                    best_score = score
+                    best_tree = tree
 
-            dt = DecisionTreeClassifier(max_depth=3, random_state=self.random_state)
-            return dt.fit(X, y)
+        elif learning_task == "regression":
+            rf = RandomForestRegressor(n_estimators=100, random_state=self.random_state, max_depth=3)
+            rf.fit(X, y)
+            best_score = np.inf
+            for tree in rf.estimators_:
+                predicciones = tree.predict(X)
+                score = metric_scores[learning_task](y, predicciones)
+                if score < best_score:
+                    best_score = score
+                    best_tree = tree
 
-        if learning_task == "regression":
-            from sklearn.tree import DecisionTreeRegressor
+        if best_tree is None:
+            raise ValueError(f"Surrogate model could not be created for learning task {learning_task}")
 
-            dt = DecisionTreeRegressor(max_depth=3, random_state=self.random_state)
-            return dt.fit(X, y)
-
-        raise ValueError("model_type must be either 'binary_classification', 'multi_classification' or 'regression'")
+        return best_tree
 
     def compute_importances(self, X: pd.DataFrame, proxy: ModelProxy) -> Importances:
         """
