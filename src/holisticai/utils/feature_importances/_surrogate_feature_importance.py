@@ -93,9 +93,7 @@ class SurrogateFeatureImportanceCalculator:
                     best_tree = tree
 
         if best_tree is None:
-            raise ValueError(
-                f"Surrogate model could not be created for learning task {learning_task}"
-            )
+            raise ValueError(f"Surrogate model could not be created for learning task {learning_task}")
 
         return best_tree
 
