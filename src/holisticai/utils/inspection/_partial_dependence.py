@@ -199,8 +199,19 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
         percentiles=percentiles,
         n_jobs=1,
     )
+    if proxy.learning_task == "binary_classification":
+        new_partial_dependence = []
+        for _ in range(2):
+            part_dep_feat = []
+            for p in partial_dependence:
+                newp = p.copy()
+                newp["individual"] = p["individual"][0][np.newaxis]
+                newp["average"] = p["average"][0][np.newaxis]
+                part_dep_feat.append(newp)
+            new_partial_dependence.append(part_dep_feat)
+        return PartialDependence(values=new_partial_dependence)
 
-    if proxy.learning_task in ["binary_classification", "multi_classification"]:
+    if proxy.learning_task == "multi_classification":
         nb_classes = len(proxy.classes)
         new_partial_dependence = []
         for c in range(nb_classes):

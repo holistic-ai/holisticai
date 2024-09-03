@@ -42,7 +42,7 @@ def get_classification_features(model, test, strategy):
 
 @pytest.mark.parametrize("strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment", [
     ("permutation", 0.010309278350515464, 1.0, 0.0, 0.0),
-    ("surrogate",  0.010309278350515464, 1.0, 1.0, 1.0)
+    ("surrogate",  0.010309278350515464, 1.0, 0.5, 0.5)
 ])
 def test_xai_classification_metrics(strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment, input_data):
     model, test = input_data
