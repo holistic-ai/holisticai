@@ -10,6 +10,13 @@ class WassersteinBarycenter(BMPost):
     predictor computing the Wasserstein barycenter of the distributions induced by the\
     standard regression function on the sensitive groups.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import WassersteinBarycenter
+    >>> mitigator = WassersteinBarycenter()
+    >>> mitigator.fit_transform(y_pred, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(y_pred, group_a, group_b)
+
     References
     ----------
         .. [1] Chzhen, Evgenii, et al. "Fair regression with wasserstein barycenters."\

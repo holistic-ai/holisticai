@@ -42,8 +42,14 @@ This section will guide you through the installation of the `holisticai` open-so
    .. grid-item-card:: Security
          :link: security/index.html
          :shadow: md
+
+         Security metrics and mitigation techniques.
+
+   .. grid-item-card:: Robustness
+         :link: robustness/index.html
+         :shadow: md
             
-         Security metrics and mitigation techniques.          
+         Robustness metrics and attackers.          
         
 
 .. If you update this toctree, also update the manual toctree in the
@@ -58,3 +64,4 @@ This section will guide you through the installation of the `holisticai` open-so
    bias/index
    explainability/index
    security/index
+   robustness/index

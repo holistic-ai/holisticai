@@ -38,6 +38,12 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
         verbose : int
             If >0, will show progress percentage.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import BlindSpotAwareMF
+    >>> mitigator = BlindSpotAwareMF(**params)
+    >>> mitigator.fit(data_matrix)
+
     References
     ----------
         .. [1] Sun, Wenlong, et al. "Debiasing the human-recommender system\

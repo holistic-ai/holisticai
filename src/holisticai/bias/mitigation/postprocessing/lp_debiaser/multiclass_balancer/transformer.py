@@ -23,6 +23,13 @@ class LPDebiaserMulticlass(BMPost):
     loss : str
         The loss function to optimize: "macro", "micro". The default is "macro"
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import LPDebiaserMulticlass
+    >>> mitigator = LPDebiaserMulticlass(**params)
+    >>> mitigator.fit(y, y_pred, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(y_pred, group_a, group_b)
+
     References
     ----------
         .. [1] Putzel, Preston, and Scott Lee. "Blackbox Post-Processing for Multiclass Fairness."\

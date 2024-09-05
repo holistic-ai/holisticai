@@ -28,6 +28,13 @@ The method consists of three main steps:
 
    - Recursively apply the Fairlet Decomposition method to each non-empty child of the node.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+You can find an example of using the Fairlet Decomposition method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/clustering/demos/inprocessing.html#4.-Fairlet>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.FairletClustering`.
+
 References
 ~~~~~~~~~~~~~~~~
 1. Backurs, Arturs, et al. "Scalable fair clustering." International Conference on Machine Learning. PMLR, 2019.

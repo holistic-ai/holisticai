@@ -48,6 +48,13 @@ class FairKCenterClustering(BaseEstimator, BMImp):
         seed : int,
             Initial random seed.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import FairKCenterClustering
+    >>> mitigator = FairKCenterClustering(**params)
+    >>> mitigator.fit(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data, group_a, group_b)
+
     References
     ---------
         .. [1] Kleindessner, Matthäus, Pranjal Awasthi, and Jamie Morgenstern. "Fair k-center clustering\

@@ -20,24 +20,29 @@ def get_classification_features(model, test, strategy):
     from holisticai.utils.inspection import compute_partial_dependence
 
     if strategy=='permutation':
-        from holisticai.utils.feature_importances import compute_permutation_feature_importance as compute_feature_importance
+        from holisticai.utils.feature_importances import compute_permutation_feature_importance
+        proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=model.classes_)
+        importances  = compute_permutation_feature_importance(proxy=proxy, X=test['X'], y=test['y'], importance_type="standard")
+        ranked_importances = importances.top_alpha(0.8)
+        partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
+        conditional_importances  = compute_permutation_feature_importance(proxy=proxy, X=test['X'], y=test['y'], importance_type="conditional")
+        return proxy, importances, ranked_importances, conditional_importances, partial_dependencies
+
     elif strategy=='surrogate':
-        from holisticai.utils.feature_importances import compute_surrogate_feature_importance as compute_feature_importance
+        from holisticai.utils.feature_importances import compute_surrogate_feature_importance
+        proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=model.classes_)
+        importances  = compute_surrogate_feature_importance(proxy=proxy, X=test['X'], y=test['y'], importance_type="standard")
+        ranked_importances = importances.top_alpha(0.8)
+        partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
+        conditional_importances  = compute_surrogate_feature_importance(proxy=proxy, X=test['X'], y=test['y'], importance_type="conditional")
+        return proxy, importances, ranked_importances, conditional_importances, partial_dependencies
     else:
         raise ValueError("Invalid strategy")
-    
-    
-    proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=model.classes_)
-    importances  = compute_feature_importance(proxy=proxy, X=test['X'], y=test['y'])
-    ranked_importances = importances.top_alpha(0.8)
-    partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
-    conditional_importances  = compute_feature_importance(proxy=proxy, X=test['X'], y=test['y'], conditional=True)
-    return proxy, importances, ranked_importances, conditional_importances, partial_dependencies
 
 
 @pytest.mark.parametrize("strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment", [
     ("permutation", 0.010309278350515464, 1.0, 0.0, 0.0),
-    ("surrogate",  0.010309278350515464, 1.0, 1.0, 1.0)
+    ("surrogate",  0.010309278350515464, 1.0, 0.5, 0.5)
 ])
 def test_xai_classification_metrics(strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment, input_data):
     model, test = input_data

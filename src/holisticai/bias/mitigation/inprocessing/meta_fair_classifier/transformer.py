@@ -27,6 +27,16 @@ class MetaFairClassifier(BMImp):
         seed : int
             Random seed.
 
+        verbose : int
+            If >0, will show progress percentage.
+
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation.inprocessing import MetaFairClassifier
+    >>> mitigator = MetaFairClassifier(**params)
+    >>> mitigator.fit(train_data, y, group_a, group_b)
+    >>> test_data_transformed = mitigator.predict(test_data)
+
     References
     ----------
         .. [1] Celis, L. Elisa, et al. "Classification with fairness constraints:\

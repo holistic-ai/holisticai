@@ -44,6 +44,13 @@ Description
   5. **Evaluation and Learning**:
      The method evaluates the performance of the recommender system using the unbiased estimators and iteratively updates the model parameters to minimize the propensity-weighted loss. This process continues until convergence, resulting in a model that is robust to selection biases.
 
+Basic Usage
+~~~~~~~~~~~~~~
+
+You can find an example of using the Matrix Factorization with Propensity Scoring method in the following `demo <https://holisticai.readthedocs.io/en/latest/gallery/tutorials/bias/mitigating_bias/recommender_systems/demos/inprocessing.html#Method:-Popularity-propensity>`_.
+
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.bias.mitigation.PopularityPropensityMF`.
+
 References
 ~~~~~~~~~~~~~~~~
 1. Tobias Schnabel, Adith Swaminathan, Ashudeep Singh, Navin Chandak, and Thorsten Joachims. 2016. Recommendations as treatments: Debiasing learning and evaluation. arXiv preprint arXiv:1602.05352 (2016).

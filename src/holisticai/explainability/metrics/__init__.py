@@ -21,7 +21,6 @@ from holisticai.explainability.metrics.global_importance import (
     xai_ease_score,
 )
 from holisticai.explainability.metrics.local_importance import (
-    data_stability,
     feature_stability,
 )
 
@@ -35,7 +34,6 @@ __all__ = [
     "spread_ratio",
     "spread_divergence",
     "xai_ease_score",
-    "data_stability",
     "feature_stability",
     "surrogate_accuracy_score",
     "surrogate_mean_squared_error",

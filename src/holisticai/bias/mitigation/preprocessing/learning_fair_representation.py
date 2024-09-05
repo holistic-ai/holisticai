@@ -102,6 +102,13 @@ class LearningFairRepresentation(BMPreprocessing):
     seed : int, optional
         Seed to make `predict` repeatable. Default is None
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import LearningFairRepresentation
+    >>> mitigator = LearningFairRepresentation(**params)
+    >>> train_data_transformed = mitigator.fit_transform(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(test_data, group_a, group_b)
+
     References
     ----------
     .. [1] Zemel, Rich, et al. "Learning fair representations."

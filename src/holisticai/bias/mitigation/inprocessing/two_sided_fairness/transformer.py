@@ -21,6 +21,12 @@ class FairRec(BMImp):
         MMS_fraction : float
             Maximin Share (MMS) threshold of producers exposure.
 
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import FairRec
+    >>> mitigator = FairRec(**params)
+    >>> mitigator.fit(data_matrix)
+
     References
     ----------
         .. [1] Patro, Gourab K., et al. "Fairrec: Two-sided fairness for personalized\

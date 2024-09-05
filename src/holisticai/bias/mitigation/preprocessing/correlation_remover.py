@@ -35,6 +35,13 @@ class CorrelationRemover(BMPre):
     values. Note that the lack of correlation does not imply anything about statistical dependence.\
     Therefore, it is expected this to be most appropriate as a preprocessing step for\
     (generalized) linear models.
+
+    Examples
+    --------
+    >>> from holisticai.bias.mitigation import CorrelationRemover
+    >>> mitigator = CorrelationRemover()
+    >>> train_data_transformed = mitigator.fit_transform(train_data, group_a, group_b)
+    >>> test_data_transformed = mitigator.transform(test_data, group_a, group_b)
     """
 
     def __init__(self, alpha=1):
