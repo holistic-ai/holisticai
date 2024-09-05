@@ -15,6 +15,9 @@ from holisticai.explainability.metrics.global_importance import (
     spread_ratio,
     surrogate_accuracy_score,
     surrogate_mean_squared_error,
+    tree_depth_variance,
+    weighted_tree_depth,
+    weighted_tree_gini,
     xai_ease_score,
 )
 from holisticai.explainability.metrics.local_importance import (
@@ -36,4 +39,7 @@ __all__ = [
     "feature_stability",
     "surrogate_accuracy_score",
     "surrogate_mean_squared_error",
+    "weighted_tree_depth",
+    "weighted_tree_gini",
+    "tree_depth_variance",
 ]

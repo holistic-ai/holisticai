@@ -28,3 +28,14 @@
 
     data_stability
     feature_stability
+
+**Tree Based Metrics**
+
+.. autosummary::
+    :nosignatures:
+    :template: function.rst
+    :toctree: .generated/
+
+    weighted_tree_depth
+    weighted_tree_gini
+    tree_depth_variance
