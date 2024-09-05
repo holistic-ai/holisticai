@@ -34,6 +34,7 @@ class WeightedTreeDepth:
         weights = np.array(counts) / n_samples
         return (depths * weights).sum()
 
+
 def weighted_tree_depth(tree: sklearn.tree._tree.Tree, ignore_repeated: bool = True):
     """
     Weighted Average Depth calculates the average depth of a tree considering the number
@@ -68,6 +69,7 @@ def weighted_tree_depth(tree: sklearn.tree._tree.Tree, ignore_repeated: bool = T
     metric = WeightedTreeDepth(ignore_repeated)
     return metric(tree)
 
+
 def is_leaf(node_index, tree):
     """
     Check if a node is a leaf.
@@ -84,9 +86,10 @@ def is_leaf(node_index, tree):
     bool
         Whether the node is a leaf or not.
     """
-    if hasattr(tree, 'left') and hasattr(tree, 'right'):
+    if hasattr(tree, "left") and hasattr(tree, "right"):
         return node_index.is_leaf()
-    return (tree.children_left[node_index] == -1 and tree.children_right[node_index] == -1)
+    return tree.children_left[node_index] == -1 and tree.children_right[node_index] == -1
+
 
 def get_cuts_counts(node_index, tree, cuts, counts, cur_set):
     """
@@ -126,6 +129,7 @@ def get_cuts_counts(node_index, tree, cuts, counts, cur_set):
         if tree.children_right[node_index] != -1:
             get_cuts_counts(tree.children_right[node_index], tree, cuts, counts, right_set)
     return cuts, counts
+
 
 def get_depths_counts(node_index, tree, depths, counts, h=0):
     """
@@ -183,13 +187,14 @@ class WeightedTreeGini:
         Returns:
             float: The weighted Gini index value.
         """
+
         def gini_impurity(node_index):
             node_samples = tree.n_node_samples[node_index]
             if node_samples == 0:
                 return 0.0
             node_value = tree.value[node_index, 0, :]
             p = node_value / node_samples
-            return 1.0 - np.sum(p ** 2)
+            return 1.0 - np.sum(p**2)
 
         weighted_gini = 0.0
         total_samples = tree.n_node_samples[0]
@@ -203,8 +208,10 @@ class WeightedTreeGini:
             else:
                 accumulate_gini(tree.children_left[node_index])
                 accumulate_gini(tree.children_right[node_index])
+
         accumulate_gini(0)
         return weighted_gini
+
 
 def weighted_tree_gini(tree):
     """
@@ -234,6 +241,7 @@ def weighted_tree_gini(tree):
     metric = WeightedTreeGini()
     return metric(tree)
 
+
 class TreeDepthVariance:
     """
     Represents the Tree Depth Variance metric.
@@ -258,6 +266,7 @@ class TreeDepthVariance:
         mean_depth = np.mean(depths)
         variance = np.mean((depths - mean_depth) ** 2)
         return variance
+
 
 def tree_depth_variance(tree):
     """
