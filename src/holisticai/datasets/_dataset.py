@@ -130,7 +130,7 @@ class GroupByDataset:
         return generate_html_for_generic_object(obj, feature_columns=5)
 
 
-def dataframe_to_level_dict_with_series(df: pd.DataFrame, row_index: int) -> pd.DataFrame:
+def dataframe_to_level_dict_with_series(df: pd.DataFrame, row_index: int):
     """
     Converts a DataFrame with two-level columns into a dictionary where:
     - Level 0 names become dictionary keys.
@@ -156,7 +156,7 @@ def dataframe_to_level_dict_with_series(df: pd.DataFrame, row_index: int) -> pd.
             data[level_0_name] = feature.iloc[row_index, 0]
         else:
             data[level_0_name] = feature.iloc[row_index]
-    return pd.concat(data, axis=1)
+    return data
 
 
 class DataLoader:
@@ -413,7 +413,7 @@ class Dataset:
     def _repr_html_(self):
         return generate_html_for_generic_object(self.repr_info(), feature_columns=5)
 
-    def __getitem__(self, key: str | int | list) -> Union[pd.Series, pd.DataFrame]:
+    def __getitem__(self, key: str | int | list):
         """Returns a subset of the dataset based on the given key."""
         if isinstance(key, str):
             feature = self.data.xs(key, level="features", axis=1)
