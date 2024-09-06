@@ -1,22 +1,18 @@
-import pytest
 import numpy as np
 import pandas as pd
-from sklearn.neighbors import NearestNeighbors
+import pytest
 from sklearn.metrics import accuracy_score
+from sklearn.neighbors import NearestNeighbors
 
 # Import the module to be tested
 from holisticai.robustness.dataset_shift._accuracy_degradation_profile import (
-    accuracy_degradation_profile,
-    _validate_inputs,
-    _calculate_accuracies,
-    _summarize_results,
-    _styled_results,
-    STEP_SIZE
-)
+    STEP_SIZE, _calculate_accuracies, _styled_results, _summarize_results,
+    _validate_inputs, accuracy_degradation_profile)
 
 # ------------------------
 # Fixtures for test data and models
 # ------------------------
+
 
 @pytest.fixture
 def test_data():
@@ -26,6 +22,7 @@ def test_data():
     y_pred = np.random.randint(0, 2, size=100)
     return X_test, y_test, y_pred
 
+
 @pytest.fixture
 def knn_model(test_data):
     """Fixture to generate a pre-trained KNN model."""
@@ -33,6 +30,7 @@ def knn_model(test_data):
     model = NearestNeighbors(n_neighbors=5)
     model.fit(X_test)
     return model
+
 
 @pytest.fixture
 def parameters():
@@ -47,6 +45,7 @@ def parameters():
 # ------------------------
 # Test: accuracy_degradation_profile
 # ------------------------
+
 
 def test_accuracy_degradation_profile(test_data, knn_model, parameters):
     """Test the accuracy_degradation_profile function."""
@@ -75,6 +74,7 @@ def test_accuracy_degradation_profile(test_data, knn_model, parameters):
 # Test: _validate_inputs
 # ------------------------
 
+
 @pytest.mark.parametrize("X_test, y_test, y_pred, baseline_accuracy, threshold_percentual, above_percentual, expected", [
     (np.array([1, 2, 3]), np.array([1, 2, 3]), np.array([1, 2, 3]), 0.8, 0.9, 0.95, None),
     (np.array([1, 2, 3]), np.array([1, 2]), np.array([1, 2, 3]), 0.8, 0.9, 0.95, ValueError),
@@ -82,25 +82,46 @@ def test_accuracy_degradation_profile(test_data, knn_model, parameters):
     (np.array([1, 2, 3]), np.array([1, 2, 3]), np.array([1, 2, 3]), 0.8, -0.5, 0.95, ValueError),
     (np.array([1, 2, 3]), np.array([1, 2, 3]), np.array([1, 2, 3]), 0.8, 0.9, 1.5, ValueError)
 ])
-def test_validate_inputs(X_test, y_test, y_pred, baseline_accuracy, threshold_percentual, above_percentual, expected):
+def test_validate_inputs(
+        X_test,
+        y_test,
+        y_pred,
+        baseline_accuracy,
+        threshold_percentual,
+        above_percentual,
+        expected):
     """Test for input validation in _validate_inputs."""
     if expected is None:
-        _validate_inputs(X_test, y_test, y_pred, baseline_accuracy, threshold_percentual, above_percentual)
+        _validate_inputs(
+            X_test,
+            y_test,
+            y_pred,
+            baseline_accuracy,
+            threshold_percentual,
+            above_percentual)
     else:
         with pytest.raises(expected):
-            _validate_inputs(X_test, y_test, y_pred, baseline_accuracy, threshold_percentual, above_percentual)
+            _validate_inputs(
+                X_test,
+                y_test,
+                y_pred,
+                baseline_accuracy,
+                threshold_percentual,
+                above_percentual)
 
 # ------------------------
 # Test: _calculate_accuracies
 # ------------------------
 
+
 def test_calculate_accuracies(test_data, knn_model, parameters):
     """Test for the _calculate_accuracies function."""
     X_test, y_test, y_pred = test_data
     step_size = parameters['step_size']
-    
-    results_df, set_size_list = _calculate_accuracies(X_test, y_test, y_pred, 5, step_size)
-    
+
+    results_df, set_size_list = _calculate_accuracies(
+        X_test, y_test, y_pred, 5, step_size)
+
     # Ensure the output is a DataFrame
     assert isinstance(results_df, pd.DataFrame)
 
@@ -116,11 +137,15 @@ def test_calculate_accuracies(test_data, knn_model, parameters):
 # Test: _summarize_results
 # ------------------------
 
+
 def test_summarize_results(parameters):
     """Test for the _summarize_results function."""
     # Simulate results_df for the test
-    results_df = pd.DataFrame(np.random.rand(100, 5), columns=[0.95, 0.9, 0.85, 0.8, 0.75])
-    
+    results_df = pd.DataFrame(
+        np.random.rand(
+            100, 5), columns=[
+            0.95, 0.9, 0.85, 0.8, 0.75])
+
     # Generate the summary
     results_summary_df = _summarize_results(
         results_df,
@@ -128,12 +153,17 @@ def test_summarize_results(parameters):
         parameters['threshold_percentual'],
         parameters['above_percentual']
     )
-    
+
     # Ensure the output is a DataFrame
     assert isinstance(results_summary_df, pd.DataFrame)
 
     # Ensure the DataFrame contains expected columns
-    assert set(results_summary_df.columns) == {'size_factor', 'decision', 'above_threshold', 'percent_above'}
+    assert set(
+        results_summary_df.columns) == {
+        'size_factor',
+        'decision',
+        'above_threshold',
+        'percent_above'}
 
     # Ensure decisions are either 'OK' or 'acc degrad!'
     assert set(results_summary_df['decision']).issubset({'OK', 'acc degrad!'})
@@ -141,6 +171,7 @@ def test_summarize_results(parameters):
 # ------------------------
 # Test: _styled_results
 # ------------------------
+
 
 @pytest.mark.skip(reason="The function associated with this test is already problematic.")
 def test_styled_results():

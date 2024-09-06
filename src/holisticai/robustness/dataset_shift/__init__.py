@@ -1,10 +1,8 @@
 # Documentation
 
 # Import modules
-from holisticai.robustness.dataset_shift._accuracy_degradation_profile import (
-    accuracy_degradation_profile,
-)
-
+from holisticai.robustness.dataset_shift._accuracy_degradation_profile import \
+    accuracy_degradation_profile
 
 # Allow functions and classes
 __all__ = [

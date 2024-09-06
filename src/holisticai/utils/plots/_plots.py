@@ -1,7 +1,7 @@
 """
-This module implements functions for visualizing 2D datasets and their properties in 
-the context of dataset shift. These functions highlight different aspects of the data, 
-such as test set points, predicted values, and neighborhoods around specific points of 
+This module implements functions for visualizing 2D datasets and their properties in
+the context of dataset shift. These functions highlight different aspects of the data,
+such as test set points, predicted values, and neighborhoods around specific points of
 interest.
 
 Functions included:
@@ -9,9 +9,9 @@ Functions included:
 - plot_graph: Plots a 2D scatter plot of the entire dataset.
 - plot_highlight_test_set: Highlights a specific subset of points in the dataset.
 - plot_just_test_set: Annotates all points with their indices in the dataset.
-- plot_ytest_ypred: Displays both true and predicted labels on the same plot with a 
+- plot_ytest_ypred: Displays both true and predicted labels on the same plot with a
 slight vertical offset.
-- plot_neighborhoods: Plots the neighborhoods around specified points of interest and 
+- plot_neighborhoods: Plots the neighborhoods around specified points of interest and
 calculates accuracy.
 """
 
@@ -70,7 +70,8 @@ def plot_highlight_test_set(X, y, test_indices):
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
 
     # Outline the selected points
-    plt.scatter(X[selected_indices, 0], X[selected_indices, 1], facecolors='none', edgecolors='red', linewidths=2, s=150)
+    plt.scatter(X[selected_indices, 0], X[selected_indices, 1],
+                facecolors='none', edgecolors='red', linewidths=2, s=150)
 
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
@@ -136,7 +137,8 @@ def plot_ytest_ypred(X, y, y_pred):
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
 
     # Plot y_pred with a vertical offset
-    plt.scatter(X[:, 0], X[:, 1] - vertical_offset, c=y_pred, cmap='viridis', s=50, edgecolor='k', label='y_pred', alpha=0.5)
+    plt.scatter(X[:, 0], X[:, 1] - vertical_offset, c=y_pred,
+                cmap='viridis', s=50, edgecolor='k', label='y_pred', alpha=0.5)
 
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
@@ -144,7 +146,12 @@ def plot_ytest_ypred(X, y, y_pred):
     plt.show()
 
 
-def plot_neighborhoods(X_test, y_test, y_pred, n_neighbors, points_of_interest):
+def plot_neighborhoods(
+        X_test,
+        y_test,
+        y_pred,
+        n_neighbors,
+        points_of_interest):
     """
     Plots the neighborhoods around specified points of interest and calculates the accuracy over the selected neighbors.
 
@@ -166,9 +173,9 @@ def plot_neighborhoods(X_test, y_test, y_pred, n_neighbors, points_of_interest):
     None
     """
     import matplotlib.pyplot as plt
+    from scipy.spatial import ConvexHull
     from sklearn.metrics import accuracy_score
     from sklearn.neighbors import NearestNeighbors
-    from scipy.spatial import ConvexHull
 
     # Adjustable vertical offset
     vertical_offset = 0.1
@@ -196,11 +203,13 @@ def plot_neighborhoods(X_test, y_test, y_pred, n_neighbors, points_of_interest):
         plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
 
         # Plot y_pred with a vertical offset
-        plt.scatter(X[:, 0], X[:, 1] - vertical_offset, c=y_pred, cmap='viridis', s=50, edgecolor='k', label='y_pred', alpha=0.5)
+        plt.scatter(X[:, 0], X[:, 1] - vertical_offset, c=y_pred,
+                    cmap='viridis', s=50, edgecolor='k', label='y_pred', alpha=0.5)
 
         # Plot the convex hull as an outline
         for simplex in hull.simplices:
-            plt.plot(selected_points[simplex, 0], selected_points[simplex, 1], 'r--', linewidth=1)
+            plt.plot(selected_points[simplex, 0],
+                     selected_points[simplex, 1], 'r--', linewidth=1)
 
         # Annotate all points with their indices
         for i, (x, y) in enumerate(X):
@@ -208,10 +217,11 @@ def plot_neighborhoods(X_test, y_test, y_pred, n_neighbors, points_of_interest):
 
         # Accuracy over the neighbors
         acc = accuracy_score(y_test[indices][0], y_pred[indices][0])
-        print(f'Accuracy on the reduced test set of Sample {sample_index} and its nearest neighbors: {acc*100:.1f}%')
+        print(
+            f'Accuracy on the reduced test set of Sample {sample_index} and its nearest neighbors: {acc*100:.1f}%')
 
         plt.xlabel('Feature 1')
         plt.ylabel('Feature 2')
-        plt.title(f'Convex Hull of {n_neighbors} points: Sample {sample_index} and its Nearest Neighbors.')
+        plt.title(
+            f'Convex Hull of {n_neighbors} points: Sample {sample_index} and its Nearest Neighbors.')
         plt.show()
-
