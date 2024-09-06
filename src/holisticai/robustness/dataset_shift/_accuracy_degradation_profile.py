@@ -8,7 +8,7 @@ The ADP methodology aims on identify the degradation in model performance as the
 reduces, offering insights into the resilience of the model under varying conditions.
 """
 
-from typing import List, Tuple
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ from sklearn.neighbors import NearestNeighbors
 
 # Constants
 STEP_SIZE = 0.05
-DECISION_COLUMN = 'decision'
+DECISION_COLUMN = "decision"
 
 
 def accuracy_degradation_profile(
@@ -28,7 +28,7 @@ def accuracy_degradation_profile(
     baseline_accuracy: float,
     threshold_percentual: float = 0.95,
     above_percentual: float = 0.90,
-    step_size: float = STEP_SIZE
+    step_size: float = STEP_SIZE,
 ) -> pd.DataFrame:
     """
     Generates an accuracy degradation profile by iteratively reducing the size of the nearest neighbors
@@ -65,24 +65,13 @@ def accuracy_degradation_profile(
     """
 
     # Validate inputs
-    _validate_inputs(
-        X_test,
-        y_test,
-        y_pred,
-        baseline_accuracy,
-        threshold_percentual,
-        above_percentual)
+    _validate_inputs(X_test, y_test, y_pred, baseline_accuracy, threshold_percentual, above_percentual)
 
     # Calculate accuracies for varying test set sizes
-    results_df, set_size_list = _calculate_accuracies(
-        X_test, y_test, y_pred, n_neighbors, step_size)
+    results_df, set_size_list = _calculate_accuracies(X_test, y_test, y_pred, n_neighbors, step_size)
 
     # Summarize the results
-    results_summary_df = _summarize_results(
-        results_df,
-        baseline_accuracy,
-        threshold_percentual,
-        above_percentual)
+    results_summary_df = _summarize_results(results_df, baseline_accuracy, threshold_percentual, above_percentual)
 
     # Apply styling
     styled_df = _styled_results(results_summary_df)
@@ -90,13 +79,14 @@ def accuracy_degradation_profile(
     return styled_df
 
 
-def _validate_inputs(X_test: np.ndarray,
-                     y_test: np.ndarray,
-                     y_pred: np.ndarray,
-                     baseline_accuracy: float,
-                     threshold_percentual: float,
-                     above_percentual: float
-                     ) -> None:
+def _validate_inputs(
+    X_test: np.ndarray,
+    y_test: np.ndarray,
+    y_pred: np.ndarray,
+    baseline_accuracy: float,
+    threshold_percentual: float,
+    above_percentual: float,
+) -> None:
     """
     Validates the inputs for the accuracy degradation profile function.
 
@@ -129,16 +119,24 @@ def _validate_inputs(X_test: np.ndarray,
 
     Example:
     -------
-    >>> _validate_inputs(np.array([1, 2, 3]), np.array([0, 1, 0]), np.array([0, 1, 1]), 0.9, 0.8, 0.95)
+    >>> _validate_inputs(
+    ...     np.array([1, 2, 3]),
+    ...     np.array([0, 1, 0]),
+    ...     np.array([0, 1, 1]),
+    ...     0.9,
+    ...     0.8,
+    ...     0.95,
+    ... )
     No error raised, input is valid.
 
-    >>> _validate_inputs(np.array([1, 2, 3]), np.array([0, 1]), np.array([0, 1, 1]), 0.9, 0.8, 0.95)
+    >>> _validate_inputs(
+    ...     np.array([1, 2, 3]), np.array([0, 1]), np.array([0, 1, 1]), 0.9, 0.8, 0.95
+    ... )
     ValueError: X_test, y_test, and y_pred must have the same length.
     """
 
     if len(X_test) != len(y_test) or len(y_test) != len(y_pred):
-        raise ValueError(
-            "X_test, y_test, and y_pred must have the same length.")
+        raise ValueError("X_test, y_test, and y_pred must have the same length.")
     if not (0 < threshold_percentual <= 1):
         raise ValueError("threshold_percentual must be between 0 and 1.")
     if not (0 < above_percentual <= 1):
@@ -148,12 +146,8 @@ def _validate_inputs(X_test: np.ndarray,
 
 
 def _calculate_accuracies(
-    X_test: np.ndarray,
-    y_test: np.ndarray,
-    y_pred: np.ndarray,
-    n_neighbors: int,
-    step_size: float
-) -> Tuple[pd.DataFrame, List[float]]:
+    X_test: np.ndarray, y_test: np.ndarray, y_pred: np.ndarray, n_neighbors: int, step_size: float
+) -> tuple[pd.DataFrame, list[float]]:
     """
     Calculate accuracies by iteratively reducing the test set size and evaluating accuracy.
 
@@ -179,7 +173,7 @@ def _calculate_accuracies(
         A tuple containing:
         - pd.DataFrame: A DataFrame with the calculated accuracies for each size factor. The rows represent the number of neighbors,
                         and the columns represent the size factors.
-        - List[float]: A list of size factors used in the reduction process.
+        - list[float]: A list of size factors used in the reduction process.
 
     Raises:
     ------
@@ -188,7 +182,9 @@ def _calculate_accuracies(
 
     Example:
     -------
-    >>> results_df, set_size_list = _calculate_accuracies(X_test, y_test, y_pred, n_neighbors, 0.05)
+    >>> results_df, set_size_list = _calculate_accuracies(
+    ...     X_test, y_test, y_pred, n_neighbors, 0.05
+    ... )
     >>> print(results_df)
     """
 
@@ -197,7 +193,6 @@ def _calculate_accuracies(
         raise ValueError("step_size must be between 0 and 1.")
 
     # Neighborhood on test set
-    from sklearn.neighbors import NearestNeighbors
     knn = NearestNeighbors(n_neighbors=n_neighbors)
     knn.fit(X_test)
 
@@ -215,30 +210,22 @@ def _calculate_accuracies(
 
         # Evaluate accuracy over each test set size
         size_factor = set_size_list[size_factor_index]
-        test_set_neighbours = knn.kneighbors(
-            X_test, n_neighbors=n_neighbours, return_distance=False)
-        accuracy_list = [
-            accuracy_score(
-                y_pred[neighbors],
-                y_test[neighbors]) for neighbors in test_set_neighbours]
+        test_set_neighbours = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
+        accuracy_list = [accuracy_score(y_pred[neighbors], y_test[neighbors]) for neighbors in test_set_neighbours]
         results[size_factor] = accuracy_list
 
     # Organize results into a DataFrame
-    results_df = pd.DataFrame.from_dict(results, orient='columns')
+    results_df = pd.DataFrame.from_dict(results, orient="columns")
     results_df.index = range(1, full_set_size + 1)
-    results_df.columns = [round(float(size_factor), 2)
-                          for size_factor in results_df.columns]
-    results_df.index.name = 'n_neighbours'
-    results_df.columns.name = 'size_factor'
+    results_df.columns = [round(float(size_factor), 2) for size_factor in results_df.columns]
+    results_df.index.name = "n_neighbours"
+    results_df.columns.name = "size_factor"
 
     return results_df, set_size_list
 
 
 def _summarize_results(
-    results_df: pd.DataFrame,
-    baseline_accuracy: float,
-    threshold_percentual: float,
-    above_percentual: float
+    results_df: pd.DataFrame, baseline_accuracy: float, threshold_percentual: float, above_percentual: float
 ) -> pd.DataFrame:
     """
     Summarize the accuracy results by checking against the threshold for degradation.
@@ -276,7 +263,12 @@ def _summarize_results(
 
     Example:
     -------
-    >>> results_summary_df = _summarize_results(results_df, baseline_accuracy=0.95, threshold_percentual=0.9, above_percentual=0.95)
+    >>> results_summary_df = _summarize_results(
+    ...     results_df,
+    ...     baseline_accuracy=0.95,
+    ...     threshold_percentual=0.9,
+    ...     above_percentual=0.95,
+    ... )
     >>> print(results_summary_df)
     """
 
@@ -284,36 +276,30 @@ def _summarize_results(
     threshold = threshold_percentual * baseline_accuracy
 
     # Initialize an empty DataFrame to store the summary of results
-    results_summary_df = pd.DataFrame(
-        columns=[
-            'size_factor',
-            'above_threshold',
-            'percent_above',
-            'decision'])
+    results_summary_df = pd.DataFrame(columns=["size_factor", "above_threshold", "percent_above", "decision"])
 
     # Iterate through each size_factor in the results_df
     for size_factor in results_df.columns:
         # Count how many accuracies are above the threshold for the current
         # size factor
-        above_threshold = results_df[results_df[size_factor]
-                                     > threshold].shape[0]
+        above_threshold = results_df[results_df[size_factor] > threshold].shape[0]
 
         # Determine whether the decision is 'OK' or indicates 'acc degrad!'
         # based on above_threshold percentage
-        decision = 'OK' if above_threshold / \
-            results_df.shape[0] >= above_percentual else 'acc degrad!'
+        decision = "OK" if above_threshold / results_df.shape[0] >= above_percentual else "acc degrad!"
 
         # Create a new row with the summary data
-        new_row = pd.DataFrame({
-            'size_factor': [size_factor],
-            'percent_above': [above_threshold / results_df.shape[0]],
-            'above_threshold': [above_threshold],
-            'decision': [decision]
-        })
+        new_row = pd.DataFrame(
+            {
+                "size_factor": [size_factor],
+                "percent_above": [above_threshold / results_df.shape[0]],
+                "above_threshold": [above_threshold],
+                "decision": [decision],
+            }
+        )
 
         # Concatenate the new row to the summary DataFrame
-        results_summary_df = pd.concat(
-            [results_summary_df, new_row], ignore_index=True)
+        results_summary_df = pd.concat([results_summary_df, new_row], ignore_index=True)
 
     # Adjust the index of the results summary DataFrame to start from 1
     results_summary_df.index += 1
@@ -321,8 +307,7 @@ def _summarize_results(
     return results_summary_df
 
 
-def _color_cells(val: str
-                 ) -> str:
+def _color_cells(val: str) -> str:
     """
     Determines the color styling based on the value of the cell.
 
@@ -336,13 +321,11 @@ def _color_cells(val: str
     str
         CSS style string to apply the appropriate color.
     """
-    color = 'green' if val == 'OK' else 'red'
-    return f'color: {color}'
+    color = "green" if val == "OK" else "red"
+    return f"color: {color}"
 
 
-def _styled_results(results_summary_df: pd.DataFrame,
-                    decision_column: str = DECISION_COLUMN
-                    ) -> pd.DataFrame:
+def _styled_results(results_summary_df: pd.DataFrame, decision_column: str = DECISION_COLUMN) -> pd.DataFrame:
     """
     Apply styling to the results summary DataFrame to highlight decisions.
 
@@ -358,6 +341,5 @@ def _styled_results(results_summary_df: pd.DataFrame,
     pd.DataFrame
         DataFrame with color-coded decisions.
     """
-    styled_df = results_summary_df.style.map(
-        _color_cells, subset=[decision_column])
+    styled_df = results_summary_df.style.map(_color_cells, subset=[decision_column])
     return styled_df

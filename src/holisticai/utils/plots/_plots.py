@@ -35,11 +35,11 @@ def plot_graph(X, y):
 
     # Plotting the data
     plt.figure(figsize=(8, 6))
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", s=50, edgecolor="k")
 
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.title('Your 2D Dataset')
+    plt.xlabel("Feature 1")
+    plt.ylabel("Feature 2")
+    plt.title("Your 2D Dataset")
     plt.show()
 
 
@@ -67,15 +67,16 @@ def plot_highlight_test_set(X, y, test_indices):
 
     # Plotting the data
     plt.figure(figsize=(8, 6))
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", s=50, edgecolor="k")
 
     # Outline the selected points
-    plt.scatter(X[selected_indices, 0], X[selected_indices, 1],
-                facecolors='none', edgecolors='red', linewidths=2, s=150)
+    plt.scatter(
+        X[selected_indices, 0], X[selected_indices, 1], facecolors="none", edgecolors="red", linewidths=2, s=150
+    )
 
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.title('Your 2D Dataset: Highlight test set')
+    plt.xlabel("Feature 1")
+    plt.ylabel("Feature 2")
+    plt.title("Your 2D Dataset: Highlight test set")
     plt.show()
 
 
@@ -98,15 +99,15 @@ def plot_just_test_set(X, y):
 
     # Plotting the data
     plt.figure(figsize=(8, 6))
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", s=50, edgecolor="k")
 
     # Annotate all points with their indices
     for i, (x, y) in enumerate(X):
-        plt.text(x, y, str(i), color='gray', fontsize=8, ha='right')
+        plt.text(x, y, str(i), color="gray", fontsize=8, ha="right")
 
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.title('Your 2D Dataset: Just test set')
+    plt.xlabel("Feature 1")
+    plt.ylabel("Feature 2")
+    plt.title("Your 2D Dataset: Just test set")
     plt.show()
 
 
@@ -134,24 +135,20 @@ def plot_ytest_ypred(X, y, y_pred):
 
     # Plotting the data
     plt.figure(figsize=(8, 6))
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", s=50, edgecolor="k")
 
     # Plot y_pred with a vertical offset
-    plt.scatter(X[:, 0], X[:, 1] - vertical_offset, c=y_pred,
-                cmap='viridis', s=50, edgecolor='k', label='y_pred', alpha=0.5)
+    plt.scatter(
+        X[:, 0], X[:, 1] - vertical_offset, c=y_pred, cmap="viridis", s=50, edgecolor="k", label="y_pred", alpha=0.5
+    )
 
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.title('Your 2D Dataset: y_true and y_pred')
+    plt.xlabel("Feature 1")
+    plt.ylabel("Feature 2")
+    plt.title("Your 2D Dataset: y_true and y_pred")
     plt.show()
 
 
-def plot_neighborhoods(
-        X_test,
-        y_test,
-        y_pred,
-        n_neighbors,
-        points_of_interest):
+def plot_neighborhoods(X_test, y_test, y_pred, n_neighbors, points_of_interest):
     """
     Plots the neighborhoods around specified points of interest and calculates the accuracy over the selected neighbors.
 
@@ -200,28 +197,27 @@ def plot_neighborhoods(
 
         # Plotting the data
         plt.figure(figsize=(8, 6))
-        plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis', s=50, edgecolor='k')
+        plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", s=50, edgecolor="k")
 
         # Plot y_pred with a vertical offset
-        plt.scatter(X[:, 0], X[:, 1] - vertical_offset, c=y_pred,
-                    cmap='viridis', s=50, edgecolor='k', label='y_pred', alpha=0.5)
+        plt.scatter(
+            X[:, 0], X[:, 1] - vertical_offset, c=y_pred, cmap="viridis", s=50, edgecolor="k", label="y_pred", alpha=0.5
+        )
 
         # Plot the convex hull as an outline
         for simplex in hull.simplices:
-            plt.plot(selected_points[simplex, 0],
-                     selected_points[simplex, 1], 'r--', linewidth=1)
+            plt.plot(selected_points[simplex, 0], selected_points[simplex, 1], "r--", linewidth=1)
 
         # Annotate all points with their indices
         for i, (x, y) in enumerate(X):
-            plt.text(x, y, str(i), color='gray', fontsize=10, ha='right')
+            plt.text(x, y, str(i), color="gray", fontsize=10, ha="right")
 
         # Accuracy over the neighbors
         acc = accuracy_score(y_test[indices][0], y_pred[indices][0])
-        print(
-            f'Accuracy on the reduced test set of Sample {sample_index} and its nearest neighbors: {acc*100:.1f}%')
 
-        plt.xlabel('Feature 1')
-        plt.ylabel('Feature 2')
+        plt.xlabel("Feature 1")
+        plt.ylabel("Feature 2")
         plt.title(
-            f'Convex Hull of {n_neighbors} points: Sample {sample_index} and its Nearest Neighbors.')
+            f"Convex Hull of {n_neighbors} points: Sample {sample_index} and its Nearest Neighbors (accuracy = {acc*100:.1f}%)"
+        )
         plt.show()
