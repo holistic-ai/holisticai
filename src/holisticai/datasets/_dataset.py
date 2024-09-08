@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Literal, Union
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from holisticai.utils.obj_rep.object_repr import generate_html_for_generic_object
+from holisticai.utils.obj_rep.object_repr import DatasetReprObj
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -16,7 +16,7 @@ import numpy as np
 from numpy.random import RandomState
 
 
-class DatasetDict(dict):
+class DatasetDict(dict, DatasetReprObj):
     """
     A dictionary-like class that represents a collection of datasets. Usually, the keys are train, validation, and test.
 
@@ -42,18 +42,17 @@ class DatasetDict(dict):
         datasets_repr = ",\n    ".join(f"{name}: {dataset}" for name, dataset in self.datasets.items())
         return f"DatasetDict({{\n    {datasets_repr}\n}})"
 
-    def _repr_html_(self):
+    def repr_info(self):
         nested_objs = []
         for name, dataset in self.datasets.items():
             repr_info = dataset.repr_info()
             repr_info["name"] = name
             nested_objs.append(repr_info)
         # Example usage
-        obj = {"dtype": "DatasetDict", "attributes": {}, "nested_objects": nested_objs}
-        return generate_html_for_generic_object(obj, feature_columns=5)
+        return {"dtype": "DatasetDict", "attributes": {}, "nested_objects": nested_objs}
 
 
-class GroupByDataset:
+class GroupByDataset(DatasetReprObj):
     """
     A class representing a Grouped Dataset.
 
@@ -117,9 +116,9 @@ class GroupByDataset:
             f"    }})"
         )
 
-    def _repr_html_(self):
+    def repr_info(self):
         """Returns an HTML representation of the GroupByDataset."""
-        obj = {
+        return {
             "dtype": "GroupByDataset",
             "attributes": {
                 "count": self.ngroups,
@@ -127,7 +126,6 @@ class GroupByDataset:
                 "Features": [" , ".join(self.features)],
             },
         }
-        return generate_html_for_generic_object(obj, feature_columns=5)
 
 
 def dataframe_to_level_dict_with_series(df: pd.DataFrame, row_index: int):
@@ -159,7 +157,7 @@ def dataframe_to_level_dict_with_series(df: pd.DataFrame, row_index: int):
     return data
 
 
-class DataLoader:
+class DataLoader(DatasetReprObj):
     """
     A class that represents a data loader for a dataset. This class is used to load the dataset in batches in a specific data type (jax, pandas, or numpy).
 
@@ -229,8 +227,8 @@ class DataLoader:
         """Iterates over the batches in the dataset."""
         yield from self.batched()
 
-    def _repr_html_(self):
-        obj = {
+    def repr_info(self):
+        return {
             "dtype": "DataLoader",
             "attributes": {
                 "Number of Batches": self.num_batches,
@@ -247,10 +245,15 @@ class DataLoader:
                 }
             ],
         }
-        return generate_html_for_generic_object(obj, feature_columns=5)
+
+    def _repr_mimebundle_(self, **kargs):
+        return {
+            'text/html': DatasetReprObj._repr_html_.__get__(self),  # Usar la representación HTML
+            'text/plain': self.repr_info()     # Usar la representación textual por defecto
+        }
 
 
-class Dataset:
+class Dataset(DatasetReprObj):
     """Represents a dataset.
 
     Parameters
@@ -397,21 +400,16 @@ class Dataset:
         """Returns the number of samples in the dataset."""
         return self.num_rows
 
-    def __repr__(self):
-        return json.dumps(self.repr_info())
-
     def repr_info(self):
         return {
             "dtype": "Dataset",
             "attributes": {
-                "Number of Rows": self.num_rows,
+                "Instances": self.num_rows,
                 "Features": [" , ".join(self.features)],
             },
             "metadata": self._metadata,
         }
 
-    def _repr_html_(self):
-        return generate_html_for_generic_object(self.repr_info(), feature_columns=5)
 
     def __getitem__(self, key: str | int | list):
         """Returns a subset of the dataset based on the given key."""

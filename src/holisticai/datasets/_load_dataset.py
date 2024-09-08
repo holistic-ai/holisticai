@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Union
+from typing import Literal, Optional
 
 import numpy as np
 import pandas as pd
@@ -38,7 +38,7 @@ def create_preprocessor(X, numerical_transform: bool = True, categorical_transfo
     return ColumnTransformer(transformers=transformers)
 
 
-def load_adult_dataset(protected_attribute: Union[Literal["race", "sex"], None] = None, preprocessed: bool = True):
+def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = None, preprocessed: bool = True):
     sensitive_attribute = ["race", "sex"]
     feature_names = [
         "age",
@@ -103,7 +103,7 @@ def load_adult_dataset(protected_attribute: Union[Literal["race", "sex"], None] 
 
 
 def load_law_school_dataset(
-    protected_attribute: Union[Literal["race", "gender"], None] = None, preprocessed: bool = True
+    protected_attribute: Optional[Literal["race", "gender"]] = None, preprocessed: bool = True
 ):
     bunch = load_law_school()
     sensitive_attribute = ["race1", "gender"]
@@ -116,7 +116,7 @@ def load_law_school_dataset(
     if preprocessed:
         y = y.map({"FALSE": 0, "TRUE": 1}).astype("category")
     X = df.drop(drop_columns, axis=1)
-
+    
     if protected_attribute is not None:
         if protected_attribute == "race":
             ga_label = "white"
@@ -139,7 +139,7 @@ def load_law_school_dataset(
 
 
 def load_student_multiclass_dataset(
-    protected_attribute: Union[Literal["sex", "address"], None] = None, preprocessed=True
+    protected_attribute: Optional[Literal["sex", "address"]] = None, preprocessed=True
 ):
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     output_column = "G3"
@@ -189,9 +189,9 @@ def load_student_multiclass_dataset(
 
 
 def load_student_dataset(
-    target: Union[Literal["G1", "G2", "G3"], None] = None,
+    target: Optional[Literal["G1", "G2", "G3"]] = None,
     preprocessed: bool = True,
-    protected_attribute: Union[Literal["sex", "address"], None] = None,
+    protected_attribute: Optional[Literal["sex", "address"]] = None,
 ):
     if target is None:
         target = "G3"
@@ -276,7 +276,7 @@ def load_lastfm_dataset():
     return Dataset(data_pivot=df_pivot, p_attr=pd.Series(p_attr))
 
 
-def load_us_crime_dataset(preprocessed=True, protected_attribute: Union[Literal["race"], None] = None):
+def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and \
     protected group B as numerical arrays or as dataframe if needed
@@ -329,7 +329,7 @@ def load_us_crime_dataset(preprocessed=True, protected_attribute: Union[Literal[
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Union[Literal["race"], None] = None):
+def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -352,9 +352,10 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Uni
     output_column = "ViolentCrimesPerPop"
     df = pd.concat([data["data"], data["target"]], axis=1)
     remove_columns = [*protected_attributes, output_column]
-    y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3)).astype("category")
-    df = df.dropna().reset_index(drop=True)
+    df = df.dropna()
+    df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
+    y_cat = pd.Series(convert_float_to_categorical(df[output_column], 3)).astype("category")
 
     if preprocessed:
         numeric_features = X.select_dtypes(include=[np.number]).columns
@@ -373,7 +374,7 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Uni
             group_b = pd.Series(~group_a, name="group_b")
         else:
             raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attributes}"
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
             )
 
     if protected_attribute is not None:
@@ -382,7 +383,7 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Uni
     return Dataset(X=X, y=y_cat, p_attrs=p_attrs)
 
 
-def load_clinical_records_dataset(protected_attribute: Union[Literal["sex"], None] = None):
+def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] = None):
     """
     Processes the heart dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -437,8 +438,8 @@ ProcessedDatasets = Literal[
 def load_dataset(
     dataset_name: ProcessedDatasets,
     preprocessed: bool = True,
-    protected_attribute: Union[str, None] = None,
-    target: Union[str, None] = None,
+    protected_attribute: Optional[str] = None,
+    target: Optional[str] = None,
 ) -> Dataset:
     """
     Load a specific dataset based on the given dataset name.

@@ -1,9 +1,12 @@
+import inspect
+
 import numpy as np
 
+from holisticai.utils.obj_rep.object_repr import BMReprObj
 from holisticai.utils.transformers._transformer_base import BMTransformerBase
 
 
-class BMPreprocessing(BMTransformerBase):
+class BMPreprocessing(BMTransformerBase, BMReprObj):
     """
     Base Preprocessing transformer
     """
@@ -29,10 +32,29 @@ class BMPreprocessing(BMTransformerBase):
         if ("sample_weight" in kargs) and (kargs["sample_weight"] is not None):
             params.update({"sample_weight": self._to_numpy(kargs, "sample_weight")})
 
-        elif "y" in locals():
-            params.update({"sample_weight": np.ones_like(y).astype(np.float64)})
+        elif "y" in kargs:
+            params.update({"sample_weight": np.ones_like(params["y"]).astype(np.float64)})
 
         elif "X" in kargs:
             params.update({"sample_weight": np.ones(len(params["X"])).astype(np.float64)})
 
         return params
+
+    def repr_info(self):
+        inputs = []
+        for p in inspect.signature(self.__init__).parameters:
+            try:
+                inputs.append(f"{p}={getattr(self,p)}")
+            except:  # noqa: E722, S112
+                continue
+            if len(inputs)==4:
+                inputs.append("...")
+                break
+
+        return {
+            "dtype": self.__class__.__name__,
+            "subtitle": self.__class__.__name__ + "(" + ", ".join(inputs) + ")",
+            "attributes": {
+                "Type": "Bias Mitigation Preprocessing",
+            },
+        }

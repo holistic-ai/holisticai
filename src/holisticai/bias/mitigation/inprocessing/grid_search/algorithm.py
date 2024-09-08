@@ -2,8 +2,9 @@ import copy
 from typing import Any
 
 import pandas as pd
-from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
 from joblib import Parallel, delayed
+
+from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
 
 
 class GridSearchAlgorithm:
@@ -87,7 +88,8 @@ class GridSearchAlgorithm:
         """
         self._load_data(X, y, sensitive_features)
         grid = self._generate_grid()
-
+        
+        """            
         results = Parallel(n_jobs=self.n_jobs, verbose=self.verbose)(
             delayed(self.evaluate_candidate)(
                 X,
@@ -95,6 +97,13 @@ class GridSearchAlgorithm:
             )
             for col_name in grid
         )
+        """
+        results = [self.evaluate_candidate(
+                        X,
+                        grid[col_name],
+                    )
+                    for col_name in grid
+        ]
 
         results = pd.DataFrame(results)
         results["col_name"] = grid.columns
@@ -140,7 +149,7 @@ class GridSearchAlgorithm:
 
     def _compute_weights(self, lambda_vec: Any) -> Any:
         weights = self.constraint.signed_weights(lambda_vec)
-        if not self.constraint.default_objective_lambda_vec:
+        if self.constraint.default_objective_lambda_vec is not None:
             weights += self.objective.signed_weights()
         return weights
 

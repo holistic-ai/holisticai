@@ -1,7 +1,52 @@
 import os
+from abc import abstractmethod
 
 
-def generate_html_for_generic_object(obj, feature_columns=5):
+class ReprObj:
+    @abstractmethod
+    def repr_info(self):
+        return {'obj': {}, 'theme': 'blue'}
+
+    @property
+    def _repr_html_(self):
+        def generate_html():
+            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme='blue')
+        return generate_html
+
+    def _repr_mimebundle_(self, **kargs):
+        return {
+            'text/html': self._repr_html_(),
+            'text/plain': self.__repr__()
+        }
+
+class DatasetReprObj(ReprObj):
+    __theme = "blue"
+
+    @property
+    def _repr_html_(self):
+        def generate_html():
+            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme=self.__theme)
+        return generate_html
+
+class BMReprObj(ReprObj):
+    __theme = "orange"
+
+    @property
+    def _repr_html_(self):
+        def generate_html():
+            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme=self.__theme)
+        return generate_html
+
+class PipelineReprObj(ReprObj):
+    __theme = "green"
+
+    @property
+    def _repr_html_(self):
+        def generate_html():
+            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme=self.__theme)
+        return generate_html
+
+def generate_html_for_generic_object(obj, feature_columns=5, theme="blue"):
     css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "object_repr.css")
 
     with open(css_path) as f:
@@ -11,73 +56,68 @@ def generate_html_for_generic_object(obj, feature_columns=5):
     <style>
         {css_template}
     </style>
-    <div class="generic-object-container">
+    <div style="display: flex;">
+    <div class="generic-object-container {theme} first-level">
         <div class="generic-object-content">
-            <div class="generic-object-header">{header}</div>
+            <div class="generic-object-header {theme}" onclick="toggleCollapse(this)">
+                <button class="toggle-button {theme}">[-]</button> {header}
+            </div>
             <div class="generic-object-body">
                 {attributes}
                 {nested_objects}
             </div>
         </div>
     </div>
+</div>
+    <script>
+    function toggleCollapse(element) {{
+        var body = element.nextElementSibling;
+        var button = element.querySelector(".toggle-button");
+        if (body.classList.contains('hidden')) {{
+            body.classList.remove('hidden');
+            button.textContent = "[-]";
+        }} else {{
+            body.classList.add('hidden');
+            button.textContent = "[+]";
+        }}
+    }}
+    </script>
     """
 
-    # Extract generic object information
     name = obj.get("name", "N/A")
-    obj_type = obj.get("dtype", "N/A").upper()
+    obj_type = obj.get("dtype", "N/A")
     attributes = obj.get("attributes", {})
     metadata = obj.get("metadata", None)
+    subtitle = obj.get("subtitle", None)
     nested_objects = obj.get("nested_objects", [])
 
-    # Generate HTML for attributes
     attributes_html = ""
+    if subtitle is not None:
+        attributes_html += f'<div class="attribute-list {theme}"><center>{subtitle}</center></div>'
+
+    if attributes_html!="" and (attributes != {} or metadata is not None):
+        attributes_html += '<hr>'
+
     for key, value in attributes.items():
         if isinstance(value, list):
-            value = ", ".join(map(str, value))  # noqa: PLW2901
-        attributes_html += f'<div class="attribute-list">- {key}: {value}</div>'
+            value = ", ".join(map(str, value))
+        attributes_html += f'<div class="attribute-list {theme}"><strong>{key.capitalize()}</strong>: {value}</div>'
 
     if isinstance(metadata, str):
-        attributes_html += f'<div class="attribute-list">- Metadata: {metadata}</div>'
+        attributes_html += f'<div class="attribute-list {theme}"><strong>Metadata</strong>: {metadata}</div>'
     elif isinstance(metadata, dict):
-        for key, value in attributes.items():
+        for key, value in metadata.items():
             if isinstance(value, list):
-                value = ", ".join(map(str, value))  # noqa: PLW2901
-            attributes_html += f'<div class="attribute-list">- {key}: {value}</div>'
+                value = ", ".join(map(str, value))
+            attributes_html += f'<div class="attribute-list {theme}"><strong>{key.capitalize()}</strong>: {value}</div>'
 
-    # Generate HTML for nested objects
     nested_objects_html = ""
     for nested_obj in nested_objects:
-        nested_objects_html += generate_html_for_generic_object(nested_obj, feature_columns)
+        nested_objects_html += generate_html_for_generic_object(nested_obj, feature_columns, theme)
 
-    # Fill the main HTML template with attributes and nested objects
-    header = f"{obj_type}" if name in ("N/A", "") else f"{name} : {obj_type}"
+    header = f"[{obj_type}]" if name in ("N/A", "") else f"{name} [{obj_type}]"
     html_output = html_template.format(
-        header=header, attributes=attributes_html, nested_objects=nested_objects_html, css_template=css_template
+        header=header, attributes=attributes_html, nested_objects=nested_objects_html, css_template=css_template, theme=theme
     )
 
     return html_output
-
-
-if __name__ == "__main__":
-    # Example usage
-    generic_object = {
-        "dtype": "DatasetDict",
-        "attributes": {},
-        "nested_objects": [
-            {
-                "dtype": "Dataset",
-                "name": "train",
-                "attributes": {"Number of Rows": 2480, "Features": ["x", "y", "group_a", "group_b"]},
-                "nested_objects": [],
-            },
-            {
-                "dtype": "Dataset",
-                "name": "test",
-                "attributes": {"Number of Rows": 2480, "Features": ["x", "y", "group_a", "group_b"]},
-                "nested_objects": [],
-            },
-        ],
-    }
-
-    # Generate HTML representation for the generic object
-    html_output_generic_object = generate_html_for_generic_object(generic_object, feature_columns=5)

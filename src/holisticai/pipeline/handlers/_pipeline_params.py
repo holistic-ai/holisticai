@@ -19,7 +19,7 @@ class ParametersHandler:
     def __setitem__(self, param_name, param_value):
         self.dict_params[param_name] = param_value
 
-    def feed(self, params, return_dropped=False):
+    def feed_and_drop(self, params):
         dropped_params = {}
         self.clean_parameters()
         if self.step_name:
@@ -38,9 +38,7 @@ class ParametersHandler:
                 else:
                     dropped_params[name] = value
 
-        if return_dropped:
-            return dropped_params
-        return None
+        return dropped_params
 
 
 class PipelineParametersHandler:

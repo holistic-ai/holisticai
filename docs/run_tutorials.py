@@ -29,8 +29,8 @@ def copy_folder(origen, destino):
     try:
         if not os.path.exists(destino):
             os.makedirs(destino)
+        #run_all_notebooks(origen)
         shutil.copytree(origen, destino, dirs_exist_ok=True)
-        #run_all_notebooks(destino)
         print(f"Folder copied from {origen} to {destino} sucessfully.")
     except Exception as e:
         print(f"Error when trying to copy folder: {e}")
