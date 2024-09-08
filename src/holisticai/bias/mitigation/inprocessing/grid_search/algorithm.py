@@ -2,8 +2,6 @@ import copy
 from typing import Any
 
 import pandas as pd
-from joblib import Parallel, delayed
-
 from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
 
 
@@ -88,7 +86,7 @@ class GridSearchAlgorithm:
         """
         self._load_data(X, y, sensitive_features)
         grid = self._generate_grid()
-        
+
         """            
         results = Parallel(n_jobs=self.n_jobs, verbose=self.verbose)(
             delayed(self.evaluate_candidate)(

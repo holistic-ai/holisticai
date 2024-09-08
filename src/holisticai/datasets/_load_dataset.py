@@ -116,7 +116,7 @@ def load_law_school_dataset(
     if preprocessed:
         y = y.map({"FALSE": 0, "TRUE": 1}).astype("category")
     X = df.drop(drop_columns, axis=1)
-    
+
     if protected_attribute is not None:
         if protected_attribute == "race":
             ga_label = "white"

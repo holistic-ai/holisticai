@@ -10,7 +10,6 @@ from holisticai.utils.obj_rep.object_repr import DatasetReprObj
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-import json
 
 import numpy as np
 from numpy.random import RandomState

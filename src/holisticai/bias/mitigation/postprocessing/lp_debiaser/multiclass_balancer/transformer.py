@@ -1,7 +1,6 @@
 from typing import Literal
 
 import numpy as np
-
 from holisticai.bias.mitigation.postprocessing.lp_debiaser.multiclass_balancer.algorithm import (
     MulticlassBalancerAlgorithm,
 )
