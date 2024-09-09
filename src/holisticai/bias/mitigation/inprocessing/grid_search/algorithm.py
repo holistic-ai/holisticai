@@ -1,8 +1,11 @@
 import copy
+import logging
 from typing import Any
 
-import pandas as pd
 from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
+from joblib import Parallel, delayed
+
+logger = logging.getLogger(__name__)
 
 
 class GridSearchAlgorithm:
@@ -86,28 +89,26 @@ class GridSearchAlgorithm:
         """
         self._load_data(X, y, sensitive_features)
         grid = self._generate_grid()
+        col_names = grid.columns
 
-        """            
-        results = Parallel(n_jobs=self.n_jobs, verbose=self.verbose)(
-            delayed(self.evaluate_candidate)(
-                X,
-                grid[col_name],
+        results = list(
+            Parallel(n_jobs=self.n_jobs, verbose=self.verbose)(
+                delayed(self.evaluate_candidate)(
+                    X,
+                    grid[col_name],
+                )
+                for col_name in col_names
             )
-            for col_name in grid
         )
-        """
-        results = [self.evaluate_candidate(
-                        X,
-                        grid[col_name],
-                    )
-                    for col_name in grid
-        ]
+        if not results:
+            raise ValueError("No results were generated. This is likely due to an issue with the grid.")
 
-        results = pd.DataFrame(results)
-        results["col_name"] = grid.columns
-        best_idx = results["loss"].idxmin()
-        best_colname = results["col_name"].iloc[best_idx]
-        self.bet_predictor = self._fit_estimator(X, grid[best_colname])
+        def loss_fct(result):
+            return (1 - self.constraint_weight) * result["objective"] + self.constraint_weight * result["gamma"].max()
+
+        losses = [loss_fct(result) for result in results]
+        self.best_idx_ = losses.index(min(losses))
+        self.best_predictor = self._fit_estimator(X, results[self.best_idx_]["lambda_vec"])  # type: ignore
         return self
 
     def evaluate_candidate(self, X, lambda_vec):
@@ -118,17 +119,42 @@ class GridSearchAlgorithm:
 
         objective = self.objective.gamma(predict_fn).iloc[0]
         gamma = self.constraint.gamma(predict_fn)
-        loss = (1 - self.constraint_weight) * objective + self.constraint_weight * gamma.max()
-        return {"loss": loss, "lambda_vec": lambda_vec}
+        return {"gamma": gamma, "objective": objective, "lambda_vec": lambda_vec}
 
     def _load_data(self, X: Any, y: Any, sensitive_features: Any):
         self.constraint.load_data(X, y, sensitive_features)
         self.objective.load_data(X, y, sensitive_features)
 
     def _generate_grid(self) -> Any:
+        """
+        Generates a grid of lambda vectors based on the constraint and grid parameters.
+        Ensures the grid is of adequate size and dimensionality.
+        """
+        # Check if negative values are allowed in the grid
         neg_allowed = self.constraint.neg_basis_present
+
+        # Check if the L1 norm must be enforced
         objective_in_the_span = self.constraint.default_objective_lambda_vec is not None
 
+        # Adjust dimensionality according to whether the L1 norm is enforced
+        if objective_in_the_span:
+            true_dim = self.constraint.basis["+"].shape[1] - 1
+        else:
+            true_dim = self.constraint.basis["-"].shape[1]
+
+        # Warning if the grid has too many dimensions
+        GRID_DIMENSION_WARN_THRESHOLD = 4
+        if true_dim > GRID_DIMENSION_WARN_THRESHOLD:
+            logger.warning(f"Warning: the grid has {true_dim} dimensions, which could be prohibitive in terms of size.")
+
+        # Minimum grid size verification
+        recommended_min_grid_size = 2**true_dim
+        if self.grid_size < recommended_min_grid_size:
+            logger.warning(
+                f"Warning: the grid size is {self.grid_size}, a minimum of {recommended_min_grid_size} is recommended."
+            )
+
+        # Inicializar el generador de grid
         generator = GridGenerator(
             grid_size=self.grid_size,
             grid_limit=self.grid_limit,
@@ -136,7 +162,10 @@ class GridSearchAlgorithm:
             force_L1_norm=objective_in_the_span,
         )
 
-        return generator.generate_grid(self.constraint)
+        # Generar la grid de coeficientes
+        grid = generator.generate_grid(self.constraint)
+        grid = grid.loc[:, ~(grid == 0).all(axis=0)]
+        return grid
 
     def _fit_estimator(self, X: Any, lambda_vec: Any):
         weights = self._compute_weights(lambda_vec)
@@ -160,7 +189,7 @@ class GridSearchAlgorithm:
         return y_reduction, weights
 
     def predict(self, X: Any) -> Any:
-        return self.bet_predictor.predict(X)
+        return self.best_predictor.predict(X)
 
     def predict_proba(self, X: Any) -> Any:
-        return self.bet_predictor.predict_proba(X)
+        return self.best_predictor.predict_proba(X)
