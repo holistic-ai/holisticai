@@ -49,7 +49,7 @@ class BMPostprocessing(BMTransformerBase, BMReprObj):
         for param_name in params_to_numpy_format:
             if self._has_valid_argument(kargs, param_name):
                 for group_param in ["group_a", "group_b"]:
-                    if not isinstance(kargs.get(group_param), pd.Series | np.ndarray):
+                    if any(isinstance(kargs.get(group_param), dtype) for dtype in [pd.Series, np.ndarray]):
                         message = f"{group_param} must be a numpy array or pandas series"
                         raise TypeError(message)
                     if kargs.get(group_param).dtype != bool:
