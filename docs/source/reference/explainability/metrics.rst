@@ -36,6 +36,7 @@
     :template: function.rst
     :toctree: .generated/
 
-    weighted_tree_depth
-    weighted_tree_gini
     tree_depth_variance
+    weighted_average_depth
+    weighted_average_explainability_score
+    weighted_tree_gini

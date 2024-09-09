@@ -2,7 +2,7 @@ import numpy as np
 import sklearn
 
 
-class WeightedTreeDepth:
+class WeightedAverageDepth:
     """
     Represents the Weighted Average Depth metric.
     """
@@ -25,30 +25,23 @@ class WeightedTreeDepth:
         Returns:
             float: The weighted average depth value.
         """
-        if self.ignore_repeated:
-            depths, counts = get_cuts_counts(0, tree, [], [], set())
-        else:
-            depths, counts = get_depths_counts(0, tree, [], [])
+
+        depths, counts = get_depths_counts(0, tree, [], [])
         n_samples = sum(counts)
         depths = np.array(depths)
         weights = np.array(counts) / n_samples
         return (depths * weights).sum()
 
 
-def weighted_tree_depth(tree: sklearn.tree._tree.Tree, ignore_repeated: bool = True):
+def weighted_average_depth(tree: sklearn.tree._tree.Tree):
     """
     Weighted Average Depth calculates the average depth of a tree considering the number
-    of samples that pass through each cut. With (WAD) and without (WAES) redundancies.
+    of samples that pass through each cut.
 
     Parameters
     ----------
     tree: sklearn.tree._tree.Tree
         The tree to calculate the weighted average depth of.
-
-    ignore_repeated: bool, optional
-        Whether to ignore repeated cuts. If True, the weighted average explainability score (WAES) will be computed
-        considering the number of samples that pass through each cut. If False, the weighted
-        average depth (WAD) will be computed considering the number of nodes that pass through each cut.
 
     Returns
     -------
@@ -63,10 +56,83 @@ def weighted_tree_depth(tree: sklearn.tree._tree.Tree, ignore_repeated: bool = T
     >>> X, y = load_iris(return_X_y=True)
     >>> clf = DecisionTreeClassifier()
     >>> clf.fit(X, y)
-    >>> weighted_tree_depth(clf.tree_, False)
-    >>> weighted_tree_depth(clf.tree_, True)
+    >>> weighted_average_depth(clf.tree_)
+
+    Reference
+    ----------
+        Laber, E., Murtinho, L., & Oliveira, F. (2023).
+        Shallow decision trees for explainable k-means clustering.
+        Pattern Recognition, 137, 109239.
     """
-    metric = WeightedTreeDepth(ignore_repeated)
+    metric = WeightedAverageDepth()
+    return metric(tree)
+
+
+class WeightedAverageExplainabilityScore:
+    """
+    Represents the Weighted Average Explainability Score.
+    """
+
+    reference: int = 0
+    name: str = "Weighted Average Explainability Score"
+
+    def __init__(self, ignore_repeated: bool = True):
+        self.ignore_repeated = ignore_repeated
+
+    def __call__(self, tree: sklearn.tree._tree.Tree):
+        """
+        Calculates the weighted average depth of a tree.
+
+        Parameters
+        ----------
+        tree: sklearn.tree._tree.Tree
+            The tree to calculate the weighted average depth of.
+
+        Returns:
+            float: The weighted average depth value.
+        """
+
+        depths, counts = get_cuts_counts(0, tree, [], [], set())
+        n_samples = sum(counts)
+        depths = np.array(depths)
+        weights = np.array(counts) / n_samples
+        return (depths * weights).sum()
+
+
+def weighted_average_explainability_score(tree: sklearn.tree._tree.Tree):
+    """
+    Weighted Average Explainability Score calculates the average depth of a tree considering the number
+    of samples that pass through each cut.
+
+    Parameters
+    ----------
+    tree: sklearn.tree._tree.Tree
+        The tree to calculate the weighted average depth of.
+
+    Returns
+    -------
+    float
+        The weighted average depth value
+
+    Examples
+    --------
+    >>> from sklearn.datasets import load_iris
+    >>> from sklearn.tree import DecisionTreeClassifier
+    >>> from holisticai.explainability.metrics import (
+    ...     weighted_average_explainability_score,
+    ... )
+    >>> X, y = load_iris(return_X_y=True)
+    >>> clf = DecisionTreeClassifier()
+    >>> clf.fit(X, y)
+    >>> weighted_average_explainability_score(clf.tree_)
+
+    Reference
+    ----------
+        Laber, E., Murtinho, L., & Oliveira, F. (2023).
+        Shallow decision trees for explainable k-means clustering.
+        Pattern Recognition, 137, 109239.
+    """
+    metric = WeightedAverageExplainabilityScore()
     return metric(tree)
 
 
@@ -86,8 +152,6 @@ def is_leaf(node_index, tree):
     bool
         Whether the node is a leaf or not.
     """
-    if hasattr(tree, "left") and hasattr(tree, "right"):
-        return node_index.is_leaf()
     return tree.children_left[node_index] == -1 and tree.children_right[node_index] == -1
 
 
@@ -119,15 +183,15 @@ def get_cuts_counts(node_index, tree, cuts, counts, cur_set):
         cuts.append(len(cur_set))
         counts.append(tree.n_node_samples[node_index])
     else:
-        left_set = cur_set.copy()
-        left_set.add((tree.feature[node_index], -1))
-        right_set = cur_set.copy()
-        right_set.add((tree.feature[node_index], 1))
+        children_left_set = cur_set.copy()
+        children_left_set.add((tree.feature[node_index], -1))
+        children_right_set = cur_set.copy()
+        children_right_set.add((tree.feature[node_index], 1))
 
         if tree.children_left[node_index] != -1:
-            get_cuts_counts(tree.children_left[node_index], tree, cuts, counts, left_set)
+            get_cuts_counts(tree.children_left[node_index], tree, cuts, counts, children_left_set)
         if tree.children_right[node_index] != -1:
-            get_cuts_counts(tree.children_right[node_index], tree, cuts, counts, right_set)
+            get_cuts_counts(tree.children_right[node_index], tree, cuts, counts, children_right_set)
     return cuts, counts
 
 
@@ -196,21 +260,31 @@ class WeightedTreeGini:
             p = node_value / node_samples
             return 1.0 - np.sum(p**2)
 
-        weighted_gini = 0.0
+        def variance_impurity(node_index):
+            node_samples = tree.n_node_samples[node_index]
+            if node_samples == 0:
+                return 0.0
+            node_value = tree.value[node_index, 0, :]
+            mean_value = np.mean(node_value)
+            return np.sum((node_value - mean_value) ** 2) / node_samples
+
+        is_classification = tree.n_classes[0] > 1
+
+        weighted_impurity = 0.0
         total_samples = tree.n_node_samples[0]
 
-        def accumulate_gini(node_index):
-            nonlocal weighted_gini
+        def accumulate_impurity(node_index):
+            nonlocal weighted_impurity
             if is_leaf(node_index, tree):
                 node_samples = tree.n_node_samples[node_index]
-                gini = gini_impurity(node_index)
-                weighted_gini += (node_samples / total_samples) * gini
+                impurity = gini_impurity(node_index) if is_classification else variance_impurity(node_index)
+                weighted_impurity += (node_samples / total_samples) * impurity
             else:
-                accumulate_gini(tree.children_left[node_index])
-                accumulate_gini(tree.children_right[node_index])
+                accumulate_impurity(tree.children_left[node_index])
+                accumulate_impurity(tree.children_right[node_index])
 
-        accumulate_gini(0)
-        return weighted_gini
+        accumulate_impurity(0)
+        return weighted_impurity
 
 
 def weighted_tree_gini(tree):

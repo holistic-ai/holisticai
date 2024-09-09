@@ -14,14 +14,6 @@ from holisticai.explainability.metrics.global_importance._surrogate import (
     surrogate_accuracy_score,
     surrogate_mean_squared_error,
 )
-from holisticai.explainability.metrics.global_importance._tree import (
-    TreeDepthVariance,
-    WeightedTreeDepth,
-    WeightedTreeGini,
-    tree_depth_variance,
-    weighted_tree_depth,
-    weighted_tree_gini,
-)
 from holisticai.explainability.metrics.global_importance._xai_ease_score import XAIEaseScore, xai_ease_score
 
 __all__ = [
@@ -31,9 +23,6 @@ __all__ = [
     "RankAlignment",
     "SpreadRatio",
     "SpreadDivergence",
-    "WeightedTreeDepth",
-    "WeightedTreeGini",
-    "TreeDepthVariance",
     "alpha_score",
     "xai_ease_score",
     "position_parity",
@@ -42,7 +31,4 @@ __all__ = [
     "spread_divergence",
     "surrogate_accuracy_score",
     "surrogate_mean_squared_error",
-    "weighted_tree_depth",
-    "weighted_tree_gini",
-    "tree_depth_variance",
 ]
