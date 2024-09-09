@@ -47,7 +47,7 @@ class BMPreprocessing(BMTransformerBase, BMReprObj):
                 inputs.append(f"{p}={getattr(self,p)}")
             except:  # noqa: E722, S112
                 continue
-            if len(inputs)==4:
+            if len(inputs) == 4:
                 inputs.append("...")
                 break
 

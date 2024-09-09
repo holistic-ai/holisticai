@@ -245,12 +245,6 @@ class DataLoader(DatasetReprObj):
             ],
         }
 
-    def _repr_mimebundle_(self, **kargs):
-        return {
-            'text/html': DatasetReprObj._repr_html_.__get__(self),  # Usar la representación HTML
-            'text/plain': self.repr_info()     # Usar la representación textual por defecto
-        }
-
 
 class Dataset(DatasetReprObj):
     """Represents a dataset.
@@ -408,7 +402,6 @@ class Dataset(DatasetReprObj):
             },
             "metadata": self._metadata,
         }
-
 
     def __getitem__(self, key: str | int | list):
         """Returns a subset of the dataset based on the given key."""

@@ -169,16 +169,18 @@ class Pipeline(PipelineReprObj, SKLPipeline, PipelineHelper):
             for p in inspect.signature(s[1].__init__).parameters:
                 try:
                     inputs.append(f"{p}={getattr(s[1],p)}")
-                except:  # noqa: S112
+                except Exception as _:  # noqa: BLE001, S112
                     continue
-                if len(inputs)==4:
+                if len(inputs) == 4:
                     inputs.append("...")
                     break
-            nested_objects.append({
+            nested_objects.append(
+                {
                     "dtype": s[1].__class__.__name__,
                     "name": s[0],
-                    "subtitle": s[1].__class__.__name__ + "(" + ", ".join(inputs) + ")"
-                })
+                    "subtitle": s[1].__class__.__name__ + "(" + ", ".join(inputs) + ")",
+                }
+            )
 
         return {
             "dtype": self.__class__.__name__,

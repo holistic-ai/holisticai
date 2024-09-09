@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 
 from holisticai.utils._validation import _check_valid_y_proba
-from holisticai.utils.obj_rep.object_repr import ReprObj
+from holisticai.utils.obj_rep.object_repr import BMReprObj
 from holisticai.utils.transformers._transformer_base import BMTransformerBase
 
 
-class BMPostprocessing(BMTransformerBase, ReprObj):
+class BMPostprocessing(BMTransformerBase, BMReprObj):
     """
     Base Post Processing transformer
     """
@@ -49,12 +49,12 @@ class BMPostprocessing(BMTransformerBase, ReprObj):
         for param_name in params_to_numpy_format:
             if self._has_valid_argument(kargs, param_name):
                 for group_param in ["group_a", "group_b"]:
-                    if not isinstance(kargs.get(group_param), pd.Series|np.ndarray):
-                        message  = f"{group_param} must be a numpy array or pandas series"
-                        raise ValueError(message)
+                    if not isinstance(kargs.get(group_param), pd.Series | np.ndarray):
+                        message = f"{group_param} must be a numpy array or pandas series"
+                        raise TypeError(message)
                     if kargs.get(group_param).dtype != bool:
                         message = f"{group_param} must be a boolean array"
-                        raise ValueError(message)
+                        raise TypeError(message)
                     kargs.update({group_param: np.array(kargs.get(group_param))})
                 params.update({param_name: self._to_numpy(kargs, param_name)})
 
@@ -80,7 +80,7 @@ class BMPostprocessing(BMTransformerBase, ReprObj):
                 inputs.append(f"{p}={getattr(self,p)}")
             except:  # noqa: E722, S112
                 continue
-            if len(inputs)==4:
+            if len(inputs) == 4:
                 inputs.append("...")
                 break
 

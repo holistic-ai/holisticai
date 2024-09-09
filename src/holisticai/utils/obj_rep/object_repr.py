@@ -3,48 +3,37 @@ from abc import abstractmethod
 
 
 class ReprObj:
+    _theme = "blue"
+
     @abstractmethod
     def repr_info(self):
-        return {'obj': {}, 'theme': 'blue'}
+        return {}
 
     @property
     def _repr_html_(self):
         def generate_html():
-            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme='blue')
+            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme="blue")
+
         return generate_html
 
-    def _repr_mimebundle_(self, **kargs):
-        return {
-            'text/html': self._repr_html_(),
-            'text/plain': self.__repr__()
-        }
+    def repr_html(self):
+        return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme=self._theme)
+
+    def _repr_mimebundle_(self, **_):
+        return {"text/html": self.repr_html(), "text/plain": self.repr_info()}
+
 
 class DatasetReprObj(ReprObj):
-    __theme = "blue"
+    _theme = "blue"
 
-    @property
-    def _repr_html_(self):
-        def generate_html():
-            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme=self.__theme)
-        return generate_html
 
 class BMReprObj(ReprObj):
-    __theme = "orange"
+    _theme = "orange"
 
-    @property
-    def _repr_html_(self):
-        def generate_html():
-            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme=self.__theme)
-        return generate_html
 
 class PipelineReprObj(ReprObj):
-    __theme = "green"
+    _theme = "green"
 
-    @property
-    def _repr_html_(self):
-        def generate_html():
-            return generate_html_for_generic_object(self.repr_info(), feature_columns=5, theme=self.__theme)
-        return generate_html
 
 def generate_html_for_generic_object(obj, feature_columns=5, theme="blue"):
     css_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "object_repr.css")
@@ -95,21 +84,25 @@ def generate_html_for_generic_object(obj, feature_columns=5, theme="blue"):
     if subtitle is not None:
         attributes_html += f'<div class="attribute-list {theme}"><center>{subtitle}</center></div>'
 
-    if attributes_html!="" and (attributes != {} or metadata is not None):
-        attributes_html += '<hr>'
+    if attributes_html != "" and (attributes != {} or metadata is not None):
+        attributes_html += "<hr>"
 
     for key, value in attributes.items():
+        value_ = value
         if isinstance(value, list):
-            value = ", ".join(map(str, value))
-        attributes_html += f'<div class="attribute-list {theme}"><strong>{key.capitalize()}</strong>: {value}</div>'
+            value_ = ", ".join(map(str, value))
+        attributes_html += f'<div class="attribute-list {theme}"><strong>{key.capitalize()}</strong>: {value_}</div>'
 
     if isinstance(metadata, str):
         attributes_html += f'<div class="attribute-list {theme}"><strong>Metadata</strong>: {metadata}</div>'
     elif isinstance(metadata, dict):
         for key, value in metadata.items():
+            value_ = value
             if isinstance(value, list):
-                value = ", ".join(map(str, value))
-            attributes_html += f'<div class="attribute-list {theme}"><strong>{key.capitalize()}</strong>: {value}</div>'
+                value_ = ", ".join(map(str, value))
+            attributes_html += (
+                f'<div class="attribute-list {theme}"><strong>{key.capitalize()}</strong>: {value_}</div>'
+            )
 
     nested_objects_html = ""
     for nested_obj in nested_objects:
@@ -117,7 +110,11 @@ def generate_html_for_generic_object(obj, feature_columns=5, theme="blue"):
 
     header = f"[{obj_type}]" if name in ("N/A", "") else f"{name} [{obj_type}]"
     html_output = html_template.format(
-        header=header, attributes=attributes_html, nested_objects=nested_objects_html, css_template=css_template, theme=theme
+        header=header,
+        attributes=attributes_html,
+        nested_objects=nested_objects_html,
+        css_template=css_template,
+        theme=theme,
     )
 
     return html_output
