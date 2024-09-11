@@ -102,9 +102,7 @@ def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = N
     return Dataset(X=xt, y=y, p_attrs=p_attrs)
 
 
-def load_law_school_dataset(
-    protected_attribute: Optional[Literal["race", "gender"]] = None, preprocessed: bool = True
-):
+def load_law_school_dataset(protected_attribute: Optional[Literal["race", "gender"]] = None, preprocessed: bool = True):
     bunch = load_law_school()
     sensitive_attribute = ["race1", "gender"]
     output_variable = "bar"
@@ -138,9 +136,7 @@ def load_law_school_dataset(
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_student_multiclass_dataset(
-    protected_attribute: Optional[Literal["sex", "address"]] = None, preprocessed=True
-):
+def load_student_multiclass_dataset(protected_attribute: Optional[Literal["sex", "address"]] = None, preprocessed=True):
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     output_column = "G3"
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
