@@ -1,5 +1,5 @@
 HolisticAI documentation
-===================
+========================
 
 .. image:: https://img.shields.io/pypi/v/holisticai
 .. image:: https://img.shields.io/pypi/dm/holisticai.svg?label=PyPI%20downloads

@@ -1,17 +1,11 @@
 name: Test and Lint feature/bugfix branches
 
 on:
-  push:
-    branches:
-      - 'feature/*'
-      - 'bugfix/*'
-    paths-ignore:
-      - '**.md'
-      - '**.rst'
-
   pull_request:
     branches:
       - main
+      - 'feature/*'
+      - 'bugfix/*'
     paths-ignore:
       - '**.md'
       - '**.rst'

@@ -7,6 +7,9 @@ from holisticai.explainability.metrics._multiclass import (
 from holisticai.explainability.metrics._regression import (
     regression_explainability_metrics,
 )
+from holisticai.explainability.metrics._tree import (
+    tree_explainability_metrics,
+)
 from holisticai.explainability.metrics.global_importance import (
     alpha_score,
     position_parity,
@@ -20,11 +23,18 @@ from holisticai.explainability.metrics.global_importance import (
 from holisticai.explainability.metrics.local_importance import (
     feature_stability,
 )
+from holisticai.explainability.metrics.tree import (
+    tree_depth_variance,
+    weighted_average_depth,
+    weighted_average_explainability_score,
+    weighted_tree_gini,
+)
 
 __all__ = [
     "classification_explainability_metrics",
     "multiclass_explainability_metrics",
     "regression_explainability_metrics",
+    "tree_explainability_metrics",
     "alpha_score",
     "position_parity",
     "rank_alignment",
@@ -34,4 +44,8 @@ __all__ = [
     "feature_stability",
     "surrogate_accuracy_score",
     "surrogate_mean_squared_error",
+    "weighted_average_depth",
+    "weighted_average_explainability_score",
+    "weighted_tree_gini",
+    "tree_depth_variance",
 ]

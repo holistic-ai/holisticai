@@ -25,5 +25,17 @@
     :nosignatures:
     :template: function.rst
     :toctree: .generated/
-
+    
     feature_stability
+
+**Tree Based Metrics**
+
+.. autosummary::
+    :nosignatures:
+    :template: function.rst
+    :toctree: .generated/
+
+    tree_depth_variance
+    weighted_average_depth
+    weighted_average_explainability_score
+    weighted_tree_gini

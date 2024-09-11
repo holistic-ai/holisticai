@@ -2,11 +2,11 @@ import inspect
 
 import numpy as np
 
-from holisticai.utils.obj_rep.object_repr import ReprObj
+from holisticai.utils.obj_rep.object_repr import BMReprObj
 from holisticai.utils.transformers._transformer_base import BMTransformerBase
 
 
-class BMInprocessing(BMTransformerBase, ReprObj):
+class BMInprocessing(BMTransformerBase, BMReprObj):
     """
     Base Inprocessing transformer
     """
@@ -45,7 +45,7 @@ class BMInprocessing(BMTransformerBase, ReprObj):
                 inputs.append(f"{p}={getattr(self,p)}")
             except:  # noqa: E722, S112
                 continue
-            if len(inputs)==4:
+            if len(inputs) == 4:
                 inputs.append("...")
                 break
 
