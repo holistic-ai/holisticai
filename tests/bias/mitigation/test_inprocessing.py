@@ -78,7 +78,8 @@ def test_multiclass_inprocessor(mitigator_name, mitigator_params, model_params, 
 
 @pytest.mark.parametrize("mitigator_name, mitigator_params, model_params", [
     ("ExponentiatedGradientReduction", {"seed":1}, {"random_state":42}),
-    ("GridSearchReduction", {},  {"random_state":42}),
+    ("GridSearchReduction", {"constraints":"EqualizedOdds", "loss":"Square", "min_val":-0.1, "max_val":1.3, 
+                                         "grid_size":20},  {"random_state":42}),
     #("MetaFairClassifier", {"seed":1}, {"random_state":42}),
     ("PrejudiceRemover", {}, {"random_state":42}),
 ])

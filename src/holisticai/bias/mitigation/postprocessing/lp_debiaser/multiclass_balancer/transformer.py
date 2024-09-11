@@ -77,8 +77,8 @@ class LPDebiaserMulticlass(BMPost):
         """
         params = self._load_data(y=y, y_pred=y_pred, group_a=group_a, group_b=group_b)
 
-        group_a = params["group_a"] == 1
-        group_b = params["group_b"] == 1
+        group_a = params["group_a"]
+        group_b = params["group_b"]
         y = params["y"]
         y_pred = params["y_pred"]
 
@@ -122,8 +122,8 @@ class LPDebiaserMulticlass(BMPost):
 
         params = self._load_data(y_pred=y_pred, group_a=group_a, group_b=group_b)
 
-        group_a = params["group_a"] == 1
-        group_b = params["group_b"] == 1
+        group_a = params["group_a"]
+        group_b = params["group_b"]
         y_pred = params["y_pred"]
 
         sensitive_features = np.stack([group_a, group_b], axis=1)

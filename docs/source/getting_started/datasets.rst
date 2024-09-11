@@ -38,7 +38,7 @@ Processed datasets are refined and structured for specific machine learning task
 - **Target**: If the dataset has more than one target, the primary target is specified here.
 
 .. csv-table:: Processed Datasets
-    :header: "Dataset", "Load Data Method", "Learning Task", "Technical Risk"
+    :header: "dataset_name", "Dataset", "Learning Task", "protected_attribute"
     :file: datasets.csv
     :widths: 7, 7, 7, 7
 
@@ -49,4 +49,4 @@ You can use this processed datasets using the function load_dataset from holisti
 
    from holisticai.datasets import load_dataset
     
-    dataset = load_dataset("adult", processed=True, protected_attribute="sex")
+    dataset = load_dataset(dataset_name="adult", processed=True, protected_attribute="sex")

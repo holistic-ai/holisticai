@@ -23,7 +23,7 @@ class ClassificationConstraint(BaseMoment):
 
     PROBLEM_TYPE = "classification"
 
-    def __init__(self, ratio_bound: Optional[float] = 1.0):
+    def __init__(self, ratio_bound: float = 1.0):
         """
         Initialize with the ratio value.
 
@@ -43,7 +43,7 @@ class ClassificationConstraint(BaseMoment):
         y,
         sensitive_features: pd.Series,
         event: pd.Series,
-        utilities: np.ndarray = None,
+        utilities: Optional[np.ndarray] = None,
     ):
         """
         Description
@@ -83,6 +83,7 @@ class ClassificationConstraint(BaseMoment):
         self.event_prob = self.tags[_EVENT].dropna().value_counts() / len(self.tags)
 
         # Groups and Events
+        self.group_prob = self.tags.groupby(_GROUP_ID).size() / self.total_samples
         self.group_values = np.sort(self.tags[_GROUP_ID].unique())
         self.group_event_prob = (
             self.tags.dropna(subset=[_EVENT]).groupby([_EVENT, _GROUP_ID]).count() / len(self.tags)
@@ -91,6 +92,16 @@ class ClassificationConstraint(BaseMoment):
         self.index = self._get_index_format()
         self.default_objective_lambda_vec = None
         self._get_basis()
+        self.U = pd.DataFrame(0, index=self.tags.index, columns=self.index)
+        for e, g in self.group_event_prob.index:
+            event_select = 1 * (self.tags[_EVENT] == e)
+            group_event_select = event_select * (self.tags[_GROUP_ID] == g)
+            self.U["+", e, g] = (
+                event_select / self.event_prob[e] + (-self.ratio) * group_event_select / self.group_event_prob[e, g]
+            )
+            self.U["-", e, g] = (-self.ratio) * event_select / self.event_prob[
+                e
+            ] + group_event_select / self.group_event_prob[e, g]
 
     def signed_weights(self, lambda_vec):
         """
@@ -136,8 +147,8 @@ class ClassificationConstraint(BaseMoment):
         utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         predictions = np.squeeze(predictor(self.X))
         pred = utility_diff.T * predictions + self.utilities[:, 0]
-
-        return self._gamma_signed(pred)
+        g_signed = -self.U.T.dot(pred) / self.total_samples
+        return g_signed  # self._gamma_signed(pred)
 
     def _gamma_signed(self, pred):
         self.tags[_PRED] = pred

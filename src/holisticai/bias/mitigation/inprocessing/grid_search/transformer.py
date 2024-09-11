@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 from holisticai.bias.mitigation.inprocessing.commons.classification import _constraints as cc
@@ -11,7 +11,7 @@ from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from sklearn.base import BaseEstimator, clone
 
 
-class GridSearchReduction(BaseEstimator, BMImp):
+class GridSearchReduction(BMImp, BaseEstimator):
     """Grid Search Reduction technique can be used for fair classification or fair regression.
 
     (1) For classification it reduces fair classification to a sequence of cost-sensitive classification problems,\
@@ -85,13 +85,13 @@ class GridSearchReduction(BaseEstimator, BMImp):
     def __init__(
         self,
         constraints: str = "EqualizedOdds",
-        constraint_weight: Optional[float] = 0.5,
+        constraint_weight: float = 0.5,
         loss: str = "ZeroOne",
-        min_val: Optional[float] = None,
-        max_val: Optional[float] = None,
-        grid_size: Optional[int] = 10,
-        grid_limit: Optional[float] = 2.0,
-        verbose: Optional[int] = 0.0,
+        min_val: float = 0.5,
+        max_val: float = 0.5,
+        grid_size: int = 10,
+        grid_limit: float = 2,
+        verbose: int = 0,
     ):
         self.constraints = constraints
         self.constraint_weight = constraint_weight

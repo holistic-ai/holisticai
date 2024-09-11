@@ -1,35 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Light blue theme (default) */
+.generic-object-container.blue {
+    background-color: #f2f8fd !important; /* Container background: light blue */
+    border-color: #4db6ac !important; /* Soft blue border */
+}
+
+.generic-object-header.blue {
+    background-color: #a0c4ff9a !important; /* Header background: darker blue */
+}
+
+.generic-object-header.blue:hover {
+    background-color: #8bb1c0 !important; /* Darker shade on hover over the header */
+}
+
+.attribute-list.blue:hover {
+    background-color: #b2dfdb !important; /* Attribute background on hover: darker blue */
+}
+
+/* Orange theme */
+.generic-object-container.orange {
+    background-color: #fff9ef !important; /* Container background: light orange */
+    border-color: #ffb74d !important; /* Soft orange border */
+}
+
+.generic-object-header.orange {
+    background-color: #ffe0b2 !important; /* Header background: darker orange */
+}
+
+.generic-object-header.orange:hover {
+    background-color: #ffcc80 !important; /* Darker shade on hover over the header */
+}
+
+.attribute-list.orange:hover {
+    background-color: #ffe0b2 !important; /* Attribute background on hover: darker orange */
+}
+
+/* Green theme */
+.generic-object-container.green {
+    background-color: #f6fff6 !important; /* Container background: light green */
+    border-color: #81c784 !important; /* Soft green border */
+}
+
+.generic-object-header.green {
+    background-color: #c8e6c9 !important; /* Header background: darker green */
+}
+
+.generic-object-header.green:hover {
+    background-color: #a5d6a7 !important; /* Darker shade on hover over the header */
+}
+
+.attribute-list.green:hover {
+    background-color: #c8e6c9 !important; /* Attribute background on hover: darker green */
+}
+
+/* Align the first container to the left */
+.generic-object-container.first-level {
+    margin: 0;
+    width: auto;
+    max-width: 800px;
+    display: block;
+    box-sizing: border-box;
+}
+
+/* Nested containers stay centered */
+.generic-object-container .generic-object-container {
+    margin: 5px auto;
+    width: 100%;
+    display: block;
+    padding: 5px 0;
+}
+
+/* Remove default background color so only themes apply it */
 .generic-object-container {
-    padding: 1px;
-    margin: 1px;
-}
-.generic-object-content {
-    background-color: #fff;
-    border: 1px solid #ddd;
+    padding: 0;
+    margin: 0 auto;
+    border: 1px dashed;
     border-radius: 5px;
-    padding: 0px;
-    margin: 10px;
-    text-align: left;
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    color: #333;
-    display: inline-block;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    display: block;
+    width: auto;
+    max-width: 800px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
+
+.generic-object-container:hover {
+    box-shadow: 0px 4px 10px rgba(77, 182, 172, 0.3);
+}
+
 .generic-object-header {
-    background-color: #e0e0e0;
-    color: #000;
-    font-size: 12px;
-    padding: 10px 150px 10px 20px;
-    margin: 0px;
-    text-align: left;
-    border-bottom: 1px solid #ccc;
-    border-radius: 5px 5px 0 0;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 14px;
+    padding: 10px 20px;
+    padding-left: 40px;
+    text-align: center;
     font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
+
+.toggle-button {
+    margin-right: 10px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    position: absolute;
+    left: 10px;
+    color: #004d40;
+}
+
 .generic-object-body {
-    padding: 5px 10px 5px 10px;
+    padding: 5px 10px;
+    display: block;
+    border-radius: 0 0 5px 5px;
+    background-color: inherit;
+    margin: 0 auto;
 }
+
+.hidden {
+    display: none;
+}
+
 .attribute-list {
     margin: 2px 0;
     padding: 2px;
+    transition: background-color 0.2s;
+    display: block;
+}
+
+.flex-space-filler {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

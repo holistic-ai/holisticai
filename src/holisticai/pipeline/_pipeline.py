@@ -1,7 +1,10 @@
+import inspect
+
 from sklearn.pipeline import Pipeline as SKLPipeline
 from sklearn.utils.metaestimators import available_if
 
 from holisticai.pipeline._pipeline_helper import PipelineHelper
+from holisticai.utils.obj_rep.object_repr import PipelineReprObj
 
 
 def _fulfill_conditions(fn_name: str):
@@ -17,7 +20,7 @@ def _fulfill_conditions(fn_name: str):
     return check
 
 
-class Pipeline(SKLPipeline, PipelineHelper):
+class Pipeline(PipelineReprObj, SKLPipeline, PipelineHelper):
     """
     Holistic AI Pipeline
 
@@ -157,3 +160,30 @@ class Pipeline(SKLPipeline, PipelineHelper):
         """
         Xt = self._transform_without_final(X)
         return self._transform_post_estimator_transformers(Xt, **params)
+
+    def repr_info(self):
+        nested_objects = []
+        steps = self.steps + self.post_estimator_transformers if self.post_estimator_transformers != [] else self.steps
+        for s in steps:
+            inputs = []
+            for p in inspect.signature(s[1].__init__).parameters:
+                try:
+                    inputs.append(f"{p}={getattr(s[1],p)}")
+                except Exception as _:  # noqa: BLE001, S112
+                    continue
+                if len(inputs) == 4:
+                    inputs.append("...")
+                    break
+            nested_objects.append(
+                {
+                    "dtype": s[1].__class__.__name__,
+                    "name": s[0],
+                    "subtitle": s[1].__class__.__name__ + "(" + ", ".join(inputs) + ")",
+                }
+            )
+
+        return {
+            "dtype": self.__class__.__name__,
+            "attributes": {},
+            "nested_objects": nested_objects,
+        }

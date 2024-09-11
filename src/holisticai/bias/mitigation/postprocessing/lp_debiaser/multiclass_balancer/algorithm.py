@@ -66,7 +66,7 @@ class MulticlassBalancerAlgorithm:
         # Getting the new cp matrices
         self.new_cp_mats = np.array([np.dot(cp_mats[i], m[i]) for i in range(self.n_groups)])
 
-    def predict(self, y_pred, p_attr, seed=2021):
+    def predict(self, y_pred, p_attr, seed=20221):
         """Generates bias-adjusted predictions on new data.
 
         Parameters
@@ -85,7 +85,7 @@ class MulticlassBalancerAlgorithm:
         assert y_pred is not None, "y_pred must be passed"
 
         pd.options.mode.chained_assignment = None
-        y_tilde = y_pred.copy()
+        y_tilde = np.zeros_like(y_pred)
         np.random.seed(seed)
         seeds = np.random.randint(0, 1e6, len(self.groups))
         for g in self.groups:

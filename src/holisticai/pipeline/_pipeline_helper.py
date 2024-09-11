@@ -110,8 +110,8 @@ class PipelineHelper:
             estimator parameters
 
         """
-        params = self.params_hdl.bias_mitigator.feed(params, return_dropped=True)
-        self.params_hdl.estimator.feed(params)
+        params = self.params_hdl.bias_mitigator.feed_and_drop(params)
+        self.params_hdl.estimator.feed_and_drop(params)
 
         if y is not None:
             params.update({"y": y})
