@@ -21,9 +21,9 @@ DECISION_COLUMN = "decision"
 
 
 def accuracy_degradation_profile(
-    X_test: np.ndarray,
-    y_test: np.ndarray,
-    y_pred: np.ndarray,
+    X_test: pd.DataFrame,
+    y_test: pd.DataFrame,
+    y_pred: pd.Series,
     n_neighbors: int,
     baseline_accuracy: float,
     threshold_percentual: float = 0.95,
@@ -63,6 +63,12 @@ def accuracy_degradation_profile(
     ValueError
         If the input arrays have mismatched lengths.
     """
+
+    # Validate inputs
+    if isinstance(X_test, pd.DataFrame) & isinstance(y_test, pd.Series):
+        # Data structures
+        X_test = X_test.values
+        y_test = y_test.values
 
     # Validate inputs
     _validate_inputs(X_test, y_test, y_pred, baseline_accuracy, threshold_percentual, above_percentual)
