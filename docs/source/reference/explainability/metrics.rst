@@ -26,7 +26,6 @@
     :template: function.rst
     :toctree: .generated/
     
-    data_stability
     feature_stability
 
 **Tree Based Metrics**
