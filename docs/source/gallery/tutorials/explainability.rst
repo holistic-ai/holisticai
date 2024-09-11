@@ -18,6 +18,7 @@ Here are some tutorials where different systems are assessed using the metrics.
    - `Measuring XAI using Surrogate Feature Importance <explainability/demos/global_surrogate.ipynb>`_
    - `Measuring XAI using SHAP Feature Importance <explainability/demos/local_shap.ipynb>`_
    - `Measuring XAI using LIME Feature Importance <explainability/demos/local_lime.ipynb>`_
+   - `Measuring XAI using Tree Based Metrics <explainability/demos/tree_based_metrics.ipynb>`_
 
 - Examples
    - `Explainability in Machine Learning - Clinical Records Analysis <explainability/examples/example_clinical_records.ipynb>`_
