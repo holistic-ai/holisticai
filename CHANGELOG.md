@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2024-09-12
+
+### 🚀 Features
+
+- Tree based metrics for explainability (#210)
+- Implement accuracy degradation profile (#211)
+
+### 🐛 Bug Fixes
+
+- Single output dataset (#212)
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove duplicated test running (#215)
+- Improving bias mitigators and Refactor Dataset Object (#213)
+
 ## [1.0.4] - 2024-09-03
 
 ### 📚 Documentation
