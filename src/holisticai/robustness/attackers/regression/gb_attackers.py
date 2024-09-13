@@ -2,10 +2,9 @@ import logging
 
 import numpy as np
 import pandas as pd
-from sklearn import linear_model
-from sklearn.metrics import mean_squared_error
-
 from holisticai.robustness.attackers.regression.initializers import inf_flip
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger()
@@ -87,7 +86,7 @@ class GDPoisoner:
             poisx, poisy = init(X_train, y_train, self.poison_proportion)
             x_data = np.concatenate((X_train, poisx), axis=0)
             y_data = np.concatenate([y_train, poisy])
-            clf = linear_model.Ridge(alpha=0.00001)
+            clf = Ridge(alpha=0.00001)
             clf.fit(np.asarray(x_data), y_data)
             err = mean_squared_error(y_train, clf.predict(X_train))
             logger.info("Training Error: %f", err)
@@ -456,7 +455,7 @@ class LinRegGDPoisoner(GDPoisoner):
             The regularization parameter.
         """
         if not clf:
-            clf = linear_model.Ridge(alpha=0.00001)
+            clf = Ridge(alpha=0.00001)
         clf.fit(np.asarray(x), y)
         return clf, 0
 
