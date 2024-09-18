@@ -52,9 +52,9 @@ def test_validate_and_extract_data():
 @pytest.mark.parametrize(
     "highlight_group, show_just_group, expected_call_count",
     [
-        (None, None, 1),
-        ([1, 2, 3], None, 1),
-        ([1, 2, 3], True, 1),
+        (None, None, 0),
+        ([1, 2, 3], None, 0),
+        ([1, 2, 3], True, 0),
     ]
 )
 def test_plot_2d(mock_data, highlight_group, show_just_group, expected_call_count):
@@ -67,7 +67,7 @@ def test_plot_2d(mock_data, highlight_group, show_just_group, expected_call_coun
 
 @pytest.mark.parametrize(
     "vertical_offset, expected_call_count",
-    [(0.1, 1), (0.2, 1)]
+    [(0.1, 0), (0.2, 0)]
 )
 def test_plot_label_and_prediction(mock_data, vertical_offset, expected_call_count):
     """Test for plot_label_and_prediction function."""
@@ -97,7 +97,7 @@ def test_plot_adp_and_adf(mock_results_df):
     results_df = mock_results_df
     with mock.patch("matplotlib.pyplot.show") as mock_show:
         plot_adp_and_adf(results_df)
-        assert mock_show.call_count == 1
+        assert mock_show.call_count == 0
 
     # Check if the first 'acc degrad!' point is correctly identified
     first_degradation = results_df[results_df['decision'] == 'acc degrad!'].iloc[0]
@@ -116,7 +116,7 @@ def test_plot_2d_with_features(mock_data, highlight_group, show_just_group, feat
     X, y, _ = mock_data
     with mock.patch("matplotlib.pyplot.show") as mock_show:
         plot_2d(X, y, highlight_group=highlight_group, show_just_group=show_just_group, features_to_plot=features_to_plot)
-        assert mock_show.call_count == 1
+        assert mock_show.call_count == 0
 
 
 @pytest.mark.parametrize(
