@@ -157,11 +157,19 @@ Robustness in machine learning refers to the ability of AI models to perform wel
 
         Techniques and strategies to simulate adversarial attacks and test model robustness.
 
+    .. grid-item-card:: Plots
+        :link: robustness/plots.html
+        :shadow: md
+
+        Plots to visualize feature robustness.
+
+
 .. toctree::
    :hidden:
    :maxdepth: 3
 
    robustness/metrics
    robustness/attackers
+   robustness/plots
 
 
