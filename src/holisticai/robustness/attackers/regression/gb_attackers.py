@@ -65,14 +65,10 @@ class LinRegGDPoisoner(GDPoisoner):
 
         Returns
         -------
-        array-like, shape (n_samples, n_features)
-            The training input samples.
-        array-like, shape (n_samples,)
-            The training target values.
-        array-like, shape (n_samples, n_features)
-            The poisoning input samples.
-        array-like, shape (n_samples,)
-            The poisoning target values.
+        Dataframe, shape (n_samples + n_poisoned, n_features)
+            The tranining and poisoning input samples. If return_only_poisoned is True, returns only the poisoned samples.
+        Series, shape (n_samples + n_poisoned,)
+            The tranining and poisoning target values. If return_only_poisoned is True, returns only the poisoned target values.
         """
 
         return self._generate(X_train, y_train, categorical_mask, return_only_poisoned)
