@@ -46,8 +46,8 @@ class GDPoisoner:
         self.opty = opty
 
         if objective == 0:  # training MSE + regularization
-            self.attack_comp = self.comp_attack_trn
-            self.obj_comp = self.comp_obj_trn
+            self.attack_comp = self._comp_attack_trn
+            self.obj_comp = self._comp_obj_trn
 
         else:
             raise NotImplementedError
@@ -102,7 +102,7 @@ class GDPoisoner:
 
         return poisx, poisy
 
-    def generate(self, X_train, y_train, categorical_mask=None, return_only_poisoned=False):
+    def _generate(self, X_train, y_train, categorical_mask=None, return_only_poisoned=False):
         """
         Takes an initial set of poisoning points and optimizes it using gradient descent.
 
@@ -153,8 +153,8 @@ class GDPoisoner:
         best_obj = 0
         count = 0
 
-        sig = self.compute_sigma()  # can already compute sigma and mu
-        mu = self.compute_mu()  # as x_c does not change them
+        sig = self._compute_sigma()  # can already compute sigma and mu
+        mu = self._compute_mu()  # as x_c does not change them
         eq7lhs = np.bmat([[sig, np.transpose(mu)], [mu, np.matrix([1])]])
 
         # initial model - used in visualization
@@ -248,13 +248,13 @@ class GDPoisoner:
         """
 
         poisxelem, poisyelem, eq7lhs, mu, clf, lam = in_tuple
-        m = self.compute_m(clf, poisxelem, poisyelem)
+        m = self._compute_m(clf, poisxelem, poisyelem)
 
         # compute partials
-        wxc, bxc, wyc, byc = self.compute_wb_zc(eq7lhs, mu, clf.coef_, m, self.samplenum, poisxelem)
+        wxc, bxc, wyc, byc = self._compute_wb_zc(eq7lhs, mu, clf.coef_, m, self.samplenum, poisxelem)
 
         if self.objective == 0:
-            r = self.compute_r(clf, lam)
+            r = self._compute_r(clf, lam)
             otherargs = (r,)
         else:
             otherargs = None

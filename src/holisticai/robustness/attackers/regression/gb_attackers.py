@@ -48,9 +48,38 @@ class LinRegGDPoisoner(GDPoisoner):
         GDPoisoner.__init__(self, eta, beta, sigma, eps, objective, opty, poison_proportion, num_inits, max_iter)
         self.initlam = 0
 
+    def generate(self, X_train, y_train, categorical_mask=None, return_only_poisoned=False):
+        """
+        Generates poisoning samples.
+
+        Parameters
+        ----------
+        X_train : array-like, shape (n_samples, n_features)
+            The training input samples.
+        y_train : array-like, shape (n_samples,)
+            The training target values.
+        categorical_mask : array-like, shape (n_features,)
+            The mask indicating whether a feature is categorical.
+        return_only_poisoned : bool
+            Whether to return only the poisoned samples.
+
+        Returns
+        -------
+        array-like, shape (n_samples, n_features)
+            The training input samples.
+        array-like, shape (n_samples,)
+            The training target values.
+        array-like, shape (n_samples, n_features)
+            The poisoning input samples.
+        array-like, shape (n_samples,)
+            The poisoning target values.
+        """
+
+        return self._generate(X_train, y_train, categorical_mask, return_only_poisoned)
+
     def learn_model(self, x, y, clf):
         """
-        Trains a linear regression model.
+        Trains a Ridge regression model.
 
         Parameters
         ----------
@@ -73,7 +102,7 @@ class LinRegGDPoisoner(GDPoisoner):
         clf.fit(np.asarray(x), y)
         return clf, 0
 
-    def compute_sigma(self):
+    def _compute_sigma(self):
         """
         Computes the covariance matrix.
 
@@ -86,7 +115,7 @@ class LinRegGDPoisoner(GDPoisoner):
         sigma = sigma / self.trnx.shape[0]
         return sigma
 
-    def compute_mu(self):
+    def _compute_mu(self):
         """
         Computes the mean of the input samples.
 
@@ -98,7 +127,7 @@ class LinRegGDPoisoner(GDPoisoner):
         mu = np.mean(np.matrix(self.trnx), axis=0)
         return mu
 
-    def compute_m(self, clf, poisxelem, poisyelem):
+    def _compute_m(self, clf, poisxelem, poisyelem):
         """
         Computes the matrix m.
 
@@ -124,7 +153,7 @@ class LinRegGDPoisoner(GDPoisoner):
         m = first + errterm[0, 0] * np.identity(self.feanum)
         return m
 
-    def compute_wb_zc(self, eq7lhs, mu, w, m, n, poisxelem):  # noqa: ARG002
+    def _compute_wb_zc(self, eq7lhs, mu, w, m, n, poisxelem):  # noqa: ARG002
         """
         Computes the weights and biases.
 
@@ -166,7 +195,7 @@ class LinRegGDPoisoner(GDPoisoner):
 
         return wxc, bxc.ravel(), wyc.ravel(), byc
 
-    def compute_r(self, clf, lam):  # noqa: ARG002
+    def _compute_r(self, clf, lam):  # noqa: ARG002
         """
         Computes the regularization term.
 
@@ -185,7 +214,7 @@ class LinRegGDPoisoner(GDPoisoner):
         r = np.zeros((1, self.feanum))
         return r
 
-    def comp_obj_trn(self, clf, lam, otherargs):  # noqa: ARG002
+    def _comp_obj_trn(self, clf, lam, otherargs):  # noqa: ARG002
         """
         Computes the objective value for the training data.
 
@@ -208,7 +237,7 @@ class LinRegGDPoisoner(GDPoisoner):
 
         return mse
 
-    def comp_attack_trn(self, clf, wxc, bxc, wyc, byc, otherargs):  # noqa: ARG002
+    def _comp_attack_trn(self, clf, wxc, bxc, wyc, byc, otherargs):  # noqa: ARG002
         """
         Computes the attack on the training data.
 
