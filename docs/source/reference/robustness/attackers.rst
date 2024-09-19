@@ -14,3 +14,12 @@
 
     HopSkipJump
     ZooAttack
+
+**Regression**
+
+.. autosummary::
+    :nosignatures:
+    :template: function.rst
+    :toctree: .generated/
+
+    LinRegGDPoisoner
