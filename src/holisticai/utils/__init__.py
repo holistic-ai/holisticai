@@ -3,6 +3,7 @@ The :mod:`holisticai.utils` module includes utils helper tools
 """
 
 # formatting
+from holisticai.utils._commons import concatenate_metrics
 from holisticai.utils._definitions import (
     BinaryClassificationProxy,
     ConditionalImportances,
@@ -45,4 +46,5 @@ __all__ = [
     "PartialDependence",
     "ConditionalImportances",
     "ModelProxy",
+    "concatenate_metrics"
 ]

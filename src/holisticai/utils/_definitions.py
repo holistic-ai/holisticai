@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Literal, Union
+from typing import Callable, Literal, Optional, Union
 
 import pandas as pd
 from numpy.typing import ArrayLike
@@ -12,7 +12,7 @@ class BinaryClassificationProxy:
     def __init__(
         self,
         predict: Callable,
-        predict_proba: Callable,
+        predict_proba: Optional[Callable] = None,
         classes: Union[list, None] = None,
     ):
         if classes is None:

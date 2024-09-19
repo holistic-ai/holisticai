@@ -1,6 +1,8 @@
 import numpy as np
 import sklearn
 
+from holisticai.utils.models.surrogate import get_features, get_number_of_rules
+
 
 class WeightedAverageDepth:
     """
@@ -369,3 +371,30 @@ def tree_depth_variance(tree):
     """
     metric = TreeDepthVariance()
     return metric(tree)
+
+class TreeNumberOfRules:
+    reference: float = 1
+    name: str = "Number of Rules"
+
+    def __call__(self, surrogate):
+        return int(get_number_of_rules(surrogate))
+
+
+def tree_number_of_rules(surrogate):
+    m = TreeNumberOfRules()
+    return m(surrogate)
+
+class TreeNumberOfFeatures:
+    reference: float = 1
+    name: str = "Number of Features"
+
+    def __call__(self, surrogate):
+        features = get_features(surrogate)
+        features_used = np.unique(features[features >= 0])
+        F1 = len(features_used)
+        return int(F1)
+
+
+def tree_number_of_features(surrogate):
+    m = TreeNumberOfFeatures()
+    return m(surrogate)
