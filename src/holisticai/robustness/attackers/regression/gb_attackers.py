@@ -50,25 +50,27 @@ class LinRegGDPoisoner(GDPoisoner):
 
     def generate(self, X_train, y_train, categorical_mask=None, return_only_poisoned=False):
         """
-        Generates poisoning samples.
-
         Parameters
         ----------
-        X_train : array-like, shape (n_samples, n_features)
-            The training input samples.
-        y_train : array-like, shape (n_samples,)
-            The training target values.
-        categorical_mask : array-like, shape (n_features,)
-            The mask indicating whether a feature is categorical.
-        return_only_poisoned : bool
-            Whether to return only the poisoned samples.
+        X_train : pandas.DataFrame
+            The training data features.
+        y_train : pandas.Series
+            The training data labels.
+        categorical_mask : numpy.ndarray, optional
+            A boolean mask indicating which columns in `X_train` are categorical.
+        return_only_poisoned : bool, optional
+            If True, return only the poisoned data points. Otherwise, return the entire dataset including the poisoned points.
 
         Returns
         -------
-        Dataframe, shape (n_samples + n_poisoned, n_features)
-            The tranining and poisoning input samples. If return_only_poisoned is True, returns only the poisoned samples.
-        Series, shape (n_samples + n_poisoned,)
-            The tranining and poisoning target values. If return_only_poisoned is True, returns only the poisoned target values.
+        pandas.DataFrame
+            The features of the dataset including the poisoned points.
+        pandas.Series
+            The labels of the dataset including the poisoned points.
+
+        Notes
+        -----
+        If `return_only_poisoned` is True, the original dataset is not modified. Otherwise, the original dataset is concatenated with the poisoned points.
         """
 
         return self._generate(X_train, y_train, categorical_mask, return_only_poisoned)

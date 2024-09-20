@@ -104,26 +104,35 @@ class GDPoisoner:
 
     def _generate(self, X_train, y_train, categorical_mask=None, return_only_poisoned=False):
         """
-        Takes an initial set of poisoning points and optimizes it using gradient descent.
+        Generate poisoned data for robustness testing in regression models.
 
         Parameters
         ----------
-        X_train : Dataframe, shape (n_samples, n_features)
-            The input samples.
-        y_train : Series, shape (n_samples,)
-            The target values.
-        categorical_mask : array-like, shape (n_features,)
-            The mask for categorical features.
-        return_only_poisoned : bool
-            Whether to return only the poisoned samples.
+        X_train : pandas.DataFrame
+            The training data features.
+        y_train : pandas.Series
+            The training data labels.
+        categorical_mask : numpy.ndarray, optional
+            A boolean mask indicating which columns in `X_train` are categorical.
+        return_only_poisoned : bool, optional
+            If True, return only the poisoned data points. Otherwise, return the entire dataset including the poisoned points.
+
         Returns
         -------
-        Dataframe, shape (n_samples, n_features)
-            The poisoned input samples.
-        Series, shape (n_samples,)
-            The poisoned target values.
-        """
+        pandas.DataFrame
+            The features of the dataset including the poisoned points.
+        pandas.Series
+            The labels of the dataset including the poisoned points.
 
+        Notes
+        -----
+        This method performs an iterative process to generate poisoned data points that can be used to test the robustness
+        of regression models. The process involves:
+        - Initializing poison points.
+        - Iteratively updating the poison points based on the model's performance.
+        - Adjusting the learning rate if no progress is made.
+        - Stopping when the maximum number of iterations is reached or the change in objective value is below a threshold.
+        """
         X_original = X_train.copy()
         y_original = y_train.copy()
 
