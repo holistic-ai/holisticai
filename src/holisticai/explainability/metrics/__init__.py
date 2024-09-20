@@ -28,6 +28,8 @@ from holisticai.explainability.metrics.tree import (
     weighted_average_depth,
     weighted_average_explainability_score,
     weighted_tree_gini,
+    tree_number_of_features,
+    tree_number_of_rules,
 )
 
 __all__ = [
@@ -48,4 +50,6 @@ __all__ = [
     "weighted_average_explainability_score",
     "weighted_tree_gini",
     "tree_depth_variance",
+    "tree_number_of_features",
+    "tree_number_of_rules",
 ]
