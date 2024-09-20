@@ -31,7 +31,8 @@ Unlike white-box attacks, where attackers have full knowledge of the model's arc
 Attackers and metrics
 ~~~~~~~~~~~~~~~~~~~
 
-**Attackers**
+Attackers
+---------
 
 .. toctree::
     :maxdepth: 1
@@ -40,7 +41,8 @@ Attackers and metrics
     attackers/zoo
     attackers/linreggdpoisoner
 
-**Metrics**
+Metrics
+-------
 
 .. toctree::
     :maxdepth: 1

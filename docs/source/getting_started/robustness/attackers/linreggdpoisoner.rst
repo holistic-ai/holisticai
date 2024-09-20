@@ -1,5 +1,8 @@
 Linear Gradient-Based Poisoning Attack
------------------
+--------------------------------------
+
+.. note::
+    **Learning tasks:** Regression.
 
 Introduction
 ~~~~~~~~~~~~~~~
