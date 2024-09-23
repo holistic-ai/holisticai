@@ -16,55 +16,55 @@ LearningTask = Literal["binary_classification", "multi_classification", "regress
 SurrogateType = Literal["shallow_tree", "tree"]
 
 
-def BinaryClassificationSurrogate(
-    X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None
-) -> Surrogate:  # noqa: N802
-    if random_state is None:
-        random_state = RandomState(42)
+class BinaryClassificationSurrogate:
+    def __new__(cls, X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None):
+        if random_state is None:
+            random_state = RandomState(42)
 
-    if model_type in ["shallow_tree", "tree"]:
-        surrogate = DecisionTreeClassifier(
-            learning_task="binary_classification", model_type=model_type, random_state=random_state
-        )
-        return surrogate.fit(X=X, y=y_pred)
-    raise ValueError(f"Surrogate type {model_type} not supported")
-
-
-def MultiClassificationSurrogate(
-    X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None
-) -> Surrogate:  # noqa: N802
-    if random_state is None:
-        random_state = RandomState(42)
-
-    if model_type in ["shallow_tree", "tree"]:
-        surrogate = DecisionTreeClassifier(
-            learning_task="multi_classification", model_type=model_type, random_state=random_state
-        )
-        return surrogate.fit(X=X, y=y_pred)
-    raise ValueError(f"Surrogate type {model_type} not supported")
+        if model_type in ["shallow_tree", "tree"]:
+            surrogate = DecisionTreeClassifier(
+                learning_task="binary_classification", model_type=model_type, random_state=random_state
+            )
+            return surrogate.fit(X=X, y=y_pred)
+        raise ValueError(f"Surrogate type {model_type} not supported")
 
 
-def RegressionSurrogate(
-    X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None
-) -> Surrogate:  # noqa: N802
-    if random_state is None:
-        random_state = RandomState(42)
-    if model_type in ["shallow_tree", "tree"]:
-        surrogate = DecisionTreeRegressor(learning_task="regression", model_type=model_type, random_state=random_state)
-        return surrogate.fit(X=X, y=y_pred)
-    raise ValueError(f"Surrogate type {model_type} not supported")
+class MultiClassificationSurrogate:
+    def __new__(cls, X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None):
+        if random_state is None:
+            random_state = RandomState(42)
+
+        if model_type in ["shallow_tree", "tree"]:
+            surrogate = DecisionTreeClassifier(
+                learning_task="multi_classification", model_type=model_type, random_state=random_state
+            )
+            return surrogate.fit(X=X, y=y_pred)
+        raise ValueError(f"Surrogate type {model_type} not supported")
 
 
-def ClusteringSurrogate(
-    X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None
-) -> Surrogate:  # noqa: N802
-    if random_state is None:
-        random_state = RandomState(42)
+class RegressionSurrogate:
+    def __new__(cls, X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None):
+        if random_state is None:
+            random_state = RandomState(42)
+        if model_type in ["shallow_tree", "tree"]:
+            surrogate = DecisionTreeRegressor(
+                learning_task="regression", model_type=model_type, random_state=random_state
+            )
+            return surrogate.fit(X=X, y=y_pred)
+        raise ValueError(f"Surrogate type {model_type} not supported")
 
-    if model_type in ["shallow_tree", "tree"]:
-        surrogate = DecisionTreeClassifier(learning_task="clustering", model_type=model_type, random_state=random_state)
-        return surrogate.fit(X=X, y=y_pred)
-    raise ValueError(f"Surrogate type {model_type} not supported")
+
+class ClusteringSurrogate:
+    def __new__(cls, X, y_pred, model_type: SurrogateType = "shallow_tree", random_state: Optional[RandomState] = None):
+        if random_state is None:
+            random_state = RandomState(42)
+
+        if model_type in ["shallow_tree", "tree"]:
+            surrogate = DecisionTreeClassifier(
+                learning_task="clustering", model_type=model_type, random_state=random_state
+            )
+            return surrogate.fit(X=X, y=y_pred)
+        raise ValueError(f"Surrogate type {model_type} not supported")
 
 
 def get_features(surrogate):

@@ -93,10 +93,88 @@ class FeatureImportancesStability:
 
 
 def surrogate_features_stability(X, y_pred, surrogate, num_bootstraps=5):
+    """
+    Calculate the stability of features used in a surrogate model.
+    The metric measures the similarity of features used in the surrogate model across different bootstraps.
+
+    Parameters
+    ----------
+    X : Any
+        The input data.
+
+    y_pred : Any
+        The predicted target values of the original model.
+
+    surrogate : Surrogate
+        The surrogate model.
+
+    num_bootstraps : int
+        The number of bootstraps to use.
+
+    Returns
+    -------
+    float
+        The stability of features used in a surrogate model.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from holisticai.explainability.metrics.surrogate import (
+    ...     surrogate_features_stability,
+    ... )
+    >>> from sklearn.ensemble import RandomForestClassifier
+    >>> from sklearn.datasets import load_iris
+    >>> X, y = load_iris(return_X_y=True)
+    >>> model = RandomForestClassifier()
+    >>> model.fit(X, y)
+    >>> y_pred = model.predict(X)
+    >>> surrogate = RandomForestClassifier()
+    >>> surrogate.fit(X, y_pred)
+    >>> surrogate_features_stability(X, y_pred, surrogate)
+    """
     m = FeaturesStability()
     return m(X, y_pred, surrogate, num_bootstraps)
 
 
 def surrogate_feature_importances_stability(X, y_pred, surrogate, num_bootstraps=5):
+    """
+    Calculate the stability of features importances in a surrogate model.
+    The metric measures the stability of feature importances across multiple bootstrap samples.
+
+    Parameters
+    ----------
+    X : Any
+        The input data.
+
+    y_pred : Any
+        The predicted target values of the original model.
+
+    surrogate : Surrogate
+        The surrogate model.
+
+    num_bootstraps : int
+        The number of bootstraps to use.
+
+    Returns
+    -------
+    float
+        The stability of features importances in a surrogate model.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from holisticai.explainability.metrics.surrogate import (
+    ...     surrogate_feature_importances_stability,
+    ... )
+    >>> from sklearn.ensemble import RandomForestClassifier
+    >>> from sklearn.datasets import load_iris
+    >>> X, y = load_iris(return_X_y=True)
+    >>> model = RandomForestClassifier()
+    >>> model.fit(X, y)
+    >>> y_pred = model.predict(X)
+    >>> surrogate = RandomForestClassifier()
+    >>> surrogate.fit(X, y_pred)
+    >>> surrogate_feature_importances_stability(X, y_pred, surrogate)
+    """
     m = FeatureImportancesStability()
     return m(X, y_pred, surrogate, num_bootstraps)

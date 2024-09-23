@@ -16,6 +16,7 @@ from holisticai.explainability.metrics.tree._tree import (
     WeightedAverageDepth,
     WeightedAverageExplainabilityScore,
 )
+from holisticai.typing import ArrayLike
 from holisticai.utils.surrogate_models import RegressionSurrogate
 
 
@@ -30,7 +31,38 @@ class MSEDifference:
         return D
 
 
-def surrogate_mean_squared_error_difference(y, y_pred, y_surrogate):
+def surrogate_mean_squared_error_difference(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):
+    """
+    Calculate the difference between the mean squared error of the original model and the surrogate model.
+
+    Parameters
+    ----------
+
+    y : ArrayLike
+        The true target values.
+
+    y_pred : ArrayLike
+        The predicted target values of the original model.
+
+    y_surrogate : ArrayLike
+        The predicted target values of the surrogate model.
+
+    Returns
+    -------
+    float
+        The difference between the mean squared error of the original model and the surrogate model
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from holisticai.explainability.metrics.surrogate import (
+    ...     surrogate_mean_squared_error_difference,
+    ... )
+    >>> y = np.array([1, 2, 3, 4, 5])
+    >>> y_pred = np.array([1.1, 2.2, 3.3, 4.4, 5.5])
+    >>> y_surrogate = np.array([1.2, 2.3, 3.4, 4.5, 5.6])
+    >>> surrogate_mean_squared_error_difference(y, y_pred, y_surrogate)
+    """
     m = MSEDifference()
     return m(y, y_pred, y_surrogate)
 

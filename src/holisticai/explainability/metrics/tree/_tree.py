@@ -386,6 +386,7 @@ class TreeNumberOfRules:
 def tree_number_of_rules(surrogate):
     """
     Calculates the number of rules in a decision tree surrogate model.
+
     Parameters
     ----------
         surrogate: A surrogate model, typically a decision tree, for which the number of rules is to be calculated.
@@ -403,7 +404,7 @@ def tree_number_of_rules(surrogate):
     >>> X, y = load_iris(return_X_y=True)
     >>> clf = DecisionTreeClassifier()
     >>> clf.fit(X, y)
-    >>> tree_number_of_rules(clf)
+    >>> tree_number_of_rules(clf.tree_)
     """
 
     m = TreeNumberOfRules()
@@ -426,5 +427,26 @@ class TreeNumberOfFeatures:
 
 
 def tree_number_of_features(surrogate):
+    """
+    Calculates the number of features used in a decision tree surrogate model.
+
+    Parameters
+    ----------
+        surrogate: A surrogate model, typically a decision tree, for which the number of features is to be calculated.
+
+    Returns
+    -------
+        int: The number of features used in the surrogate model.
+
+    Examples
+    --------
+    >>> from sklearn.datasets import load_iris
+    >>> from sklearn.tree import DecisionTreeClassifier
+    >>> from holisticai.explainability.metrics import tree_number_of_features
+    >>> X, y = load_iris(return_X_y=True)
+    >>> clf = DecisionTreeClassifier()
+    >>> clf.fit(X, y)
+    >>> tree_number_of_features(clf.tree_)
+    """
     m = TreeNumberOfFeatures()
     return m(surrogate)

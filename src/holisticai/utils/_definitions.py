@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Callable, Literal, Optional, Union
 
 import pandas as pd
 
-from holisticai.explainability.metrics.global_feature_importance._alpha_score import get_top_alpha_num_features
+from holisticai.utils._commons import get_top_ranking_from_scores
 from holisticai.utils._validation import _array_like_to_numpy
 
 if TYPE_CHECKING:
@@ -102,7 +102,7 @@ class Importances:
         return len(self.feature_names)
 
     def top_alpha(self, alpha=0.8) -> Importances:
-        num_top_features = get_top_alpha_num_features(self.values, alpha)
+        num_top_features = get_top_ranking_from_scores(self.values, alpha)
         assert num_top_features > 0, "No features selected"
         return self.select(list(range(num_top_features)))
 
