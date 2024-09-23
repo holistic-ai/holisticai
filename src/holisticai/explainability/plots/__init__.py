@@ -4,9 +4,10 @@ from holisticai.explainability.plots._feature_importance import (
     plot_predictions_vs_interpretability,
 )
 from holisticai.explainability.plots._partial_dependencies import plot_partial_dependence
-from holisticai.explainability.plots._tree import plot_surrogate
+from holisticai.explainability.plots._tree import plot_surrogate, plot_tree
 
 __all__ = [
+    "plot_tree",
     "plot_surrogate",
     "plot_feature_importance",
     "plot_partial_dependence",

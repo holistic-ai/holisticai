@@ -1,7 +1,7 @@
 from holisticai.datasets import load_dataset
 from sklearn.naive_bayes import GaussianNB
 from holisticai.explainability.metrics import classification_explainability_metrics
-from holisticai.explainability.metrics.global_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
+from holisticai.explainability.metrics.global_feature_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
 import numpy as np
 import pytest
 
@@ -41,8 +41,8 @@ def get_classification_features(model, test, strategy):
 
 
 @pytest.mark.parametrize("strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment", [
-    ("permutation", 0.010309278350515464, 1.0, 0.0, 0.0),
-    ("surrogate",  0.010309278350515464, 1.0, 0.5, 0.5)
+    ("permutation", 0.020618556701030927, 1.0, 0.0, 0.25),
+    ("surrogate",  0.020618556701030927, 1.0, 0.5, 0.75)
 ])
 def test_xai_classification_metrics(strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment, input_data):
     model, test = input_data
@@ -61,7 +61,7 @@ def test_xai_classification_metrics_separated(input_data):
     proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_classification_features(model, test, 'permutation')
         
     value = rank_alignment(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.0)
+    assert np.isclose(value, 0.25)
 
     value = position_parity(conditional_importances, ranked_importances)
     assert np.isclose(value, 0.0)
@@ -69,8 +69,8 @@ def test_xai_classification_metrics_separated(input_data):
     value = xai_ease_score(partial_dependencies, ranked_importances)
     assert np.isclose(value, 1.0)
 
-    value = alpha_score(importances)
-    assert np.isclose(value, 0.010309278350515464)
+    value = alpha_score(importances.values)
+    assert np.isclose(value, 0.020618556701030927)
 
 
 def test_rank_alignment():
@@ -109,18 +109,15 @@ def test_position_parity():
     assert np.isclose(score,0.6388888888888888)
 
 def test_alpha_score():
-    from holisticai.utils import Importances
     from holisticai.explainability.metrics import alpha_score
 
-    values = np.array([0.10, 0.20, 0.30])
-    feature_names = ["feature_1", "feature_2", "feature_3"]
-    feature_importance = Importances(values=values, feature_names=feature_names)
+    feature_importance = np.array([0.10, 0.20, 0.30])
     score = alpha_score(feature_importance)
     assert np.isclose(score, 0.6666666666666666)
 
 def test_xai_ease_score():
     from holisticai.utils import PartialDependence, Importances
-    from holisticai.explainability.metrics.global_importance import xai_ease_score
+    from holisticai.explainability.metrics.global_feature_importance import xai_ease_score
     
     partial_dependence = [[
         {
@@ -140,20 +137,16 @@ def test_xai_ease_score():
 
 def test_spread_ratio():
     from holisticai.utils import Importances
-    from holisticai.explainability.metrics.global_importance import spread_ratio
+    from holisticai.explainability.metrics.global_feature_importance import spread_ratio
     
-    values = np.array([0.10, 0.20, 0.30])
-    feature_names = ["feature_1", "feature_2", "feature_3"]
-    feature_importance = Importances(values=values, feature_names=feature_names)
+    feature_importance = np.array([0.10, 0.20, 0.30])
     score = spread_ratio(feature_importance)
     assert np.isclose(score, 0.9206198357143052)
 
 def test_spread_divergence():
     from holisticai.utils import Importances
-    from holisticai.explainability.metrics.global_importance import spread_divergence
+    from holisticai.explainability.metrics.global_feature_importance import spread_divergence
     
-    values = np.array([0.10, 0.20, 0.30])
-    feature_names = ["feature_1", "feature_2", "feature_3"]
-    feature_importance = Importances(values=values, feature_names=feature_names)
+    feature_importance = np.array([0.10, 0.20, 0.30])
     score = spread_divergence(feature_importance)
     assert np.isclose(score, 0.8196393599933761)

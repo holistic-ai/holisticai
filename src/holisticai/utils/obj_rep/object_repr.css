@@ -142,3 +142,9 @@
     justify-content: center;
     align-items: center;
 }
+
+.generic-object-container,
+.generic-object-header,
+.attribute-list {
+    color: #000000 !important; /* Establece el color del texto a negro */
+}

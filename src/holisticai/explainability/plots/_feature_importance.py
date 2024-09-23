@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from holisticai.explainability.metrics.local_importance import compute_importance_distribution
+from holisticai.explainability.metrics.local_feature_importance import compute_importance_distribution
 from holisticai.utils import Importances
 from matplotlib import pyplot as plt
 from scipy.spatial.distance import jensenshannon

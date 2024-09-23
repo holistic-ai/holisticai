@@ -222,9 +222,11 @@ def _array_like_to_numpy(arr, name=""):
     """
     try:
         out = np.squeeze(np.asarray(arr))
+        if len(out.shape) == 0:
+            return np.array([out])
         if len(out.shape) == 1:
             return out
-        raise ValueError
+        raise ValueError(f"input is not 1d array-like.: {out}")
     except TypeError as e:
         msg = f"input {name} is not array-like. This includes numpy 1d arrays, lists,\
             pandas Series or pandas 1d DataFrame"

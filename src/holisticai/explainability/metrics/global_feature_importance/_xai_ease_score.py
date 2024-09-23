@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pandas as pd
-from holisticai.utils import Importances, PartialDependence
+
+if TYPE_CHECKING:
+    from holisticai.utils._definitions import Importances, PartialDependence
 
 
 def compute_feature_scores(data, threshold):
@@ -184,7 +188,7 @@ def xai_ease_score(partial_dependence: PartialDependence, ranked_feature_importa
     Examples
     --------
     >>> from holisticai.explainability.commons import PartialDependence, Importances
-    >>> from holisticai.explainability.metrics.global_importance import xai_ease_score
+    >>> from holisticai.explainability.metrics.global_feature_importance import xai_ease_score
     >>> partial_dependence = [
     ...     {
     ...         "average": [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]],

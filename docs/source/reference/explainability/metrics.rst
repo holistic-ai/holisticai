@@ -39,3 +39,18 @@
     weighted_average_depth
     weighted_average_explainability_score
     weighted_tree_gini
+    tree_number_of_rules
+    tree_number_of_features
+
+**Surrogate Based Metrics**
+
+.. autosummary::
+    :nosignatures:
+    :template: function.rst
+    :toctree: .generated/
+
+    surrogate_accuracy_difference
+    surrogate_mean_squared_error_difference
+    surrogate_features_stability
+    surrogate_feature_importances_stability
+

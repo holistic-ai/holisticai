@@ -3,8 +3,10 @@ The :mod:`holisticai.utils` module includes utils helper tools
 """
 
 # formatting
+from holisticai.utils._commons import concatenate_metrics
 from holisticai.utils._definitions import (
     BinaryClassificationProxy,
+    ClusteringProxy,
     ConditionalImportances,
     Importances,
     LocalConditionalImportances,
@@ -26,6 +28,12 @@ from holisticai.utils._formatting import (
 # plotting
 from holisticai.utils._plotting import get_colors
 from holisticai.utils.inspection._partial_dependence import compute_partial_dependence
+from holisticai.utils.surrogate_models import (
+    BinaryClassificationSurrogate,
+    ClusteringSurrogate,
+    MultiClassificationSurrogate,
+    RegressionSurrogate,
+)
 
 __all__ = [
     "extract_columns",
@@ -45,4 +53,10 @@ __all__ = [
     "PartialDependence",
     "ConditionalImportances",
     "ModelProxy",
+    "concatenate_metrics",
+    "ClusteringProxy",
+    "ClusteringSurrogate",
+    "RegressionSurrogate",
+    "MultiClassificationSurrogate",
+    "BinaryClassificationSurrogate",
 ]

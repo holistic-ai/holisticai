@@ -10,7 +10,7 @@ from holisticai.explainability.metrics._regression import (
 from holisticai.explainability.metrics._tree import (
     tree_explainability_metrics,
 )
-from holisticai.explainability.metrics.global_importance import (
+from holisticai.explainability.metrics.global_feature_importance import (
     alpha_score,
     position_parity,
     rank_alignment,
@@ -20,11 +20,22 @@ from holisticai.explainability.metrics.global_importance import (
     surrogate_mean_squared_error,
     xai_ease_score,
 )
-from holisticai.explainability.metrics.local_importance import (
+from holisticai.explainability.metrics.local_feature_importance import (
     feature_stability,
+)
+from holisticai.explainability.metrics.surrogate import (
+    classification_surrogate_explainability_metrics,
+    clustering_surrogate_explainability_metrics,
+    regression_surrogate_explainability_metrics,
+    surrogate_accuracy_difference,
+    surrogate_feature_importances_stability,
+    surrogate_features_stability,
+    surrogate_mean_squared_error_difference,
 )
 from holisticai.explainability.metrics.tree import (
     tree_depth_variance,
+    tree_number_of_features,
+    tree_number_of_rules,
     weighted_average_depth,
     weighted_average_explainability_score,
     weighted_tree_gini,
@@ -32,6 +43,9 @@ from holisticai.explainability.metrics.tree import (
 
 __all__ = [
     "classification_explainability_metrics",
+    "classification_surrogate_explainability_metrics",
+    "regression_surrogate_explainability_metrics",
+    "clustering_surrogate_explainability_metrics",
     "multiclass_explainability_metrics",
     "regression_explainability_metrics",
     "tree_explainability_metrics",
@@ -48,4 +62,10 @@ __all__ = [
     "weighted_average_explainability_score",
     "weighted_tree_gini",
     "tree_depth_variance",
+    "surrogate_accuracy_difference",
+    "surrogate_mean_squared_error_difference",
+    "surrogate_feature_importances_stability",
+    "surrogate_features_stability",
+    "tree_number_of_features",
+    "tree_number_of_rules",
 ]
