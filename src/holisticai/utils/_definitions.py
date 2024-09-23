@@ -1,9 +1,14 @@
 from __future__ import annotations
 
-from typing import Callable, Literal, Union
+from typing import TYPE_CHECKING, Callable, Literal, Optional, Union
 
 import pandas as pd
-from numpy.typing import ArrayLike
+
+from holisticai.utils._commons import get_top_ranking_from_scores
+from holisticai.utils._validation import _array_like_to_numpy
+
+if TYPE_CHECKING:
+    from holisticai.typing import ArrayLike
 
 
 class BinaryClassificationProxy:
@@ -12,7 +17,7 @@ class BinaryClassificationProxy:
     def __init__(
         self,
         predict: Callable,
-        predict_proba: Callable,
+        predict_proba: Optional[Callable] = None,
         classes: Union[list, None] = None,
     ):
         if classes is None:
@@ -38,7 +43,15 @@ class RegressionProxy:
         self.predict = predict
 
 
-ModelProxy = Union[BinaryClassificationProxy, MultiClassificationProxy, RegressionProxy]
+class ClusteringProxy:
+    learning_task: Literal["clustering"] = "clustering"
+
+    def __init__(self, X, labels):
+        self.X = X
+        self.labels = labels
+
+
+ModelProxy = Union[BinaryClassificationProxy, MultiClassificationProxy, RegressionProxy, ClusteringProxy]
 
 
 def create_proxy(**kargs) -> ModelProxy:
@@ -49,6 +62,8 @@ def create_proxy(**kargs) -> ModelProxy:
         return MultiClassificationProxy(**kargs)
     if task == "regression":
         return RegressionProxy(**kargs)
+    if task == "clustering":
+        return ClusteringProxy(**kargs)
     raise ValueError("Unknown learning task type")
 
 
@@ -61,7 +76,7 @@ class Importances:
     ):
         if extra_attrs is None:
             extra_attrs = {}
-        self.values = values
+        self.values = _array_like_to_numpy(values)
         self.feature_names = feature_names
         self.extra_attrs = extra_attrs
 
@@ -74,9 +89,10 @@ class Importances:
 
     def select(self, idx: list[int]):
         data = pd.DataFrame({"feature_names": self.feature_names, "values": self.values})
+        data = data.sort_values("values", ascending=False)
         new_data = data.loc[idx]
         feature_names = new_data["feature_names"].tolist()
-        values = new_data["values"].values
+        values = list(new_data["values"].values)
         return Importances(values=values, feature_names=feature_names)
 
     def as_dataframe(self):
@@ -86,10 +102,9 @@ class Importances:
         return len(self.feature_names)
 
     def top_alpha(self, alpha=0.8) -> Importances:
-        feature_weight = self.values / self.values.sum()
-        accum_feature_weight = feature_weight.cumsum()
-        threshold = max(accum_feature_weight.min(), alpha)
-        return self.select(accum_feature_weight <= threshold)
+        num_top_features = get_top_ranking_from_scores(self.values, alpha)
+        assert num_top_features > 0, "No features selected"
+        return self.select(list(range(num_top_features)))
 
 
 class ConditionalImportances:

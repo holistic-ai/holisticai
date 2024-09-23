@@ -35,3 +35,5 @@ docs/build
 .ruff_cache
 .pytest_cache
 docs/**/*.ipynb
+src/*.ipynb
+.env

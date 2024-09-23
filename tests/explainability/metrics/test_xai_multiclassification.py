@@ -1,7 +1,7 @@
 from sklearn.naive_bayes import GaussianNB
 from holisticai.datasets import load_dataset   
 from holisticai.explainability.metrics import multiclass_explainability_metrics
-from holisticai.explainability.metrics.global_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
+from holisticai.explainability.metrics.global_feature_importance import alpha_score, rank_alignment, position_parity, xai_ease_score
 import numpy as np
 import pytest
 

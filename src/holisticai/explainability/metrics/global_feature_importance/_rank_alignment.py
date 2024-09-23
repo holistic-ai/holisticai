@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-from holisticai.utils import ConditionalImportances, Importances
+
+if TYPE_CHECKING:
+    from holisticai.utils._definitions import ConditionalImportances, Importances
 
 
 class RankAlignment:

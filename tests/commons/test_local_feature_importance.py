@@ -25,7 +25,7 @@ def test_local_feature_importance_to_global():
 
 def test_partial_dependence():
     from holisticai.utils import PartialDependence, Importances
-    from holisticai.explainability.metrics.global_importance import xai_ease_score
+    from holisticai.explainability.metrics.global_feature_importance import xai_ease_score
 
     partial_dependence = [[
          {'average': [[0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3]], 'grid_values': [[1,2,3,4,5,6,7,8,9]]},
