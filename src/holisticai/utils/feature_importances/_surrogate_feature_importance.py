@@ -8,7 +8,7 @@ from numpy.random import RandomState
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error
 
-from holisticai.utils import ConditionalImportances, Importances, ModelProxy
+from holisticai.utils._definitions import ConditionalImportances, Importances, ModelProxy
 from holisticai.utils.feature_importances import group_index_samples_by_learning_task
 
 metric_scores = {
@@ -22,10 +22,9 @@ metric_scores = {
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: Optional[pd.Series],
-    random_state: Union[RandomState, int, None] = None,
-    importance_type: Literal["conditional"] = "conditional",
-) -> ConditionalImportances: ...
+    y: Optional[pd.Series] = None,
+    random_state: Optional[Union[RandomState, int]] = None,
+) -> Importances: ...
 
 
 @overload
@@ -34,7 +33,7 @@ def compute_surrogate_feature_importance(
     X: pd.DataFrame,
     y: Optional[pd.Series] = None,
     random_state: Union[RandomState, int, None] = None,
-    importance_type: Literal["standard"] = "standard",
+    importance_type: Literal["conditional"] = "conditional",
 ) -> Importances: ...
 
 
@@ -42,8 +41,8 @@ def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
     y: Optional[pd.Series] = None,
-    random_state: Union[RandomState, int, None] = None,
-    importance_type: Literal["conditional", "standard"] = "conditional",
+    random_state: Optional[Union[RandomState, int]] = None,
+    importance_type: Literal["conditional", "standard"] = "standard",
 ) -> Union[Importances, ConditionalImportances]:
     pfi = SurrogateFeatureImportanceCalculator(random_state=random_state)
     if importance_type == "conditional":

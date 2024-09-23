@@ -1,7 +1,7 @@
 from holisticai.datasets import load_dataset
 from sklearn.linear_model import LinearRegression
 from holisticai.explainability.metrics import regression_explainability_metrics
-from holisticai.explainability.metrics.global_importance import (
+from holisticai.explainability.metrics.global_feature_importance import (
     alpha_score,
     rank_alignment,
     position_parity,

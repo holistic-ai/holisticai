@@ -1,9 +1,13 @@
+from __future__ import annotations
+
+from typing import Literal, Optional
+
 import numpy as np
 import pandas as pd
 from numpy.random import RandomState
 from sklearn.metrics import accuracy_score, mean_squared_error
 
-from holisticai.utils.models.surrogate._base import SurrogateBase
+from holisticai.utils.surrogate_models._base import SurrogateBase
 
 
 def validate_input(X, y=None):
@@ -12,6 +16,7 @@ def validate_input(X, y=None):
     if y is None:
         return X
     return X, y
+
 
 class TreeBase(SurrogateBase):
     _surrogate = None
@@ -59,65 +64,31 @@ class OptimalTreeBase(TreeBase):
         return self._surrogate.predict(X)
 
 
-class ShallowDecisionTreeClassifier(OptimalTreeBase):
-    name = "Shallow Decision Tree Classifier"
-    def __init__(self, random_state: RandomState):
-        self.random_state = random_state
-        super().__init__()
-
-    def build(self, X, y):
-        X,y = validate_input(X, y)
-
-        best_tree = None
-        from sklearn.ensemble import RandomForestClassifier
-        rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, max_depth=3)
-        rf.fit(X, y)
-        best_score = -np.inf
-        for tree in rf.estimators_:
-            predicciones = tree.predict(X)
-            score = accuracy_score(y, predicciones)
-            if score > best_score:
-                best_score = score
-                best_tree = tree
-        return best_tree
-
-
-class ShallowDecisionTreeRegressor(OptimalTreeBase):
-    name = "Shallow Decision Tree Regressor"
-    def __init__(self, random_state: RandomState):
-        self.random_state = random_state
-        super().__init__()
-
-
-    def build(self, X, y):
-        X,y = validate_input(X, y)
-
-        best_tree = None
-        from sklearn.ensemble import RandomForestRegressor
-        rf = RandomForestRegressor(n_estimators=100, random_state=self.random_state, max_depth=3)
-        rf.fit(X, y)
-        best_score = np.inf
-        for tree in rf.estimators_:
-            predicciones = tree.predict(X)
-            score = mean_squared_error(y, predicciones)
-            if score < best_score:
-                best_score = score
-                best_tree = tree
-        return best_tree
-
-
 class DecisionTreeClassifier(OptimalTreeBase):
-    name = "Decision Tree Classifier"
-    def __init__(self, random_state: RandomState):
+    name = "Shallow Decision Tree Classifier"
+
+    def __init__(
+        self,
+        learning_task: Literal["binary_classification", "multi_classification", "clustering"],
+        model_type: Literal["shallow_tree", "tree"] = "shallow_tree",
+        random_state: Optional[RandomState] = None,
+    ):
         self.random_state = random_state
-        super().__init__()
+        self.model_type = model_type
+        super().__init__(learning_task=learning_task)
 
     def build(self, X, y):
-        X,y = validate_input(X, y)
+        X, y = validate_input(X, y)
 
         best_tree = None
         from sklearn.ensemble import RandomForestClassifier
-        rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state)
+
+        if self.model_type == "shallow_tree":
+            rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state, max_depth=3)
+        elif self.model_type == "tree":
+            rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state)
+        else:
+            raise ValueError(f"Model type {self.model_type} not supported")
         rf.fit(X, y)
         best_score = -np.inf
         for tree in rf.estimators_:
@@ -127,21 +98,38 @@ class DecisionTreeClassifier(OptimalTreeBase):
                 best_score = score
                 best_tree = tree
         return best_tree
+
+    @property
+    def feature_importances_(self):
+        assert self._surrogate is not None, "Model not fitted"
+        return self._surrogate.feature_importances_
 
 
 class DecisionTreeRegressor(OptimalTreeBase):
-    name = "Decision Tree Regressor"
-    def __init__(self, random_state: RandomState):
-        self.random_state = random_state
-        super().__init__()
+    name = "Shallow Decision Tree Regressor"
 
+    def __init__(
+        self,
+        learning_task: Literal["regression"],
+        model_type: Literal["shallow_tree", "tree"] = "shallow_tree",
+        random_state: Optional[RandomState] = None,
+    ):
+        self.model_type = model_type
+        self.random_state = random_state
+        super().__init__(learning_task=learning_task)
 
     def build(self, X, y):
-        X,y = validate_input(X, y)
+        X, y = validate_input(X, y)
 
         best_tree = None
         from sklearn.ensemble import RandomForestRegressor
-        rf = RandomForestRegressor(n_estimators=100, random_state=self.random_state)
+
+        if self.model_type == "shallow_tree":
+            rf = RandomForestRegressor(n_estimators=100, random_state=self.random_state, max_depth=3)
+        elif self.model_type == "tree":
+            rf = RandomForestRegressor(n_estimators=100, random_state=self.random_state)
+        else:
+            raise ValueError(f"Model type {self.model_type} not supported")
         rf.fit(X, y)
         best_score = np.inf
         for tree in rf.estimators_:
@@ -151,3 +139,8 @@ class DecisionTreeRegressor(OptimalTreeBase):
                 best_score = score
                 best_tree = tree
         return best_tree
+
+    @property
+    def feature_importances_(self):
+        assert self._surrogate is not None, "Model not fitted"
+        return self._surrogate.feature_importances_

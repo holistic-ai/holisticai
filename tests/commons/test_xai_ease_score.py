@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from holisticai.explainability.metrics.global_importance._xai_ease_score import XAIEaseScore, XAIEaseAnnotator, compare_tangents
+from holisticai.explainability.metrics.global_feature_importance._xai_ease_score import XAIEaseScore, XAIEaseAnnotator, compare_tangents
 from collections import namedtuple
 
 @pytest.fixture

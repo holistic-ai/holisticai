@@ -1,8 +1,13 @@
+from typing import Literal
+
 import pandas as pd
 
 
 class SurrogateBase:
-    def __init__(self, **_):
+    def __init__(
+        self, learning_task: Literal["binary_classification", "multi_classification", "regression", "clustering"]
+    ):
+        self.learning_task = learning_task
         self._surrogate = None
         self.__is_fitted__ = False
 
@@ -17,8 +22,3 @@ class SurrogateBase:
     def predict(self, X):
         assert self._surrogate is not None, "Model not fitted"
         return self._surrogate.predict(X)
-
-
-
-class SurrogateTreeBase(SurrogateBase):
-    pass

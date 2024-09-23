@@ -1,7 +1,5 @@
 import numpy as np
-import sklearn
-
-from holisticai.utils.models.surrogate import get_features, get_number_of_rules
+from holisticai.utils.surrogate_models import get_features, get_number_of_rules
 
 
 class WeightedAverageDepth:
@@ -15,13 +13,13 @@ class WeightedAverageDepth:
     def __init__(self, ignore_repeated: bool = True):
         self.ignore_repeated = ignore_repeated
 
-    def __call__(self, tree: sklearn.tree._tree.Tree):
+    def __call__(self, tree):
         """
         Calculates the weighted average depth of a tree.
 
         Parameters
         ----------
-        tree: sklearn.tree._tree.Tree
+        tree: Tree
             The tree to calculate the weighted average depth of.
 
         Returns:
@@ -35,14 +33,14 @@ class WeightedAverageDepth:
         return (depths * weights).sum()
 
 
-def weighted_average_depth(tree: sklearn.tree._tree.Tree):
+def weighted_average_depth(tree):
     """
     Weighted Average Depth calculates the average depth of a tree considering the number
     of samples that pass through each cut.
 
     Parameters
     ----------
-    tree: sklearn.tree._tree.Tree
+    tree: Tree
         The tree to calculate the weighted average depth of.
 
     Returns
@@ -81,13 +79,13 @@ class WeightedAverageExplainabilityScore:
     def __init__(self, ignore_repeated: bool = True):
         self.ignore_repeated = ignore_repeated
 
-    def __call__(self, tree: sklearn.tree._tree.Tree):
+    def __call__(self, tree):
         """
         Calculates the weighted average depth of a tree.
 
         Parameters
         ----------
-        tree: sklearn.tree._tree.Tree
+        tree: Tree
             The tree to calculate the weighted average depth of.
 
         Returns:
@@ -101,14 +99,14 @@ class WeightedAverageExplainabilityScore:
         return (depths * weights).sum()
 
 
-def weighted_average_explainability_score(tree: sklearn.tree._tree.Tree):
+def weighted_average_explainability_score(tree):
     """
     Weighted Average Explainability Score calculates the average depth of a tree considering the number
     of samples that pass through each cut.
 
     Parameters
     ----------
-    tree: sklearn.tree._tree.Tree
+    tree: Tree
         The tree to calculate the weighted average depth of.
 
     Returns
@@ -146,7 +144,7 @@ def is_leaf(node_index, tree):
     ----------
     node_index : int
         The index of the node to check.
-    tree : sklearn.tree._tree.Tree
+    tree : Tree
         The tree to check the node in.
 
     Returns
@@ -165,7 +163,7 @@ def get_cuts_counts(node_index, tree, cuts, counts, cur_set):
     ----------
     node_index : int
         The index of the node to start from.
-    tree : sklearn.tree._tree.Tree
+    tree : Tree
         The tree to get the cuts and counts from.
     cuts : list
         The list to store the cuts.
@@ -205,7 +203,7 @@ def get_depths_counts(node_index, tree, depths, counts, h=0):
     ----------
     node_index : int
         The index of the node to start from.
-    tree : sklearn.tree._tree.Tree
+    tree : Tree
         The tree to get the depths and counts from.
     depths : list
         The list to store the depths.
@@ -241,13 +239,13 @@ class WeightedTreeGini:
     reference: float = 0.0
     name: str = "Weighted Gini Index"
 
-    def __call__(self, tree: sklearn.tree._tree.Tree):
+    def __call__(self, tree):
         """
         Calculates the weighted Gini index of a tree.
 
         Parameters
         ----------
-        tree: sklearn.tree._tree.Tree
+        tree: Tree
             The tree to calculate the weighted Gini index of.
 
         Returns:
@@ -296,7 +294,7 @@ def weighted_tree_gini(tree):
 
     Parameters
     ----------
-    tree : sklearn.tree._tree.Tree
+    tree : Tree
         The tree to compute the weighted Gini index of.
 
     Returns
@@ -326,13 +324,13 @@ class TreeDepthVariance:
     reference: float = 0.0
     name: str = "Tree Depth Variance"
 
-    def __call__(self, tree: sklearn.tree._tree.Tree):
+    def __call__(self, tree):
         """
         Calculates the variance of the depths of the leaves in the tree.
 
         Parameters
         ----------
-        tree: sklearn.tree._tree.Tree
+        tree: Tree
             The tree to calculate the depth variance of.
 
         Returns:
@@ -351,7 +349,7 @@ def tree_depth_variance(tree):
 
     Parameters
     ----------
-    tree : sklearn.tree._tree.Tree
+    tree : Tree
         The tree to compute the depth variance of.
 
     Returns
@@ -372,7 +370,12 @@ def tree_depth_variance(tree):
     metric = TreeDepthVariance()
     return metric(tree)
 
+
 class TreeNumberOfRules:
+    """
+    Represents the Number of Rules metric
+    """
+
     reference: float = 1
     name: str = "Number of Rules"
 
@@ -381,10 +384,37 @@ class TreeNumberOfRules:
 
 
 def tree_number_of_rules(surrogate):
+    """
+    Calculates the number of rules in a decision tree surrogate model.
+    Parameters
+    ----------
+        surrogate: A surrogate model, typically a decision tree, for which the number of rules is to be calculated.
+
+    Returns
+    -------
+        int: The number of rules present in the surrogate model.
+
+    Examples
+    --------
+
+    >>> from sklearn.datasets import load_iris
+    >>> from sklearn.tree import DecisionTreeClassifier
+    >>> from holisticai.explainability.metrics import tree_number_of_rules
+    >>> X, y = load_iris(return_X_y=True)
+    >>> clf = DecisionTreeClassifier()
+    >>> clf.fit(X, y)
+    >>> tree_number_of_rules(clf)
+    """
+
     m = TreeNumberOfRules()
     return m(surrogate)
 
+
 class TreeNumberOfFeatures:
+    """
+    Represents the Number of Features metric
+    """
+
     reference: float = 1
     name: str = "Number of Features"
 

@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
-from holisticai.explainability.metrics.global_importance._xai_ease_score import XAIEaseAnnotator
+from holisticai.explainability.metrics.global_feature_importance._xai_ease_score import XAIEaseAnnotator
 from holisticai.utils import Importances, PartialDependence
 
 

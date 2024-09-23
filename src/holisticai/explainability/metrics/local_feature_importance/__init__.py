@@ -1,4 +1,4 @@
-from holisticai.explainability.metrics.local_importance._stability import (
+from holisticai.explainability.metrics.local_feature_importance._stability import (
     FeatureStability,
     compute_importance_distribution,
     feature_stability,

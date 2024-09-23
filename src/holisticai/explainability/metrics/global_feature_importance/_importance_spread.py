@@ -1,27 +1,37 @@
 import numpy as np
-from holisticai.utils import Importances
+from holisticai.typing import ArrayLike
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy
 
 
-class ImportanceSpread:
-    def __call__(self, feature_importance):
-        """
-        Parameters
-        ----------
-        feature_importance: np.array
-            array with raw feature importance
-        divergence: bool
-            if True calculate the inverse Jensen-Shannon divergence, otherwise the ratio
-        """
-        tol = 1e-8
-        feature_importances = np.array(feature_importance.values, dtype=float)
-        if len(feature_importances) == 0 or sum(feature_importances) < tol:
-            return 0 if self.divergence else 1
+class FeatureImportanceSpread:
+    """
+    FeatureImportanceSpread meausre the concentration of feature importances in a surrogate model.
 
-        importance = feature_importances
-        feature_weight = importance / sum(importance)
-        feature_equal_weight = np.array([1.0 / len(importance)] * len(importance))
+    Parameters
+    ----------
+
+    name : str
+        The name of the metric, which is "Spread Divergence".
+    reference : float
+        The reference value for the metric, initialized to 0.
+    """
+
+    name: str = "Spread Divergence"
+    reference: float = 0
+    divergence: bool = True
+
+    def __call__(self, feature_importances: ArrayLike):
+        tol = 1e-8
+        feature_importance_values = np.array(feature_importances, dtype=float)
+        if len(feature_importance_values) == 0 or sum(feature_importance_values) < tol:
+            return 0
+
+        if len(feature_importance_values) == 1:
+            return 1.0
+
+        feature_weight = feature_importance_values / sum(feature_importance_values)
+        feature_equal_weight = np.array([1.0 / len(feature_importance_values)] * len(feature_importance_values))
 
         if self.divergence:
             metric = 1 - jensenshannon(feature_weight, feature_equal_weight, base=2)
@@ -30,19 +40,24 @@ class ImportanceSpread:
         return float(metric)
 
 
-class SpreadRatio(ImportanceSpread):
+def feature_importances_spread(feature_importances: ArrayLike):
+    m = FeatureImportanceSpread()
+    return m(feature_importances)
+
+
+class SpreadRatio(FeatureImportanceSpread):
     name: str = "Spread Ratio"
     reference: float = 0
     divergence: bool = False
 
 
-class SpreadDivergence(ImportanceSpread):
+class SpreadDivergence(FeatureImportanceSpread):
     name: str = "Spread Divergence"
     reference: float = 0
     divergence: bool = True
 
 
-def spread_ratio(feature_importance: Importances):
+def spread_ratio(feature_importance: ArrayLike):
     """
     The spread ratio, ranging from 0 to 1, measures the degree of evenness or concentration in the distribution of feature importance values.
     A higher spread ratio indicates a more evenly distributed feature importance, while a lower spread ratio indicates a more concentrated feature importance.
@@ -50,7 +65,7 @@ def spread_ratio(feature_importance: Importances):
 
     Parameters
     ----------
-    feature_importance: Importances
+    feature_importance: ArrayLike
         The feature importance values for the features.
 
     Returns
@@ -61,11 +76,10 @@ def spread_ratio(feature_importance: Importances):
     Examples
     --------
 
-    >>> from holisticai.explainability.commons import Importances
-    >>> from holisticai.explainability.metrics.global_importance import spread_ratio
-    >>> values = np.array([0.10, 0.20, 0.30])
-    >>> feature_names = ["feature_1", "feature_2", "feature_3"]
-    >>> feature_importance = Importances(values=values, feature_names=feature_names)
+    >>> from holisticai.explainability.metrics.global_feature_importance import (
+    ...     spread_ratio,
+    ... )
+    >>> feature_importance = np.array([0.10, 0.20, 0.30])
     >>> score = spread_ratio(feature_importance)
     0.9206198357143052
 
@@ -74,7 +88,7 @@ def spread_ratio(feature_importance: Importances):
     return metric(feature_importance)
 
 
-def spread_divergence(feature_importance: Importances):
+def spread_divergence(feature_importance: ArrayLike):
     """
     Calculates the spread divergence metric based on the inverse of the Jensen-Shannon distance
     (square root of the Jensen-Shannon divergence), for a given feature importance.
@@ -82,7 +96,7 @@ def spread_divergence(feature_importance: Importances):
 
     Parameters
     ----------
-    feature_importance: Importances
+    feature_importance: ArrayLike
         The feature importance values for the features.
 
     Returns
@@ -92,14 +106,8 @@ def spread_divergence(feature_importance: Importances):
     Example
     -------
 
-    >>> from holisticai.explainability.commons import Importances
-    >>> from holisticai.explainability.metrics.global_importance import (
-    ...     spread_divergence,
-    ... )
-    >>> feature_importance = Importances(
-    ...     values=np.array([0.10, 0.20, 0.30]),
-    ...     feature_names=["feature_1", "feature_2", "feature_3"],
-    ... )
+    >>> from holisticai.explainability.metrics import spread_divergence
+    >>> feature_importance = np.array([0.10, 0.20, 0.30])
     >>> score = spread_divergence(feature_importance)
     0.8196393599933761
 

@@ -7,13 +7,13 @@ def test_compute_ranked_feature_importance():
 
     # Test filtering with default threshold (alpha=None)
     ranked_importances = feature_importance.top_alpha()
-    assert np.isclose(ranked_importances.values , np.array([0.6, 0.15])).all()
-    assert ranked_importances.feature_names == ['feature1', 'feature2']
+    assert np.isclose(ranked_importances.values , np.array([0.6, 0.15, 0.15])).all()
+    assert ranked_importances.feature_names == ['feature1', 'feature2', 'feature3']
 
     # Test filtering with custom threshold (alpha=0.8)
     ranked_importances = feature_importance.top_alpha(alpha=0.8)
-    assert np.isclose(ranked_importances.values, np.array([0.6, 0.15])).all()
-    assert ranked_importances.feature_names == ['feature1', 'feature2']
+    assert np.isclose(ranked_importances.values, np.array([0.6, 0.15, 0.15])).all()
+    assert ranked_importances.feature_names == ['feature1', 'feature2', 'feature3']
 
     # Test filtering with custom threshold (alpha=0.5)
     ranked_importances = feature_importance.top_alpha(alpha=0.5)

@@ -131,6 +131,6 @@ def plot_surrogate(feature_importance: Importances, ax=None, **kargs):
         ax=ax,
         **kargs,
     )
-    #description = """Classification: Color indicate majority class.\nRegression: Color indicate extremity of values."""
-    #ax.text(0.02, 0.92, description, fontsize=15, ha="left", transform=plt.gca().transAxes)
+    # description = """Classification: Color indicate majority class.\nRegression: Color indicate extremity of values."""
+    # ax.text(0.02, 0.92, description, fontsize=15, ha="left", transform=plt.gca().transAxes)
     return ax

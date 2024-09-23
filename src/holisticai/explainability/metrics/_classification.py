@@ -1,25 +1,26 @@
 from __future__ import annotations
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 import pandas as pd
-
-from holisticai.explainability.metrics.global_importance import (
+from holisticai.explainability.metrics.global_feature_importance import (
     AlphaScore,
     PositionParity,
     RankAlignment,
     SpreadDivergence,
     SpreadRatio,
     XAIEaseScore,
+    surrogate_accuracy_score,
 )
-from holisticai.explainability.metrics.global_importance._surrogate import surrogate_accuracy_score
-from holisticai.explainability.metrics.local_importance import FeatureStability
-from holisticai.utils import (
-    ConditionalImportances,
-    Importances,
-    LocalImportances,
-    PartialDependence,
-)
+from holisticai.explainability.metrics.local_feature_importance import FeatureStability
+
+if TYPE_CHECKING:
+    from holisticai.utils._definitions import (
+        ConditionalImportances,
+        Importances,
+        LocalImportances,
+        PartialDependence,
+    )
 
 
 def classification_explainability_metrics(
@@ -33,7 +34,7 @@ def classification_explainability_metrics(
     ranked_importances = importances.top_alpha(0.8)
     results = []
     metric = AlphaScore()
-    value = metric(importances)
+    value = metric(importances.values)
     results.append({"metric": metric.name, "value": value, "reference": metric.reference})
 
     metric = XAIEaseScore()
@@ -49,11 +50,11 @@ def classification_explainability_metrics(
     results.append({"metric": metric.name, "value": value, "reference": metric.reference})
 
     metric = SpreadRatio()
-    value = metric(importances)
+    value = metric(importances.values)
     results.append({"metric": metric.name, "value": value, "reference": metric.reference})
 
     metric = SpreadDivergence()
-    value = metric(importances)
+    value = metric(importances.values)
     results.append({"metric": metric.name, "value": value, "reference": metric.reference})
 
     if "surrogate" in importances.extra_attrs:
