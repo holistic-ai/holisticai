@@ -529,9 +529,14 @@ def plot_adp_and_adf(results_df):
     x = results_df["size_factor"]
     y = results_df["percent_above"]
     decision = results_df["decision"]
+    average_accuracy = results_df["average_accuracy"]
+    variance_accuracy = results_df["variance_accuracy"]
 
     # Create figure
     plt.figure(figsize=(10, 6))
+
+    plt.plot(x, average_accuracy, '-o', color="blue", label="average_accuracy")
+    plt.fill_between(x, average_accuracy - 0.95*variance_accuracy, average_accuracy + 0.95*variance_accuracy, color='blue', alpha=0.2)
 
     # Plot OK points (green)
     plt.scatter(x[decision == "OK"], y[decision == "OK"], color="green", label="OK", s=100, edgecolor="k")
@@ -582,3 +587,4 @@ def plot_adp_and_adf(results_df):
 
     # Show legend
     plt.legend()
+    plt.grid()

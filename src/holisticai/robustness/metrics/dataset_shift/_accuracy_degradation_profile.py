@@ -357,6 +357,10 @@ def _calculate_accuracies(
     n_neighbours_list = [int(full_set_size * i) for i in set_size_list]
     results = {size_factor: [] for size_factor in set_size_list}
 
+    # TODO: Get the neighbors for each test set size (is it possible to optimize like this?)
+    test_set_neighbours = knn.kneighbors(X_test, n_neighbors=full_set_size, return_distance=False)
+    matches = y_test[test_set_neighbours] == y_pred[test_set_neighbours]
+    
     # Loop over different number of neighbors
     for size_factor_index, n_neighbours in enumerate(n_neighbours_list):
         if n_neighbours <= 0:
@@ -364,8 +368,16 @@ def _calculate_accuracies(
 
         # Evaluate accuracy over each test set size
         size_factor = set_size_list[size_factor_index]
-        test_set_neighbours = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
-        accuracy_list = [accuracy_score(y_pred[neighbors], y_test[neighbors]) for neighbors in test_set_neighbours]
+        #test_set_neighbours = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
+
+        accuracy_list = np.mean(matches[:,:n_neighbours], axis=1) #[accuracy_score(y_pred[neighbors[:n_neighbours]], y_test[neighbors[:n_neighbours]]) for neighbors in test_set_neighbours]
+        #accuracy_list = np.mean(matches[:,:n_neighbours], axis=1)
+
+
+        #den = 1./np.arange(1, n_neighbours + 1)
+        #den_norm = den/np.sum(den)
+        #accuracy_list = np.sum(den_norm[None,:]*matches[:,:n_neighbours],axis=1)
+
         results[size_factor] = accuracy_list
 
     # Organize results into a DataFrame
@@ -448,13 +460,13 @@ def _summarize_results(
     threshold = threshold_percentual * baseline_accuracy
 
     # Initialize an empty DataFrame to store the summary of results
-    results_summary_df = pd.DataFrame(columns=["size_factor", "above_threshold", "percent_above", "decision"])
+    results_summary_df = pd.DataFrame(columns=["size_factor", "above_threshold", "percent_above", "average_accuracy",  'variance_accuracy', "decision"])
 
     # Iterate through each size_factor in the results_df
     for size_factor in results_df.columns:
         # Count how many accuracies are above the threshold for the current
         # size factor
-        above_threshold = results_df[results_df[size_factor] > threshold].shape[0]
+        above_threshold =  (results_df[size_factor] > threshold).sum() #results_df[results_df[size_factor] > threshold].shape[0]
 
         # Determine whether the decision is 'OK' or indicates 'acc degrad!'
         # based on above_threshold percentage
@@ -466,7 +478,9 @@ def _summarize_results(
                 "size_factor": [size_factor],
                 "percent_above": [above_threshold / results_df.shape[0]],
                 "above_threshold": [above_threshold],
-                "decision": [decision],
+                'average_accuracy': np.mean(results_df[size_factor]),
+                'variance_accuracy': np.std(results_df[size_factor]),
+                "decision": [decision]
             }
         )
 
