@@ -155,15 +155,6 @@ def plot_2d(X, y, highlight_group=None, show_just_group=None, features_to_plot=N
         :alt: Scatter Plot of a 2D dataset with a highlighted group and it's labels
 
 
-    Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph. The values
-    of y_pred (shaded circles) are shifted vertically by a small amount to allow better
-    visualization. It is possible to see where the classifier uncorrectedly classified the
-    true labels **by the different collors** between y_test and y_pred.
-
-    .. image:: /_static/images/plot_2d_label_and_prediction.png
-        :alt: Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph
-
-
     Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph while
     caltulating the accuracy over the point and its' selected neighbors.
 
@@ -282,6 +273,15 @@ def plot_label_and_prediction(X, y, y_pred, vertical_offset=0.1, features_to_plo
     ... )
     This will display a 2D scatter plot with both the true labels and the predicted
     labels, where the predicted labels are slightly offset.
+
+    Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph. The values
+    of y_pred (shaded circles) are shifted vertically by a small amount to allow better
+    visualization. It is possible to see where the classifier uncorrectedly classified the
+    true labels **by the different collors** between y_test and y_pred.
+
+    .. image:: /_static/images/plot_2d_label_and_prediction.png
+        :alt: Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph
+
     """
 
     import inspect
@@ -455,7 +455,7 @@ def plot_neighborhood(
 
         # Annotate all points with their indices
         for i, (x_plot, y_plot) in enumerate(X):
-            ax.text(x_plot, y_plot, str(i), color="gray", fontsize=10, ha="right")
+            ax.text(x_plot, y_plot, str(i), color="grey", fontsize=10, ha="right")
 
         # Accuracy over the neighbors
         acc = accuracy_score(y[indices][0], y_pred[indices][0])

@@ -89,13 +89,13 @@ def image_plot_dataset_shift():
     plot_2d(X, y)
     plt.savefig(f"{static_image_folder}/plot_2d_pure.png")
 
-    # Scatter Plot of a 2D dataset with a highlighted group
-    plot_2d(X, y, highlight_group=test_indices)
-    plt.savefig(f"{static_image_folder}/plot_2d_highlight_group.png")
+    # # Scatter Plot of a 2D dataset with a highlighted group
+    # plot_2d(X, y, highlight_group=test_indices)
+    # plt.savefig(f"{static_image_folder}/plot_2d_highlight_group.png")
 
-    # Scatter Plot of a 2D dataset with a highlighted group and it's labels
-    plot_2d(X, y, highlight_group=test_indices, show_just_group=True)
-    plt.savefig(f"{static_image_folder}/plot_2d_show_just_group.png")
+    # # Scatter Plot of a 2D dataset with a highlighted group and it's labels
+    # plot_2d(X, y, highlight_group=test_indices, show_just_group=True)
+    # plt.savefig(f"{static_image_folder}/plot_2d_show_just_group.png")
 
     # Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph
     plot_label_and_prediction(X_test, y_test, y_pred, vertical_offset=0.1)

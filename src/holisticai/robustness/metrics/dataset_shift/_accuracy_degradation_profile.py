@@ -30,7 +30,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.neighbors import NearestNeighbors
 
 # Constants
-STEP_SIZE = 0.05
+STEP_SIZE = 0.01
 DECISION_COLUMN = "decision"
 
 
@@ -348,7 +348,7 @@ def _calculate_accuracies(
     # Auxiliary data structures
     full_set_size = X_test.shape[0]
     no_of_steps = int(1 // step_size)
-    set_size_list = [1 - ((i + 1) * step_size) for i in range(no_of_steps)]
+    set_size_list = [(1 - ((i + 1) * step_size)) for i in range(no_of_steps)]
     n_neighbours_list = [int(full_set_size * i) for i in set_size_list]
     results = {size_factor: [] for size_factor in set_size_list}
 
