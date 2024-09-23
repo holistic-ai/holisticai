@@ -104,15 +104,6 @@ python -m pip install cylp
 brew install cmake
 ```
 
-**Explainability Visualization Tools:**
-
-Install GraphViz:
-
-```bash
-sudo apt update
-sudo apt-get install graphviz
-```
-
 ### Contributing
 
 We welcome contributions from the community To learn more about contributing to Holistic AI, please refer to our [Contributing Guide](CONTRIBUTING.md).

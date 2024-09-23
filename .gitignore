@@ -36,3 +36,4 @@ docs/build
 .pytest_cache
 docs/**/*.ipynb
 src/*.ipynb
+.env
