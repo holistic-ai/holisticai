@@ -34,6 +34,8 @@ from holisticai.explainability.metrics.surrogate import (
 )
 from holisticai.explainability.metrics.tree import (
     tree_depth_variance,
+    tree_number_of_features,
+    tree_number_of_rules,
     weighted_average_depth,
     weighted_average_explainability_score,
     weighted_tree_gini,
@@ -61,8 +63,9 @@ __all__ = [
     "weighted_tree_gini",
     "tree_depth_variance",
     "surrogate_accuracy_difference",
-    "surrogate_mean_squared_error",
     "surrogate_mean_squared_error_difference",
     "surrogate_feature_importances_stability",
     "surrogate_features_stability",
+    "tree_number_of_features",
+    "tree_number_of_rules",
 ]

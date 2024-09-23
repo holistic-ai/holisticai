@@ -11,3 +11,4 @@ Explainable metrics play a crucial role in achieving transparent and trustworthy
    metrics/similarity
    metrics/permutation
    metrics/stability
+   metrics/tree
