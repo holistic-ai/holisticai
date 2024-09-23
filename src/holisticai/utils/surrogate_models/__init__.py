@@ -9,9 +9,7 @@ from holisticai.utils.surrogate_models._trees import (
     DecisionTreeRegressor,
 )
 
-SklearnDecisionTree = Union[DecisionTreeClassifier, DecisionTreeRegressor]
-
-Surrogate = SklearnDecisionTree
+Surrogate = Union[DecisionTreeClassifier, DecisionTreeRegressor]
 LearningTask = Literal["binary_classification", "multi_classification", "regression"]
 SurrogateType = Literal["shallow_tree", "tree"]
 
@@ -71,7 +69,7 @@ def get_features(surrogate):
     if hasattr(surrogate, "feature"):
         return surrogate.feature
 
-    if isinstance(surrogate, SklearnDecisionTree):
+    if isinstance(surrogate, (DecisionTreeClassifier, DecisionTreeRegressor)):
         assert surrogate.__is_fitted__, "Model not fitted"
         return surrogate._surrogate.tree_.feature  # noqa: SLF001
     raise ValueError(f"Surrogate type {type(surrogate)} not supported")
@@ -81,7 +79,7 @@ def get_number_of_rules(surrogate):
     if hasattr(surrogate, "n_leaves"):
         return surrogate.n_leaves
 
-    if isinstance(surrogate, SklearnDecisionTree):
+    if isinstance(surrogate, (DecisionTreeClassifier, DecisionTreeRegressor)):
         assert surrogate.__is_fitted__, "Model not fitted"
         return surrogate._surrogate.get_n_leaves()  # noqa: SLF001
     raise ValueError(f"Surrogate type {type(surrogate)} not supported")
