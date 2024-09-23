@@ -26,11 +26,12 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
+from matplotlib.pyplot import step
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import NearestNeighbors
 
 # Constants
-STEP_SIZE = 0.01
+STEP_SIZE = 0.05
 DECISION_COLUMN = "decision"
 
 
@@ -169,6 +170,10 @@ def accuracy_degradation_profile(
     - This method applies nearest neighbors to simulate accuracy degradation by
     reducing test set size.
     """
+
+    # Check if the step size is too small
+    if step_size < (1 / X_test.shape[0]):
+        raise ValueError("'step_size' is too small (less than 1 divided by the number of samples).")
 
     # Validate inputs
     if isinstance(X_test, pd.DataFrame) & isinstance(y_test, pd.Series):
