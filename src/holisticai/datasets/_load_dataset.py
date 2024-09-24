@@ -11,6 +11,13 @@ from holisticai.datasets._dataloaders import (
     load_law_school,
     load_student,
     load_us_crime,
+    load_german_credit,
+    load_census_kdd,
+    load_bank_marketing,
+    load_compass,
+    load_diabetes,
+    load_acsincome,
+    load_acspublic,
 )
 from holisticai.datasets._dataset import Dataset
 from holisticai.datasets._utils import convert_float_to_categorical, get_protected_values
@@ -419,6 +426,416 @@ def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] 
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
+def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = None):
+    """
+    Processes the german credit dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    size : str
+        The size of the dataset to return. Either 'small' or 'large'
+    return_df : bool
+        Whether to return the data as dataframe or not
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_german_credit()
+    protected_attributes = ["Sex", "Age"]
+    output_column = "Risk"
+    # change risk to binary
+    data["target"] = data["target"].map({"good": 0, "bad": 1})
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    remove_columns = [*protected_attributes, output_column]
+    df = df.ffill()
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "male"
+            gb_label = "female"
+            group_a = pd.Series(df["Sex"] == "male", name="group_a")
+            group_b = pd.Series(df["Sex"] == "female", name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = None):
+    """
+    Processes the Census KDD dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    size : str
+        The size of the dataset to return. Either 'small' or 'large'
+    return_df : bool
+        Whether to return the data as dataframe or not
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_census_kdd()
+    protected_attributes = ["race", "sex"]
+    output_column = "income_50k"
+    # change risk to binary
+    data["target"] = data["target"].map({"' - 50000.'": 0, "' 50000+.'": 1})
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    remove_columns = [*protected_attributes, output_column]
+    df = df.dropna(axis=0)
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+    
+    df['race'] = [1 if x == "' White'" else 0 for x in df['race']]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["sex"] == "' Male'", name="group_a")
+            group_b = pd.Series(df["sex"] == "' Female'", name="group_b")
+
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Non-White"
+            group_a = pd.Series(df["race"] == 1, name="group_a")
+            group_b = pd.Series(df["race"] == 0, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional[Literal["marital"]] = None):
+    """
+    Processes the Banking Marketing dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_bank_marketing()
+    protected_attributes = ["marital", "age"]
+    output_column = "class"
+    # change risk to binary
+    data["target"] = data["target"].map({1: 0, 2: 1})
+
+    rename_columns = {
+        'V1': 'age',
+        'V2': 'job',
+        'V3': 'marital',
+        'V4': 'education',
+        'V5': 'default',
+        'V6': 'balance',
+        'V7': 'housing',
+        'V8': 'loan',
+        'V9': 'contact',
+        'V10': 'day',
+        'V11': 'month',
+        'V12': 'duration',
+        'V13': 'campaign',
+        'V14': 'pdays',
+        'V15': 'previous',
+        'V16': 'poutcome',
+    }
+
+    data["data"].rename(columns=rename_columns, inplace=True)
+
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    df['marital'] = [1 if x == "married" else 0 for x in df['marital']]
+    remove_columns = [*protected_attributes, output_column]
+    df = df.dropna(axis=0)
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "marital":
+            ga_label = "Married"
+            gb_label = "Not Married"
+            group_a = pd.Series(df["marital"] == 1, name="group_a")
+            group_b = pd.Series(df["marital"] == 0, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+    """
+    Processes the Compass dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_compass()
+    protected_attributes = ["race", "sex", "age"]
+    output_column = "is_recid"
+    # change risk to binary
+    data["target"] = data["target"].map({-1: 1})
+
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    df['race'] = ['Caucasian' if x == 0 else 'Non-Caucasian' for x in df['race']]
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["sex"] == 1, name="group_a")
+            group_b = pd.Series(df["sex"] == 0, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "Causasian"
+            gb_label = "Non-Caucasian"
+            group_a = pd.Series(df["race"] == 'Causasian', name="group_a")
+            group_b = pd.Series(df["race"] == 'Non-Caucasian', name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "gender"]] = None):
+    """
+    Processes the Diabetes dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_diabetes()
+    protected_attributes = ["race", "gender", "age"]
+    output_column = "readmit_30_days"
+    # change risk to binary
+    data["target"] = data["target"].map({-1: 1})
+
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    df['race'] = ['Caucasian' if x == "Caucasian" else 'Non-Caucasian' for x in df['race']]
+
+    remove_columns = [*protected_attributes, output_column]
+    #df = df.dropna()
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["gender"] == "Male", name="group_a")
+            group_b = pd.Series(df["gender"] == "Female", name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "Caucasian"
+            gb_label = "Non-Caucasian"
+            group_a = pd.Series(df["race"] == "Caucasian", name="group_a")
+            group_b = pd.Series(df["race"] == "Non-Caucasian", name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+    """
+    Processes the ACSIncome dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_acsincome()
+    protected_attributes = ["AGEP", "RAC1P", "SEX"]
+    output_column = "PINCP" # Total person's income
+    # change risk to binary
+    data["target"] = data["target"].map({-1: 1})
+
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    df['RAC1P'] = ['White' if x == 1 else 'Non-White' for x in df['RAC1P']]
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["SEX"] == 1, name="group_a")
+            group_b = pd.Series(df["SEX"] == 2, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Non_White"
+            group_a = pd.Series(df["RAC1P"] == 'White', name="group_a")
+            group_b = pd.Series(df["RAC1P"] == 'Non-White', name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+    """
+    Processes the ACSPublicCoverage dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_acspublic()
+    protected_attributes = ["AGEP", "RAC1P", "SEX"]
+    output_column = "PINCP" # Total person's income
+
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    df['RAC1P'] = ['White' if x == 1 else 'Non-White' for x in df['RAC1P']]
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["SEX"] == 1, name="group_a")
+            group_b = pd.Series(df["SEX"] == 2, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Non_White"
+            group_a = pd.Series(df["RAC1P"] == 'White', name="group_a")
+            group_b = pd.Series(df["RAC1P"] == 'Non-White', name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
 ProcessedDatasets = Literal[
     "adult",
     "law_school",
@@ -428,6 +845,13 @@ ProcessedDatasets = Literal[
     "us_crime",
     "us_crime_multiclass",
     "clinical_records",
+    "german_credit",
+    "census_kdd",
+    "bank_marketing",
+    "compass",
+    "diabetes",
+    "acsincome",
+    "acspublic",
 ]
 
 
@@ -475,4 +899,18 @@ def load_dataset(
         return load_us_crime_multiclass_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "clinical_records":
         return load_clinical_records_dataset(protected_attribute=protected_attribute)
+    if dataset_name == "german_credit":
+        return load_german_credit_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "census_kdd":
+        return load_census_kdd_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "bank_marketing":
+        return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "compass":
+        return load_compass_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "diabetes":
+        return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "acsincome":
+        return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "acspublic":
+        return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     raise NotImplementedError
