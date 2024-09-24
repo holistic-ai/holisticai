@@ -6,18 +6,18 @@ import numpy as np
 import pandas as pd
 
 from holisticai.datasets._dataloaders import (
+    load_acsincome,
+    load_acspublic,
     load_adult,
+    load_bank_marketing,
+    load_census_kdd,
+    load_compass,
+    load_diabetes,
+    load_german_credit,
     load_last_fm,
     load_law_school,
     load_student,
     load_us_crime,
-    load_german_credit,
-    load_census_kdd,
-    load_bank_marketing,
-    load_compass,
-    load_diabetes,
-    load_acsincome,
-    load_acspublic,
 )
 from holisticai.datasets._dataset import Dataset
 from holisticai.datasets._utils import convert_float_to_categorical, get_protected_values
@@ -508,8 +508,8 @@ def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Lit
 
     p_attrs = df[protected_attributes]
     y = df[output_column]
-    
-    df['race'] = [1 if x == "' White'" else 0 for x in df['race']]
+
+    df["race"] = [1 if x == "' White'" else 0 for x in df["race"]]
 
     if protected_attribute is not None:
         if protected_attribute == "sex":
@@ -558,28 +558,28 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     data["target"] = data["target"].map({1: 0, 2: 1})
 
     rename_columns = {
-        'V1': 'age',
-        'V2': 'job',
-        'V3': 'marital',
-        'V4': 'education',
-        'V5': 'default',
-        'V6': 'balance',
-        'V7': 'housing',
-        'V8': 'loan',
-        'V9': 'contact',
-        'V10': 'day',
-        'V11': 'month',
-        'V12': 'duration',
-        'V13': 'campaign',
-        'V14': 'pdays',
-        'V15': 'previous',
-        'V16': 'poutcome',
+        "V1": "age",
+        "V2": "job",
+        "V3": "marital",
+        "V4": "education",
+        "V5": "default",
+        "V6": "balance",
+        "V7": "housing",
+        "V8": "loan",
+        "V9": "contact",
+        "V10": "day",
+        "V11": "month",
+        "V12": "duration",
+        "V13": "campaign",
+        "V14": "pdays",
+        "V15": "previous",
+        "V16": "poutcome",
     }
 
     data["data"].rename(columns=rename_columns, inplace=True)
 
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df['marital'] = [1 if x == "married" else 0 for x in df['marital']]
+    df["marital"] = [1 if x == "married" else 0 for x in df["marital"]]
     remove_columns = [*protected_attributes, output_column]
     df = df.dropna(axis=0)
     df.reset_index(drop=True, inplace=True)
@@ -632,7 +632,7 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
     data["target"] = data["target"].map({-1: 1})
 
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df['race'] = ['Caucasian' if x == 0 else 'Non-Caucasian' for x in df['race']]
+    df["race"] = ["Caucasian" if x == 0 else "Non-Caucasian" for x in df["race"]]
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
@@ -652,8 +652,8 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
         elif protected_attribute == "race":
             ga_label = "Causasian"
             gb_label = "Non-Caucasian"
-            group_a = pd.Series(df["race"] == 'Causasian', name="group_a")
-            group_b = pd.Series(df["race"] == 'Non-Caucasian', name="group_b")
+            group_a = pd.Series(df["race"] == "Causasian", name="group_a")
+            group_b = pd.Series(df["race"] == "Non-Caucasian", name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
@@ -689,10 +689,10 @@ def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Liter
     data["target"] = data["target"].map({-1: 1})
 
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df['race'] = ['Caucasian' if x == "Caucasian" else 'Non-Caucasian' for x in df['race']]
+    df["race"] = ["Caucasian" if x == "Caucasian" else "Non-Caucasian" for x in df["race"]]
 
     remove_columns = [*protected_attributes, output_column]
-    #df = df.dropna()
+    # df = df.dropna()
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
 
@@ -743,12 +743,12 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
     """
     data = load_acsincome()
     protected_attributes = ["AGEP", "RAC1P", "SEX"]
-    output_column = "PINCP" # Total person's income
+    output_column = "PINCP"  # Total person's income
     # change risk to binary
     data["target"] = data["target"].map({-1: 1})
 
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df['RAC1P'] = ['White' if x == 1 else 'Non-White' for x in df['RAC1P']]
+    df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
@@ -768,8 +768,8 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
         elif protected_attribute == "race":
             ga_label = "White"
             gb_label = "Non_White"
-            group_a = pd.Series(df["RAC1P"] == 'White', name="group_a")
-            group_b = pd.Series(df["RAC1P"] == 'Non-White', name="group_b")
+            group_a = pd.Series(df["RAC1P"] == "White", name="group_a")
+            group_b = pd.Series(df["RAC1P"] == "Non-White", name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
@@ -800,10 +800,10 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
     """
     data = load_acspublic()
     protected_attributes = ["AGEP", "RAC1P", "SEX"]
-    output_column = "PINCP" # Total person's income
+    output_column = "PINCP"  # Total person's income
 
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df['RAC1P'] = ['White' if x == 1 else 'Non-White' for x in df['RAC1P']]
+    df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
@@ -823,8 +823,8 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
         elif protected_attribute == "race":
             ga_label = "White"
             gb_label = "Non_White"
-            group_a = pd.Series(df["RAC1P"] == 'White', name="group_a")
-            group_b = pd.Series(df["RAC1P"] == 'Non-White', name="group_b")
+            group_a = pd.Series(df["RAC1P"] == "White", name="group_a")
+            group_b = pd.Series(df["RAC1P"] == "Non-White", name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"

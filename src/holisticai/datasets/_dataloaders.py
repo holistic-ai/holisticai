@@ -67,41 +67,54 @@ def load_openml(name, version, data_home=None, return_X_y=False, as_frame=True):
         as_frame=as_frame,
     )
 
+
 def load_student(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("UCI-student-performance-mat", 1, data_home, return_X_y, as_frame)
+
 
 def load_adult(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("adult", 2, data_home, return_X_y, as_frame)
 
+
 def load_law_school(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("law-school-admission-bianry", 1, data_home, return_X_y, as_frame)
+
 
 def load_last_fm(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("LastFM_dataset", 1, data_home, return_X_y, as_frame)
 
+
 def load_us_crime(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("us_crime", 1, data_home, return_X_y, as_frame)
+
 
 def load_heart(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("heart-failure", 1, data_home, return_X_y, as_frame)
 
+
 def load_german_credit(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("German-Credit-Risk-with-Target", 1, data_home, return_X_y, as_frame)
+
 
 def load_census_kdd(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("Census-Income-KDD", 3, data_home, return_X_y, as_frame)
 
+
 def load_bank_marketing(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("bank-marketing", 9, data_home, return_X_y, as_frame)
+
 
 def load_compass(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("compass", 3, data_home, return_X_y, as_frame)
 
+
 def load_diabetes(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("Diabetes-130-Hospitals_(Fairlearn)", 2, data_home, return_X_y, as_frame)
 
+
 def load_acsincome(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("ACSIncome", 3, data_home, return_X_y, as_frame)
+
 
 def load_acspublic(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("ACSPublicCoverage", 2, data_home, return_X_y, as_frame)
