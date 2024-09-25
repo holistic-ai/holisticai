@@ -6,3 +6,10 @@ student,Student,Binary Classification, sex / address
 student_multiclass,Student (Multiclass),Multiclassification, sex / address
 us_crime,US Crime,Regression, race
 us_crime_multiclass,US Crime (Multiclass),Regression, race
+german_credit, German Credit, Binary Classification, sex
+census_kdd, Census KDD, Binary Classification, sex/race
+bank_marketing, Bank Marketing, Binary Classification, marital 
+compass, Compass, Binary Classification, sex/race
+diabetes, Diabetes, Binary Classification, sex/race
+acsincome, ACS Income, Binary Classification, sex/race
+acspublic, ACS Public Coverage, Binary Classification, sex/race

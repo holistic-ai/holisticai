@@ -3,7 +3,14 @@ The :mod:`holisticai.datasets` module includes dataloaders for quick experimenta
 """
 
 from holisticai.datasets._dataloaders import (
+    load_acsincome,
+    load_acspublic,
     load_adult,
+    load_bank_marketing,
+    load_census_kdd,
+    load_compass,
+    load_diabetes,
+    load_german_credit,
     load_heart,
     load_last_fm,
     load_law_school,
@@ -26,4 +33,11 @@ __all__ = [
     "load_heart",
     "load_student",
     "load_us_crime",
+    "load_german_credit",
+    "load_census_kdd",
+    "load_bank_marketing",
+    "load_compass",
+    "load_diabetes",
+    "load_acsincome",
+    "load_acspublic",
 ]
