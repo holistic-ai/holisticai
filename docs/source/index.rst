@@ -13,7 +13,7 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
     :padding: 1 1 0 0
 
     .. grid-item::
-        .. button-link:: https://holisticai.com         
+        .. button-link:: https://www.holisticai.com/        
             :class: btn-primary
 
             :fa:`globe` Holistic AI website
