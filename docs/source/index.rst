@@ -1,4 +1,4 @@
-HolisticAI documentation
+Holistic AI documentation
 ========================
 
 .. image:: https://img.shields.io/pypi/v/holisticai
