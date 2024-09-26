@@ -1,6 +1,6 @@
 <h1 align="center">
 <img src="docs/source/holistic_ai.png" width="100">
-<br>holisticai: building trustworthy AI systems
+<br>Holistic AI: building trustworthy AI systems
 </h1>
 
 [![PyPI](https://img.shields.io/pypi/v/holisticai)](https://pypi.org/project/holisticai/)
