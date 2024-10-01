@@ -68,6 +68,19 @@ def compute_permutation_feature_importance(
     return pfi.compute_importances(Dataset(X=X, y=y), proxy)
 
 
+from sklearn.metrics import accuracy_score, mean_squared_error
+
+class SklearnClassifier:
+    @staticmethod
+    def from_proxy(proxy):
+        class Wrapper:
+            predict = proxy.predict
+            predict_proba = proxy.predict_proba
+            classes = proxy.classes
+            fit = lambda x, y: None
+            score = lambda x, y: accuracy_score(y, proxy.predict(x))
+        return Wrapper
+
 class PermutationFeatureImportanceCalculator:
     def __init__(
         self,
@@ -86,6 +99,28 @@ class PermutationFeatureImportanceCalculator:
         self.importance_type = importance_type
 
     def compute_importances(self, dataset: Dataset, proxy: ModelProxy) -> Importances:
+        X = dataset["X"]
+        y = dataset["y"]
+        #metric = metric_scores[proxy.learning_task]
+        #baseline_score = metric(y, proxy.predict(X))
+        #n_features = X.shape[1]
+
+        sklearn_model = SklearnClassifier.from_proxy(proxy)
+        from sklearn.inspection import permutation_importance
+
+        r = permutation_importance(sklearn_model, X, y, n_repeats=self.n_repeats, random_state=0, n_jobs=self.n_jobs)
+        feature_importance_values = np.abs(r['importances_mean'])
+
+        features = list(X.columns)
+        feature_importances = pd.DataFrame.from_dict(
+            {"Variable": features, "Importance": feature_importance_values}
+        ).sort_values("Importance", ascending=False)
+        feature_importances["Importance"] = feature_importances["Importance"] / feature_importances["Importance"].sum()
+        feature_names = list(feature_importances["Variable"].values)
+        importances = np.array(feature_importances["Importance"].values)
+        return Importances(values=importances, feature_names=feature_names)
+
+    def compute_importances_(self, dataset: Dataset, proxy: ModelProxy) -> Importances:
         X = dataset["X"]
         y = dataset["y"]
         metric = metric_scores[proxy.learning_task]

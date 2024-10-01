@@ -120,14 +120,18 @@ class ConditionalImportances:
 
 
 class LocalImportances:
-    def __init__(self, data: pd.DataFrame, cond: pd.Series | None = None):
+    def __init__(self, data: pd.DataFrame, cond: pd.Series | None = None, metadata: pd.DataFrame | None = None):
         if cond is None:
             cond = pd.Series(["all"] * len(data))
         cond.rename("condition", inplace=True)
         self.data = pd.concat([data, cond], axis=1)
-        self.data.columns = pd.MultiIndex.from_tuples(
-            [("DataFrame", col) for col in data.columns] + [("Serie", cond.name)]
-        )
+        column_names = [("DataFrame", col) for col in data.columns] + [("Serie", cond.name)]
+
+        if metadata is not None:
+            self.data = pd.concat([self.data, metadata], axis=1)
+            column_names += [("Metadata", col) for col in metadata.columns]
+
+        self.data.columns = pd.MultiIndex.from_tuples(column_names)
 
     @property
     def values(self):
@@ -189,6 +193,14 @@ class LocalConditionalImportances:
         return len(self.values)
 
 
+
 class PartialDependence:
-    def __init__(self, values: list[list[dict]]):
+    def __init__(self, values: list[list[dict]], feature_names: Optional[list[str]]=None):
         self.values = values
+        if feature_names is None:
+            feature_names = [f"Feature {i}" for i in range(len(values))]
+        self.feature_names = feature_names
+
+    def get_value(self, feature_name: str, label: str, data_type: str):
+        feature_index = self.feature_names.index(feature_name)
+        return self.values[label][feature_index][data_type][0]

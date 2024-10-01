@@ -209,7 +209,7 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
                 newp["average"] = p["average"][0][np.newaxis]
                 part_dep_feat.append(newp)
             new_partial_dependence.append(part_dep_feat)
-        return PartialDependence(values=new_partial_dependence)
+        return PartialDependence(values=new_partial_dependence, feature_names=features)
 
     if proxy.learning_task == "multi_classification":
         nb_classes = len(proxy.classes)
@@ -224,4 +224,4 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
                 part_dep_feat.append(newp)
             new_partial_dependence.append(part_dep_feat)
         return PartialDependence(values=new_partial_dependence)
-    return PartialDependence(values=[partial_dependence])
+    return PartialDependence(values=[partial_dependence], feature_names=features)
