@@ -81,6 +81,15 @@ class SklearnClassifier:
             score = lambda x, y: accuracy_score(y, proxy.predict(x))
         return Wrapper
 
+class SklearnRegressor:
+    @staticmethod
+    def from_proxy(proxy):
+        class Wrapper:
+            predict = proxy.predict
+            fit = lambda x, y: None
+            score = lambda x, y: mean_squared_error(y, proxy.predict(x))
+        return Wrapper
+
 class PermutationFeatureImportanceCalculator:
     def __init__(
         self,
@@ -104,8 +113,12 @@ class PermutationFeatureImportanceCalculator:
         #metric = metric_scores[proxy.learning_task]
         #baseline_score = metric(y, proxy.predict(X))
         #n_features = X.shape[1]
-
-        sklearn_model = SklearnClassifier.from_proxy(proxy)
+        if proxy.learning_task == "regression":
+            sklearn_model = SklearnRegressor.from_proxy(proxy)
+        
+        elif proxy.learning_task == "binary_classification" or proxy.learning_task == "multi_classification":
+            sklearn_model = SklearnClassifier.from_proxy(proxy)
+        
         from sklearn.inspection import permutation_importance
 
         r = permutation_importance(sklearn_model, X, y, n_repeats=self.n_repeats, random_state=0, n_jobs=self.n_jobs)

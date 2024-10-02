@@ -44,7 +44,7 @@ def compute_shap_feature_importance(
     if 'y_proba' in ds.features:
         local_importances = LocalImportances(data=data, cond=condition, metadata=ds[['y','y_proba']])
     else:
-        local_importances = LocalImportances(data=data, cond=condition, metadata=ds['y'])
+        local_importances = LocalImportances(data=data, cond=condition, metadata=ds[['y']])
     return local_importances
 
 
