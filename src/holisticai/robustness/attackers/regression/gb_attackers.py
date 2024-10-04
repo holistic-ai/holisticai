@@ -277,6 +277,34 @@ class LinRegGDPoisoner(GDPoisoner):
 
 
 class RidgeGDPoisoner(GDPoisoner):
+    """
+    RidgeGDPoisoner implements computations for Ridge regression. Unlike LinRegGDPoisoner, RidgeGDPoisoner includes regularization terms in the computations.
+
+    Parameters
+    ----------
+    poison_proportion : float
+        The proportion of points to flip. Default is 0.2.
+    num_inits : int
+        The number of initializations. Default is 1.
+    max_iter : int
+        The maximum number of iterations. Default is 15.
+    eta : float
+        Gradient descent step size. Default is 0.01.
+    beta : float
+        Decay rate for line search. Default is 0.05.
+    sigma : float
+        Line search stop condition. Default is 0.9.
+    eps : float
+        Poisoning stop condition. Default is 1e-3.
+    objective : int
+        Objective function to optimize. Default is 0.
+    opty : bool
+        Whether to optimize y. Default is True.
+
+    References
+    ----------
+    .. [1] Jagielski, M., Oprea, A., Biggio, B., Liu, C., Nita-Rotaru, C., & Li, B. (2018, May). Manipulating machine learning: Poisoning attacks and countermeasures for regression learning. In 2018 IEEE symposium on security and privacy (SP) (pp. 19-35). IEEE.
+    """
     def __init__(
         self,
         poison_proportion=0.2,
