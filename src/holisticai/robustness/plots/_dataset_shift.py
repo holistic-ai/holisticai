@@ -334,72 +334,16 @@ def plot_label_and_prediction(X, y, y_pred, vertical_offset=0.1, features_to_plo
 
 
 def plot_neighborhood(
-    X, y, y_pred, n_neighbors, points_of_interest, vertical_offset=0.1, features_to_plot=None, ax=None
+    X,
+    y,
+    y_pred,
+    n_neighbors,
+    points_of_interest,
+    vertical_offset=0.1,
+    features_to_plot=None,
+    ax=None,
+    indices_show = None,
 ):
-    """
-    Plots the neighborhoods around specified points of interest and calculates
-    the accuracy over the selected neighbors.
-
-    This function visualizes neighborhoods around the points of interest within the
-    dataset by calculating the nearest neighbors for each point. The neighborhoods
-    are outlined using a convex hull, and the accuracy of predictions over the
-    neighborhood is shown for each selected point. Optionally, a vertical offset is
-    applied to differentiate between true labels and predicted labels.
-
-    Parameters:
-    ----------
-    X : np.ndarray or pd.DataFrame
-        The feature matrix where each row represents a sample and each column
-        represents a feature. It can be a NumPy array or a pandas DataFrame.
-    y : np.ndarray or pd.Series
-        The true labels for the test set. Can be a NumPy array or a pandas Series.
-    y_pred : np.ndarray or pd.Series
-        The predicted labels for the test set. Can be a NumPy array or a pandas
-        Series.
-    n_neighbors : int
-        The number of nearest neighbors to consider for constructing neighborhoods.
-    points_of_interest : list or np.ndarray
-        The indices of the points of interest in the dataset for which the
-        neighborhoods will be highlighted.
-    vertical_offset : float, optional (default=0.1)
-        A small vertical offset to separate the predicted points from the true
-        labels for visualization clarity.
-    features_to_plot : list, optional
-        A list of feature names (strings) to label the x and y axes of the plot.
-        If not provided, the function will infer the names of `X` and `y`.
-    ax : matplotlib.axes.Axes, optional
-        An existing matplotlib Axes object to plot on. If not provided, a new
-        figure and axis are created.
-
-    Returns:
-    -------
-    None
-        This function does not return any values. It generates and displays a 2D
-        scatter plot showing neighborhoods around the points of interest and the
-        accuracy of predictions over these neighborhoods.
-
-    Example:
-    -------
-    >>> import numpy as np
-    >>> import pandas as pd
-    >>> from sklearn.datasets import make_classification
-    >>> from matplotlib import pyplot as plt
-    >>>
-    >>> # Example dataset
-    >>> X, y = make_classification(
-    ...     n_samples=100, n_features=2, n_informative=2, n_redundant=0, random_state=42
-    ... )
-    >>> y_pred = np.random.randint(0, 2, size=100)  # Random predictions
-    >>> points_of_interest = [10, 50, 90]
-    >>>
-    >>> # Plot the neighborhood
-    >>> plot_neighborhood(
-    ...     X, y, y_pred, n_neighbors=5, points_of_interest=points_of_interest
-    ... )
-    This will display a 2D scatter plot of the dataset, highlighting the
-    neighborhoods around points 10, 50, and 90, along with the accuracy of
-    predictions for each neighborhood.
-    """
 
     import inspect
 
@@ -419,7 +363,7 @@ def plot_neighborhood(
         X_name = next(name for name, value in arg_info.locals.items() if value is X)
         y_name = next(name for name, value in arg_info.locals.items() if value is y)
 
-    # Neighborhood on test set
+    # Neighborhood on X
     knn = NearestNeighbors(n_neighbors=n_neighbors + 1)
     knn.fit(X)
 
@@ -439,7 +383,9 @@ def plot_neighborhood(
         X[:, 0], X[:, 1] - vertical_offset, c=y_pred, cmap="viridis", s=50, edgecolor="k", label="y_pred", alpha=0.5
     )
 
-    for sample_index in points_of_interest:
+    points_to_plot = np.arange(0, indices_show.size)
+
+    for sample_index in points_to_plot[:len(points_of_interest)-1]:
         # Find the n nearest neighbors of the sample
         _, indices = knn.kneighbors([X[sample_index]])
 
@@ -455,7 +401,7 @@ def plot_neighborhood(
 
         # Annotate all points with their indices
         for i, (x_plot, y_plot) in enumerate(X):
-            ax.text(x_plot, y_plot, str(i), color="grey", fontsize=10, ha="right")
+            ax.text(x_plot, y_plot, str(indices_show[i]), color="grey", fontsize=10, ha="right")
 
         # Accuracy over the neighbors
         acc = accuracy_score(y[indices][0], y_pred[indices][0])
@@ -476,7 +422,7 @@ def plot_neighborhood(
     ax.set_ylabel(y_name, fontweight="bold")
 
     plt.title(
-        f"Convex Hulls of Samples {', '.join(map(str, points_of_interest))} and its {n_neighbors} Nearest Neighbors."
+        f"Convex Hulls of Samples {', '.join(map(str, points_of_interest+1))} and its {n_neighbors} Nearest Neighbors."
     )
 
 
@@ -579,8 +525,8 @@ def plot_adp_and_adf(results_df):
 
     # Label axes and title
     plt.xlabel("Size Factor", fontweight="bold")
-    plt.ylabel("Percent Above", fontweight="bold")
-    plt.title("ADP and ADF plot (Percent Above vs. Size Factor)")
+    plt.ylabel("Percentual", fontweight="bold")
+    plt.title("Accuracy Degradation Profile (ADP) and Accuracy Degradation Factor (ADF)")
 
     # Reverse the x-axis (from 0.95 to 0.05)
     plt.gca().invert_xaxis()

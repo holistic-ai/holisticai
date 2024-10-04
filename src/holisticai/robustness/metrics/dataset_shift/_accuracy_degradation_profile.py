@@ -22,7 +22,7 @@ environments where test data may change or reduce in size.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -33,6 +33,42 @@ from sklearn.neighbors import NearestNeighbors
 # Constants
 STEP_SIZE = 0.05
 DECISION_COLUMN = "decision"
+
+
+def pre_process_data(
+        X: Union[np.ndarray, pd.DataFrame],
+        y: Union[np.ndarray, pd.Series, pd.DataFrame],
+        test_size: float = 0.3,
+        random_state: int = 42
+):
+
+    import numpy as np
+    from sklearn.model_selection import train_test_split
+
+    # Check if input is a DataFrame or NumPy array
+    if isinstance(X, (np.ndarray, pd.DataFrame)) and isinstance(y, (np.ndarray, pd.Series, pd.DataFrame)):
+
+        # Array of indices
+        indices = np.arange(X.shape[0])
+
+        # Split the indices
+        train_indices, test_indices = train_test_split(indices, test_size=test_size, random_state=random_state)
+
+        # Split the data using the indices
+        if isinstance(X, pd.DataFrame):
+            X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
+        else:
+            X_train, X_test = X[train_indices], X[test_indices]
+
+        if isinstance(y, (pd.Series, pd.DataFrame)):
+            y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
+        else:
+            y_train, y_test = y[train_indices], y[test_indices]
+
+    else:
+        raise TypeError("X must be a NumPy array or pandas DataFrame, and y must be a NumPy array, pandas Series, or DataFrame.")
+
+    return X_train, X_test, y_train, y_test, test_indices
 
 
 def accuracy_degradation_factor(df: pd.DataFrame) -> float:
@@ -359,8 +395,9 @@ def _calculate_accuracies(
 
     # TODO: Get the neighbors for each test set size (is it possible to optimize like this?)
     test_set_neighbours = knn.kneighbors(X_test, n_neighbors=full_set_size, return_distance=False)
+    # print(test_set_neighbours)
     matches = y_test[test_set_neighbours] == y_pred[test_set_neighbours]
-    
+
     # Loop over different number of neighbors
     for size_factor_index, n_neighbours in enumerate(n_neighbours_list):
         if n_neighbours <= 0:
@@ -368,11 +405,11 @@ def _calculate_accuracies(
 
         # Evaluate accuracy over each test set size
         size_factor = set_size_list[size_factor_index]
-        #test_set_neighbours = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
+        # test_set_neighbours_2 = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
+        # print(test_set_neighbours_2)
 
         accuracy_list = np.mean(matches[:,:n_neighbours], axis=1) #[accuracy_score(y_pred[neighbors[:n_neighbours]], y_test[neighbors[:n_neighbours]]) for neighbors in test_set_neighbours]
         #accuracy_list = np.mean(matches[:,:n_neighbours], axis=1)
-
 
         #den = 1./np.arange(1, n_neighbours + 1)
         #den_norm = den/np.sum(den)
