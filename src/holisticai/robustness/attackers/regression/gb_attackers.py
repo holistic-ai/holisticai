@@ -305,6 +305,7 @@ class RidgeGDPoisoner(GDPoisoner):
     ----------
     .. [1] Jagielski, M., Oprea, A., Biggio, B., Liu, C., Nita-Rotaru, C., & Li, B. (2018, May). Manipulating machine learning: Poisoning attacks and countermeasures for regression learning. In 2018 IEEE symposium on security and privacy (SP) (pp. 19-35). IEEE.
     """
+
     def __init__(
         self,
         poison_proportion=0.2,
