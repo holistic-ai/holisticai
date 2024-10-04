@@ -1,17 +1,23 @@
-Linear Gradient-Based Poisoning Attack
---------------------------------------
+Gradient-Based Poisoning Attackers
+----------------------------------
 
 .. note::
     **Learning tasks:** Regression.
 
 Introduction
 ~~~~~~~~~~~~~~~
-The linear gradient-based poisoning attack aims to inject malicious data points into a training dataset for linear regression models, thereby manipulating the model's learned parameters and degrading its predictive performance. This attack leverages the gradients of the loss function with respect to the input features to strategically position poisoned points that maximize their impact on the regression line.
+The gradient-based poisoning attackers aim to inject malicious data points into a training dataset for regression models, thereby manipulating the model's learned parameters and degrading its predictive performance. This attack leverages the gradients of the loss function with respect to the input features to strategically position poisoned points that maximize their impact on the regression line.
+
+According to the regularization term used to craft the attack, we provide two types of gradient-based poisoning attackers:
+
+1. **LinRegGDPoisoner**: This attacker is based on the ordinary least squares (OLS) loss function without any regularization term. 
+2. **RidgeGDPoisoner**: This attacker is based on the ridge regression loss function with an L2 regularization term.
 
 Description
 ~~~~~~~~~~~~~~
 
 **Problem definition**
+
 The goal is to introduce a small number of carefully crafted data points into the training set such that they significantly alter the learned regression line, leading to inaccurate predictions on unseen data. 
 
 
@@ -35,7 +41,7 @@ The goal is to introduce a small number of carefully crafted data points into th
 Basic Usage
 ~~~~~~~~~~~~~~
 
-Read more about the class attributes and methods in the API reference: :class:`~holisticai.robustness.attackers.LinRegGDPoisoner`.
+Read more about the class attributes and methods in the API reference: :class:`~holisticai.robustness.attackers.LinRegGDPoisoner`, and :class:`~holisticai.robustness.attackers.RidgeGDPoisoner`.
 
 References
 ~~~~~~~~~~~~~~
