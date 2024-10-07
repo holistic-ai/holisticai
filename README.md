@@ -1,6 +1,6 @@
 <h1 align="center">
 <img src="docs/source/holistic_ai.png" width="100">
-<br>holisticai: building trustworthy AI systems
+<br>Holistic AI: building trustworthy AI systems
 </h1>
 
 [![PyPI](https://img.shields.io/pypi/v/holisticai)](https://pypi.org/project/holisticai/)
@@ -44,7 +44,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 # load an example dataset and split
-dataset = load_dataset('law_school')
+dataset = load_dataset('law_school', protected_attribute="race")
 dataset_split = dataset.train_test_split(test_size=0.3)
 
 # separate the data into train and test sets
@@ -53,8 +53,8 @@ test_data = dataset_split['test']
 
 # rescale the data
 scaler = StandardScaler()
-X_train_t = scaler.fit_transform(train_data['x'])
-X_test_t = scaler.transform(test_data['x'])
+X_train_t = scaler.fit_transform(train_data['X'])
+X_test_t = scaler.transform(test_data['X'])
 
 # train a logistic regression model
 model = LogisticRegression(random_state=42, max_iter=500)

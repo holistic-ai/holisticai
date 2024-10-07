@@ -383,11 +383,16 @@ def plot_neighborhood(
         X[:, 0], X[:, 1] - vertical_offset, c=y_pred, cmap="viridis", s=50, edgecolor="k", label="y_pred", alpha=0.5
     )
 
-    points_to_plot = np.arange(0, indices_show.size)
+    for sample_index in points_of_interest:
 
-    for sample_index in points_to_plot[:len(points_of_interest)-1]:
+        if sample_index not in indices_show:
+            raise ValueError(f"The point {sample_index} is not a point in 'indices_show'.")
+
+        # Find the position of sample_index in indices_show
+        position = np.where(indices_show == sample_index)[0]
+
         # Find the n nearest neighbors of the sample
-        _, indices = knn.kneighbors([X[sample_index]])
+        _, indices = knn.kneighbors([X[position[0]]])
 
         # Extract the selected points (sample + neighbors)
         selected_points = X[indices[0]]
@@ -408,8 +413,8 @@ def plot_neighborhood(
 
         # Add text near sample_index
         plt.text(
-            X[sample_index][0],
-            X[sample_index][1],
+            X[position[0]][0],
+            X[position[0]][1],
             f"Acc = {acc*100:.1f}%",
             ha="left",
             va="bottom",
@@ -422,7 +427,7 @@ def plot_neighborhood(
     ax.set_ylabel(y_name, fontweight="bold")
 
     plt.title(
-        f"Convex Hulls of Samples {', '.join(map(str, points_of_interest+1))} and its {n_neighbors} Nearest Neighbors."
+        f"Convex Hull of Samples {', '.join(map(str, points_of_interest))} and its {n_neighbors} Nearest Neighbors."
     )
 
 
