@@ -29,22 +29,23 @@ def compute_shap_feature_importance(
         ds = Dataset(X=X, y=y_, y_proba=y_proba_)
     else:
         ds = Dataset(X=X, y=y_)
+    
+    ds["cond"] = group_mask_samples_by_learning_task(
+        ds['y'],
+        proxy.learning_task,
+    )
 
     if max_samples > 0:
-        ds = ds.groupby('y').sample(n=max_samples, random_state=random_state)
+        ds = ds.groupby('cond').sample(n=max_samples, random_state=random_state)
 
     pfi = SHAPImportanceCalculator()
     pfi.initialize_explainer(X, proxy)
     data = pfi.compute_importances(ds)
 
-    condition = group_mask_samples_by_learning_task(
-        ds['y'],
-        proxy.learning_task,
-    )
     if 'y_proba' in ds.features:
-        local_importances = LocalImportances(data=data, cond=condition, metadata=ds[['y','y_proba']])
+        local_importances = LocalImportances(data=data, cond=ds['cond'], metadata=ds[['y','y_proba']])
     else:
-        local_importances = LocalImportances(data=data, cond=condition, metadata=ds[['y']])
+        local_importances = LocalImportances(data=data, cond=ds['cond'], metadata=ds[['y']])
     return local_importances
 
 
