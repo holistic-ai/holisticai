@@ -628,8 +628,7 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
     data = load_compass()
     protected_attributes = ["race", "sex", "age"]
     output_column = "is_recid"
-    # change risk to binary
-    data["target"] = data["target"].map({-1: 1})
+    data["target"] = data["target"].astype(int).map({0: 0, -1: 1})  # map -1 to 1 for binary classification
 
     df = pd.concat([data["data"], data["target"]], axis=1)
     df["race"] = ["Caucasian" if x == 0 else "Non-Caucasian" for x in df["race"]]
@@ -685,8 +684,6 @@ def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Liter
     data = load_diabetes()
     protected_attributes = ["race", "gender", "age"]
     output_column = "readmit_30_days"
-    # change risk to binary
-    data["target"] = data["target"].map({-1: 1})
 
     df = pd.concat([data["data"], data["target"]], axis=1)
     df["race"] = ["Caucasian" if x == "Caucasian" else "Non-Caucasian" for x in df["race"]]
@@ -744,8 +741,7 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
     data = load_acsincome()
     protected_attributes = ["AGEP", "RAC1P", "SEX"]
     output_column = "PINCP"  # Total person's income
-    # change risk to binary
-    data["target"] = data["target"].map({-1: 1})
+    data["target"] = (data["target"] > 50000).astype(int)  # map income to binary
 
     df = pd.concat([data["data"], data["target"]], axis=1)
     df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
@@ -800,7 +796,7 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
     """
     data = load_acspublic()
     protected_attributes = ["AGEP", "RAC1P", "SEX"]
-    output_column = "PINCP"  # Total person's income
+    output_column = "PUBCOV"  # public health coverage : an individual's label is 1 if PUBCOV == 1 (with public health coverage), otherwise 0.
 
     df = pd.concat([data["data"], data["target"]], axis=1)
     df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
