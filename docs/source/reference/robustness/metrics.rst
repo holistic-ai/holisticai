@@ -16,3 +16,5 @@
 
     adversarial_accuracy
     empirical_robustness
+    accuracy_degradation_profile
+    accuracy_degradation_factor
