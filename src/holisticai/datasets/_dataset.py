@@ -442,8 +442,8 @@ class Dataset(DatasetReprObj):
             self.data = self.data.join(value)
 
         if isinstance(value, pd.Series):
-            new_column = (key, value.name or len(existing_subfeatures))
-            self.data[new_column] = list(value)
+            new_column = (key, key or len(existing_subfeatures))
+            self.data[new_column] = value
 
         self.data.columns = self.data.columns.set_names(["features", "subfeatures"])
 

@@ -4,7 +4,7 @@ import pandas as pd
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import (
     FeatureImportanceSpread,
 )
-from holisticai.explainability.metrics.global_feature_importance._surrogate import surrogate_mean_squared_error
+from holisticai.explainability.metrics.global_feature_importance._surrogate import surrogate_fidelity, surrogate_mean_squared_error
 from holisticai.explainability.metrics.surrogate._stability import (
     FeatureImportancesStability,
     FeaturesStability,
@@ -20,18 +20,18 @@ from holisticai.typing import ArrayLike
 from holisticai.utils.surrogate_models import RegressionSurrogate
 
 
-class MSEDifference:
+class MSEDegradation:
     reference: float = 0
-    name: str = "MSE Difference"
+    name: str = "MSE Degradation"
 
     def __call__(self, y, y_pred, y_surrogate):
         Pb = surrogate_mean_squared_error(y, y_pred)
-        Pt = surrogate_mean_squared_error(y, y_surrogate)
-        D = Pb - Pt
+        Ps = surrogate_mean_squared_error(y, y_surrogate)
+        D = 2*(Ps-Pb)/(Pb+Ps) # Normalized difference between the two SMAPE values
         return D
 
 
-def surrogate_mean_squared_error_difference(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):
+def surrogate_mean_squared_error_degradation(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):
     """
     Calculate the difference between the mean squared error of the original model and the surrogate model.
 
@@ -56,14 +56,14 @@ def surrogate_mean_squared_error_difference(y: ArrayLike, y_pred: ArrayLike, y_s
     --------
     >>> import numpy as np
     >>> from holisticai.explainability.metrics.surrogate import (
-    ...     surrogate_mean_squared_error_difference,
+    ...     surrogate_smape_difference,
     ... )
     >>> y = np.array([1, 2, 3, 4, 5])
     >>> y_pred = np.array([1.1, 2.2, 3.3, 4.4, 5.5])
     >>> y_surrogate = np.array([1.2, 2.3, 3.4, 4.5, 5.6])
-    >>> surrogate_mean_squared_error_difference(y, y_pred, y_surrogate)
+    >>> surrogate_smape_difference(y, y_pred, y_surrogate)
     """
-    m = MSEDifference()
+    m = MSEDegradation()
     return m(y, y_pred, y_surrogate)
 
 
@@ -81,10 +81,10 @@ def regression_surrogate_explainability_metrics(
     results = {}
     is_all = metric_type == "all"
     if is_all or metric_type == "performance":
-        m = MSEDifference()
+        m = MSEDegradation()
         results[m.name] = {"Value": m(y, y_pred, y_surrogate), "Reference": m.reference}
 
-        results["Surrogate MSE"] = {"Value": surrogate_mean_squared_error(y_pred, y_surrogate), "Reference": 0}
+        results["Surrogate Fidelity"] = {"Value": surrogate_fidelity(y_pred, y_surrogate), "Reference": 0}
 
     if is_all or metric_type == "stability":
         m = FeaturesStability()

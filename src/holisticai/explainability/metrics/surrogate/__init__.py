@@ -8,10 +8,11 @@ from holisticai.explainability.metrics.surrogate._clustering import (
     clustering_surrogate_explainability_metrics,
 )
 from holisticai.explainability.metrics.surrogate._regression import (
-    MSEDifference,
+    MSEDegradation,
     regression_surrogate_explainability_metrics,
     surrogate_mean_squared_error,
-    surrogate_mean_squared_error_difference,
+    surrogate_fidelity,
+    surrogate_mean_squared_error_degradation,
 )
 from holisticai.explainability.metrics.surrogate._stability import (
     FeatureImportancesStability,
@@ -30,8 +31,9 @@ __all__ = [
     "surrogate_feature_importances_stability",
     "classification_surrogate_explainability_metrics",
     "regression_surrogate_explainability_metrics",
-    "MSEDifference",
+    "MSEDegradation",
     "surrogate_mean_squared_error",
-    "surrogate_mean_squared_error_difference",
+    "surrogate_fidelity",
+    "surrogate_mean_squared_error_degradation",
     "clustering_surrogate_explainability_metrics",
 ]
