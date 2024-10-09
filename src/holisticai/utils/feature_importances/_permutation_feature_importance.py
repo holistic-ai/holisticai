@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Literal, Union, overload
+from typing import Literal, Union, overload, Any
 
 import numpy as np
 import pandas as pd
@@ -16,6 +16,7 @@ from holisticai.utils._definitions import (
     ModelProxy,
 )
 from holisticai.utils.feature_importances import group_index_samples_by_learning_task
+from holisticai.utils._commons import get_columns, get_item
 
 metric_scores = {
     "binary_classification": accuracy_score,
@@ -47,7 +48,6 @@ def compute_permutation_feature_importance(
     importance_type: Literal["standard"] = "standard",
 ) -> Importances: ...
 
-
 def compute_permutation_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
@@ -60,12 +60,12 @@ def compute_permutation_feature_importance(
     pfi = PermutationFeatureImportanceCalculator(n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state)
     if importance_type == "conditional":
         sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
-        values = {
-            group_name: pfi.compute_importances(Dataset(X=X.loc[indexes], y=y.loc[indexes]), proxy=proxy)
-            for group_name, indexes in sample_groups.items()
-        }
+        values = {}
+        for group_name, indexes in sample_groups.items():
+            values[group_name] =pfi.compute_importances(X=get_item(X, indexes), y=get_item(y, indexes), proxy=proxy)
+
         return ConditionalImportances(values=values)
-    return pfi.compute_importances(Dataset(X=X, y=y), proxy)
+    return pfi.compute_importances(X=X, y=y, proxy=proxy)
 
 
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -98,9 +98,9 @@ class PermutationFeatureImportanceCalculator:
         self.random_state = random_state
         self.importance_type = importance_type
 
-    def compute_importances(self, dataset: Dataset, proxy: ModelProxy) -> Importances:
-        X = dataset["X"]
-        y = dataset["y"]
+    def compute_importances(self, X: Any, y:Any, proxy: ModelProxy) -> Importances:
+        #X = dataset["X"]
+        #y = dataset["y"]
         #metric = metric_scores[proxy.learning_task]
         #baseline_score = metric(y, proxy.predict(X))
         #n_features = X.shape[1]
@@ -111,7 +111,7 @@ class PermutationFeatureImportanceCalculator:
         r = permutation_importance(sklearn_model, X, y, n_repeats=self.n_repeats, random_state=0, n_jobs=self.n_jobs)
         feature_importance_values = np.abs(r['importances_mean'])
 
-        features = list(X.columns)
+        features = list(get_columns(X))
         feature_importances = pd.DataFrame.from_dict(
             {"Variable": features, "Importance": feature_importance_values}
         ).sort_values("Importance", ascending=False)

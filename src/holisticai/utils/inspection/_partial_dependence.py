@@ -9,7 +9,7 @@ from sklearn.inspection import partial_dependence
 from sklearn.metrics import accuracy_score, r2_score
 
 from holisticai.utils._definitions import ModelProxy, PartialDependence
-
+from holisticai.utils._commons import get_columns, get_item
 
 def get_partial_dependence(
     estimator,
@@ -182,7 +182,7 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
         raise ValueError(f"Learning task {proxy.learning_task} is not supported for partial dependence computation")
 
     model = wrap_sklearn_model(proxy)
-    feature_names = np.array(X.columns)
+    feature_names = np.array(get_columns(X))
     method = "auto"
     response_method = "auto"
     grid_resolution = 50
