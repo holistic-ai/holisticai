@@ -76,7 +76,8 @@ def test_accuracy_degradation_profile(mock_data, n_neighbors, baseline_acc, mock
             pd.Series(y_test), 
             pd.Series(y_pred), 
             n_neighbors=n_neighbors, 
-            baseline_accuracy=baseline_acc
+            baseline_accuracy=baseline_acc,
+            step_size = 0.10,
         )
         
         # Assertions
