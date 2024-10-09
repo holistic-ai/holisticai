@@ -28,7 +28,7 @@ def partial_dependence_oscilation(partial_dependencies, importances, top_n=10, a
     #print(feature_names)
     oscilacion = []
     for feature_name in feature_names:
-        individuals = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='individual')
+        individuals = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='individual')
         indice_oscilacion_normalizados = get_osillations_from_individuals(individuals)
         score = np.mean(indice_oscilacion_normalizados)
         weight = df.at[feature_name, 'Importance']
