@@ -51,3 +51,44 @@ class KNeighborsClassifier:
         # Vectorize prediction for all input points
         predictions = vmap(self._predict_single)(jnp.array(X))
         return predictions
+
+
+class NearestNeighbors:
+
+    def __init__(self, n_neighbors, batch_size=100):
+        self.n_neighbors = n_neighbors
+        self.batch_size = batch_size
+
+    def fit(self, X_train):
+        self.X_train = jnp.array(X_train)
+        self.n_train_samples = len(X_train)
+
+    def kneighbors_batched(self, X, n_neighbors=None, return_distance=True, batch_size=None):
+        if n_neighbors is None:
+            n_neighbors = self.n_neighbors
+
+        if batch_size is None:
+            batch_size = self.batch_size
+
+        n_samples = X.shape[0]
+
+        for i in range(0, n_samples, batch_size):
+            X_batch = jnp.array(X[i : i + batch_size])
+            dists_batch = jnp.sqrt(jnp.sum((X_batch[:, None, :] - self.X_train[None, :, :]) ** 2, axis=-1))
+            batch_neighbors_idx = jnp.argsort(dists_batch, axis=1)[:, :n_neighbors]
+            if return_distance:
+                yield dists_batch, batch_neighbors_idx
+            else:
+                yield batch_neighbors_idx
+
+    def kneighbors(self, X, return_distance=False, n_neighbors=None, batch_size=None):
+        neighbors_idx = []
+
+        for _, batch_neighbors_idx in self.kneighbors_batched(X, n_neighbors, batch_size=batch_size, return_distance=True):
+            neighbors_idx.append(batch_neighbors_idx)
+
+        neighbors_idx = jnp.vstack(neighbors_idx)
+
+        return neighbors_idx
+
+

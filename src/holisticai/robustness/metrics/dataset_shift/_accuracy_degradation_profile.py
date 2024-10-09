@@ -22,7 +22,7 @@ environments where test data may change or reduce in size.
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -122,7 +122,8 @@ def accuracy_degradation_profile(
     X_test: pd.DataFrame,
     y_test: pd.DataFrame,
     y_pred: pd.Series,
-    n_neighbors: int,
+    n_neighbors = None,
+    neighbor_estimator = None,
     baseline_accuracy: Optional[float] = None,
     threshold_percentual: float = 0.95,
     above_percentual: float = 0.90,
@@ -223,8 +224,14 @@ def accuracy_degradation_profile(
     # Validate inputs
     _validate_inputs(X_test, y_test, y_pred, baseline_accuracy, threshold_percentual, above_percentual)
 
+    if neighbor_estimator is None:
+        neighbor_estimator = NearestNeighbors(n_neighbors=n_neighbors)
+
+    # Neighborhood on test set
+    neighbor_estimator.fit(X_test)
+
     # Calculate accuracies for varying test set sizes
-    results_df, set_size_list = _calculate_accuracies(X_test, y_test, y_pred, n_neighbors, step_size)
+    results_df, set_size_list = _calculate_accuracies(X_test, y_test, y_pred, neighbor_estimator, step_size)
 
     # Summarize the results
     results_summary_df = _summarize_results(results_df, baseline_accuracy, threshold_percentual, above_percentual)
@@ -313,9 +320,20 @@ def _validate_inputs(
     if not (0 < baseline_accuracy <= 1):
         raise ValueError("baseline_accuracy must be between 0 and 1.")
 
+def batched(X, batch_size=100):
+
+    n_samples = X.shape[0]
+
+    for i in range(0, n_samples, batch_size):
+        yield np.array(X[i : i + batch_size])
+
 
 def _calculate_accuracies(
-    X_test: np.ndarray, y_test: np.ndarray, y_pred: np.ndarray, n_neighbors: int, step_size: float
+    X_test: np.ndarray,
+    y_test: np.ndarray,
+    y_pred: np.ndarray,
+    knn: Any,
+    step_size: float,
 ) -> tuple[pd.DataFrame, list[float]]:
     """
     Calculate accuracies by iteratively reducing the test set size and evaluating accuracy.
@@ -364,11 +382,6 @@ def _calculate_accuracies(
     ...     X, y, test_size=0.3, random_state=42
     ... )
 
-    >>> # Fit a KNN model
-    >>> knn = KNeighborsClassifier(n_neighbors=5)
-    >>> knn.fit(X_train, y_train)
-    >>> y_pred = knn.predict(X_test)
-
     >>> # Calculate accuracies over decreasing test set sizes
     >>> results_df, set_size_list = _calculate_accuracies(
     ...     X_test, y_test, y_pred, n_neighbors=5, step_size=0.05
@@ -382,10 +395,6 @@ def _calculate_accuracies(
     if not (0 < step_size <= 1):
         raise ValueError("step_size must be between 0 and 1.")
 
-    # Neighborhood on test set
-    knn = NearestNeighbors(n_neighbors=n_neighbors)
-    knn.fit(X_test)
-
     # Auxiliary data structures
     full_set_size = X_test.shape[0]
     no_of_steps = int(1 // step_size)
@@ -394,8 +403,11 @@ def _calculate_accuracies(
     results = {size_factor: [] for size_factor in set_size_list}
 
     # TODO: Get the neighbors for each test set size (is it possible to optimize like this?)
-    test_set_neighbours = knn.kneighbors(X_test, n_neighbors=full_set_size, return_distance=False)
-    # print(test_set_neighbours)
+    test_set_neighbours = []
+    for batch in batched(X_test):
+        batch_indexes = knn.kneighbors(batch, n_neighbors=full_set_size, return_distance=False)
+        test_set_neighbours.extend(batch_indexes)
+    test_set_neighbours = np.array(test_set_neighbours)
     matches = y_test[test_set_neighbours] == y_pred[test_set_neighbours]
 
     # Loop over different number of neighbors
@@ -410,10 +422,6 @@ def _calculate_accuracies(
 
         accuracy_list = np.mean(matches[:,:n_neighbours], axis=1) #[accuracy_score(y_pred[neighbors[:n_neighbours]], y_test[neighbors[:n_neighbours]]) for neighbors in test_set_neighbours]
         #accuracy_list = np.mean(matches[:,:n_neighbours], axis=1)
-
-        #den = 1./np.arange(1, n_neighbours + 1)
-        #den_norm = den/np.sum(den)
-        #accuracy_list = np.sum(den_norm[None,:]*matches[:,:n_neighbours],axis=1)
 
         results[size_factor] = accuracy_list
 
@@ -497,16 +505,19 @@ def _summarize_results(
     threshold = threshold_percentual * baseline_accuracy
 
     # Initialize an empty DataFrame to store the summary of results
-    results_summary_df = pd.DataFrame(columns=["size_factor", "above_threshold", "percent_above", "average_accuracy",  'variance_accuracy', "decision"])
+    results_summary_df = pd.DataFrame(columns=["size_factor",
+                                               "above_threshold",
+                                               "percent_above", "average_accuracy",  'variance_accuracy', "degradate", "decision"])
 
     # Iterate through each size_factor in the results_df
     for size_factor in results_df.columns:
         # Count how many accuracies are above the threshold for the current
         # size factor
-        above_threshold =  (results_df[size_factor] > threshold).sum() #results_df[results_df[size_factor] > threshold].shape[0]
+        above_threshold = (results_df[size_factor] > threshold).sum() #results_df[results_df[size_factor] > threshold].shape[0]
 
         # Determine whether the decision is 'OK' or indicates 'acc degrad!'
         # based on above_threshold percentage
+        degradate = 0 if above_threshold / results_df.shape[0] >= above_percentual else 1
         decision = "OK" if above_threshold / results_df.shape[0] >= above_percentual else "acc degrad!"
 
         # Create a new row with the summary data
@@ -517,6 +528,7 @@ def _summarize_results(
                 "above_threshold": [above_threshold],
                 'average_accuracy': np.mean(results_df[size_factor]),
                 'variance_accuracy': np.std(results_df[size_factor]),
+                'degradate': [degradate],
                 "decision": [decision]
             }
         )

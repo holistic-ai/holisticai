@@ -1,3 +1,8 @@
-from holisticai.utils.models.neighbors._classification import KNeighborsClassifier
+from holisticai.utils.models.neighbors._classification import (
+    KNeighborsClassifier,
+    NearestNeighbors,
+)
 
-__all__ = ["KNeighborsClassifier"]
+__all__ = ["KNeighborsClassifier",
+           "NearestNeighbors",
+           ]
