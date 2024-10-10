@@ -246,7 +246,7 @@ def plot_partial_dependence_oscilation(partial_dependencies, top_n=None, subplot
     plt.tight_layout()
 
 
-def plot_partial_dependence_with_std(partial_dependencies, top_n=None, figsize=None, feature_names=None):
+def plot_partial_dependence_with_std(partial_dependencies, importance, top_n=None, figsize=None, feature_names=None, model_name=None):
     if figsize is None:
         figsize = (20, 5)
     
@@ -259,10 +259,12 @@ def plot_partial_dependence_with_std(partial_dependencies, top_n=None, figsize=N
 
     fig, axs = plt.subplots(1, top_n, figsize=figsize, dpi=100)
     color_map = cm.get_cmap('Blues')
+    if model_name is not None:
+        fig.suptitle(model_name)
 
     if top_n == 1:
         axs = [axs]  # Asegura que axs sea iterable incluso con un solo subplot
-
+    df = importance.as_dataframe().set_index('Variable')
     for i, feature_name in enumerate(feature_names[:top_n]):
         # Obtenemos los valores individuales y la malla de valores (grid_values)
         individuals = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='individual')
@@ -276,6 +278,9 @@ def plot_partial_dependence_with_std(partial_dependencies, top_n=None, figsize=N
         std_dev = np.std(individuals_matrix, axis=0)
 
         # Graficamos la curva promedio
+        imp = df.loc[feature_name, 'Importance']
+        axs[i].set_facecolor((1,0,0, imp))
+
         axs[i].plot(grid_values, average, color='blue', linewidth=2, label='Average')
 
         # Graficamos la banda de confianza (curva promedio ± desviación estándar)
@@ -285,7 +290,7 @@ def plot_partial_dependence_with_std(partial_dependencies, top_n=None, figsize=N
         short_feature_name = feature_name.split('_')[-1]
         axs[i].set_xlabel('Grid Values')
         axs[i].set_ylabel('Partial Dependence')
-        axs[i].set_title(f"[feature={short_feature_name}]")
+        axs[i].set_title(f"[feature={short_feature_name}]", fontsize=12)
         axs[i].legend()
         
         # Limitamos el número de ticks en el eje X
@@ -357,3 +362,41 @@ def feature_rank_stability(local_importances):
     overall_stability = np.mean([rank_stability(feature_ranks[feature]) for feature in unique_features])
     
     return overall_stability
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+def plot_feature_importance_contrast(model_name, importances, conditional_feature_importances):
+    feature_names = []
+    for name, cimp in conditional_feature_importances.values.items():
+        feature_names += cimp.top_alpha().feature_names
+    feature_names = sorted(set(feature_names))[:10]
+    # Prepare dataframes
+    imp_df = importances.as_dataframe().set_index('Variable').rename({'Importance': "Overall"}, axis=1).loc[feature_names]
+    cimp_df = [cimp.as_dataframe().set_index('Variable').rename({"Importance": f"label={name}"}, axis=1).loc[feature_names] for name, cimp in conditional_feature_importances.values.items()]
+    all_df = pd.concat([imp_df, *cimp_df], axis=1).sort_values(by='Overall', ascending=False)
+    # Set bar width and the number of bars
+    width = 0.5  # Width of each bar
+    num_columns = len(all_df.columns)  # Number of columns to plot
+    # Create figure and primary axis
+    #fig, ax1 = plt.subplots(figsize=(30, 6), dpi=200)
+    # Plot each set of bars with different positions
+    x = np.arange(len(all_df))  # Position for each feature
+    # Plot conditional importances and Overall importance
+    for i, col in enumerate(all_df.columns):  # Exclude the last column (Fluctuation Ratio)
+        # stacked bar chart for class
+        if i == 0:
+            data = all_df[col]
+            plt.bar(x, all_df[col], width=width, label=col, bottom=0)
+        else:
+            plt.bar(x, all_df[col], width=width, label=col, bottom=data)
+            data += all_df[col]
+    # Set axis labels and title
+    plt.xlabel('Features')
+    plt.ylabel('Importance')
+    plt.title(f'[{model_name}]')
+    plt.tick_params(axis='x', rotation=90)
+    plt.xticks(x, labels=all_df.index)
+    plt.legend()
+    plt.tight_layout()
+    plt.tight_layout()
