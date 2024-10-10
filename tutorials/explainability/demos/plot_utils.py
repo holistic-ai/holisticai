@@ -46,9 +46,9 @@ def plot_partial_dependence(partial_dependencies, top_n=None, subplots=None, fig
     color_map = cm.get_cmap('PuBu')
 
     for i, feature_name in enumerate(partial_dependencies.feature_names[:4]):
-        individuals = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='individual')
-        average = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='average')
-        grid_values = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='grid_values')
+        individuals = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='individual')
+        average = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='average')
+        grid_values = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='grid_values')
         
         num_curves = len(individuals)
         
@@ -182,7 +182,7 @@ def plot_feature_importance_partial_dependencies_oscillation(model_name, df, top
         Line2D([0], [0], color='#5B7BE9', label='Importance', 
             markerfacecolor='#5B7BE9', markersize=8, linewidth=2),
         Line2D([0], [0], color='#47B39C', label='Oscillation',
-            markerfacecolor='#47B39C', markersize=7, linestyle='None')
+            markerfacecolor='#47B39C', markersize=7, linewidth=2)
     ]
     ax1.legend(handles=legend_elements, loc='lower right')
 
@@ -216,7 +216,7 @@ def plot_partial_dependence_oscilation(partial_dependencies, top_n=None, subplot
         axs = [axs]  # Asegura que axs sea iterable incluso con un solo subplot
 
     for i, feature_name in enumerate(feature_names[:top_n]):
-        individuals = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='individual')
+        individuals = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='individual')
 
         indice_oscilacion_normalizados = []
         for c in individuals:
@@ -267,9 +267,9 @@ def plot_partial_dependence_with_std(partial_dependencies, importance, top_n=Non
     df = importance.as_dataframe().set_index('Variable')
     for i, feature_name in enumerate(feature_names[:top_n]):
         # Obtenemos los valores individuales y la malla de valores (grid_values)
-        individuals = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='individual')
-        grid_values = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='grid_values')
-        average = partial_dependencies.get_value(feature_name=feature_name, label=1, data_type='average')
+        individuals = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='individual')
+        grid_values = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='grid_values')
+        average = partial_dependencies.get_value(feature_name=feature_name, label=0, data_type='average')
 
         # Convertimos los individuos en una matriz para facilitar el cálculo de la desviación estándar
         individuals_matrix = np.array(individuals)
