@@ -342,9 +342,8 @@ def plot_neighborhood(
     vertical_offset=0.1,
     features_to_plot=None,
     ax=None,
-    indices_show = None,
+    indices_show=None,
 ):
-
     import inspect
 
     import matplotlib.pyplot as plt
@@ -384,7 +383,6 @@ def plot_neighborhood(
     )
 
     for sample_index in points_of_interest:
-
         if sample_index not in indices_show:
             raise ValueError(f"The point {sample_index} is not a point in 'indices_show'.")
 
@@ -486,8 +484,14 @@ def plot_adp_and_adf(results_df):
     # Create figure
     plt.figure(figsize=(10, 6))
 
-    plt.plot(x, average_accuracy, '-o', color="blue", label="average_accuracy")
-    plt.fill_between(x, average_accuracy - 0.95*variance_accuracy, average_accuracy + 0.95*variance_accuracy, color='blue', alpha=0.2)
+    plt.plot(x, average_accuracy, "-o", color="blue", label="average_accuracy")
+    plt.fill_between(
+        x,
+        average_accuracy - 0.95 * variance_accuracy,
+        average_accuracy + 0.95 * variance_accuracy,
+        color="blue",
+        alpha=0.2,
+    )
 
     # Plot OK points (green)
     plt.scatter(x[decision == "OK"], y[decision == "OK"], color="green", label="OK", s=100, edgecolor="k")

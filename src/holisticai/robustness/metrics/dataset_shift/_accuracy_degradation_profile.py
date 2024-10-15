@@ -35,18 +35,16 @@ DECISION_COLUMN = "decision"
 
 
 def pre_process_data(
-        X: Union[np.ndarray, pd.DataFrame],
-        y: Union[np.ndarray, pd.Series, pd.DataFrame],
-        test_size: float = 0.3,
-        random_state: int = 42
+    X: Union[np.ndarray, pd.DataFrame],
+    y: Union[np.ndarray, pd.Series, pd.DataFrame],
+    test_size: float = 0.3,
+    random_state: int = 42,
 ):
-
     import numpy as np
     from sklearn.model_selection import train_test_split
 
     # Check if input is a DataFrame or NumPy array
     if isinstance(X, (np.ndarray, pd.DataFrame)) and isinstance(y, (np.ndarray, pd.Series, pd.DataFrame)):
-
         # Array of indices
         indices = np.arange(X.shape[0])
 
@@ -65,7 +63,9 @@ def pre_process_data(
             y_train, y_test = y[train_indices], y[test_indices]
 
     else:
-        raise TypeError("X must be a NumPy array or pandas DataFrame, and y must be a NumPy array, pandas Series, or DataFrame.")
+        raise TypeError(
+            "X must be a NumPy array or pandas DataFrame, and y must be a NumPy array, pandas Series, or DataFrame."
+        )
 
     return X_train, X_test, y_train, y_test, test_indices
 
@@ -121,8 +121,8 @@ def accuracy_degradation_profile(
     X_test: pd.DataFrame,
     y_test: pd.DataFrame,
     y_pred: pd.Series,
-    n_neighbors = None,
-    neighbor_estimator = None,
+    n_neighbors=None,
+    neighbor_estimator=None,
     baseline_accuracy: Optional[float] = None,
     threshold_percentual: float = 0.95,
     above_percentual: float = 0.90,
@@ -319,8 +319,8 @@ def _validate_inputs(
     if not (0 < baseline_accuracy <= 1):
         raise ValueError("baseline_accuracy must be between 0 and 1.")
 
-def batched(X, batch_size=100):
 
+def batched(X, batch_size=100):
     n_samples = X.shape[0]
 
     for i in range(0, n_samples, batch_size):
@@ -419,8 +419,10 @@ def _calculate_accuracies(
         # test_set_neighbours_2 = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
         # print(test_set_neighbours_2)
 
-        accuracy_list = np.mean(matches[:,:n_neighbours], axis=1) #[accuracy_score(y_pred[neighbors[:n_neighbours]], y_test[neighbors[:n_neighbours]]) for neighbors in test_set_neighbours]
-        #accuracy_list = np.mean(matches[:,:n_neighbours], axis=1)
+        accuracy_list = np.mean(
+            matches[:, :n_neighbours], axis=1
+        )  # [accuracy_score(y_pred[neighbors[:n_neighbours]], y_test[neighbors[:n_neighbours]]) for neighbors in test_set_neighbours]
+        # accuracy_list = np.mean(matches[:,:n_neighbours], axis=1)
 
         results[size_factor] = accuracy_list
 
@@ -504,15 +506,25 @@ def _summarize_results(
     threshold = threshold_percentual * baseline_accuracy
 
     # Initialize an empty DataFrame to store the summary of results
-    results_summary_df = pd.DataFrame(columns=["size_factor",
-                                               "above_threshold",
-                                               "percent_above", "average_accuracy",  'variance_accuracy', "degradate", "decision"])
+    results_summary_df = pd.DataFrame(
+        columns=[
+            "size_factor",
+            "above_threshold",
+            "percent_above",
+            "average_accuracy",
+            "variance_accuracy",
+            "degradate",
+            "decision",
+        ]
+    )
 
     # Iterate through each size_factor in the results_df
     for size_factor in results_df.columns:
         # Count how many accuracies are above the threshold for the current
         # size factor
-        above_threshold = (results_df[size_factor] > threshold).sum() #results_df[results_df[size_factor] > threshold].shape[0]
+        above_threshold = (
+            results_df[size_factor] > threshold
+        ).sum()  # results_df[results_df[size_factor] > threshold].shape[0]
 
         # Determine whether the decision is 'OK' or indicates 'acc degrad!'
         # based on above_threshold percentage
@@ -525,10 +537,10 @@ def _summarize_results(
                 "size_factor": [size_factor],
                 "percent_above": [above_threshold / results_df.shape[0]],
                 "above_threshold": [above_threshold],
-                'average_accuracy': np.mean(results_df[size_factor]),
-                'variance_accuracy': np.std(results_df[size_factor]),
-                'degradate': [degradate],
-                "decision": [decision]
+                "average_accuracy": np.mean(results_df[size_factor]),
+                "variance_accuracy": np.std(results_df[size_factor]),
+                "degradate": [degradate],
+                "decision": [decision],
             }
         )
 
