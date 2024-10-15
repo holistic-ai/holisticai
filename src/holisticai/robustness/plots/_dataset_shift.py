@@ -494,12 +494,9 @@ def plot_adp_and_adf(results_df):
     )
 
     # Plot OK points (green)
-    plt.scatter(x[decision == "OK"],
-                y[decision == "OK"],
-                color="green",
-                label="percent_degradation - OK",
-                s=100,
-                edgecolor="k")
+    plt.scatter(
+        x[decision == "OK"], y[decision == "OK"], color="green", label="percent_degradation - OK", s=100, edgecolor="k"
+    )
 
     # Plot acc degrad! points (red)
     plt.scatter(
