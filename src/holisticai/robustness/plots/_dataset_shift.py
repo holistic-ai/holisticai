@@ -444,10 +444,10 @@ def plot_adp_and_adf(results_df):
     Parameters:
     ----------
     results_df : pd.DataFrame
-        The DataFrame containing columns 'size_factor', 'percent_above', and
+        The DataFrame containing columns 'size_factor', 'percent_degradation', and
         'decision'.
         - 'size_factor' (float): The fraction of the dataset used in the evaluation.
-        - 'percent_above' (float): The percentage of samples above the threshold
+        - 'percent_degradation' (float): The percentage of samples above the threshold
         for the decision.
         - 'decision' (str): A string indicating if the model's performance is 'OK'
         or shows 'acc degrad!'.
@@ -464,19 +464,19 @@ def plot_adp_and_adf(results_df):
     >>> import pandas as pd
     >>> data = {
     ...     "size_factor": [0.95, 0.9, 0.85, 0.8, 0.75],
-    ...     "percent_above": [0.98, 0.97, 0.94, 0.87, 0.76],
+    ...     "percent_degradation": [0.98, 0.97, 0.94, 0.87, 0.76],
     ...     "decision": ["OK", "OK", "OK", "acc degrad!", "acc degrad!"],
     ... }
     >>> results_df = pd.DataFrame(data)
     >>> plot_adp_and_adf(results_df)
     This will display a scatter plot with size_factor on the x-axis (in reverse
-    order) and percent_above on the y-axis. The first 'acc degrad!' point will be
+    order) and percent_degradation on the y-axis. The first 'acc degrad!' point will be
     highlighted with a circle, and a vertical dotted line will be added.
     """
 
     # Extract relevant columns
     x = results_df["size_factor"]
-    y = results_df["percent_above"]
+    y = results_df["percent_degradation"]
     decision = results_df["decision"]
     average_accuracy = results_df["average_accuracy"]
     variance_accuracy = results_df["variance_accuracy"]
@@ -494,14 +494,19 @@ def plot_adp_and_adf(results_df):
     )
 
     # Plot OK points (green)
-    plt.scatter(x[decision == "OK"], y[decision == "OK"], color="green", label="OK", s=100, edgecolor="k")
+    plt.scatter(x[decision == "OK"],
+                y[decision == "OK"],
+                color="green",
+                label="percent_degradation - OK",
+                s=100,
+                edgecolor="k")
 
     # Plot acc degrad! points (red)
     plt.scatter(
         x[decision == "acc degrad!"],
         y[decision == "acc degrad!"],
         color="red",
-        label="acc degrad!",
+        label="percent_degradation - acc degrad!",
         s=100,
         edgecolor="k",
     )
@@ -512,7 +517,7 @@ def plot_adp_and_adf(results_df):
     # Highlight the first 'acc degrad!' point
     plt.scatter(
         first_degradation["size_factor"],
-        first_degradation["percent_above"],
+        first_degradation["percent_degradation"],
         s=300,
         facecolors="none",
         edgecolors="red",
