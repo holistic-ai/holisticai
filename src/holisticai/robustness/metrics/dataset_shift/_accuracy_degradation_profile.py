@@ -173,7 +173,7 @@ def accuracy_degradation_profile(
         The DataFrame contains the following columns:
         - `size_factor`: Fraction of the test set used in each step.
         - `above_threshold`: Number of samples with accuracy above the threshold.
-        - `percent_degradation`: Percentage of samples exceeding the threshold.
+        - `ADP`: Percentage of samples exceeding the threshold.
         - `decision`: Indicates whether the accuracy at the given step meets
         the threshold ('OK') or is degraded ('acc degrad!').
 
@@ -471,7 +471,7 @@ def _summarize_results(
         ('OK') or degraded ('acc degrad!').
         - 'above_threshold': The count of samples with accuracy above the
         threshold.
-        - 'percent_degradation': The percentage of samples with accuracy above the
+        - 'ADP': The percentage of samples with accuracy above the
         threshold.
 
     Raises:
@@ -510,7 +510,7 @@ def _summarize_results(
         columns=[
             "size_factor",
             "above_threshold",
-            "percent_degradation",
+            "ADP",
             "average_accuracy",
             "variance_accuracy",
             "degradate",
@@ -535,7 +535,7 @@ def _summarize_results(
         new_row = pd.DataFrame(
             {
                 "size_factor": [size_factor],
-                "percent_degradation": [above_threshold / results_df.shape[0]],
+                "ADP": [above_threshold / results_df.shape[0]],
                 "above_threshold": [above_threshold],
                 "average_accuracy": np.mean(results_df[size_factor]),
                 "variance_accuracy": np.std(results_df[size_factor]),

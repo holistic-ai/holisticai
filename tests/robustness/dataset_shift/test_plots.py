@@ -26,7 +26,7 @@ def mock_results_df():
     """Fixture providing a mock results DataFrame."""
     return pd.DataFrame({
         'size_factor': [0.95, 0.9, 0.85, 0.8],
-        'percent_degradation': [0.9, 0.85, 0.8, 0.75],
+        'ADP': [0.9, 0.85, 0.8, 0.75],
         'decision': ['OK', 'OK', 'acc degrad!', 'acc degrad!'],
         'average_accuracy': [0.95, 0.9, 0.85, 0.8],
         'variance_accuracy': [0.01, 0.02, 0.03, 0.04]
