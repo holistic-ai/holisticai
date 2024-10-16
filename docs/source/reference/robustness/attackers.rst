@@ -23,3 +23,4 @@
     :toctree: .generated/
 
     LinRegGDPoisoner
+    RidgeGDPoisoner
