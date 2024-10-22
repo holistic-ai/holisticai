@@ -1,23 +1,8 @@
 """
-This module provides tools to evaluate and visualize the robustness of machine
-learning models under conditions of dataset shift by analyzing accuracy
-degradation. It includes methods for generating degradation profiles and
-identifying critical points where performance significantly drops. The
-functions in this module help quantify how well a model maintains its
-predictive performance as the available test data size decreases, enabling
-users to make informed decisions about model stability in real-world scenarios.
-
-Functions included:
+Module description:
 -------------------
-- accuracy_degradation_factor: Identifies the first percentual of the group of
-interest where accuracy suffers a significant drawback.
+- This module contains functions to calculate the accuracy degradation profile of a model.
 
-- accuracy_degradation_profile: Generates a detailed profile showing how a
-model's accuracy degrades as the test set size is iteratively reduced, enabling
-analysis of the model's stability and resilience under varying conditions.
-
-This module is particularly useful for monitoring model performance in dynamic
-environments where test data may change or reduce in size.
 """
 
 from __future__ import annotations
@@ -119,10 +104,10 @@ def accuracy_degradation_factor(df: pd.DataFrame) -> float:
 
 def accuracy_degradation_profile(
     X_test: pd.DataFrame,
-    y_test: pd.DataFrame,
+    y_test: pd.Series,
     y_pred: pd.Series,
-    n_neighbors=None,
-    neighbor_estimator=None,
+    n_neighbors: Optional[int] = None,
+    neighbor_estimator: Optional[Any] = None,
     baseline_accuracy: Optional[float] = None,
     threshold_percentual: float = 0.95,
     above_percentual: float = 0.90,
@@ -131,80 +116,86 @@ def accuracy_degradation_profile(
     """
     Generates an accuracy degradation profile by iteratively reducing the size
     of the nearest neighbors considered in the test set and comparing the
-    classifier's accuracy against a baseline.
+    model's accuracy to a baseline.
 
-    This function assesses the robustness of a model by gradually reducing the
-    test set size and evaluating whether the accuracy falls below a defined
-    threshold. It returns a DataFrame summarizing whether the accuracy at each
-    step meets the baseline accuracy or if there is degradation.
+    This function evaluates the robustness of a model by gradually reducing the
+    test set size and determining if the accuracy falls below a defined threshold.
+    It returns a DataFrame that tracks whether accuracy at each step meets or
+    falls short of the baseline accuracy.
 
-    Parameters:
+    Parameters
     ----------
     X_test : pd.DataFrame
         The feature matrix of the test set. Each row represents a sample, and
         each column represents a feature.
-    y_test : pd.Series
-        The true labels for the test set. This should be a one-dimensional
-        Series or array.
-    y_pred : pd.Series
-        The predicted labels for the test set. This should be a one-dimensional
-        Series or array.
-    n_neighbors : int
-        The number of neighbors to consider when computing the nearest neighbors
-        model.
-    baseline_accuracy : Optional[float], optional
-        The baseline accuracy to compare the model's performance. If not provided,
-        it will be calculated based on `y_test` and `y_pred`.
-    threshold_percentual : float, optional, default=0.95
-        The threshold for acceptable accuracy degradation. It represents a
-        percentage of the baseline accuracy that defines the minimum acceptable
-        accuracy.
-    above_percentual : float, optional, default=0.90
-        The proportion of samples that must exceed the accuracy threshold to avoid
-        being marked as degraded.
-    step_size : float, optional, default=STEP_SIZE
-        The step size by which to incrementally reduce the test set size in each
-        iteration. It defines the rate at which the test set is reduced.
 
-    Returns:
+    y_test : pd.Series
+        The true labels for the test set. This should be a one-dimensional Series.
+
+    y_pred : pd.Series
+        The predicted labels for the test set. This should be a one-dimensional Series.
+
+    n_neighbors : Optional[int], optional
+        The number of neighbors to consider when using a nearest neighbors model.
+        If not provided, the function will not perform neighbor-based operations.
+
+    neighbor_estimator : Optional[Any], optional
+        An estimator implementing the neighbor search algorithm. If not provided,
+        the default `NearestNeighbors` from sklearn will be used.
+
+    baseline_accuracy : Optional[float], optional
+        The baseline accuracy to be compared against. If not provided, it will
+        be calculated using `y_test` and `y_pred`.
+
+    threshold_percentual : float, optional (default=0.95)
+        The threshold for acceptable accuracy degradation. Defined as a percentage
+        of the baseline accuracy, below which degradation is considered to occur.
+
+    above_percentual : float, optional (default=0.90)
+        The proportion of samples that must have accuracy above the threshold
+        to avoid being marked as degraded.
+
+    step_size : float, optional (default=STEP_SIZE)
+        The step size by which to reduce the test set size in each iteration. It
+        determines the incremental reduction of the test set in each step.
+
+    Returns
     -------
     pd.DataFrame
-        A styled pandas DataFrame summarizing the accuracy degradation results.
-        The DataFrame contains the following columns:
-        - `size_factor`: Fraction of the test set used in each step.
-        - `above_threshold`: Number of samples with accuracy above the threshold.
-        - `ADP`: Percentage of samples exceeding the threshold.
-        - `decision`: Indicates whether the accuracy at the given step meets
-        the threshold ('OK') or is degraded ('acc degrad!').
+        A pandas DataFrame summarizing the accuracy degradation results. The DataFrame
+        contains the following columns:
+        - `size_factor`: The fraction of the test set used in each step.
+        - `above_threshold`: The number of samples with accuracy above the threshold.
+        - `ADP`: The percentage of samples exceeding the accuracy threshold.
+        - `decision`: Whether the accuracy at each step meets the threshold ('OK')
+          or is considered degraded ('acc degrad!').
 
-    Example:
-    --------
+    Example
+    -------
     >>> from sklearn.neighbors import NearestNeighbors
     >>> import pandas as pd
-    >>> from sklearn.metrics import accuracy_score
     >>> X_test = pd.DataFrame([[1.2, 3.4], [2.2, 1.8], [1.1, 4.5], [3.2, 2.1]])
     >>> y_test = pd.Series([0, 1, 0, 1])
     >>> y_pred = pd.Series([0, 1, 0, 0])
-    >>> n_neighbors = 3
     >>> degradation_profile = accuracy_degradation_profile(
-    ...     X_test=X_test, y_test=y_test, y_pred=y_pred, n_neighbors=n_neighbors
+    ...     X_test=X_test, y_test=y_test, y_pred=y_pred, n_neighbors=3
     ... )
-    >>> degradation_profile
-    # Outputs a styled DataFrame summarizing the decisions for each test set size.
+    >>> print(degradation_profile)
+    # Outputs a DataFrame summarizing the accuracy degradation decisions for each step.
 
-    Raises:
-    -------
+    Raises
+    ------
     ValueError
         If the lengths of `X_test`, `y_test`, or `y_pred` are inconsistent, or
-        if the input parameters for `threshold_percentual`, `above_percentual`,
-        or `n_neighbors` are invalid.
+        if invalid values are provided for `threshold_percentual`, `above_percentual`,
+        or `n_neighbors`.
 
-    Notes:
-    ------
-    - The function assumes that the input DataFrames or Series are appropriately
-    structured and that the baseline accuracy is reasonable.
-    - This method applies nearest neighbors to simulate accuracy degradation by
-    reducing test set size.
+    Notes
+    -----
+    - The function assumes that the input DataFrames or Series are correctly structured
+      and that the baseline accuracy, if provided, is meaningful.
+    - Nearest neighbors is used to simulate accuracy degradation by reducing the test
+      set size incrementally.
     """
 
     # Check if the step size is too small
@@ -416,13 +407,8 @@ def _calculate_accuracies(
 
         # Evaluate accuracy over each test set size
         size_factor = set_size_list[size_factor_index]
-        # test_set_neighbours_2 = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
-        # print(test_set_neighbours_2)
 
-        accuracy_list = np.mean(
-            matches[:, :n_neighbours], axis=1
-        )  # [accuracy_score(y_pred[neighbors[:n_neighbours]], y_test[neighbors[:n_neighbours]]) for neighbors in test_set_neighbours]
-        # accuracy_list = np.mean(matches[:,:n_neighbours], axis=1)
+        accuracy_list = np.mean(matches[:, :n_neighbours], axis=1)  # Calculate accuracy for each sample in the test set
 
         results[size_factor] = accuracy_list
 

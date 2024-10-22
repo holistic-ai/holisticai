@@ -1,38 +1,8 @@
 """
-This module provides a collection of plot functions for 2D datasets, focusing
-on displaying model predictions, neighborhood analysis, and accuracy
-degradation profiles. The functions are designed to help users understand how
-models behave under different scenarios, such as changes in data, prediction
-performance, and neighborhood-based analysis. Through intuitive scatter plots
-and additional visual aids, users can assess model predictions, compare actual
-vs. predicted values, and analyze model robustness under varying conditions.
-
-Functions included:
+Module description:
 -------------------
-- plot_2d: Generates a 2D scatter plot for a dataset, with options to highlight
-  or exclusively display a subset of points. It supports both general
-  visualizations and focused views of specific data points.
+- This module contains functions to plot the dataset shift analysis results.
 
-- plot_label_and_prediction: Creates a scatter plot that shows both actual
-  labels and predicted labels for a dataset, with a vertical offset to visually
-  differentiate between the two. Ideal for visual comparison of prediction
-  accuracy.
-
-- plot_neighborhood: Visualizes the neighborhoods around specified points of
-  interest by plotting a convex hull, the nearest neighbors, and the accuracy
-  within those neighbors. It helps users understand how local groups of data
-  points contribute to overall model performance.
-
-- plot_adp_and_adf: Plots the accuracy degradation profile (ADP) by showing the
-  percentage of samples above a threshold versus the size factor of the
-  dataset. It highlights key points of degradation with color-coding and
-  vertical markers, providing insights into the model's robustness as data
-  availability decreases. Accuracy degradation factor (ADF) is also showed
-  as a circle at the first degradation point.
-
-This module offers a set of functions to explore the behavior and performance
-of machine learning models visually, facilitating a better understanding of
-model predictions and robustness across different data scenarios.
 """
 
 # Importing required libraries
@@ -88,36 +58,41 @@ def plot_2d(X, y, highlight_group=None, show_just_group=None, features_to_plot=N
     Plots a 2D scatter plot of a dataset, with options to highlight or exclusively
     show a subset of points.
 
-    This function creates a scatter plot of the provided dataset, where each point
-    represents a sample. Users can highlight specific points or display only a
-    subset of points. The plot can also label the axes based on the feature names
-    provided.
+    This function generates a 2D scatter plot from the given dataset, where each
+    point represents a sample. Users can highlight specific points or display only
+    a subset of the data. Axis labels can be customized using feature names from the
+    `features_to_plot` argument.
 
-    Parameters:
+    Parameters
     ----------
     X : np.ndarray or pd.DataFrame
-        The feature matrix where each row represents a sample and each column
-        represents a feature. It can be a NumPy array or a pandas DataFrame with
-        two columns.
-    y : np.ndarray or pd.Series
-        The labels for each sample. It can be a NumPy array or a pandas Series.
-    highlight_group : list or np.ndarray, optional
-        The indices of the points to be highlighted (outlined with red) or
-        exclusively plotted.
-    show_just_group : bool, optional
-        If True, only the points corresponding to `highlight_group` are plotted,
-        and the rest are hidden.
-    features_to_plot : list, optional
-        A list of feature names (strings) to label the x and y axes of the plot.
-        If not provided, the function will infer the names of `X` and `y` from the
-        argument names.
+        The feature matrix, where each row is a sample and each column represents
+        a feature. This can be either a NumPy array or a pandas DataFrame with two columns.
 
-    Returns:
+    y : np.ndarray or pd.Series
+        The labels for each sample, represented as a one-dimensional NumPy array or
+        pandas Series.
+
+    highlight_group : list or np.ndarray, optional
+        The indices of the points to be highlighted (outlined in red) or exclusively
+        plotted. If None, no points are highlighted.
+
+    show_just_group : bool, optional
+        If True, only the points specified in `highlight_group` are plotted, and all
+        other points are hidden. If False, all points are plotted, but the highlighted
+        group is outlined.
+
+    features_to_plot : list, optional
+        A list of feature names (strings) to label the x and y axes of the plot. The
+        list should contain exactly two elements. If not provided, the function will
+        infer the names of `X` and `y` from the argument names.
+
+    Returns
     -------
     None
-        This function does not return any value. It displays the scatter plot.
+        This function does not return any values. It displays the scatter plot.
 
-    Example:
+    Example
     -------
     >>> import numpy as np
     >>> import pandas as pd
@@ -136,30 +111,22 @@ def plot_2d(X, y, highlight_group=None, show_just_group=None, features_to_plot=N
     ...     features_to_plot=["Feature1", "Feature2"],
     ... )
 
-
     Scatter Plot of a 2D dataset:
 
     .. image:: /_static/images/plot_2d_pure.png
         :alt: Scatter Plot of a 2D dataset
 
+    Raises
+    ------
+    TypeError
+        If `highlight_group` is not a list or a NumPy array.
 
-    Scatter Plot of a 2D dataset with a highlighted group:
-
-    .. image:: /_static/images/plot_2d_highlight_group.png
-        :alt: Scatter Plot of a 2D dataset with a highlighted group
-
-
-    Scatter Plot of a 2D dataset with a highlighted group and it's labels:
-
-    .. image:: /_static/images/plot_2d_show_just_group.png
-        :alt: Scatter Plot of a 2D dataset with a highlighted group and it's labels
-
-
-    Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph while
-    caltulating the accuracy over the point and its' selected neighbors.
-
-    .. image:: /_static/images/plot_2d_neighborhood.png
-        :alt: Scatter Plot of a 2D dataset with y_test and y_pred together with neighborhood accuracy calculation
+    Notes
+    -----
+    - This function requires `matplotlib` for visualization and can handle both
+      NumPy arrays and pandas DataFrames for input data.
+    - The `highlight_group` feature allows the user to either emphasize certain points
+      or exclusively plot them based on the `show_just_group` flag.
     """
 
     import inspect
@@ -222,39 +189,43 @@ def plot_2d(X, y, highlight_group=None, show_just_group=None, features_to_plot=N
 
 def plot_label_and_prediction(X, y, y_pred, vertical_offset=0.1, features_to_plot=None):
     """
-    Plots a 2D scatter plot of a dataset showing both the true labels (y) and the
-    predicted labels (y_pred) with a slight vertical offset for distinction.
+    Plots a 2D scatter plot of a dataset, displaying both the true labels (`y`) and the
+    predicted labels (`y_pred`) with a slight vertical offset for distinction.
 
-    This function creates a scatter plot where each point represents a sample from
-    the dataset. The true labels are displayed in a darker shade, and the predicted
-    labels are displayed with a vertical offset in a lighter shade. The plot also
-    labels the axes based on the feature names provided or inferred.
+    This function generates a scatter plot where each point represents a sample from
+    the dataset. The true labels are shown in a darker shade, while the predicted labels
+    are displayed with a vertical offset to distinguish them. The axes can be labeled
+    using feature names provided by the user or inferred from the data.
 
-    Parameters:
+    Parameters
     ----------
     X : np.ndarray or pd.DataFrame
         The feature matrix where each row represents a sample and each column
-        represents a feature. Can be a NumPy array or a pandas DataFrame.
+        represents a feature. This can be either a NumPy array or a pandas DataFrame.
+
     y : np.ndarray or pd.Series
-        The true labels for each sample. Can be a NumPy array or a pandas Series.
+        The true labels for each sample. This can be a one-dimensional NumPy array or
+        a pandas Series.
+
     y_pred : np.ndarray or pd.Series
-        The predicted labels for each sample. Can be a NumPy array or a pandas
-        Series.
+        The predicted labels for each sample. This can be a one-dimensional NumPy array
+        or a pandas Series.
+
     vertical_offset : float, optional (default=0.1)
-        The vertical offset applied to the predicted labels on the plot to
-        distinguish them from the true labels.
+        The vertical offset applied to the predicted labels on the plot to distinguish
+        them from the true labels.
+
     features_to_plot : list, optional
         A list of feature names (strings) to label the x and y axes of the plot.
-        If not provided, the function will infer the names of `X` and `y` from
-        the argument names.
+        If not provided, the function will infer the names of `X` and `y` from the argument names.
 
-    Returns:
+    Returns
     -------
     None
         This function does not return any value. It displays the scatter plot
-        with labels and predictions.
+        with true labels and predicted labels.
 
-    Example:
+    Example
     -------
     >>> import numpy as np
     >>> import pandas as pd
@@ -272,16 +243,16 @@ def plot_label_and_prediction(X, y, y_pred, vertical_offset=0.1, features_to_plo
     ...     X, y, y_pred, vertical_offset=0.1, features_to_plot=["Feature1", "Feature2"]
     ... )
     This will display a 2D scatter plot with both the true labels and the predicted
-    labels, where the predicted labels are slightly offset.
+    labels, where the predicted labels are slightly offset for clarity.
 
-    Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph. The values
-    of y_pred (shaded circles) are shifted vertically by a small amount to allow better
-    visualization. It is possible to see where the classifier uncorrectedly classified the
-    true labels **by the different collors** between y_test and y_pred.
+    Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph.
+    The predicted values (`y_pred`, shaded circles) are shifted vertically by a small
+    amount to allow better visualization. The plot highlights areas where the classifier
+    incorrectly predicted the true labels, evident by differing colors between `y_test`
+    and `y_pred`.
 
     .. image:: /_static/images/plot_2d_label_and_prediction.png
         :alt: Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph
-
     """
 
     import inspect
@@ -344,6 +315,95 @@ def plot_neighborhood(
     ax=None,
     indices_show=None,
 ):
+    """
+    Plots a 2D scatter plot of the dataset, highlighting the neighborhood of specific
+    points of interest and calculating accuracy over the selected neighbors.
+
+    This function visualizes the neighborhood of selected points in a 2D dataset
+    using the k-nearest neighbors algorithm. The convex hull of the points and their
+    neighbors is plotted, and the accuracy of predictions within this neighborhood is
+    displayed. The plot shows both true labels and predicted labels with a slight
+    vertical offset for clarity.
+
+    Parameters
+    ----------
+    X : np.ndarray or pd.DataFrame
+        The feature matrix where each row represents a sample and each column
+        represents a feature. It can be either a NumPy array or pandas DataFrame.
+
+    y : np.ndarray or pd.Series
+        The true labels for each sample. It can be either a NumPy array or pandas Series.
+
+    y_pred : np.ndarray or pd.Series
+        The predicted labels for each sample. It can be either a NumPy array or pandas Series.
+
+    n_neighbors : int
+        The number of nearest neighbors to consider when identifying the neighborhood
+        of each point of interest.
+
+    points_of_interest : list or np.ndarray
+        A list or array of indices corresponding to the points whose neighborhoods
+        will be highlighted.
+
+    vertical_offset : float, optional (default=0.1)
+        The vertical offset applied to the predicted labels on the plot to distinguish
+        them from the true labels.
+
+    features_to_plot : list, optional
+        A list of feature names (strings) to label the x and y axes of the plot.
+        If not provided, the function will infer the names of `X` and `y` from the
+        argument names.
+
+    ax : matplotlib.axes.Axes, optional
+        A matplotlib axes object. If not provided, a new figure and axes will be created.
+
+    indices_show : list or np.ndarray, required
+        The indices of the points to be shown on the plot. If a point from `points_of_interest`
+        is not included in `indices_show`, a ValueError is raised.
+
+    Returns
+    -------
+    None
+        This function does not return any value. It displays the scatter plot with neighborhoods.
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> import pandas as pd
+    >>> from matplotlib import pyplot as plt
+    >>> X = pd.DataFrame(
+    ...     {"Feature1": np.random.rand(100), "Feature2": np.random.rand(100)}
+    ... )
+    >>> y = pd.Series(np.random.randint(0, 2, size=100))
+    >>> y_pred = pd.Series(np.random.randint(0, 2, size=100))
+    >>> points_of_interest = [10, 50]
+    >>> plot_neighborhood(
+    ...     X=X,
+    ...     y=y,
+    ...     y_pred=y_pred,
+    ...     n_neighbors=3,
+    ...     points_of_interest=points_of_interest,
+    ...     indices_show=np.arange(100),
+    ...     features_to_plot=["Feature1", "Feature2"],
+    ... )
+
+    The plot will display the convex hull around the neighborhoods of the points
+    of interest and annotate the accuracy of predictions over these neighbors.
+
+    Raises
+    ------
+    ValueError
+        If a point in `points_of_interest` is not present in `indices_show`.
+
+    Notes
+    -----
+    - The convex hull of each point's neighborhood is plotted as a red dashed line.
+    - The accuracy over the nearest neighbors is calculated and annotated next to
+      each point of interest.
+    - The function uses the k-nearest neighbors algorithm to find neighbors and
+      create neighborhoods.
+    """
+
     import inspect
 
     import matplotlib.pyplot as plt
@@ -431,47 +491,58 @@ def plot_neighborhood(
 
 def plot_adp_and_adf(results_df):
     """
+    Plots the Accuracy Degradation Profile (ADP) in a 2D plot, showing the percentage
+    of samples above the threshold (ADP) on the vertical axis and dataset size (size_factor)
+    on the horizontal axis, with the x-axis reversed.
 
-    Plots the Accuracy Degradation Profile (ADP) information matrix in a 2D plot,
-    showing the percentage of samples above a threshold on the vertical axis and
-    dataset size on the horizontal axis, with the horizontal axis reversed.
-    Points are green if the performance is acceptable ("OK") and
-    red if there is a significant accuracy drop ("acc degrad!"). The first
-    instance of performance degradation is circled (ADF), and a vertical dotted
-    line is added at this point, with the corresponding dataset size displayed on
-    the horizontal axis.
+    Points are colored green if the model's performance is acceptable ("OK") and red
+    if there is significant accuracy degradation ("acc degrad!"). The first point where
+    performance degradation occurs is highlighted and circled (Accuracy Degradation Factor, ADF),
+    and a vertical dotted line is drawn at this point to mark the corresponding dataset size.
 
-    Parameters:
+    Parameters
     ----------
     results_df : pd.DataFrame
-        The DataFrame containing columns 'size_factor', 'ADP', and
-        'decision'.
-        - 'size_factor' (float): The fraction of the dataset used in the evaluation.
-        - 'ADP' (float): The percentage of samples above the threshold
-        for the decision.
-        - 'decision' (str): A string indicating if the model's performance is 'OK'
-        or shows 'acc degrad!'.
+        A DataFrame containing the following columns:
+        - 'size_factor' (float): Fraction of the dataset used in the evaluation.
+        - 'ADP' (float): The percentage of samples above the threshold for acceptable accuracy.
+        - 'decision' (str): A string indicating whether the model's performance is acceptable
+          ('OK') or shows significant accuracy degradation ('acc degrad!').
+        - 'average_accuracy' (float): The average accuracy across the samples.
+        - 'variance_accuracy' (float): The variance of the accuracy across the samples.
 
-    Returns:
+    Returns
     -------
     None
-        This function does not return any values. It generates and displays a
-        scatter plot with labeled points and a vertical line at the first accuracy
-        degradation point.
+        This function does not return any values. It generates and displays a scatter plot
+        with labeled points and a vertical line at the first accuracy degradation point.
 
-    Example:
+    Example
     -------
     >>> import pandas as pd
     >>> data = {
     ...     "size_factor": [0.95, 0.9, 0.85, 0.8, 0.75],
     ...     "ADP": [0.98, 0.97, 0.94, 0.87, 0.76],
     ...     "decision": ["OK", "OK", "OK", "acc degrad!", "acc degrad!"],
+    ...     "average_accuracy": [0.97, 0.96, 0.93, 0.85, 0.74],
+    ...     "variance_accuracy": [0.02, 0.03, 0.04, 0.05, 0.06],
     ... }
     >>> results_df = pd.DataFrame(data)
     >>> plot_adp_and_adf(results_df)
-    This will display a scatter plot with size_factor on the x-axis (in reverse
-    order) and ADP on the y-axis. The first 'acc degrad!' point will be
-    highlighted with a circle, and a vertical dotted line will be added.
+
+    This will display a scatter plot with 'size_factor' on the x-axis (in reverse order)
+    and 'ADP' on the y-axis. The first point where performance degrades ('acc degrad!')
+    will be circled, and a vertical dotted line will be added to indicate the corresponding
+    size factor.
+
+    Notes
+    -----
+    - The blue line represents the average accuracy with shaded areas indicating the
+      variance. Green points indicate acceptable performance, while red points mark
+      instances of degradation.
+    - The first 'acc degrad!' point is highlighted with a red circle and a vertical
+      dotted line to emphasize the Accuracy Degradation Factor (ADF).
+    - The x-axis is inverted to show the dataset size decreasing from left to right.
     """
 
     # Extract relevant columns
