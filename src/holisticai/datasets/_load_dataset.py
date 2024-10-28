@@ -143,7 +143,9 @@ def load_law_school_dataset(protected_attribute: Optional[Literal["race", "sex"]
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_student_multiclass_dataset(protected_attribute: Optional[Literal["sex", "address"]] = "sex", preprocessed=True):
+def load_student_multiclass_dataset(
+    protected_attribute: Optional[Literal["sex", "address"]] = "sex", preprocessed=True
+):
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     output_column = "G3"
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
@@ -220,6 +222,11 @@ def load_student_dataset(
             gb_label = "M"
             group_a = pd.Series(df["sex"] == "F", name="group_a")
             group_b = pd.Series(df["sex"] == "M", name="group_b")
+        elif protected_attribute == "address":
+            ga_label = "U"
+            gb_label = "R"
+            group_a = pd.Series(df["address"] == "U", name="group_a")
+            group_b = pd.Series(df["address"] == "R", name="group_b")
         else:
             raise ValueError("The protected attribute doesn't exist or not implemented")
     df = df.drop(drop_columns, axis=1)
@@ -574,7 +581,7 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
         "V15": "previous",
         "V16": "poutcome",
     }
-
+    data["data"] = data["data"].copy()
     data["data"].rename(columns=rename_columns, inplace=True)
 
     df = pd.concat([data["data"], data["target"]], axis=1)
@@ -918,7 +925,6 @@ def load_dataset(
 def _load_dataset_benchmark(
     dataset_name: ProcessedDatasets,
     preprocessed: bool = True,
-    target: Optional[str] = None,
 ) -> Dataset:
     """
     Load a specific dataset based on the given dataset name.
@@ -942,34 +948,66 @@ def _load_dataset_benchmark(
     NotImplementedError:
         If the specified dataset name is not supported.
     """
-    if dataset_name == "adult":
-        return load_adult_dataset(preprocessed=preprocessed)
-    if dataset_name == "law_school":
-        return load_law_school_dataset(preprocessed=preprocessed)
-    if dataset_name == "student_multiclass":
-        return load_student_multiclass_dataset(preprocessed=preprocessed)
-    if dataset_name == "student":
-        return load_student_dataset(preprocessed=preprocessed, target=target)
-    if dataset_name == "lastfm":
-        return load_lastfm_dataset()
-    if dataset_name == "us_crime":
-        return load_us_crime_dataset(preprocessed=preprocessed)
-    if dataset_name == "us_crime_multiclass":
-        return load_us_crime_multiclass_dataset(preprocessed=preprocessed)
-    if dataset_name == "clinical_records":
-        return load_clinical_records_dataset()
-    if dataset_name == "german_credit":
-        return load_german_credit_dataset(preprocessed=preprocessed)
-    if dataset_name == "census_kdd":
-        return load_census_kdd_dataset(preprocessed=preprocessed)
-    if dataset_name == "bank_marketing":
-        return load_bank_marketing_dataset(preprocessed=preprocessed)
-    if dataset_name == "compass":
-        return load_compass_dataset(preprocessed=preprocessed)
-    if dataset_name == "diabetes":
-        return load_diabetes_dataset(preprocessed=preprocessed)
-    if dataset_name == "acsincome":
-        return load_acsincome_dataset(preprocessed=preprocessed)
-    if dataset_name == "acspublic":
-        return load_acspublic_dataset(preprocessed=preprocessed)
+    if dataset_name == "adult_sex":
+        return load_adult_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "adult_race":
+        return load_adult_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "law_school_sex":
+        return load_law_school_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "law_school_race":
+        return load_law_school_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "student_multiclass_sex":
+        return load_student_multiclass_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "student_multiclass_address":
+        return load_student_multiclass_dataset(preprocessed=preprocessed, protected_attribute="address")
+
+    if dataset_name == "student_sex":
+        return load_student_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "student_address":
+        return load_student_dataset(preprocessed=preprocessed, protected_attribute="address")
+
+    if dataset_name == "us_crime_race":
+        return load_us_crime_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "us_crime_multiclass_race":
+        return load_us_crime_multiclass_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "clinical_records_sex":
+        return load_clinical_records_dataset(protected_attribute="sex")
+
+    if dataset_name == "german_credit_sex":
+        return load_german_credit_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "census_kdd_sex":
+        return load_census_kdd_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "bank_marketing_marital":
+        return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute="marital")
+
+    if dataset_name == "compass_sex":
+        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "compass_race":
+        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "diabetes_sex":
+        return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "diabetes_race":
+        return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "acsincome_sex":
+        return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "acsincome_race":
+        return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "acspublic_sex":
+        return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "acspublic_race":
+        return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute="race")
+
     raise NotImplementedError
