@@ -31,7 +31,7 @@ def test_permutation_feature_importance_call(input_data):
     from holisticai.utils import BinaryClassificationProxy
     proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=[0,1])
     fi_strategy = PermutationFeatureImportanceCalculator(random_state=RandomState(42))
-    importance = fi_strategy.compute_importances(test, proxy=proxy)
+    importance = fi_strategy.compute_importances(test['X'], test['y'], proxy=proxy)
     assert isinstance(importance, Importances)
     assert np.isclose(importance['capital-gain'], 0.38461538461538486, atol=5e-2)
     

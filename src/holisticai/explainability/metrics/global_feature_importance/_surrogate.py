@@ -1,11 +1,14 @@
-from sklearn.metrics import accuracy_score, mean_squared_error
 import numpy as np
+from sklearn.metrics import accuracy_score, mean_squared_error
+
 
 def surrogate_accuracy_score(y_pred, y_surrogate):
     return accuracy_score(y_pred, y_surrogate)
 
+
 def surrogate_mean_squared_error(y_pred, y_surrogate):
     return mean_squared_error(y_pred, y_surrogate)
+
 
 def smape(y_true, y_pred):
     """
@@ -26,6 +29,7 @@ def smape(y_true, y_pred):
     epsilon = 1e-10
     smape_value = np.mean(numerator / (denominator + epsilon))
     return smape_value
+
 
 def surrogate_fidelity(y_pred, y_surrogate):
     return smape(y_pred, y_surrogate)

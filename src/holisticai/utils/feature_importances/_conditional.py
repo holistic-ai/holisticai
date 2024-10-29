@@ -18,7 +18,6 @@ def group_index_samples_by_learning_task(y: pd.Series, learning_task="regression
     y_group = group_mask_samples_by_learning_task(y, learning_task)
     unique_values = np.unique(y_group)
     return {val: np.where(y_group == val)[0].tolist() for val in unique_values}
-    #return y_group.groupby(y_group).apply(lambda x: x.index.tolist()).to_dict()
 
 
 def group_mask_samples_by_learning_task(

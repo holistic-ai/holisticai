@@ -1,6 +1,8 @@
 from typing import Any, Literal
 
 import pandas as pd
+from sklearn.metrics import accuracy_score
+
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import (
     FeatureImportanceSpread,
 )
@@ -20,10 +22,9 @@ from holisticai.explainability.metrics.tree._tree import (
     WeightedTreeGini,
 )
 from holisticai.utils.surrogate_models import ClusteringSurrogate
-from sklearn.metrics import accuracy_score
 
 
-class AccuracyDifference:
+class AccuracyDegradation:
     reference: float = 0
     name: str = "Accuracy Difference"
 
@@ -37,7 +38,7 @@ class AccuracyDifference:
 
 
 def accuracy_difference(X, y, proxy, surrogate):
-    m = AccuracyDifference()
+    m = AccuracyDegradation()
     return m(X, y, proxy, surrogate)
 
 

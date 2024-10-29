@@ -2,6 +2,8 @@ from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score
+
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import FeatureImportanceSpread
 from holisticai.explainability.metrics.global_feature_importance._surrogate import (
     surrogate_accuracy_score,
@@ -20,26 +22,26 @@ from holisticai.explainability.metrics.tree._tree import (
 )
 from holisticai.typing import ArrayLike
 from holisticai.utils.surrogate_models import BinaryClassificationSurrogate, MultiClassificationSurrogate
-from sklearn.metrics import accuracy_score
 
 
-class AccuracyDifference:
+class AccuracyDegradation:
     reference: float = 0
-    name: str = "Surrogate Accuracy Difference"
+    name: str = "Accuracy Degradation"
 
     def __call__(self, y, y_pred, y_surrogate):
         Pb = accuracy_score(y, y_pred)
-        Pt = accuracy_score(y, y_surrogate)
-        D = Pb - Pt
+        Ps = accuracy_score(y, y_surrogate)
+        D = 2 * (Pb - Ps) / (Pb + Ps)  # Normalized difference between the two SMAPE values
         return D
 
 
-def surrogate_accuracy_difference(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):
+def surrogate_accuracy_degradation(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):
     """
-    Calculate the difference between the accuracy of the original model and the surrogate model.
+    Calculate the difference between the mean squared error of the original model and the surrogate model.
 
     Parameters
     ----------
+
     y : ArrayLike
         The true target values.
 
@@ -52,21 +54,44 @@ def surrogate_accuracy_difference(y: ArrayLike, y_pred: ArrayLike, y_surrogate: 
     Returns
     -------
     float
-        The difference between the accuracy of the original model and the surrogate model.
+        The difference between the mean squared error of the original model and the surrogate model
 
     Examples
     --------
     >>> import numpy as np
     >>> from holisticai.explainability.metrics.surrogate import (
-    ...     surrogate_accuracy_difference,
+    ...     surrogate_smape_difference,
     ... )
     >>> y = np.array([1, 2, 3, 4, 5])
-    >>> y_pred = np.array([1, 2, 3, 4, 5])
-    >>> y_surrogate = np.array([1, 2, 3, 4, 5])
-    >>> surrogate_accuracy_difference(y, y_pred, y_surrogate)
+    >>> y_pred = np.array([1.1, 2.2, 3.3, 4.4, 5.5])
+    >>> y_surrogate = np.array([1.2, 2.3, 3.4, 4.5, 5.6])
+    >>> surrogate_smape_difference(y, y_pred, y_surrogate)
     """
-    m = AccuracyDifference()
+    m = AccuracyDegradation()
     return m(y, y_pred, y_surrogate)
+
+
+class SurrogateFidelityClassification:
+    """
+    FeaturesStability calculates the stability of features used in a surrogate model.
+    The metric measures the similarity of features used in the surrogate model across different bootstraps.
+
+    Parameters
+    ----------
+        reference (float): The reference of best stability value = 1.
+        name (str): The name of the stability metric: "Features Stability".
+    """
+
+    reference: float = 1
+    name: str = "Surrogate Fidelity Classification"
+
+    def __call__(self, y_pred, y_surrogate):
+        return accuracy_score(y_pred, y_surrogate)
+
+
+def surrogate_fidelity_classification(y_pred, y_surrogate):
+    m = SurrogateFidelityClassification()
+    return m(y_pred, y_surrogate)
 
 
 def classification_surrogate_explainability_metrics(
@@ -88,7 +113,7 @@ def classification_surrogate_explainability_metrics(
     results = {}
     is_all = metric_type == "all"
     if is_all or metric_type == "performance":
-        m = AccuracyDifference()
+        m = AccuracyDegradation()
         results[m.name] = {"Value": m(y, y_pred, y_surrogate), "Reference": m.reference}
 
         results["Surrogate Accuracy"] = {"Value": surrogate_accuracy_score(y_pred, y_surrogate), "Reference": 1}

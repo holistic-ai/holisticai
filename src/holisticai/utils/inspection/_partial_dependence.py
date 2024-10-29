@@ -8,8 +8,9 @@ from joblib import Parallel, delayed
 from sklearn.inspection import partial_dependence
 from sklearn.metrics import accuracy_score, r2_score
 
+from holisticai.utils._commons import get_columns
 from holisticai.utils._definitions import ModelProxy, PartialDependence
-from holisticai.utils._commons import get_columns, get_item
+
 
 def get_partial_dependence(
     estimator,
@@ -119,7 +120,7 @@ def wrap_sklearn_binary_model(classes: list, predict: callable, predict_proba: c
 
 
 def wrap_sklearn_multi_classification_model(classes: list, predict: callable, predict_proba: callable | None = None):
-    def fit(x, y):  # noqa: ARG001
+    def fit(x, y):
         pass
 
     def score(x, y):

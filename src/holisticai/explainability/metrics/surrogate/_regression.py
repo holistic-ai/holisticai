@@ -1,10 +1,15 @@
 from typing import Any, Literal
 
+import numpy as np
 import pandas as pd
+
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import (
     FeatureImportanceSpread,
 )
-from holisticai.explainability.metrics.global_feature_importance._surrogate import surrogate_fidelity, surrogate_mean_squared_error
+from holisticai.explainability.metrics.global_feature_importance._surrogate import (
+    surrogate_fidelity,
+    surrogate_mean_squared_error,
+)
 from holisticai.explainability.metrics.surrogate._stability import (
     FeatureImportancesStability,
     FeaturesStability,
@@ -27,7 +32,7 @@ class MSEDegradation:
     def __call__(self, y, y_pred, y_surrogate):
         Pb = surrogate_mean_squared_error(y, y_pred)
         Ps = surrogate_mean_squared_error(y, y_surrogate)
-        D = 2*(Ps-Pb)/(Pb+Ps) # Normalized difference between the two SMAPE values
+        D = max(0, 2 * (Ps - Pb) / (Pb + Ps))
         return D
 
 
@@ -65,6 +70,39 @@ def surrogate_mean_squared_error_degradation(y: ArrayLike, y_pred: ArrayLike, y_
     """
     m = MSEDegradation()
     return m(y, y_pred, y_surrogate)
+
+
+class SurrogateFidelityRegression:
+    """
+    FeaturesStability calculates the stability of features used in a surrogate model.
+    The metric measures the similarity of features used in the surrogate model across different bootstraps.
+
+    Parameters
+    ----------
+        reference (float): The reference of best stability value = 1.
+        name (str): The name of the stability metric: "Features Stability".
+    """
+
+    reference: float = 1
+    name: str = "Surrogate Fidelity Regression"
+
+    def __call__(self, y_pred, y_surrogate):
+        # return surrogate_fidelity(y_pred, y_surrogate)
+        epsilon = 1e-10
+        # Normalizar el error absoluto entre y_pred y y_surrogate
+        abs_error = np.abs(y_pred - y_surrogate)
+        max_value = np.maximum(np.abs(y_pred), np.abs(y_surrogate)) + epsilon
+
+        # Calcular el error relativo normalizado
+        relative_error = abs_error / max_value
+
+        # Devolver 1 menos el error promedio, lo que representa la fidelidad
+        return 1 - np.mean(relative_error)
+
+
+def surrogate_fidelity_regression(y_pred, y_surrogate):
+    m = SurrogateFidelityRegression()
+    return m(y_pred, y_surrogate)
 
 
 def regression_surrogate_explainability_metrics(

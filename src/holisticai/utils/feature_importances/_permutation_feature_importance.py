@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Literal, Union, overload, Any
+from typing import Any, Literal, Union, overload
 
 import numpy as np
 import pandas as pd
@@ -10,13 +10,13 @@ from numpy.random import RandomState
 from sklearn.metrics import accuracy_score, mean_squared_error
 
 from holisticai.datasets import Dataset
+from holisticai.utils._commons import get_columns, get_item
 from holisticai.utils._definitions import (
     ConditionalImportances,
     Importances,
     ModelProxy,
 )
 from holisticai.utils.feature_importances import group_index_samples_by_learning_task
-from holisticai.utils._commons import get_columns, get_item
 
 metric_scores = {
     "binary_classification": accuracy_score,
@@ -45,8 +45,8 @@ def compute_permutation_feature_importance(
     n_repeats: int = 5,
     n_jobs: int = -1,
     random_state: Union[RandomState, int, None] = None,
-    importance_type: Literal["standard"] = "standard",
 ) -> Importances: ...
+
 
 def compute_permutation_feature_importance(
     proxy: ModelProxy,
@@ -59,16 +59,28 @@ def compute_permutation_feature_importance(
 ) -> Union[Importances, ConditionalImportances]:
     pfi = PermutationFeatureImportanceCalculator(n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state)
     if importance_type == "conditional":
-        sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
-        values = {}
-        for group_name, indexes in sample_groups.items():
-            values[group_name] =pfi.compute_importances(X=get_item(X, indexes), y=get_item(y, indexes), proxy=proxy)
-
-        return ConditionalImportances(values=values)
+        return compute_conditional_permutation_feature_importance(
+            proxy=proxy, X=X, y=y, n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state
+        )
     return pfi.compute_importances(X=X, y=y, proxy=proxy)
 
 
-from sklearn.metrics import accuracy_score, mean_squared_error
+def compute_conditional_permutation_feature_importance(
+    proxy: ModelProxy,
+    X: pd.DataFrame,
+    y: pd.Series,
+    n_repeats: int = 5,
+    n_jobs: int = -1,
+    random_state: Union[RandomState, int, None] = None,
+) -> Union[Importances, ConditionalImportances]:
+    pfi = PermutationFeatureImportanceCalculator(n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state)
+    sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
+    values = {}
+    for group_name, indexes in sample_groups.items():
+        values[group_name] = pfi.compute_importances(X=get_item(X, indexes), y=get_item(y, indexes), proxy=proxy)
+
+    return ConditionalImportances(values=values)
+
 
 class SklearnClassifier:
     @staticmethod
@@ -77,18 +89,22 @@ class SklearnClassifier:
             predict = proxy.predict
             predict_proba = proxy.predict_proba
             classes = proxy.classes
-            fit = lambda x, y: None
-            score = lambda x, y: accuracy_score(y, proxy.predict(x))
+            fit = lambda x, y: None  # noqa: ARG005, E731
+            score = lambda x, y: accuracy_score(y, proxy.predict(x))  # noqa: E731
+
         return Wrapper
+
 
 class SklearnRegressor:
     @staticmethod
     def from_proxy(proxy):
         class Wrapper:
             predict = proxy.predict
-            fit = lambda x, y: None
-            score = lambda x, y: mean_squared_error(y, proxy.predict(x))
+            fit = lambda x, y: None  # noqa: ARG005, E731
+            score = lambda x, y: mean_squared_error(y, proxy.predict(x))  # noqa: E731
+
         return Wrapper
+
 
 class PermutationFeatureImportanceCalculator:
     def __init__(
@@ -107,22 +123,17 @@ class PermutationFeatureImportanceCalculator:
         self.random_state = random_state
         self.importance_type = importance_type
 
-    def compute_importances(self, X: Any, y:Any, proxy: ModelProxy) -> Importances:
-        #X = dataset["X"]
-        #y = dataset["y"]
-        #metric = metric_scores[proxy.learning_task]
-        #baseline_score = metric(y, proxy.predict(X))
-        #n_features = X.shape[1]
+    def compute_importances(self, X: Any, y: Any, proxy: ModelProxy) -> Importances:
         if proxy.learning_task == "regression":
             sklearn_model = SklearnRegressor.from_proxy(proxy)
-        
-        elif proxy.learning_task == "binary_classification" or proxy.learning_task == "multi_classification":
+
+        elif proxy.learning_task in ("binary_classification", "multi_classification"):
             sklearn_model = SklearnClassifier.from_proxy(proxy)
-        
+
         from sklearn.inspection import permutation_importance
 
         r = permutation_importance(sklearn_model, X, y, n_repeats=self.n_repeats, random_state=0, n_jobs=self.n_jobs)
-        feature_importance_values = np.abs(r['importances_mean'])
+        feature_importance_values = np.abs(r["importances_mean"])
 
         features = list(get_columns(X))
         feature_importances = pd.DataFrame.from_dict(

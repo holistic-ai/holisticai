@@ -1,7 +1,8 @@
 import numpy as np
-from holisticai.typing import ArrayLike
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy
+
+from holisticai.typing import ArrayLike
 
 
 class FeatureImportanceSpread:
@@ -18,14 +19,14 @@ class FeatureImportanceSpread:
     """
 
     name: str = "Spread Divergence"
-    reference: float = 0
+    reference: float = 1
     divergence: bool = True
 
     def __call__(self, feature_importances: ArrayLike):
         tol = 1e-8
         feature_importance_values = np.array(feature_importances, dtype=float)
         if len(feature_importance_values) == 0 or sum(feature_importance_values) < tol:
-            return 0
+            return 1
 
         if len(feature_importance_values) == 1:
             return 1.0
@@ -34,7 +35,7 @@ class FeatureImportanceSpread:
         feature_equal_weight = np.array([1.0 / len(feature_importance_values)] * len(feature_importance_values))
 
         if self.divergence:
-            metric = 1 - jensenshannon(feature_weight, feature_equal_weight, base=2)
+            metric = jensenshannon(feature_weight, feature_equal_weight, base=2)
         else:
             metric = entropy(feature_weight) / entropy(feature_equal_weight)
         return float(metric)
@@ -53,7 +54,7 @@ class SpreadRatio(FeatureImportanceSpread):
 
 class SpreadDivergence(FeatureImportanceSpread):
     name: str = "Spread Divergence"
-    reference: float = 0
+    reference: float = 1
     divergence: bool = True
 
 

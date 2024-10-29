@@ -70,7 +70,7 @@ def test_xai_regression_metrics(input_data):
         y_pred=proxy.predict(test["X"]),
     )
     assert np.isclose(
-        metrics.loc["Rank Alignment"].value, 0.7317350088183421, atol=ATOL
+        metrics.loc["Rank Alignment"].value, 0.5477272727272727, atol=ATOL
     )
     assert np.isclose(
         metrics.loc["Position Parity"].value, 0.18504188712522046, atol=ATOL
@@ -93,7 +93,7 @@ def test_xai_classification_metrics_separated(input_data):
     ) = get_regression_features(model, test)
 
     value = rank_alignment(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.7317350088183421, atol=ATOL)
+    assert np.isclose(value, 0.5477272727272727, atol=ATOL)
 
     value = position_parity(conditional_importances, ranked_importances)
     assert np.isclose(value, 0.18504188712522046, atol=ATOL)

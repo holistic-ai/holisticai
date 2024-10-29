@@ -8,6 +8,7 @@ from holisticai.utils.feature_importances._lime import (
 )
 from holisticai.utils.feature_importances._permutation_feature_importance import (
     PermutationFeatureImportanceCalculator,
+    compute_conditional_permutation_feature_importance,
     compute_permutation_feature_importance,
 )
 from holisticai.utils.feature_importances._shap import (
@@ -30,4 +31,5 @@ __all__ = [
     "compute_lime_feature_importance",
     "SHAPImportanceCalculator",
     "compute_shap_feature_importance",
+    "compute_conditional_permutation_feature_importance",
 ]

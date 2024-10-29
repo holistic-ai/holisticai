@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Union
 
 import pandas as pd
+
 from holisticai.explainability.metrics.global_feature_importance import (
     AlphaScore,
     PositionParity,
@@ -10,7 +11,7 @@ from holisticai.explainability.metrics.global_feature_importance import (
     SpreadDivergence,
     SpreadRatio,
     XAIEaseScore,
-    surrogate_mean_squared_error
+    surrogate_mean_squared_error,
 )
 from holisticai.explainability.metrics.local_feature_importance import FeatureStability
 
