@@ -2,8 +2,6 @@ from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score
-
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import FeatureImportanceSpread
 from holisticai.explainability.metrics.global_feature_importance._surrogate import (
     surrogate_accuracy_score,
@@ -22,6 +20,7 @@ from holisticai.explainability.metrics.tree._tree import (
 )
 from holisticai.typing import ArrayLike
 from holisticai.utils.surrogate_models import BinaryClassificationSurrogate, MultiClassificationSurrogate
+from sklearn.metrics import accuracy_score
 
 
 class AccuracyDegradation:

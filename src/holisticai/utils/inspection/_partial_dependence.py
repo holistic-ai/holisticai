@@ -120,7 +120,7 @@ def wrap_sklearn_binary_model(classes: list, predict: callable, predict_proba: c
 
 
 def wrap_sklearn_multi_classification_model(classes: list, predict: callable, predict_proba: callable | None = None):
-    def fit(x, y):
+    def fit(x, y):  # noqa: ARG001
         pass
 
     def score(x, y):

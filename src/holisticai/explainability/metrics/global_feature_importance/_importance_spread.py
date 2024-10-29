@@ -1,8 +1,7 @@
 import numpy as np
+from holisticai.typing import ArrayLike
 from scipy.spatial.distance import jensenshannon
 from scipy.stats import entropy
-
-from holisticai.typing import ArrayLike
 
 
 class FeatureImportanceSpread:

@@ -5,10 +5,9 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-from scipy.interpolate import interp1d
-
 from holisticai.typing import ArrayLike, MatrixLike
 from holisticai.utils import Importances, PartialDependence
+from scipy.interpolate import interp1d
 
 logger = logging.getLogger(__name__)
 
