@@ -16,3 +16,4 @@
     shapr_score
     data_minimization_score
     attribute_attack_score
+    privacy_risk_score
