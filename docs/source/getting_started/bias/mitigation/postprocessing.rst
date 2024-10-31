@@ -12,11 +12,7 @@ Here are the in-processing methods implemented in the Holistic AI package:
         postprocessing/bc_eq_odds_post_processing_equality_of_opportunity.rst
         postprocessing/bc_lp_debiaser_linear_program.rst
         postprocessing/bc_ml_debiaser_rto.rst
-        postprocessing/bc_reject_option_classification_reject_option_based_classiﬁcation.rst
+        postprocessing/bc_reject_option_classification_reject_option_based_classification.rst
         postprocessing/c_mcmf_clustering_mcmf_problem.rst
         postprocessing/mc_lp_debiaser_linear_program.rst
         postprocessing/r_plugin_estimator_and_calibrator_plug_in_estimator_and_recalibration.rst
-        .. postprocessing/rs_debiasing_exposure_deltr.rst
-        postprocessing/rs_disparate_impact_remover_disparate_impact_remover.rst
-        postprocessing/rs_fair_topk_fa*ir_algorithm.rst
-        postprocessing/r_wasserstein_barycenters_wasserstein_barycenter.rst

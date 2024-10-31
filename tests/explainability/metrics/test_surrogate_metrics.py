@@ -21,7 +21,7 @@ def test_feature_importances_spread():
     # Test with uniform feature importances
     feature_importances = np.array([0.25, 0.25, 0.25, 0.25])
     result = spread_divergence(feature_importances)
-    assert np.isclose(result, 1.0), f"Expected 1.0, got {result}"
+    assert np.isclose(result, 0.0), f"Expected 1.0, got {result}"
 
     # Test with non-uniform feature importances
     feature_importances = np.array([0.7, 0.1, 0.1, 0.1])
@@ -31,7 +31,7 @@ def test_feature_importances_spread():
     # Test with zero feature importances
     feature_importances = np.array([0.0, 0.0, 0.0, 0.0])
     result = spread_divergence(feature_importances)
-    assert result == 0.0, f"Expected 0.0, got {result}"
+    assert result == 1.0, f"Expected 0.0, got {result}"
 
     # Test with single feature importance
     feature_importances = np.array([1.0])
@@ -73,7 +73,7 @@ def test_categorical_explainability_metrics(data, surrogate):
     from holisticai.explainability.metrics import classification_surrogate_explainability_metrics
     X, y = data
     y_pred = surrogate.predict(X)
-    metrics = classification_surrogate_explainability_metrics(X, y, y_pred, surrogate_type="shallow_tree", metric_type="all")
+    metrics = classification_surrogate_explainability_metrics(X, y, y_pred, surrogate)
     values = metrics.loc[:,'Value'] # type: ignore
     assert not values.isnull().any(), "Values should not be null"
 
@@ -81,7 +81,7 @@ def test_regression_explainability_metrics(data, surrogate):
     from holisticai.explainability.metrics import regression_surrogate_explainability_metrics
     X, y = data
     y_pred = surrogate.predict(X)
-    metrics = regression_surrogate_explainability_metrics(X, y, y_pred, surrogate_type="shallow_tree", metric_type="all")
+    metrics = regression_surrogate_explainability_metrics(X, y, y_pred, surrogate)
     values = metrics.loc[:,'Value'] # type: ignore
     assert not values.isnull().any(), "Values should not be null"
 

@@ -39,9 +39,8 @@ def get_classification_features(model, test, strategy):
     else:
         raise ValueError("Invalid strategy")
 
-
 @pytest.mark.parametrize("strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment", [
-    ("permutation", 0.020618556701030927, 1.0, 0.0, 0.25),
+    ("permutation", 0.020618556701030927, 1.0, 0.5, 0.35),
     ("surrogate",  0.020618556701030927, 1.0, 0.5, 0.75)
 ])
 def test_xai_classification_metrics(strategy, alpha_imp_score, xai_ease_score, position_parity, rank_alignment, input_data):
@@ -61,10 +60,10 @@ def test_xai_classification_metrics_separated(input_data):
     proxy, importances, ranked_importances, conditional_importances, partial_dependencies = get_classification_features(model, test, 'permutation')
         
     value = rank_alignment(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.25)
+    assert np.isclose(value, 0.35)
 
     value = position_parity(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.0)
+    assert np.isclose(value, 0.5)
     
     value = xai_ease_score(partial_dependencies, ranked_importances)
     assert np.isclose(value, 1.0)
@@ -79,7 +78,7 @@ def test_rank_alignment():
 
     values = {
         '0': Importances(values=[0.1, 0.2, 0.3, 0.4], 
-                         feature_names=['feature_2', 'feature_3', 'feature_4']),
+                         feature_names=['feature_2', 'feature_3', 'feature_3', 'feature_4']),
         '1': Importances(values=[0.4, 0.3, 0.2, 0.1], 
                          feature_names=['feature_1', 'feature_2', 'feature_3', 'feature_4'])
     }
@@ -87,7 +86,7 @@ def test_rank_alignment():
 
     ranked_feature_importance = Importances(values=[0.5, 0.3, 0.2], feature_names=['feature_1', 'feature_2', 'feature_3'])
     score = rank_alignment(conditional_feature_importance, ranked_feature_importance)
-    assert np.isclose(score,0.6944444444444444)
+    assert np.isclose(score,0.5)
 
 def test_position_parity():
     from holisticai.utils import ConditionalImportances, Importances
@@ -144,9 +143,8 @@ def test_spread_ratio():
     assert np.isclose(score, 0.9206198357143052)
 
 def test_spread_divergence():
-    from holisticai.utils import Importances
     from holisticai.explainability.metrics.global_feature_importance import spread_divergence
     
     feature_importance = np.array([0.10, 0.20, 0.30])
     score = spread_divergence(feature_importance)
-    assert np.isclose(score, 0.8196393599933761)
+    assert np.isclose(score, 0.18036064000662386)

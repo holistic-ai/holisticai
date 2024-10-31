@@ -1,8 +1,17 @@
 import numpy as np
 import pandas as pd
-from holisticai.explainability.metrics.local_feature_importance import compute_importance_distribution
+import seaborn as sns
+from holisticai.explainability.metrics.global_feature_importance import fluctuation_ratio
+from holisticai.explainability.metrics.local_feature_importance import (
+    compute_importance_distribution,
+    importance_stability,
+    local_normalized_desviation,
+    rank_consistency,
+)
 from holisticai.utils import Importances
+from matplotlib import patches
 from matplotlib import pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from scipy.spatial.distance import jensenshannon
 
 
@@ -95,3 +104,125 @@ def plot_predictions_vs_interpretability(y_score, local_importances, ax=None, **
     ax.set_xlabel("Ouput Probability")
     ax.set_ylabel("Jensen-Shannon Divergence")
     ax.set_title("Higher value means more interpretability")
+
+
+"""
+def create_metric_table(partial_dependencies, importances):
+    top_fluctuation_ratios = fluctuation_ratio(partial_dependencies, importances, top_n=top_n, aggregated=False)
+    df = importances.as_dataframe()
+    df['Fluctuation Ratio'] = top_fluctuation_ratios
+    return df
+"""
+
+
+def plot_top_explainable_global_feature_importances(partial_dependencies, importances, model_name, top_n):
+    fr_df = fluctuation_ratio(partial_dependencies, importances, top_n=top_n, aggregated=False)
+
+    df = importances.as_dataframe().set_index("Variable")
+
+    df = (
+        pd.concat([df, fr_df], axis=1)
+        .dropna()
+        .sort_values("Importance", ascending=False)
+        .reset_index()
+        .rename({"index": "Variable"}, axis=1)
+    )
+    score = fluctuation_ratio(partial_dependencies, importances, top_n=top_n)
+
+    if top_n is not None:
+        df = df.iloc[:top_n]
+
+    base_color = "#4A6BC1"
+    plt.subplots_adjust(wspace=0.5, hspace=0.5)
+    plt.barh(np.arange(len(df)) - 0.15, df["Importance"], height=0.3, color=base_color, alpha=0.8)
+
+    # Add oscillation markers
+    feature_names = [f.rsplit("_")[-1] for f in df["Variable"].tolist()]
+
+    # Customize the plot
+    plt.yticks(range(len(df)), feature_names)
+    plt.xlabel("Value", fontsize=12)
+
+    # Add a second x-axis for oscillation
+    plt.gca().invert_yaxis()
+    ax1 = plt.gca()
+
+    ax2 = ax1.twiny()
+    ax2.barh(np.arange(len(df)) + 0.15, df["Fluctuation Ratio"], height=0.3, color="#47B39C", alpha=0.8)
+    ax2.set_xlim(0, 1)
+
+    # Set labels and titles
+    ax1.set_xlabel("Permutation Feature Importance", color=base_color, fontsize=12)
+    ax2.set_xlabel("Fluctuation Ratio", color="#47B39C", fontsize=12)
+
+    plt.title(f"{model_name} [FR={score:.3f}]", fontsize=14, pad=20)
+    ax1.tick_params(axis="x", colors=base_color)
+    ax2.tick_params(axis="x", colors="#47B39C")
+
+    ax2.grid(True)
+
+
+def plot_local_feature_importances_stability(local_importances, top_n=None, model_name=None):
+    local_importances_values = np.abs(local_importances.values)
+    local_importances_values /= local_importances_values.sum(axis=1, keepdims=True)
+    avg_importances = local_importances_values.mean(axis=0)
+
+    feature_names = local_importances.feature_names
+
+    df = pd.DataFrame({"Variable": feature_names, "Importance": avg_importances})  # .set_index('Variable')
+    df["importance_stability"] = np.array(importance_stability(local_importances_values, aggregate=False))
+    df = df.sort_values("Importance", ascending=False).reset_index().dropna()
+
+    score = importance_stability(local_importances_values, aggregate=True)
+    if top_n is not None:
+        df = df.iloc[:top_n]
+
+    base_color = "#4A6BC1"
+    base_color2 = "#C14A6B"
+    plt.subplots_adjust(wspace=0.5, hspace=0.5)
+    plt.barh(np.arange(len(df)) - 0.15, df["Importance"], height=0.3, color=base_color, alpha=0.8)
+
+    # Add oscillation markers
+    feature_names = [f.rsplit("_")[-1] for f in df["Variable"].tolist()]
+
+    # Customize the plot
+    plt.yticks(range(len(df)), feature_names)
+    plt.xlabel("Value", fontsize=12)
+
+    # Add a second x-axis for oscillation
+    plt.gca().invert_yaxis()
+    ax1 = plt.gca()
+
+    ax2 = ax1.twiny()
+    ax2.barh(np.arange(len(df)) + 0.15, df["importance_stability"], height=0.3, color=base_color2, alpha=0.8)
+    ax2.set_xlim(0, 1)
+
+    # Set labels and titles
+    ax1.set_xlabel("SHAP Importance", color=base_color, fontsize=12)
+    ax2.set_xlabel("Importance Stability", color=base_color2, fontsize=12)
+
+    plt.title(f"{model_name} [FR={score:.3f}]", fontsize=14, pad=20)
+    ax1.tick_params(axis="x", colors=base_color)
+    ax2.tick_params(axis="x", colors=base_color2)
+
+    ax2.grid(True)
+
+
+def plot_ranking_consistency(local_importances, model_name):
+    base_color = "#5B7BE9"
+    cmap = LinearSegmentedColormap.from_list("custom_cmap", ["#ffffff", base_color])
+    local_importances_values = local_importances.values
+    values = local_normalized_desviation(local_importances_values)
+    all_scores = rank_consistency(local_importances_values, aggregate=False)
+    score = rank_consistency(local_importances.values)
+    indexes = np.argsort(all_scores)
+    plt.subplots_adjust(wspace=0.1, hspace=0.5)
+    sns.heatmap(values[:, indexes], cmap=cmap, cbar=True, yticklabels=False)
+    title = f"{model_name} [RC={score:.3f}]"
+    plt.title(title)
+    plt.ylabel("Samples")
+    plt.xlabel("Features")
+    rect = patches.Rectangle(
+        (0, 0), 1, 1, linewidth=1, edgecolor="black", facecolor="none", transform=plt.gca().transAxes
+    )
+    plt.gca().add_patch(rect)

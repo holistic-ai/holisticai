@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional, Union
 
+import numpy as np
 from numpy.random import RandomState
 
 from holisticai.utils.surrogate_models._trees import (
@@ -12,6 +13,21 @@ from holisticai.utils.surrogate_models._trees import (
 Surrogate = Union[DecisionTreeClassifier, DecisionTreeRegressor]
 LearningTask = Literal["binary_classification", "multi_classification", "regression"]
 SurrogateType = Literal["shallow_tree", "tree"]
+
+
+def create_surrogate_model(X, y_pred, surrogate_type, learning_task="classification"):
+    if learning_task == "classification":
+        if len(np.unique(y_pred)) == 2:
+            surrogate = BinaryClassificationSurrogate(X, y_pred=y_pred, model_type=surrogate_type)
+        elif len(np.unique(y_pred)) > 2:
+            surrogate = MultiClassificationSurrogate(X, y_pred=y_pred, model_type=surrogate_type)
+        else:
+            raise ValueError("y_pred must have at least two unique values")
+    elif learning_task == "regression":
+        surrogate = RegressionSurrogate(X, y_pred=y_pred, model_type=surrogate_type)
+    else:
+        raise ValueError(f"Learning task {learning_task} not supported")
+    return surrogate
 
 
 class BinaryClassificationSurrogate:

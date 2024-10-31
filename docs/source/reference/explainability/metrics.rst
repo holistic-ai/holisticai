@@ -13,11 +13,10 @@
     :toctree: .generated/
 
     alpha_score
-    xai_ease_score
-    position_parity
+    fluctuation_ratio
+    spread_divergence
     rank_alignment
     spread_ratio
-    spread_divergence
 
 **Local Feature Importance**
 
@@ -26,7 +25,8 @@
     :template: function.rst
     :toctree: .generated/
     
-    feature_stability
+    importance_stability
+    rank_consistency
 
 **Tree Based Metrics**
 
@@ -49,8 +49,9 @@
     :template: function.rst
     :toctree: .generated/
 
-    surrogate_accuracy_difference
-    surrogate_mean_squared_error_difference
     surrogate_features_stability
-    surrogate_feature_importances_stability
+    surrogate_fidelity_classification
+    surrogate_fidelity_regression
+    surrogate_accuracy_degradation
+    surrogate_mean_squared_error_degradation
 

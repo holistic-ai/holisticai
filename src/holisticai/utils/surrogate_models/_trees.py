@@ -7,6 +7,7 @@ import pandas as pd
 from numpy.random import RandomState
 from sklearn.metrics import accuracy_score, mean_squared_error
 
+from holisticai.utils.obj_rep.object_repr import ReprObj
 from holisticai.utils.surrogate_models._base import SurrogateBase
 
 
@@ -64,7 +65,7 @@ class OptimalTreeBase(TreeBase):
         return self._surrogate.predict(X)
 
 
-class DecisionTreeClassifier(OptimalTreeBase):
+class DecisionTreeClassifier(OptimalTreeBase, ReprObj):
     name = "Shallow Decision Tree Classifier"
 
     def __init__(
@@ -104,8 +105,18 @@ class DecisionTreeClassifier(OptimalTreeBase):
         assert self._surrogate is not None, "Model not fitted"
         return self._surrogate.feature_importances_
 
+    def repr_info(self):
+        return {
+            "dtype": "Surrogate Model",
+            "attributes": {
+                "Learning Task": self.learning_task,
+                "Name": self.name,
+                "Model Type": self.model_type,
+            },
+        }
 
-class DecisionTreeRegressor(OptimalTreeBase):
+
+class DecisionTreeRegressor(OptimalTreeBase, ReprObj):
     name = "Shallow Decision Tree Regressor"
 
     def __init__(
@@ -144,3 +155,13 @@ class DecisionTreeRegressor(OptimalTreeBase):
     def feature_importances_(self):
         assert self._surrogate is not None, "Model not fitted"
         return self._surrogate.feature_importances_
+
+    def repr_info(self):
+        return {
+            "dtype": "Surrogate Model",
+            "attributes": {
+                "Learning Task": self.learning_task,
+                "Name": self.name,
+                "Model Type": self.model_type,
+            },
+        }
