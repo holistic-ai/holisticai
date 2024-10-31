@@ -39,7 +39,8 @@ class GDPoisoner:
     max_iter : int
         The maximum number of iterations. Default is 15.
     initializer : str
-        The initialization method. Default is 'inf_flip'.
+        The initialization method. Default is 'inf_flip'.\
+        Options are 'inf_flip'. 'adaptive', 'randflip' and 'randflipnobd'.
 
     References
     ----------
