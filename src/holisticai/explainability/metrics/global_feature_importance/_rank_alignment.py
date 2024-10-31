@@ -36,5 +36,23 @@ class RankAlignment:
 def rank_alignment(
     conditional_feature_importance: ConditionalImportances, ranked_feature_importance: Importances, aggregation=True
 ):
+    """
+
+    Compute the rank alignment metric between conditional feature importance and ranked feature importance.
+
+    Parameters
+    ----------
+    conditional_feature_importance : ConditionalImportances
+        The conditional feature importance values.
+    ranked_feature_importance : Importances
+        The ranked feature importance values.
+    aggregation : bool, optional
+        If True, aggregate the results, by default True.
+
+    Returns
+    -------
+    float
+        The computed rank alignment metric.
+    """
     metric = RankAlignment()
     return metric(conditional_feature_importance, ranked_feature_importance, aggregation=aggregation)

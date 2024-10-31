@@ -21,6 +21,28 @@ def local_normalized_desviation(local_importances_values: np.ndarray):
 
 
 def rank_consistency(local_importances_values: np.ndarray, weighted=False, aggregate=True):
+    """
+
+    Calculate the rank consistency of local feature importances through all the instances.
+
+    Parameters
+    ----------
+
+    local_importances_values : np.ndarray
+        A 2D array where each row represents the local feature importances for a specific instance.
+    weighted : bool, optional
+        If True, the rank consistency will be weighted by the average local importances. Default is False.
+    aggregate : bool, optional
+        If True, the function will return an aggregated consistency score. If False, it will return the consistency
+        scores for each feature. Default is True.
+
+    Returns
+    -------
+
+    float or np.ndarray
+        If `aggregate` is True, returns a single float representing the aggregated rank consistency.
+        If `aggregate` is False, returns an array of consistency scores for each feature.
+    """
     normalized_desviation = local_normalized_desviation(local_importances_values)
     consistencies = np.mean(normalized_desviation, axis=0)
     if aggregate:

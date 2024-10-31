@@ -3,14 +3,21 @@ import numpy as np
 
 def importance_stability(feature_importances: np.ndarray, aggregate=True):
     """
-    Calculate the stability of local feature importance (e.g., SHAP values).
 
-    Parameters:
-    - feature_importances (np.array): A matrix of shape (M, d), where M is the number of samples
-      and d is the number of features. Each entry represents the importance of a feature in a sample.
+    Determine the stability of feature importance.
 
-    Returns:
-    - stability (float): The stability metric, bounded between 0 and 1.
+    Parameters
+    ----------
+
+    feature_importances: np.array
+    A matrix of shape (M, d), where M is the number of samples and d is the number
+    of features. Each entry represents the importance of a feature in a sample.
+
+    Returns
+    -------
+
+    stability: float
+    The stability metric, bounded between 0 and 1.
     """
     M, d = feature_importances.shape  # M: number of samples, d: number of features
 

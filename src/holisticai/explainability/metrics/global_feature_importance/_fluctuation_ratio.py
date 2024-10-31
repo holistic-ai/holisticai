@@ -33,6 +33,30 @@ def fluctuation_ratio(
     weighted=False,
     aggregated=True,
 ):
+    """
+
+    Calculate the fluctuation ratio for features based on partial dependencies.
+
+    Parameters
+    ----------
+    partial_dependencies : PartialDependence
+        An object containing partial dependence values for features.
+    importances : Optional[Importances], default=None
+        A dictionary or similar structure containing feature importances. Required if `weighted` is True.
+    top_n : int, default=-1
+        The number of top features to consider. If -1, all features are considered.
+    label : int, default=0
+        The label for which the partial dependencies are calculated.
+    weighted : bool, default=False
+        If True, the fluctuation ratios are weighted by feature importances.
+    aggregated : bool, default=True
+        If True, return the aggregated fluctuation ratio. If False, return a DataFrame with individual fluctuation ratios.
+
+    Returns
+    -------
+    float or pd.DataFrame
+        The aggregated fluctuation ratio if `aggregated` is True. Otherwise, a DataFrame with individual fluctuation ratios.
+    """
     feature_names = partial_dependencies.feature_names
     fluctuations = []
     selected_feature_names = feature_names[:top_n]

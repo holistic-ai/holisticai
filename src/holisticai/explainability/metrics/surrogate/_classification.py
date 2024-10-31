@@ -89,6 +89,24 @@ class SurrogateFidelityClassification:
 
 
 def surrogate_fidelity_classification(y_pred, y_surrogate):
+    """
+    Calculate the surrogate fidelity for classification tasks.
+
+    Surrogate fidelity measures how well the surrogate model's predictions
+    match the original model's predictions.
+
+    Parameters
+    ----------
+    y_pred : array-like
+        Predictions from the original model.
+    y_surrogate : array-like
+        Predictions from the surrogate model.
+
+    Returns
+    -------
+    float
+        The surrogate fidelity score.
+    """
     m = SurrogateFidelityClassification()
     return m(y_pred, y_surrogate)
 

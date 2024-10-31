@@ -67,13 +67,7 @@ extensions = [
     "sphinxcontrib.youtube",
 ]
 
-intersphinx_mapping = {
-    "python3": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "sklearn": ("https://scikit-learn.org/stable/", None),
-    "matplotlib": ("https://matplotlib.org/stable/", None)
-}
+
 
 source_suffix = {
     '.rst': 'restructuredtext',
@@ -82,7 +76,7 @@ source_suffix = {
 
 
 nbsphinx_allow_errors = True  # Permitir errores en los notebooks
-nbsphinx_execute = 'auto'  # Puede ser 'auto', 'always', o 'never'
+nbsphinx_execute = 'never'  # Puede ser 'auto', 'always', o 'never'
 
 html_show_sourcelink = False
 # autodoc options
