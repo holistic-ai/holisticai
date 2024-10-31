@@ -14,3 +14,5 @@ This gallery contains a collection of examples that demonstrate the usage of ``h
     Explainability <tutorials/explainability>
 
     Robustness <tutorials/robustness>
+
+    Security <tutorials/security>
