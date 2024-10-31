@@ -13,19 +13,19 @@ from holisticai.explainability.metrics._tree import (
 from holisticai.explainability.metrics.global_feature_importance import (
     alpha_score,
     classification_global_feature_importance_explainability_metrics,
+    fluctuation_ratio,
     position_parity,
     rank_alignment,
     spread_divergence,
     spread_ratio,
     surrogate_accuracy_score,
     xai_ease_score,
-    fluctuation_ratio,
 )
 from holisticai.explainability.metrics.local_feature_importance import (
     classification_local_feature_importance_explainability_metrics,
     feature_stability,
+    importance_stability,
     rank_consistency,
-    importance_stability
 )
 from holisticai.explainability.metrics.surrogate import (
     classification_surrogate_explainability_metrics,
@@ -34,9 +34,9 @@ from holisticai.explainability.metrics.surrogate import (
     surrogate_accuracy_degradation,
     surrogate_feature_importances_stability,
     surrogate_features_stability,
-    surrogate_mean_squared_error_degradation,
     surrogate_fidelity_classification,
-    surrogate_fidelity_regression
+    surrogate_fidelity_regression,
+    surrogate_mean_squared_error_degradation,
 )
 from holisticai.explainability.metrics.tree import (
     tree_depth_variance,
@@ -79,5 +79,5 @@ __all__ = [
     "tree_number_of_features",
     "tree_number_of_rules",
     "surrogate_fidelity_classification",
-    "surrogate_fidelity_regression"
+    "surrogate_fidelity_regression",
 ]

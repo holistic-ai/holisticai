@@ -103,15 +103,15 @@ def surrogate_fidelity_regression(y_pred, y_surrogate):
     """
     Calculate the surrogate fidelity for regression models.
 
-    This function evaluates how well a surrogate model's predictions match the 
-    predictions of the original model. 
+    This function evaluates how well a surrogate model's predictions match the
+    predictions of the original model.
 
     Parameters:
     y_pred (array-like): Predictions from the original model.
     y_surrogate (array-like): Predictions from the surrogate model.
 
     Returns:
-    float: A fidelity score indicating how closely the surrogate model's 
+    float: A fidelity score indicating how closely the surrogate model's
            predictions match the original model's predictions.
     """
     m = SurrogateFidelityRegression()
