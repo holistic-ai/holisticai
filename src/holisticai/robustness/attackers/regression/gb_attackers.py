@@ -16,6 +16,8 @@ class LinRegGDPoisoner(GDPoisoner):
         The number of initializations. Default is 1.
     max_iter : int
         The maximum number of iterations. Default is 15.
+    initializer : str
+        The initialization method. Default is 'inf_flip'.
     eta : float
         Gradient descent step size. Default is 0.01.
     beta : float
@@ -288,6 +290,8 @@ class RidgeGDPoisoner(GDPoisoner):
         The number of initializations. Default is 1.
     max_iter : int
         The maximum number of iterations. Default is 15.
+    initializer : str
+        The initialization method. Default is 'inf_flip'.
     eta : float
         Gradient descent step size. Default is 0.01.
     beta : float
