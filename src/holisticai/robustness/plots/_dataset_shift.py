@@ -3,6 +3,40 @@ Module description:
 -------------------
 - This module contains functions to plot the dataset shift analysis results.
 
+This module provides a collection of plot functions for 2D datasets, focusing
+on displaying model predictions, neighborhood analysis, and accuracy
+degradation profiles. The functions are designed to help users understand how
+models behave under different scenarios, such as changes in data, prediction
+performance, and neighborhood-based analysis. Through intuitive scatter plots
+and additional visual aids, users can assess model predictions, compare actual
+vs. predicted values, and analyze model robustness under varying conditions.
+
+Functions included:
+-------------------
+- plot_2d: Generates a 2D scatter plot for a dataset, with options to highlight
+  or exclusively display a subset of points. It supports both general
+  visualizations and focused views of specific data points.
+
+- plot_label_and_prediction: Creates a scatter plot that shows both actual
+  labels and predicted labels for a dataset, with a vertical offset to visually
+  differentiate between the two. Ideal for visual comparison of prediction
+  accuracy.
+
+- plot_neighborhood: Visualizes the neighborhoods around specified points of
+  interest by plotting a convex hull, the nearest neighbors, and the accuracy
+  within those neighbors. It helps users understand how local groups of data
+  points contribute to overall model performance.
+
+- plot_adp_and_adf: Plots the accuracy degradation profile (ADP) by showing the
+  percentage of samples above a threshold versus the size factor of the
+  dataset. It highlights key points of degradation with color-coding and
+  vertical markers, providing insights into the model's robustness as data
+  availability decreases. Accuracy degradation factor (ADF) is also showed
+  as a circle at the first degradation point.
+
+This module offers a set of functions to explore the behavior and performance
+of machine learning models visually, facilitating a better understanding of
+model predictions and robustness across different data scenarios.
 """
 
 # Importing required libraries
@@ -116,17 +150,24 @@ def plot_2d(X, y, highlight_group=None, show_just_group=None, features_to_plot=N
     .. image:: /_static/images/plot_2d_pure.png
         :alt: Scatter Plot of a 2D dataset
 
-    Raises
-    ------
-    TypeError
-        If `highlight_group` is not a list or a NumPy array.
 
-    Notes
-    -----
-    - This function requires `matplotlib` for visualization and can handle both
-      NumPy arrays and pandas DataFrames for input data.
-    - The `highlight_group` feature allows the user to either emphasize certain points
-      or exclusively plot them based on the `show_just_group` flag.
+    Scatter Plot of a 2D dataset with a highlighted group:
+
+    .. image:: /_static/images/plot_2d_highlight_group.png
+        :alt: Scatter Plot of a 2D dataset with a highlighted group
+
+
+    Scatter Plot of a 2D dataset with a highlighted group and it's labels:
+
+    .. image:: /_static/images/plot_2d_show_just_group.png
+        :alt: Scatter Plot of a 2D dataset with a highlighted group and it's labels
+
+
+    Scatter Plot of a 2D dataset with y_test and y_pred together in the same graph while
+    caltulating the accuracy over the point and its' selected neighbors.
+
+    .. image:: /_static/images/plot_2d_neighborhood.png
+        :alt: Scatter Plot of a 2D dataset with y_test and y_pred together with neighborhood accuracy calculation
     """
 
     import inspect

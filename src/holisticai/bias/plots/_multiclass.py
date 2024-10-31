@@ -30,6 +30,7 @@ def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):
     Returns
     -------
     matplotlib ax (or None)
+
     """
 
     # check and coerce inputs

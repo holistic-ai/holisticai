@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from holisticai.typing._typing import ArrayLike
 
-from holisticai.utils._commons import get_top_ranking_from_scores
+from holisticai.utils._commons import get_number_of_feature_above_threshold_importance
 
 
 class AlphaScore:
@@ -32,7 +32,7 @@ class AlphaScore:
         Returns:
             float: The alpha importance value.
         """
-        return get_top_ranking_from_scores(feature_importances) / len(feature_importances)
+        return get_number_of_feature_above_threshold_importance(feature_importances) / len(feature_importances)
 
 
 def alpha_score(feature_importance: ArrayLike, alpha: float = 0.8):

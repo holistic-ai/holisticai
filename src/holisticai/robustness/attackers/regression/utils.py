@@ -62,6 +62,8 @@ def revert_one_hot_encoding(data, column_mapping, col_names=None):
 
     reverted_df = data.copy()
 
+    all_one_hot_cols = []
+
     for original_col, one_hot_indexes in column_mapping.items():
         # Get the one-hot encoded column names from their indexes
         one_hot_cols = [reverted_df.columns[idx] for idx in one_hot_indexes]
@@ -69,8 +71,10 @@ def revert_one_hot_encoding(data, column_mapping, col_names=None):
         # Reconstruct the original categorical values
         reverted_df[original_col] = reverted_df[one_hot_cols].idxmax(axis=1).apply(lambda x: x.split("_", 1)[1])
 
-        # Drop the one-hot encoded columns
-        reverted_df = reverted_df.drop(columns=one_hot_cols)
+        all_one_hot_cols.extend(one_hot_cols)
+
+    # Drop the one-hot encoded columns
+    reverted_df = reverted_df.drop(columns=all_one_hot_cols)
 
     # Convert DataFrame back to numpy array if the original input was a numpy array
     if isinstance(data, np.ndarray):

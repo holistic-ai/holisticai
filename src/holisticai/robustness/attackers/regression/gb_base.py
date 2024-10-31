@@ -2,13 +2,16 @@ import logging
 
 import numpy as np
 import pandas as pd
-from holisticai.robustness.attackers.regression.initializers import inf_flip
+from holisticai.robustness.attackers.regression.initializers import adaptive, inf_flip, randflip, randflipnobd
 from holisticai.robustness.attackers.regression.utils import one_hot_encode_columns, revert_one_hot_encoding
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger()
+
+
+INITS = {"inf_flip": inf_flip, "adaptive": adaptive, "randflip": randflip, "randflipnobd": randflipnobd}
 
 
 class GDPoisoner:
@@ -35,13 +38,28 @@ class GDPoisoner:
         The number of initializations. Default is 1.
     max_iter : int
         The maximum number of iterations. Default is 15.
+    initializer : str
+        The initialization method. Default is 'inf_flip'.\
+        Options are 'inf_flip'. 'adaptive', 'randflip' and 'randflipnobd'.
 
     References
     ----------
     .. [1] Jagielski, M., Oprea, A., Biggio, B., Liu, C., Nita-Rotaru, C., & Li, B. (2018, May). Manipulating machine learning: Poisoning attacks and countermeasures for regression learning. In 2018 IEEE symposium on security and privacy (SP) (pp. 19-35). IEEE.
     """
 
-    def __init__(self, eta, beta, sigma, eps, objective, opty, poison_proportion, num_inits=1, max_iter=15):
+    def __init__(
+        self,
+        eta,
+        beta,
+        sigma,
+        eps,
+        objective,
+        opty,
+        poison_proportion,
+        num_inits=1,
+        max_iter=15,
+        initializer="inf_flip",
+    ):
         self.objective = objective
         self.opty = opty
 
@@ -61,7 +79,7 @@ class GDPoisoner:
 
         self.colmap = None
         self.poison_proportion = poison_proportion
-        self.init = inf_flip
+        self.init = INITS[initializer]
         self.num_inits = num_inits
         self.max_iter = max_iter
 

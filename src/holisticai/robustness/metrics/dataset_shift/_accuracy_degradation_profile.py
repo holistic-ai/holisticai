@@ -3,6 +3,26 @@ Module description:
 -------------------
 - This module contains functions to calculate the accuracy degradation profile of a model.
 
+
+This module provides tools to evaluate and visualize the robustness of machine
+learning models under conditions of dataset shift by analyzing accuracy
+degradation. It includes methods for generating degradation profiles and
+identifying critical points where performance significantly drops. The
+functions in this module help quantify how well a model maintains its
+predictive performance as the available test data size decreases, enabling
+users to make informed decisions about model stability in real-world scenarios.
+
+Functions included:
+-------------------
+- accuracy_degradation_factor: Identifies the first percentual of the group of
+interest where accuracy suffers a significant drawback.
+
+- accuracy_degradation_profile: Generates a detailed profile showing how a
+model's accuracy degrades as the test set size is iteratively reduced, enabling
+analysis of the model's stability and resilience under varying conditions.
+
+This module is particularly useful for monitoring model performance in dynamic
+environments where test data may change or reduce in size.
 """
 
 from __future__ import annotations
@@ -106,24 +126,24 @@ def accuracy_degradation_profile(
     X_test: pd.DataFrame,
     y_test: pd.Series,
     y_pred: pd.Series,
-    n_neighbors: Optional[int] = None,
+    n_neighbors: int = 5,
     neighbor_estimator: Optional[Any] = None,
     baseline_accuracy: Optional[float] = None,
     threshold_percentual: float = 0.95,
     above_percentual: float = 0.90,
     step_size: float = STEP_SIZE,
-) -> pd.DataFrame:
+):
     """
     Generates an accuracy degradation profile by iteratively reducing the size
     of the nearest neighbors considered in the test set and comparing the
-    model's accuracy to a baseline.
+    classifier's accuracy against a baseline.
 
-    This function evaluates the robustness of a model by gradually reducing the
-    test set size and determining if the accuracy falls below a defined threshold.
-    It returns a DataFrame that tracks whether accuracy at each step meets or
-    falls short of the baseline accuracy.
+    This function assesses the robustness of a model by gradually reducing the
+    test set size and evaluating whether the accuracy falls below a defined
+    threshold. It returns a DataFrame summarizing whether the accuracy at each
+    step meets the baseline accuracy or if there is degradation.
 
-    Parameters
+    Parameters:
     ----------
     X_test : pd.DataFrame
         The feature matrix of the test set. Each row represents a sample, and
@@ -203,10 +223,11 @@ def accuracy_degradation_profile(
         raise ValueError("'step_size' is too small (less than 1 divided by the number of samples).")
 
     # Validate inputs
-    if isinstance(X_test, pd.DataFrame) & isinstance(y_test, pd.Series):
-        # Data structures
-        X_test = X_test.values
-        y_test = y_test.values
+    if isinstance(X_test, pd.DataFrame):
+        X_test = X_test.to_numpy()
+
+    if isinstance(y_test, pd.Series):
+        y_test = y_test.to_numpy()
 
     if baseline_accuracy is None:
         baseline_accuracy = accuracy_score(y_test, y_pred)
@@ -407,8 +428,13 @@ def _calculate_accuracies(
 
         # Evaluate accuracy over each test set size
         size_factor = set_size_list[size_factor_index]
+        # test_set_neighbours_2 = knn.kneighbors(X_test, n_neighbors=n_neighbours, return_distance=False)
+        # print(test_set_neighbours_2)
 
-        accuracy_list = np.mean(matches[:, :n_neighbours], axis=1)  # Calculate accuracy for each sample in the test set
+        accuracy_list = np.mean(
+            matches[:, :n_neighbours], axis=1
+        )  # [accuracy_score(y_pred[neighbors[:n_neighbours]], y_test[neighbors[:n_neighbours]]) for neighbors in test_set_neighbours]
+        # accuracy_list = np.mean(matches[:,:n_neighbours], axis=1)
 
         results[size_factor] = accuracy_list
 
@@ -493,7 +519,7 @@ def _summarize_results(
 
     # Initialize an empty DataFrame to store the summary of results
     results_summary_df = pd.DataFrame(
-        columns=[
+        columns=pd.Index([
             "size_factor",
             "above_threshold",
             "ADP",
@@ -501,7 +527,7 @@ def _summarize_results(
             "variance_accuracy",
             "degradate",
             "decision",
-        ]
+        ])
     )
 
     # Iterate through each size_factor in the results_df
@@ -557,7 +583,7 @@ def _color_cells(val: str) -> str:
     return f"color: {color}"
 
 
-def _styled_results(results_summary_df: pd.DataFrame, decision_column: str = DECISION_COLUMN) -> pd.DataFrame:
+def _styled_results(results_summary_df: pd.DataFrame, decision_column: str = DECISION_COLUMN):
     """
     Apply styling to the results summary DataFrame to highlight decisions.
 
