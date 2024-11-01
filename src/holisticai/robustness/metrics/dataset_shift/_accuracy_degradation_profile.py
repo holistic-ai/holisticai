@@ -148,11 +148,11 @@ def accuracy_degradation_profile(
     pd.DataFrame
         A pandas DataFrame summarizing the accuracy degradation results. The DataFrame
         contains the following columns:
+
         - `size_factor`: The fraction of the test set used in each step.
         - `above_threshold`: The number of samples with accuracy above the threshold.
         - `ADP`: The percentage of samples exceeding the accuracy threshold.
-        - `decision`: Whether the accuracy at each step meets the threshold ('OK')
-          or is considered degraded ('acc degrad!').
+        - `decision`: Whether the accuracy at each step meets the threshold ('OK') or is considered degraded ('acc degrad!').
 
     Example
     -------
