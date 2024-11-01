@@ -6,7 +6,11 @@ from sklearn import linear_model
 
 class LinRegGDPoisoner(GDPoisoner):
     """
-    LinRegGDPoisoner implements computations for ordinary least squares regression. Computations involving regularization are handled in the respective children classes.
+    LinRegGDPoisoner implements a gradient-based poisoning attack for regression models\
+    by using an ordinary least squares regression model at its core.\
+    The attack involves calculating gradients, selecting poison points based on these gradients, \
+    assigning response values to amplify their effect, and iterating this process to generate the \
+    desired number of poisoned points.
 
     Parameters
     ----------
@@ -281,7 +285,11 @@ class LinRegGDPoisoner(GDPoisoner):
 
 class RidgeGDPoisoner(GDPoisoner):
     """
-    RidgeGDPoisoner implements computations for Ridge regression. Unlike LinRegGDPoisoner, RidgeGDPoisoner includes regularization terms in the computations.
+    RidgeGDPoisoner implements a gradient-based poisoning attack for regression models, \
+    designed to inject malicious data points into the training dataset to manipulate the \
+    model's learned parameters and degrade its predictive performance.
+    Unlike `LinRegGDPoisoner`, this method includes regularization terms in the computations \
+    to generate the poisoned points to maximize their impact on the regression line.
 
     Parameters
     ----------

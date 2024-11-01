@@ -16,7 +16,10 @@ INITS = {"inf_flip": inf_flip, "adaptive": adaptive, "randflip": randflip, "rand
 
 class GDPoisoner:
     """
-    Gradient Descent Poisoner handles gradient poisoning routines computations for specific models found in respective classes.
+    Gradient Descent Poisoning Attacker for Regression Models. \
+    This attacker generates poisoned data points that can be used to test the robustness of regression models.\
+    The attack involves calculating gradients, selecting poison points based on these gradients, assigning \
+    response values to amplify their effect, and iterating this process to generate the desired number of poisoned points.
 
     Parameters
     ----------
