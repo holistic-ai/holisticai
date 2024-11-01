@@ -14,6 +14,7 @@ from holisticai.security.metrics._data_minimization import (
     DataMinimizationMSERatio,
     data_minimization_score,
 )
+from holisticai.security.metrics._privacy_risk_score import privacy_risk_score
 from holisticai.security.metrics._shapr import ShaprScore, shapr_score
 
 
@@ -78,4 +79,5 @@ __all__ = [
     "data_minimization_score",
     "attribute_attack_score",
     "AttributeAttackScore",
+    "privacy_risk_score",
 ]

@@ -2,20 +2,20 @@
 
 /* Light blue theme (default) */
 .generic-object-container.blue {
-    background-color: #f2f8fd !important; /* Container background: light blue */
+    background-color: rgba(242, 248, 253, 0.9) !important; /* Light blue with 70% opacity */
     border-color: #4db6ac !important; /* Soft blue border */
 }
 
 .generic-object-header.blue {
-    background-color: #a0c4ff9a !important; /* Header background: darker blue */
+    background-color: rgba(152, 171, 202, 0.4) !important; /* Darker blue with 60% opacity */
 }
 
 .generic-object-header.blue:hover {
-    background-color: #8bb1c0 !important; /* Darker shade on hover over the header */
+    background-color: rgba(139, 177, 192, 0.8) !important; /* Darker blue on hover with 60% opacity */
 }
 
 .attribute-list.blue:hover {
-    background-color: #b2dfdb !important; /* Attribute background on hover: darker blue */
+    background-color: rgba(178, 223, 219, 0.8) !important; /* Attribute hover background with 60% opacity */
 }
 
 /* Orange theme */
@@ -75,7 +75,7 @@
 .generic-object-container {
     padding: 0;
     margin: 0 auto;
-    border: 1px dashed;
+    border: 0px dashed;
     border-radius: 5px;
     display: block;
     width: auto;
@@ -83,10 +83,11 @@
     box-sizing: border-box;
     margin-bottom: 15px;
     transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0px 2px 5px rgba(77, 182, 172, 0.3);
 }
 
 .generic-object-container:hover {
-    box-shadow: 0px 4px 10px rgba(77, 182, 172, 0.3);
+    box-shadow: 0px 8px 20px rgba(77, 182, 172, 0.3);
 }
 
 .generic-object-header {

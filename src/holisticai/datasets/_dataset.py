@@ -279,6 +279,11 @@ class Dataset(DatasetReprObj):
                     data[name] = value.reset_index(drop=True)
                 elif isinstance(value, pd.Series):
                     data[name] = pd.Series(value.reset_index(drop=True), name=name).astype(value.dtype)
+                elif isinstance(value, np.ndarray):
+                    if len(value.shape) == 2:
+                        data[name] = pd.DataFrame(value, columns=[name + str(i) for i in range(value.shape[1])])
+                    elif len(value.shape) == 1:
+                        data[name] = pd.Series(value, name=name)
                 else:
                     msg = f"Variable '{name}' is of type {type(value)}, but only pd.DataFrame and pd.Series are supported."
                     raise TypeError(msg)
@@ -437,7 +442,7 @@ class Dataset(DatasetReprObj):
             self.data = self.data.join(value)
 
         if isinstance(value, pd.Series):
-            new_column = (key, value.name or len(existing_subfeatures))
+            new_column = (key, key or len(existing_subfeatures))
             self.data[new_column] = value
 
         self.data.columns = self.data.columns.set_names(["features", "subfeatures"])

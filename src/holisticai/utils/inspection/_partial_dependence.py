@@ -8,6 +8,7 @@ from joblib import Parallel, delayed
 from sklearn.inspection import partial_dependence
 from sklearn.metrics import accuracy_score, r2_score
 
+from holisticai.utils._commons import get_columns
 from holisticai.utils._definitions import ModelProxy, PartialDependence
 
 
@@ -182,7 +183,7 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
         raise ValueError(f"Learning task {proxy.learning_task} is not supported for partial dependence computation")
 
     model = wrap_sklearn_model(proxy)
-    feature_names = np.array(X.columns)
+    feature_names = np.array(get_columns(X))
     method = "auto"
     response_method = "auto"
     grid_resolution = 50
@@ -209,7 +210,7 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
                 newp["average"] = p["average"][0][np.newaxis]
                 part_dep_feat.append(newp)
             new_partial_dependence.append(part_dep_feat)
-        return PartialDependence(values=new_partial_dependence)
+        return PartialDependence(values=new_partial_dependence, feature_names=features)
 
     if proxy.learning_task == "multi_classification":
         nb_classes = len(proxy.classes)
@@ -224,4 +225,4 @@ def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: Mode
                 part_dep_feat.append(newp)
             new_partial_dependence.append(part_dep_feat)
         return PartialDependence(values=new_partial_dependence)
-    return PartialDependence(values=[partial_dependence])
+    return PartialDependence(values=[partial_dependence], feature_names=features)

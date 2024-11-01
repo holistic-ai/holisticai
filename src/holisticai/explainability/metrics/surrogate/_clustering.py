@@ -23,7 +23,7 @@ from holisticai.utils.surrogate_models import ClusteringSurrogate
 from sklearn.metrics import accuracy_score
 
 
-class AccuracyDifference:
+class AccuracyDegradation:
     reference: float = 0
     name: str = "Accuracy Difference"
 
@@ -37,7 +37,7 @@ class AccuracyDifference:
 
 
 def accuracy_difference(X, y, proxy, surrogate):
-    m = AccuracyDifference()
+    m = AccuracyDegradation()
     return m(X, y, proxy, surrogate)
 
 

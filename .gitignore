@@ -37,3 +37,4 @@ docs/build
 docs/**/*.ipynb
 src/*.ipynb
 .env
+paper
