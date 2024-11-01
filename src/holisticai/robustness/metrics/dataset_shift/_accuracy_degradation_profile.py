@@ -27,7 +27,7 @@ environments where test data may change or reduce in size.
 
 from __future__ import annotations
 
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
@@ -37,6 +37,7 @@ from sklearn.neighbors import NearestNeighbors
 # Constants
 STEP_SIZE = 0.05
 DECISION_COLUMN = "decision"
+
 
 def accuracy_degradation_factor(df: pd.DataFrame) -> float:
     """
@@ -482,15 +483,17 @@ def _summarize_results(
 
     # Initialize an empty DataFrame to store the summary of results
     results_summary_df = pd.DataFrame(
-        columns=pd.Index([
-            "size_factor",
-            "above_threshold",
-            "ADP",
-            "average_accuracy",
-            "variance_accuracy",
-            "degradate",
-            "decision",
-        ])
+        columns=pd.Index(
+            [
+                "size_factor",
+                "above_threshold",
+                "ADP",
+                "average_accuracy",
+                "variance_accuracy",
+                "degradate",
+                "decision",
+            ]
+        )
     )
 
     # Iterate through each size_factor in the results_df
