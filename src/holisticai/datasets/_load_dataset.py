@@ -45,7 +45,7 @@ def create_preprocessor(X, numerical_transform: bool = True, categorical_transfo
     return ColumnTransformer(transformers=transformers)
 
 
-def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = None, preprocessed: bool = True):
+def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "sex", preprocessed: bool = True):
     sensitive_attribute = ["race", "sex"]
     feature_names = [
         "age",
@@ -109,9 +109,9 @@ def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = N
     return Dataset(X=xt, y=y, p_attrs=p_attrs)
 
 
-def load_law_school_dataset(protected_attribute: Optional[Literal["race", "gender"]] = None, preprocessed: bool = True):
+def load_law_school_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "sex", preprocessed: bool = True):
     bunch = load_law_school()
-    sensitive_attribute = ["race1", "gender"]
+    sensitive_attribute = ["race1", "gender", "age"]
     output_variable = "bar"
     drop_columns = ["ugpagt3", "bar", *sensitive_attribute]
     df = bunch["frame"]
@@ -129,9 +129,9 @@ def load_law_school_dataset(protected_attribute: Optional[Literal["race", "gende
             group_a = pd.Series(get_protected_values(df, "race1", ga_label), name="group_a")
             group_b = pd.Series(get_protected_values(df, "race1", gb_label), name="group_b")
 
-        elif protected_attribute == "gender":
-            ga_label = "Female"
-            gb_label = "Male"
+        elif protected_attribute == "sex":
+            ga_label = "female"
+            gb_label = "male"
             group_a = pd.Series(get_protected_values(df, "gender", ga_label), name="group_a")
             group_b = pd.Series(get_protected_values(df, "gender", gb_label), name="group_b")
         else:
@@ -143,7 +143,9 @@ def load_law_school_dataset(protected_attribute: Optional[Literal["race", "gende
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_student_multiclass_dataset(protected_attribute: Optional[Literal["sex", "address"]] = None, preprocessed=True):
+def load_student_multiclass_dataset(
+    protected_attribute: Optional[Literal["sex", "address"]] = "sex", preprocessed=True
+):
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     output_column = "G3"
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
@@ -194,7 +196,7 @@ def load_student_multiclass_dataset(protected_attribute: Optional[Literal["sex",
 def load_student_dataset(
     target: Optional[Literal["G1", "G2", "G3"]] = None,
     preprocessed: bool = True,
-    protected_attribute: Optional[Literal["sex", "address"]] = None,
+    protected_attribute: Optional[Literal["sex", "address"]] = "sex",
 ):
     if target is None:
         target = "G3"
@@ -220,6 +222,11 @@ def load_student_dataset(
             gb_label = "M"
             group_a = pd.Series(df["sex"] == "F", name="group_a")
             group_b = pd.Series(df["sex"] == "M", name="group_b")
+        elif protected_attribute == "address":
+            ga_label = "U"
+            gb_label = "R"
+            group_a = pd.Series(df["address"] == "U", name="group_a")
+            group_b = pd.Series(df["address"] == "R", name="group_b")
         else:
             raise ValueError("The protected attribute doesn't exist or not implemented")
     df = df.drop(drop_columns, axis=1)
@@ -279,7 +286,7 @@ def load_lastfm_dataset():
     return Dataset(data_pivot=df_pivot, p_attr=pd.Series(p_attr))
 
 
-def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = "race"):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and \
     protected group B as numerical arrays or as dataframe if needed
@@ -332,7 +339,7 @@ def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Liter
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = "race"):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -386,7 +393,7 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Opt
     return Dataset(X=X, y=y_cat, p_attrs=p_attrs)
 
 
-def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] = None):
+def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] = "sex"):
     """
     Processes the heart dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -426,7 +433,7 @@ def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] 
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = None):
+def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = "sex"):
     """
     Processes the german credit dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -476,7 +483,7 @@ def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = None):
+def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = "sex"):
     """
     Processes the Census KDD dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -534,7 +541,7 @@ def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Lit
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional[Literal["marital"]] = None):
+def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional[Literal["marital"]] = "marital"):
     """
     Processes the Banking Marketing dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -554,7 +561,6 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     data = load_bank_marketing()
     protected_attributes = ["marital", "age"]
     output_column = "class"
-    # change risk to binary
     data["target"] = data["target"].map({1: 0, 2: 1})
 
     rename_columns = {
@@ -575,7 +581,7 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
         "V15": "previous",
         "V16": "poutcome",
     }
-
+    data["data"] = data["data"].copy()
     data["data"].rename(columns=rename_columns, inplace=True)
 
     df = pd.concat([data["data"], data["target"]], axis=1)
@@ -608,7 +614,7 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
     """
     Processes the Compass dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -631,7 +637,10 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
     data["target"] = data["target"].astype(int).map({0: 0, -1: 1})  # map -1 to 1 for binary classification
 
     df = pd.concat([data["data"], data["target"]], axis=1)
-    df["race"] = ["Caucasian" if x == 0 else "Non-Caucasian" for x in df["race"]]
+    df["sex"] = df["sex"].astype(int)
+    df["race"] = df["race"].astype(int)
+    df["race"] = [1 if x == 0 else 2 for x in df["race"]]
+
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
@@ -651,8 +660,8 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
         elif protected_attribute == "race":
             ga_label = "Causasian"
             gb_label = "Non-Caucasian"
-            group_a = pd.Series(df["race"] == "Causasian", name="group_a")
-            group_b = pd.Series(df["race"] == "Non-Caucasian", name="group_b")
+            group_a = pd.Series(df["race"] == 1, name="group_a")
+            group_b = pd.Series(df["race"] == 2, name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
@@ -664,7 +673,7 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "gender"]] = None):
+def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "sex"):
     """
     Processes the Diabetes dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -684,12 +693,13 @@ def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Liter
     data = load_diabetes()
     protected_attributes = ["race", "gender", "age"]
     output_column = "readmit_30_days"
+    data["target"] = data["target"].astype(int)
 
     df = pd.concat([data["data"], data["target"]], axis=1)
     df["race"] = ["Caucasian" if x == "Caucasian" else "Non-Caucasian" for x in df["race"]]
-
+    # drop gender row with "unknown/invalid" value
+    df = df[~df["gender"].isin(["Unknown/Invalid"])]
     remove_columns = [*protected_attributes, output_column]
-    # df = df.dropna()
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
 
@@ -721,7 +731,7 @@ def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Liter
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "sex"):
     """
     Processes the ACSIncome dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -777,7 +787,7 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = None):
+def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "sex"):
     """
     Processes the ACSPublicCoverage dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -909,4 +919,95 @@ def load_dataset(
         return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "acspublic":
         return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    raise NotImplementedError
+
+
+def _load_dataset_benchmark(
+    dataset_name: ProcessedDatasets,
+    preprocessed: bool = True,
+) -> Dataset:
+    """
+    Load a specific dataset based on the given dataset name.
+
+    Parameters
+    ----------
+    dataset_name: ProcessedDatasets
+        The name of the dataset to load. The list of supported datasets are here: :ref:`processed_datasets`.
+    preprocessed: (bool, Optional)
+        Whether to return the preprocessed X and y.
+    protected_attribute: (str, Optional)
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    Dataset: The loaded dataset.
+
+    Raises
+    ------
+    NotImplementedError:
+        If the specified dataset name is not supported.
+    """
+    if dataset_name == "adult_sex":
+        return load_adult_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "adult_race":
+        return load_adult_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "law_school_sex":
+        return load_law_school_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "law_school_race":
+        return load_law_school_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "student_multiclass_sex":
+        return load_student_multiclass_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "student_multiclass_address":
+        return load_student_multiclass_dataset(preprocessed=preprocessed, protected_attribute="address")
+
+    if dataset_name == "student_sex":
+        return load_student_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "student_address":
+        return load_student_dataset(preprocessed=preprocessed, protected_attribute="address")
+
+    if dataset_name == "us_crime_race":
+        return load_us_crime_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "us_crime_multiclass_race":
+        return load_us_crime_multiclass_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "clinical_records_sex":
+        return load_clinical_records_dataset(protected_attribute="sex")
+
+    if dataset_name == "german_credit_sex":
+        return load_german_credit_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "census_kdd_sex":
+        return load_census_kdd_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "bank_marketing_marital":
+        return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute="marital")
+
+    if dataset_name == "compass_sex":
+        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "compass_race":
+        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "diabetes_sex":
+        return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "diabetes_race":
+        return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "acsincome_sex":
+        return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "acsincome_race":
+        return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "acspublic_sex":
+        return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "acspublic_race":
+        return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute="race")
+
     raise NotImplementedError
