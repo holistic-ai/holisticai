@@ -1,9 +1,9 @@
 
 
-:py:mod:`holisticai.robustness.metrics`
+:py:mod:`holisticai.robustness.plots`
 =======================================
 
-.. automodule:: holisticai.robustness.metrics
+.. automodule:: holisticai.robustness.plots
     :no-members:
     :no-inherited-members:
 
@@ -14,6 +14,7 @@
     :template: function.rst
     :toctree: .generated/
 
-    adversarial_accuracy
-    empirical_robustness
-    accuracy_degradation_profile
+    plot_2d
+    plot_label_and_prediction
+    plot_neighborhood
+    plot_adp_and_adf

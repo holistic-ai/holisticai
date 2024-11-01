@@ -1,4 +1,9 @@
 """
+Module description:
+-------------------
+- This module contains functions to calculate the accuracy degradation profile of a model.
+
+
 This module provides tools to evaluate and visualize the robustness of machine
 learning models under conditions of dataset shift by analyzing accuracy
 degradation. It includes methods for generating degradation profiles and
@@ -22,7 +27,7 @@ environments where test data may change or reduce in size.
 
 from __future__ import annotations
 
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
@@ -32,42 +37,6 @@ from sklearn.neighbors import NearestNeighbors
 # Constants
 STEP_SIZE = 0.05
 DECISION_COLUMN = "decision"
-
-
-def pre_process_data(
-    X: Union[np.ndarray, pd.DataFrame],
-    y: Union[np.ndarray, pd.Series, pd.DataFrame],
-    test_size: float = 0.3,
-    random_state: int = 42,
-):
-    import numpy as np
-    from sklearn.model_selection import train_test_split
-
-    # Check if input is a DataFrame or NumPy array
-    if isinstance(X, (np.ndarray, pd.DataFrame)) and isinstance(y, (np.ndarray, pd.Series, pd.DataFrame)):
-        # Array of indices
-        indices = np.arange(X.shape[0])
-
-        # Split the indices
-        train_indices, test_indices = train_test_split(indices, test_size=test_size, random_state=random_state)
-
-        # Split the data using the indices
-        if isinstance(X, pd.DataFrame):
-            X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
-        else:
-            X_train, X_test = X[train_indices], X[test_indices]
-
-        if isinstance(y, (pd.Series, pd.DataFrame)):
-            y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
-        else:
-            y_train, y_test = y[train_indices], y[test_indices]
-
-    else:
-        raise TypeError(
-            "X must be a NumPy array or pandas DataFrame, and y must be a NumPy array, pandas Series, or DataFrame."
-        )
-
-    return X_train, X_test, y_train, y_test, test_indices
 
 
 def accuracy_degradation_factor(df: pd.DataFrame) -> float:
@@ -119,15 +88,15 @@ def accuracy_degradation_factor(df: pd.DataFrame) -> float:
 
 def accuracy_degradation_profile(
     X_test: pd.DataFrame,
-    y_test: pd.DataFrame,
+    y_test: pd.Series,
     y_pred: pd.Series,
-    n_neighbors=None,
-    neighbor_estimator=None,
+    n_neighbors: int = 5,
+    neighbor_estimator: Optional[Any] = None,
     baseline_accuracy: Optional[float] = None,
     threshold_percentual: float = 0.95,
     above_percentual: float = 0.90,
     step_size: float = STEP_SIZE,
-) -> pd.DataFrame:
+):
     """
     Generates an accuracy degradation profile by iteratively reducing the size
     of the nearest neighbors considered in the test set and comparing the
@@ -143,68 +112,74 @@ def accuracy_degradation_profile(
     X_test : pd.DataFrame
         The feature matrix of the test set. Each row represents a sample, and
         each column represents a feature.
-    y_test : pd.Series
-        The true labels for the test set. This should be a one-dimensional
-        Series or array.
-    y_pred : pd.Series
-        The predicted labels for the test set. This should be a one-dimensional
-        Series or array.
-    n_neighbors : int
-        The number of neighbors to consider when computing the nearest neighbors
-        model.
-    baseline_accuracy : Optional[float], optional
-        The baseline accuracy to compare the model's performance. If not provided,
-        it will be calculated based on `y_test` and `y_pred`.
-    threshold_percentual : float, optional, default=0.95
-        The threshold for acceptable accuracy degradation. It represents a
-        percentage of the baseline accuracy that defines the minimum acceptable
-        accuracy.
-    above_percentual : float, optional, default=0.90
-        The proportion of samples that must exceed the accuracy threshold to avoid
-        being marked as degraded.
-    step_size : float, optional, default=STEP_SIZE
-        The step size by which to incrementally reduce the test set size in each
-        iteration. It defines the rate at which the test set is reduced.
 
-    Returns:
+    y_test : pd.Series
+        The true labels for the test set. This should be a one-dimensional Series.
+
+    y_pred : pd.Series
+        The predicted labels for the test set. This should be a one-dimensional Series.
+
+    n_neighbors : Optional[int], optional
+        The number of neighbors to consider when using a nearest neighbors model.
+        If not provided, the function will not perform neighbor-based operations.
+
+    neighbor_estimator : Optional[Any], optional
+        An estimator implementing the neighbor search algorithm. If not provided,
+        the default `NearestNeighbors` from sklearn will be used.
+
+    baseline_accuracy : Optional[float], optional
+        The baseline accuracy to be compared against. If not provided, it will
+        be calculated using `y_test` and `y_pred`.
+
+    threshold_percentual : float, optional (default=0.95)
+        The threshold for acceptable accuracy degradation. Defined as a percentage
+        of the baseline accuracy, below which degradation is considered to occur.
+
+    above_percentual : float, optional (default=0.90)
+        The proportion of samples that must have accuracy above the threshold
+        to avoid being marked as degraded.
+
+    step_size : float, optional (default=STEP_SIZE)
+        The step size by which to reduce the test set size in each iteration. It
+        determines the incremental reduction of the test set in each step.
+
+    Returns
     -------
     pd.DataFrame
-        A styled pandas DataFrame summarizing the accuracy degradation results.
-        The DataFrame contains the following columns:
-        - `size_factor`: Fraction of the test set used in each step.
-        - `above_threshold`: Number of samples with accuracy above the threshold.
-        - `ADP`: Percentage of samples exceeding the threshold.
-        - `decision`: Indicates whether the accuracy at the given step meets
-        the threshold ('OK') or is degraded ('acc degrad!').
+        A pandas DataFrame summarizing the accuracy degradation results. The DataFrame
+        contains the following columns:
 
-    Example:
-    --------
+        - `size_factor`: The fraction of the test set used in each step.
+        - `above_threshold`: The number of samples with accuracy above the threshold.
+        - `ADP`: The percentage of samples exceeding the accuracy threshold.
+        - `decision`: Whether the accuracy at each step meets the threshold ('OK') or is considered degraded ('acc degrad!').
+
+    Example
+    -------
     >>> from sklearn.neighbors import NearestNeighbors
     >>> import pandas as pd
-    >>> from sklearn.metrics import accuracy_score
     >>> X_test = pd.DataFrame([[1.2, 3.4], [2.2, 1.8], [1.1, 4.5], [3.2, 2.1]])
     >>> y_test = pd.Series([0, 1, 0, 1])
     >>> y_pred = pd.Series([0, 1, 0, 0])
-    >>> n_neighbors = 3
     >>> degradation_profile = accuracy_degradation_profile(
-    ...     X_test=X_test, y_test=y_test, y_pred=y_pred, n_neighbors=n_neighbors
+    ...     X_test=X_test, y_test=y_test, y_pred=y_pred, n_neighbors=3
     ... )
-    >>> degradation_profile
-    # Outputs a styled DataFrame summarizing the decisions for each test set size.
+    >>> print(degradation_profile)
+    # Outputs a DataFrame summarizing the accuracy degradation decisions for each step.
 
-    Raises:
-    -------
+    Raises
+    ------
     ValueError
         If the lengths of `X_test`, `y_test`, or `y_pred` are inconsistent, or
-        if the input parameters for `threshold_percentual`, `above_percentual`,
-        or `n_neighbors` are invalid.
+        if invalid values are provided for `threshold_percentual`, `above_percentual`,
+        or `n_neighbors`.
 
-    Notes:
-    ------
-    - The function assumes that the input DataFrames or Series are appropriately
-    structured and that the baseline accuracy is reasonable.
-    - This method applies nearest neighbors to simulate accuracy degradation by
-    reducing test set size.
+    Notes
+    -----
+    - The function assumes that the input DataFrames or Series are correctly structured
+      and that the baseline accuracy, if provided, is meaningful.
+    - Nearest neighbors is used to simulate accuracy degradation by reducing the test
+      set size incrementally.
     """
 
     # Check if the step size is too small
@@ -212,10 +187,11 @@ def accuracy_degradation_profile(
         raise ValueError("'step_size' is too small (less than 1 divided by the number of samples).")
 
     # Validate inputs
-    if isinstance(X_test, pd.DataFrame) & isinstance(y_test, pd.Series):
-        # Data structures
-        X_test = X_test.values
-        y_test = y_test.values
+    if isinstance(X_test, pd.DataFrame):
+        X_test = X_test.to_numpy()
+
+    if isinstance(y_test, pd.Series):
+        y_test = y_test.to_numpy()
 
     if baseline_accuracy is None:
         baseline_accuracy = accuracy_score(y_test, y_pred)
@@ -507,15 +483,17 @@ def _summarize_results(
 
     # Initialize an empty DataFrame to store the summary of results
     results_summary_df = pd.DataFrame(
-        columns=[
-            "size_factor",
-            "above_threshold",
-            "ADP",
-            "average_accuracy",
-            "variance_accuracy",
-            "degradate",
-            "decision",
-        ]
+        columns=pd.Index(
+            [
+                "size_factor",
+                "above_threshold",
+                "ADP",
+                "average_accuracy",
+                "variance_accuracy",
+                "degradate",
+                "decision",
+            ]
+        )
     )
 
     # Iterate through each size_factor in the results_df
@@ -571,7 +549,7 @@ def _color_cells(val: str) -> str:
     return f"color: {color}"
 
 
-def _styled_results(results_summary_df: pd.DataFrame, decision_column: str = DECISION_COLUMN) -> pd.DataFrame:
+def _styled_results(results_summary_df: pd.DataFrame, decision_column: str = DECISION_COLUMN):
     """
     Apply styling to the results summary DataFrame to highlight decisions.
 
