@@ -36,9 +36,25 @@ class BiasMitigationBenchmark:
         self.stage = stage
 
     def get_datasets(self):
+        """
+        Get the datasets for the given task type.
+
+        Returns
+        -------
+        dict
+            Datasets.
+        """
         return self.DATASETS[self.task_type]
 
     def get_mitigators(self):
+        """
+        Get the mitigators for the given task type and stage.
+
+        Returns
+        -------
+        dict
+            Mitigators.
+        """
         if self.stage:
             if self.stage not in self.MITIGATORS[self.task_type]:
                 raise ValueError(f"Invalid stage. Choose from {list(self.MITIGATORS[self.task_type].keys())}")
@@ -46,6 +62,14 @@ class BiasMitigationBenchmark:
         return self.MITIGATORS[self.task_type]
 
     def get_table(self):
+        """
+        Get the benchmark results as a table.
+
+        Returns
+        -------
+        pd.DataFrame
+            Benchmark results.
+        """
         osdir = os.path.dirname(os.path.abspath(__file__))
         data = pd.read_csv(
             os.path.join(osdir, "results/bias", self.task_type, self.stage, "benchmark.csv"), index_col=0
@@ -53,6 +77,14 @@ class BiasMitigationBenchmark:
         return data
 
     def get_heatmap(self):
+        """
+        Create a heatmap based on the benchmark results.
+
+        Returns
+        -------
+        fig
+            Heatmap.
+        """
         plt.style.use("ggplot")
         plt.rc("font", size=14)
 
@@ -63,6 +95,14 @@ class BiasMitigationBenchmark:
         return fig
 
     def get_plot(self):
+        """
+        Create a bar plot based on the benchmark results.
+
+        Returns
+        -------
+        fig
+            Plot.
+        """
         results = self.get_table()
         plt.style.use("ggplot")
         plt.rc("font", size=14)
@@ -98,6 +138,19 @@ class BiasMitigationBenchmark:
         return fig
 
     def get_radar(self, figsize=(10, 5)):
+        """
+        Create a radar plot.
+
+        Parameters
+        ----------
+        figsize : tuple, optional
+            Size of the figure. The default is (10, 5).
+
+        Returns
+        -------
+        ax
+            Radar plot.
+        """
         tab = self.get_table()
         tab_trans = tab[3:].T.reset_index(names="Mitigators")
 
@@ -143,6 +196,21 @@ class BiasMitigationBenchmark:
         return ax
 
     def run(self, custom_mitigator: object = None, custom_dataset=None):
+        """
+        Run the benchmark for the given task type and stage.
+
+        Parameters
+        ----------
+        custom_mitigator : object, optional
+            Custom mitigator to run the benchmark with. The default is None.
+        custom_dataset : object, optional
+            Custom dataset to run the benchmark with. The default is None.
+
+        Returns
+        -------
+        pd.DataFrame
+            Results of the benchmark.
+        """
         dataset = custom_dataset if custom_dataset is not None else self.get_datasets()
         mitigator = custom_mitigator if custom_mitigator is not None else self.get_mitigators()
 
@@ -185,6 +253,25 @@ class BiasMitigationBenchmark:
         return wrapper
 
     def _build_benchmark(self, datasets, mitigators, custom_mitigator=None, custom_dataset=None, **kwargs):
+        """
+        Run the benchmark for the given task type and stage.
+
+        Parameters
+        ----------
+        datasets : object
+            Datasets to run the benchmark with.
+        mitigators : object
+            Mitigators to run the benchmark with.
+        custom_mitigator : object, optional
+            Custom mitigator to run the benchmark with. The default is None.
+        custom_dataset : object, optional
+            Custom dataset to run the benchmark with. The default is None.
+
+        Returns
+        -------
+        pd.DataFrame
+            Results of the benchmark.
+        """
         results = pd.DataFrame({"dataset": [], "mitigator": [], "metric": [], "time": [], "value": []})
 
         if not custom_dataset:
@@ -324,6 +411,25 @@ class BiasMitigationBenchmark:
     def run_mitigator(
         self, mitigator: Any, train: dict[str, Any], test: dict[str, Any], dataset_name: str, **kwargs
     ) -> pd.DataFrame:
+        """
+        Run the benchmark for the given mitigator.
+
+        Parameters
+        ----------
+        mitigator : Any
+            Mitigator to run the benchmark with.
+        train : dict[str, Any]
+            Training data.
+        test : dict[str, Any]
+            Testing data.
+        dataset_name : str
+            Name of the dataset.
+
+        Returns
+        -------
+        pd.DataFrame
+            Results of the benchmark.
+        """
         mitigator_name = mitigator.__class__.__name__ if self.stage != "inprocessing" else mitigator.__name__
         start_time = time.time()
 
