@@ -75,7 +75,7 @@ class BiasMitigationBenchmark:
         )
         return data
 
-    def get_heatmap(self, fig_size=(10, 5)):
+    def get_heatmap(self, fig_size=(10, 5), output_path=None):
         """
         Create a heatmap based on the benchmark results.
 
@@ -93,10 +93,12 @@ class BiasMitigationBenchmark:
         # color bar title
         cbar = ax.collections[0].colorbar
         cbar.set_label("Balanced Fairness Score (mean)", fontsize=14)
+        if output_path:
+            plt.savefig(output_path, bbox_inches="tight")
         plt.close()
         return fig
 
-    def get_plot(self):
+    def get_plot(self, output_path=None):
         """
         Create a bar plot based on the benchmark results.
 
@@ -136,10 +138,12 @@ class BiasMitigationBenchmark:
 
         plt.tight_layout()
         fig.legend(results.columns, title="Mitigator", loc="center left", bbox_to_anchor=(1, 0.9), ncols=1, fontsize=14)
+        if output_path:
+            plt.savefig(output_path, bbox_inches="tight")
         plt.close()
         return fig
 
-    def get_radar(self, figsize=(10, 5)):
+    def get_radar(self, figsize=(10, 5), output_path=None):
         """
         Create a radar plot.
 
@@ -195,6 +199,8 @@ class BiasMitigationBenchmark:
 
         plt.legend(loc="center left", bbox_to_anchor=(1.3, 0.5))
         plt.tight_layout()
+        if output_path:
+            plt.savefig(output_path, bbox_inches="tight")
         return ax
 
     def run(self, custom_mitigator: object = None, custom_dataset=None):
