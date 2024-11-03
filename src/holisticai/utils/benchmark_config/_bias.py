@@ -62,12 +62,9 @@ DATASETS = {
     "clustering": [
         "clinical_records_sex",
         "student_sex",
-        "student_address",
         "german_credit_sex",
-        "compass_sex",
         "compass_race",
         "adult_sex",
-        "adult_race",
     ],
 }
 

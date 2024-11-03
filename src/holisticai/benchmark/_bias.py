@@ -70,13 +70,12 @@ class BiasMitigationBenchmark:
         pd.DataFrame
             Benchmark results.
         """
-        osdir = os.path.dirname(os.path.abspath(__file__))
         data = pd.read_csv(
-            os.path.join(osdir, "results/bias", self.task_type, self.stage, "benchmark.csv"), index_col=0
+            f'https://huggingface.co/datasets/holistic-ai/bias_mitigation_benchmark/resolve/main/benchmark_{self.task_type}_{self.stage}.csv', index_col=0
         )
         return data
 
-    def get_heatmap(self):
+    def get_heatmap(self, fig_size=(10, 5)):
         """
         Create a heatmap based on the benchmark results.
 
@@ -88,9 +87,12 @@ class BiasMitigationBenchmark:
         plt.style.use("ggplot")
         plt.rc("font", size=14)
 
-        fig, ax = plt.subplots(figsize=(10, 5))
+        fig, ax = plt.subplots(figsize=fig_size)
         data = self.get_table()[3:].T
         sns.heatmap(data, annot=True, fmt=".4f", cmap=get_colors(len(data.columns)), linewidths=1, ax=ax)
+        # color bar title
+        cbar = ax.collections[0].colorbar
+        cbar.set_label("Balanced Fairness Score (mean)", fontsize=14)
         plt.close()
         return fig
 
