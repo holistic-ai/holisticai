@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
 from holisticai.utils.models.neighbors import KNeighborsClassifier
 from jax.nn import one_hot
-from numpy.typing import ArrayLike
+from holisticai.typing import ArrayLike
 from sklearn.preprocessing import LabelEncoder
 
 if TYPE_CHECKING:
@@ -101,7 +101,8 @@ class ShaprScore:
         y_pred_test: ArrayLike,
         batch_size=500,
         train_size=1.0,
-    ) -> jnp.ndarray:
+        aggregated=True,
+    ) -> Union[np.ndarray, float]:
         y_train, le = transform_label_to_numerical_label(y_train)
         y_test = transform_label_to_numerical_label(y_test, le)
         y_pred_train = transform_label_to_numerical_label(y_pred_train, le)
@@ -137,9 +138,10 @@ class ShaprScore:
             results_test_sorted = jnp.take_along_axis(phi_y, sorted_indexes, axis=1)
             results.append(results_test_sorted)
 
-        results = jnp.concatenate(results, axis=0)
-        per_sample = jnp.sum(results, axis=0)
-        sum_per_sample = per_sample * n_train_samples / n_test
+        results = jnp.concatenate(results, axis=0)* n_train_samples / n_test
+        if aggregated:
+            return np.array(results)
+        sum_per_sample = jnp.sum(results, axis=0)
         return float(sum_per_sample.mean())
 
 

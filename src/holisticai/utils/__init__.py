@@ -27,7 +27,6 @@ from holisticai.utils._formatting import (
 
 # plotting
 from holisticai.utils._plotting import get_colors
-from holisticai.utils.inspection._partial_dependence import compute_partial_dependence
 from holisticai.utils.surrogate_models import (
     BinaryClassificationSurrogate,
     ClusteringSurrogate,
@@ -45,7 +44,6 @@ __all__ = [
     "BinaryClassificationProxy",
     "MultiClassificationProxy",
     "RegressionProxy",
-    "compute_partial_dependence",
     "create_proxy",
     "Importances",
     "LocalImportances",
@@ -59,4 +57,5 @@ __all__ = [
     "RegressionSurrogate",
     "MultiClassificationSurrogate",
     "BinaryClassificationSurrogate",
+
 ]

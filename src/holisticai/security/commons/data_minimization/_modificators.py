@@ -56,9 +56,10 @@ def replace_data_with_average(x, important_feature_names):
     no_important_feature_names = [f for f in feature_names if f not in important_feature_names]
 
     xdf = x.copy()
-    average = x[no_important_feature_names].select_dtypes(include=["number"]).mean()
-
-    xdf[average.index] = average
+    x_numeric = x[no_important_feature_names].select_dtypes(include=["number"])
+    numeric_columns = x_numeric.columns
+    average = x_numeric.mean()
+    xdf[numeric_columns] = average.values
 
     return xdf, list(average.index)
 

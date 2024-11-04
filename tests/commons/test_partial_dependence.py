@@ -20,11 +20,11 @@ def input_data():
 def test_get_partial_dependence_results_binary_classification(input_data):
     test,model = input_data
     from holisticai.utils import RegressionProxy
-    from holisticai.utils.feature_importances import compute_permutation_feature_importance
-    from holisticai.utils.inspection import compute_partial_dependence
+    from holisticai.inspection import compute_permutation_importance
+    from holisticai.inspection import compute_partial_dependence
     
     proxy = RegressionProxy(predict=model.predict)
-    importances  = compute_permutation_feature_importance(proxy=proxy, X=test['X'], y=test['y'])
+    importances  = compute_permutation_importance(proxy=proxy, X=test['X'], y=test['y'])
     ranked_importances = importances.top_alpha(0.8)
     partial_dependencies = compute_partial_dependence(test['X'], features=ranked_importances.feature_names, proxy=proxy)
     np.isclose(partial_dependencies.values[0][0]['average'][0][0], 0.03)

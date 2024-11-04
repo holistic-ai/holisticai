@@ -59,7 +59,7 @@ def fluctuation_ratio(
     """
     feature_names = partial_dependencies.feature_names
     fluctuations = []
-    selected_feature_names = feature_names[:top_n]
+    selected_feature_names = feature_names[:top_n] if top_n > 0 else feature_names
     for feature_name in selected_feature_names:
         individuals = partial_dependencies.get_value(feature_name=feature_name, label=label, data_type="individual")
         grid_values = partial_dependencies.get_value(feature_name=feature_name, label=label, data_type="grid_values")
@@ -73,6 +73,7 @@ def fluctuation_ratio(
                     "Importances are required for weighted fluctuation ratio. Using unweighted fluctuation ratio."
                 )
                 return np.mean(fluctuations)
-            return np.sum([importances[fn] * fr for fr, fn in zip(fluctuations, feature_names)])
-        return np.mean(fluctuations)
+            assert all(f in importances.feature_names for f in selected_feature_names), "Feature names in partial dependence do not match faetures names in importance."
+            return float(np.sum([importances[fn] * fr for fr, fn in zip(fluctuations, selected_feature_names)]))
+        return float(np.mean(fluctuations))
     return pd.DataFrame(fluctuations, columns=["Fluctuation Ratio"], index=selected_feature_names)

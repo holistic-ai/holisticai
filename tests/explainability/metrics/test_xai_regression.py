@@ -27,20 +27,20 @@ def input_data():
 
 def get_regression_features(model, test):
     from holisticai.utils import RegressionProxy
-    from holisticai.utils.feature_importances import (
-        compute_permutation_feature_importance,
+    from holisticai.inspection import (
+        compute_permutation_importance,
     )
-    from holisticai.utils.inspection import compute_partial_dependence
+    from holisticai.inspection import compute_partial_dependence
 
     proxy = RegressionProxy(predict=model.predict)
-    importances = compute_permutation_feature_importance(
+    importances = compute_permutation_importance(
         X=test["X"], y=test["y"], proxy=proxy, importance_type="standard"
     )
     ranked_importances = importances.top_alpha(0.8)
     partial_dependencies = compute_partial_dependence(
         test["X"], features=ranked_importances.feature_names, proxy=proxy
     )
-    conditional_importances = compute_permutation_feature_importance(
+    conditional_importances = compute_permutation_importance(
         X=test["X"], y=test["y"], proxy=proxy, importance_type="conditional"
     )
     return (
