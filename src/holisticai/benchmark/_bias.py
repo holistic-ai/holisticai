@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import math
-import os
 import time
 from functools import partial
 from typing import Any
@@ -71,7 +70,8 @@ class BiasMitigationBenchmark:
             Benchmark results.
         """
         data = pd.read_csv(
-            f'https://huggingface.co/datasets/holistic-ai/bias_mitigation_benchmark/resolve/main/benchmark_{self.task_type}_{self.stage}.csv', index_col=0
+            f"https://huggingface.co/datasets/holistic-ai/bias_mitigation_benchmark/resolve/main/benchmark_{self.task_type}_{self.stage}.csv",
+            index_col=0,
         )
         return data
 
