@@ -32,8 +32,10 @@ from holisticai.bias.mitigation import (
 
 DATASETS = {
     "binary_classification": [
-        "compass_sex",
-        "compass_race",
+        "compas_two_year_recid_sex",
+        "compas_two_year_recid_race",
+        "compas_is_recid_sex",
+        "compas_is_recid_race",
         "adult_sex",
         "adult_race",
         "german_credit_sex",
@@ -63,7 +65,10 @@ DATASETS = {
         "clinical_records_sex",
         "student_sex",
         "german_credit_sex",
-        "compass_race",
+        "compas_two_year_recid_sex",
+        "compas_two_year_recid_race",
+        "compas_is_recid_sex",
+        "compas_is_recid_race",
         "adult_sex",
     ],
 }
