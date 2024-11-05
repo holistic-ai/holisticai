@@ -5,8 +5,8 @@ from typing import Literal, get_args
 
 import numpy as np
 import pandas as pd
+from holisticai.inspection import compute_permutation_importance
 from holisticai.utils import Importances, ModelProxy
-from holisticai.utils.feature_importances import compute_permutation_feature_importance
 from sklearn.feature_selection import (
     SelectPercentile,
     VarianceThreshold,
@@ -87,7 +87,7 @@ class SelectorsHandler:
         for sn, selector in selectors_by_importance.items():
             logger.info(f"Fitting selector {sn}")
             if importances is None:
-                importances = compute_permutation_feature_importance(proxy=self.proxy, X=X, y=y)
+                importances = compute_permutation_importance(proxy=self.proxy, X=X, y=y)
             selector.fit(importances)
 
         self.selectors = {**selectors_by_data, **selectors_by_importance}

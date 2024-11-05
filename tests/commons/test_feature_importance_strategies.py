@@ -1,7 +1,8 @@
 from sklearn.linear_model import LogisticRegression
-from holisticai.utils.feature_importances import SurrogateFeatureImportanceCalculator, PermutationFeatureImportanceCalculator
+from holisticai.inspection import SurrogateFeatureImportanceCalculator, PermutationFeatureImportanceCalculator
 from holisticai.utils import Importances
 from holisticai.datasets import load_dataset
+from holisticai.utils import BinaryClassificationProxy
 import pytest
 import numpy as np
 from numpy.random import RandomState
@@ -19,7 +20,6 @@ def input_data():
 
 def test_surrogate_feature_importance_call(input_data):
     model, test = input_data
-    from holisticai.utils import BinaryClassificationProxy
     proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=[0,1])
     fi_strategy = SurrogateFeatureImportanceCalculator(random_state=RandomState(42))
     importance = fi_strategy.compute_importances(test['X'], proxy=proxy)
@@ -28,10 +28,9 @@ def test_surrogate_feature_importance_call(input_data):
     
 def test_permutation_feature_importance_call(input_data):
     model, test = input_data
-    from holisticai.utils import BinaryClassificationProxy
     proxy = BinaryClassificationProxy(predict=model.predict, predict_proba=model.predict_proba, classes=[0,1])
     fi_strategy = PermutationFeatureImportanceCalculator(random_state=RandomState(42))
-    importance = fi_strategy.compute_importances(test, proxy=proxy)
+    importance = fi_strategy.compute_importances(test['X'], test['y'], proxy=proxy)
     assert isinstance(importance, Importances)
     assert np.isclose(importance['capital-gain'], 0.38461538461538486, atol=5e-2)
     

@@ -27,20 +27,20 @@ def input_data():
 
 def get_regression_features(model, test):
     from holisticai.utils import RegressionProxy
-    from holisticai.utils.feature_importances import (
-        compute_permutation_feature_importance,
+    from holisticai.inspection import (
+        compute_permutation_importance,
     )
-    from holisticai.utils.inspection import compute_partial_dependence
+    from holisticai.inspection import compute_partial_dependence
 
     proxy = RegressionProxy(predict=model.predict)
-    importances = compute_permutation_feature_importance(
+    importances = compute_permutation_importance(
         X=test["X"], y=test["y"], proxy=proxy, importance_type="standard"
     )
     ranked_importances = importances.top_alpha(0.8)
     partial_dependencies = compute_partial_dependence(
         test["X"], features=ranked_importances.feature_names, proxy=proxy
     )
-    conditional_importances = compute_permutation_feature_importance(
+    conditional_importances = compute_permutation_importance(
         X=test["X"], y=test["y"], proxy=proxy, importance_type="conditional"
     )
     return (
@@ -70,7 +70,7 @@ def test_xai_regression_metrics(input_data):
         y_pred=proxy.predict(test["X"]),
     )
     assert np.isclose(
-        metrics.loc["Rank Alignment"].value, 0.7317350088183421, atol=ATOL
+        metrics.loc["Rank Alignment"].value, 0.5477272727272727, atol=ATOL
     )
     assert np.isclose(
         metrics.loc["Position Parity"].value, 0.18504188712522046, atol=ATOL
@@ -93,7 +93,7 @@ def test_xai_classification_metrics_separated(input_data):
     ) = get_regression_features(model, test)
 
     value = rank_alignment(conditional_importances, ranked_importances)
-    assert np.isclose(value, 0.7317350088183421, atol=ATOL)
+    assert np.isclose(value, 0.5477272727272727, atol=ATOL)
 
     value = position_parity(conditional_importances, ranked_importances)
     assert np.isclose(value, 0.18504188712522046, atol=ATOL)

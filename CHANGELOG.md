@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6] - 2024-09-23
+
+### 🚀 Features
+
+- Adding Surrogate and Tree-Based Metrics (#225)
+- Adding regression attacker LGB poisoner (#220)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update files for new gitflow (#227) (#228)
+
 ## [1.0.5] - 2024-09-12
 
 ### 🚀 Features

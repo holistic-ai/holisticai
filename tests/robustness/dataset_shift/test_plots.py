@@ -2,105 +2,106 @@ import pytest
 import numpy as np
 import pandas as pd
 from unittest import mock
-from holisticai.utils.plots._plots import _validate_and_extract_data, plot_graph, plot_just_test_set, plot_ytest_ypred, plot_neighborhoods
+from matplotlib import pyplot as plt
 
+# Import the functions to be tested
+from holisticai.robustness.plots._dataset_shift import (
+    _validate_and_extract_data,
+    plot_2d,
+    plot_label_and_prediction,
+    plot_neighborhood,
+    plot_adp_and_adf,
+)
 
-# Fixtures for reusable test data
 @pytest.fixture
-def sample_data():
-    X = pd.DataFrame({
-        'Feature1': np.random.rand(100),
-        'Feature2': np.random.rand(100)
+def mock_data():
+    """Fixture providing mock data for tests."""
+    X = np.random.rand(10, 2)  # 10 samples, indices 0-9
+    y = np.array([0, 1, 0, 1, 1, 0, 0, 1, 0, 1])  # True labels
+    y_pred = np.array([0, 1, 0, 1, 1, 0, 0, 1, 0, 1])  # Predicted labels
+    return X, y, y_pred
+
+@pytest.fixture
+def mock_results_df():
+    """Fixture providing a mock results DataFrame."""
+    return pd.DataFrame({
+        'size_factor': [0.95, 0.9, 0.85, 0.8],
+        'ADP': [0.9, 0.85, 0.8, 0.75],
+        'decision': ['OK', 'OK', 'acc degrad!', 'acc degrad!'],
+        'average_accuracy': [0.95, 0.9, 0.85, 0.8],
+        'variance_accuracy': [0.01, 0.02, 0.03, 0.04]
     })
-    y = pd.Series(np.random.randint(0, 2, size=100))
-    return X, y
 
-@pytest.fixture
-def sample_numpy_data():
-    X = np.random.rand(100, 2)
-    y = np.random.randint(0, 2, size=100)
-    return X, y
+def test_validate_and_extract_data():
+    """Test for _validate_and_extract_data function."""
+    df = pd.DataFrame({
+        'feature1': np.random.rand(10),
+        'feature2': np.random.rand(10)
+    })
+    series = pd.Series(np.random.rand(10))
 
-# Test cases for _validate_and_extract_data
-@pytest.mark.parametrize("data, expected_shape", [
-    (pd.DataFrame(np.random.rand(10, 2)), (10, 2)),
-    (np.random.rand(10, 2), (10, 2)),
-    (pd.Series(np.random.rand(10)), (10,)),
-    (np.random.rand(10), (10,))
-])
-def test_validate_and_extract_data_valid(data, expected_shape):
-    result = _validate_and_extract_data(data)
-    assert result.shape == expected_shape
+    assert isinstance(_validate_and_extract_data(df), np.ndarray)
+    assert isinstance(_validate_and_extract_data(series), np.ndarray)
 
-@pytest.mark.parametrize("data", [
-    pd.DataFrame(np.random.rand(10, 3)),  # More than 2 columns
-    "invalid_data",  # Invalid type
-    np.random.rand(10, 3)  # NumPy array with more than 2 columns
-])
-@pytest.mark.skip(reason="internal error")
-def test_validate_and_extract_data_invalid(data):
-    with pytest.raises((ValueError, TypeError)):
-        _validate_and_extract_data(data)
-
-# Test cases for plot_graph
-@pytest.mark.parametrize("test_indices", [
-    None, 
-    [1, 2, 3],
-    np.array([0, 4, 5])
-])
-@mock.patch("matplotlib.pyplot.show")  # Mock plt.show to avoid actual plotting
-def test_plot_graph(mock_show, sample_data, test_indices):
-    X, y = sample_data
-    plot_graph(X, y, test_indices)
-    mock_show.assert_called_once()  # Ensure plot was invoked
-
-@pytest.mark.parametrize("X, y", [
-    (np.random.rand(10, 3), np.random.randint(0, 2, 10)),  # Invalid X shape
-    ("invalid_data", np.random.randint(0, 2, 10)),  # Invalid X type
-])
-@pytest.mark.skip(reason="internal error")
-def test_plot_graph_invalid(X, y):
-    with pytest.raises((ValueError, TypeError)):
-        plot_graph(X, y)
-
-# Test cases for plot_just_test_set
-@mock.patch("matplotlib.pyplot.show")
-def test_plot_just_test_set(mock_show, sample_data):
-    X, y = sample_data
-    plot_just_test_set(X, y)
-    mock_show.assert_called_once()
-
-# Test cases for plot_ytest_ypred
-@mock.patch("matplotlib.pyplot.show")
-def test_plot_ytest_ypred(mock_show, sample_numpy_data):
-    X, y = sample_numpy_data
-    y_pred = np.random.randint(0, 2, size=100)
-    plot_ytest_ypred(X, y, y_pred)
-    mock_show.assert_called_once()
-
-@pytest.mark.parametrize("X, y, y_pred", [
-    (np.random.rand(10, 3), np.random.randint(0, 2, 10), np.random.randint(0, 2, 10)),  # Invalid X shape
-    (np.random.rand(10, 2), np.random.randint(0, 2, 10), np.random.randint(0, 2, 9))  # Mismatched y and y_pred length
-])
-@pytest.mark.skip(reason="internal error")
-def test_plot_ytest_ypred_invalid(X, y, y_pred):
     with pytest.raises(ValueError):
-        plot_ytest_ypred(X, y, y_pred)
+        _validate_and_extract_data(pd.DataFrame(np.random.rand(10, 3)))
 
-# Test cases for plot_neighborhoods
-@mock.patch("matplotlib.pyplot.show")
-@pytest.mark.skip(reason="internal error")
-def test_plot_neighborhoods(mock_show, sample_numpy_data):
-    X, y = sample_numpy_data
-    y_pred = np.random.randint(0, 2, size=100)
-    points_of_interest = [0, 5, 10]
-    plot_neighborhoods(X, y, y_pred, n_neighbors=3, points_of_interest=points_of_interest)
-    mock_show.assert_called_once()
+    with pytest.raises(TypeError):
+        _validate_and_extract_data("Not a DataFrame or Array")
 
-@pytest.mark.parametrize("X, y, y_pred, points_of_interest", [
-    (np.random.rand(10, 3), np.random.randint(0, 2, 10), np.random.randint(0, 2, 10), [0, 1]),  # Invalid X shape
-    (np.random.rand(10, 2), np.random.randint(0, 2, 10), np.random.randint(0, 2, 9), [0, 1]),  # Mismatched y_pred
-])
-def test_plot_neighborhoods_invalid(X, y, y_pred, points_of_interest):
-    with pytest.raises(ValueError):
-        plot_neighborhoods(X, y, y_pred, n_neighbors=3, points_of_interest=points_of_interest)
+@pytest.mark.parametrize(
+    "highlight_group, show_just_group, expected_call_count",
+    [
+        (None, None, 0),
+        ([1, 2, 3], None, 0),
+        ([1, 2, 3], True, 0),
+    ]
+)
+def test_plot_2d(mock_data, highlight_group, show_just_group, expected_call_count):
+    """Test for plot_2d function."""
+    X, y, _ = mock_data
+    with mock.patch("matplotlib.pyplot.show") as mock_show:
+        plot_2d(X, y, highlight_group=highlight_group, show_just_group=show_just_group)
+        assert mock_show.call_count == expected_call_count
+
+@pytest.mark.parametrize(
+    "vertical_offset, expected_call_count",
+    [(0.1, 0), (0.2, 0)]
+)
+def test_plot_label_and_prediction(mock_data, vertical_offset, expected_call_count):
+    """Test for plot_label_and_prediction function."""
+    X, y, y_pred = mock_data
+    with mock.patch("matplotlib.pyplot.show") as mock_show:
+        plot_label_and_prediction(X, y, y_pred, vertical_offset=vertical_offset)
+        assert mock_show.call_count == expected_call_count
+
+def test_plot_adp_and_adf(mock_results_df):
+    """Test for plot_adp_and_adf function."""
+    results_df = mock_results_df
+    with mock.patch("matplotlib.pyplot.show") as mock_show:
+        plot_adp_and_adf(results_df)
+        assert mock_show.call_count == 0
+
+    # Check if the first 'acc degrad!' point is correctly identified
+    first_degradation = results_df[results_df['decision'] == 'acc degrad!'].iloc[0]
+    assert first_degradation['size_factor'] == 0.85
+
+@pytest.mark.parametrize(
+    "highlight_group, show_just_group, features_to_plot",
+    [
+        ([0, 1], False, ['X1', 'X2']),
+        ([2, 3], True, None)
+    ]
+)
+def test_plot_2d_with_features(mock_data, highlight_group, show_just_group, features_to_plot):
+    """Test for plot_2d with features_to_plot."""
+    X, y, _ = mock_data
+    with mock.patch("matplotlib.pyplot.show") as mock_show:
+        plot_2d(
+            X,
+            y,
+            highlight_group=highlight_group,
+            show_just_group=show_just_group,
+            features_to_plot=features_to_plot
+        )
+        assert mock_show.call_count == 0
