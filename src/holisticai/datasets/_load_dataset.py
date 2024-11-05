@@ -1044,16 +1044,14 @@ def _load_dataset_benchmark(
         return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute="marital")
 
     if dataset_name == "compas_two_year_recid_sex":
-        return load_compas_two_year_recid(preprocessed=preprocessed, protected_attribute="sex")
-
+        return load_compas_two_year_recid_dataset(preprocessed=preprocessed, protected_attribute="sex")
     if dataset_name == "compas_two_year_recid_race":
-        return load_compas_two_year_recid(preprocessed=preprocessed, protected_attribute="race")
+        return load_compas_two_year_recid_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "compas_is_recid_sex":
-        return load_compas_is_recid(preprocessed=preprocessed, protected_attribute="sex")
-
+        return load_compas_is_recid_dataset(preprocessed=preprocessed, protected_attribute="sex")
     if dataset_name == "compas_is_recid_race":
-        return load_compas_is_recid(preprocessed=preprocessed, protected_attribute="race")
+        return load_compas_is_recid_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "diabetes_sex":
         return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="sex")
