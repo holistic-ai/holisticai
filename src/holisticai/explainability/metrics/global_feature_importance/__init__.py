@@ -23,7 +23,7 @@ from holisticai.explainability.metrics.global_feature_importance._xai_ease_score
 
 
 def classification_global_feature_importance_explainability_metrics(
-    partial_dependencies, importances, conditional_feature_importances, top_n
+    partial_dependence, importances, conditional_feature_importances, top_n=None
 ):
     metrics = pd.DataFrame(
         index=["Spread Divergence", "Fluctuation Ratio", "Rank Alignment"], columns=["Value", "Reference"]
@@ -35,7 +35,9 @@ def classification_global_feature_importance_explainability_metrics(
     metrics.at["Spread Divergence", "Value"] = spread_divergence(importances)
     metrics.at["Spread Divergence", "Reference"] = 1
 
-    metrics.at["Fluctuation Ratio", "Value"] = fluctuation_ratio(partial_dependencies, importances, top_n=top_n)
+    if top_n is None:
+        top_n = len(partial_dependence.feature_names)
+    metrics.at["Fluctuation Ratio", "Value"] = fluctuation_ratio(partial_dependence, importances, top_n=top_n)
     metrics.at["Fluctuation Ratio", "Reference"] = 0
 
     metrics.at["Rank Alignment", "Value"] = rank_alignment(conditional_feature_importances, importances)

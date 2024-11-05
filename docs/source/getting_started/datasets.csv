@@ -9,7 +9,8 @@ us_crime_multiclass,US Crime (Multiclass),Regression, race
 german_credit, German Credit, Binary Classification, sex
 census_kdd, Census KDD, Binary Classification, sex/race
 bank_marketing, Bank Marketing, Binary Classification, marital 
-compass, Compass, Binary Classification, sex/race
+compas_two_year_recid, Compas (two_year_recid), Binary Classification, sex/race
+compas_is_recid, Compas (is_recid), Binary Classification, sex/race
 diabetes, Diabetes, Binary Classification, sex/race
 acsincome, ACS Income, Binary Classification, sex/race
 acspublic, ACS Public Coverage, Binary Classification, sex/race
