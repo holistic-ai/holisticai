@@ -8,8 +8,8 @@ import pandas as pd
 from numpy.random import RandomState
 
 from holisticai.datasets._dataset import Dataset
-from holisticai.utils._definitions import LocalImportances, ModelProxy
 from holisticai.inspection._utils import group_mask_samples_by_learning_task
+from holisticai.utils._definitions import LocalImportances, ModelProxy
 
 warnings.filterwarnings("ignore")
 

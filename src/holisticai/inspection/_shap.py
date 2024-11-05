@@ -7,8 +7,8 @@ import pandas as pd
 from numpy.random import RandomState
 
 from holisticai.datasets._dataset import Dataset
-from holisticai.utils import LocalImportances, ModelProxy
 from holisticai.inspection import group_mask_samples_by_learning_task
+from holisticai.utils import LocalImportances, ModelProxy
 
 
 def compute_shap_feature_importance(

@@ -615,7 +615,9 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_compas_two_year_recid_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+def load_compas_two_year_recid_dataset(
+    preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"
+):
     """
     Processes the compas dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
     Target: 2-year recidivism
@@ -643,7 +645,7 @@ def load_compas_two_year_recid_dataset(preprocessed=True, protected_attribute: O
     X = df.drop(columns=remove_columns)
 
     if preprocessed:
-            X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
 
     p_attrs = df[protected_attributes]
     y = df[output_column]
@@ -668,6 +670,7 @@ def load_compas_two_year_recid_dataset(preprocessed=True, protected_attribute: O
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
         return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
     return Dataset(X=X, y=y, p_attrs=p_attrs)
+
 
 def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
     """
@@ -697,7 +700,7 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
     X = df.drop(columns=remove_columns)
 
     if preprocessed:
-            X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
 
     p_attrs = df[protected_attributes]
     y = df[output_column]

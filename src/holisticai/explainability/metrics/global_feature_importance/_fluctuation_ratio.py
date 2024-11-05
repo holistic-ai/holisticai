@@ -73,7 +73,9 @@ def fluctuation_ratio(
                     "Importances are required for weighted fluctuation ratio. Using unweighted fluctuation ratio."
                 )
                 return np.mean(fluctuations)
-            assert all(f in importances.feature_names for f in selected_feature_names), "Feature names in partial dependence do not match faetures names in importance."
+            assert all(
+                f in importances.feature_names for f in selected_feature_names
+            ), "Feature names in partial dependence do not match faetures names in importance."
             return float(np.sum([importances[fn] * fr for fr, fn in zip(fluctuations, selected_feature_names)]))
         return float(np.mean(fluctuations))
     return pd.DataFrame(fluctuations, columns=["Fluctuation Ratio"], index=selected_feature_names)

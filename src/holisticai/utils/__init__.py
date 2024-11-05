@@ -57,5 +57,4 @@ __all__ = [
     "RegressionSurrogate",
     "MultiClassificationSurrogate",
     "BinaryClassificationSurrogate",
-
 ]

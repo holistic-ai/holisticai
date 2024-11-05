@@ -5,15 +5,14 @@ from typing import Literal, get_args
 
 import numpy as np
 import pandas as pd
+from holisticai.inspection import compute_permutation_importance
+from holisticai.utils import Importances, ModelProxy
 from sklearn.feature_selection import (
     SelectPercentile,
     VarianceThreshold,
     f_classif,
     f_regression,
 )
-
-from holisticai.inspection import compute_permutation_importance
-from holisticai.utils import Importances, ModelProxy
 
 logger = logging.getLogger(__name__)
 SelectorbyData = Literal["Percentile", "Variance"]

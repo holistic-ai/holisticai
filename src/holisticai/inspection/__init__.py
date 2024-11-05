@@ -11,8 +11,9 @@ from holisticai.inspection._surrogate_importance import (
 
 __all__ = [
     "compute_partial_dependence",
-    'compute_permutation_importance',
-    'compute_conditional_permutation_importance',
-    'PermutationFeatureImportanceCalculator',
-    'SurrogateFeatureImportanceCalculator',
-    'compute_surrogate_feature_importance']
+    "compute_permutation_importance",
+    "compute_conditional_permutation_importance",
+    "PermutationFeatureImportanceCalculator",
+    "SurrogateFeatureImportanceCalculator",
+    "compute_surrogate_feature_importance",
+]

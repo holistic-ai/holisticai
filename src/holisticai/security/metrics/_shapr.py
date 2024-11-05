@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Union
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
+from holisticai.typing import ArrayLike
 from holisticai.utils.models.neighbors import KNeighborsClassifier
 from jax.nn import one_hot
-from holisticai.typing import ArrayLike
 from sklearn.preprocessing import LabelEncoder
 
 if TYPE_CHECKING:
@@ -138,7 +138,7 @@ class ShaprScore:
             results_test_sorted = jnp.take_along_axis(phi_y, sorted_indexes, axis=1)
             results.append(results_test_sorted)
 
-        results = jnp.concatenate(results, axis=0)* n_train_samples / n_test
+        results = jnp.concatenate(results, axis=0) * n_train_samples / n_test
         if aggregated:
             return np.array(results)
         sum_per_sample = jnp.sum(results, axis=0)
