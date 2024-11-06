@@ -29,7 +29,7 @@ class RankAlignment:
                 / len(set(top_feature_names).union(top_cond_feature_names))
             )
         if aggregation:
-            return np.mean(similarities)
+            return float(np.mean(similarities))
         return similarities
 
 

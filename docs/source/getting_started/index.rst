@@ -2,55 +2,45 @@
 Getting Started
 ===============
 
-This section will guide you through the installation of the `holisticai` open-source library and the first steps to get you started.
+This section provides a comprehensive guide to help you install the `holisticai` open-source library and take your first steps with its features.
 
-.. grid:: 3 3 3 3
-   :gutter: 4
+.. grid:: 2 2 2 2
+   :gutter: 2
    :padding: 2 2 0 0
    :class-container: sd-text-center
 
-   .. grid-item-card:: Install
+   .. grid-item-card:: Installation Guide
+         :img-top: ../_static/coffe.svg
+         :class-card: intro-card
          :link: install.html
          :shadow: md
 
-         Installation and customizations, workaround and troubleshooting.
+         Step-by-step installation instructions, customization options, and troubleshooting tips.
 
-   .. grid-item-card:: Quickstart
+   .. grid-item-card:: Quick Start
+         :img-top: ../_static/start.svg
+         :class-card: intro-card
          :link: quickstart.ipynb
          :shadow: md
 
-         Quickstart guide to get you started with the library.
+         Follow this quick start guide to set up and begin using the library in minutes.
 
-   .. grid-item-card:: Datasets
+   .. grid-item-card:: Available Datasets
+         :img-top: ../_static/datasets.svg
          :link: datasets.html
+         :class-card: intro-card
          :shadow: md
            
-         Datasets and artifacts available in the library.
+         Explore a variety of datasets and artifacts included in the library to enhance your projects.
 
-   .. grid-item-card:: Bias
-         :link: bias/index.html
+   .. grid-item-card:: Understanding AI Technical Risks
+         :img-top: ../_static/learn.svg
+         :class-card: intro-card
+         :link: technical_risks.html
          :shadow: md
+           
+         Learn about technical risks associated with AI and discover best practices for managing them.
 
-         Bias metrics and mitigation techniques.
-
-   .. grid-item-card:: Explainability
-         :link: explainability/index.html
-         :shadow: md
-            
-         Explainability metrics and techniques.          
-
-   .. grid-item-card:: Security
-         :link: security/index.html
-         :shadow: md
-
-         Security metrics and mitigation techniques.
-
-   .. grid-item-card:: Robustness
-         :link: robustness/index.html
-         :shadow: md
-            
-         Robustness metrics and attackers.          
-        
 
 .. If you update this toctree, also update the manual toctree in the
 .. main index.rst.template
@@ -61,7 +51,4 @@ This section will guide you through the installation of the `holisticai` open-so
    install
    quickstart.ipynb
    datasets
-   bias/index
-   explainability/index
-   security/index
-   robustness/index
+   technical_risks

@@ -11,7 +11,8 @@ from holisticai.datasets._dataloaders import (
     load_adult,
     load_bank_marketing,
     load_census_kdd,
-    load_compass,
+    load_compas_is_recid,
+    load_compas_two_year_recid,
     load_diabetes,
     load_german_credit,
     load_last_fm,
@@ -614,9 +615,12 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+def load_compas_two_year_recid_dataset(
+    preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"
+):
     """
-    Processes the Compass dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+    Processes the compas dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+    Target: 2-year recidivism
 
     Parameters
     ----------
@@ -631,16 +635,11 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_compass()
+    data = load_compas_two_year_recid()
     protected_attributes = ["race", "sex", "age"]
-    output_column = "is_recid"
-    data["target"] = data["target"].astype(int).map({0: 0, -1: 1})  # map -1 to 1 for binary classification
+    output_column = "two_year_recid"
 
-    df = pd.concat([data["data"], data["target"]], axis=1)
-    df["sex"] = df["sex"].astype(int)
-    df["race"] = df["race"].astype(int)
-    df["race"] = [1 if x == 0 else 2 for x in df["race"]]
-
+    df = data.copy()
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
@@ -655,8 +654,63 @@ def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Litera
         if protected_attribute == "sex":
             ga_label = "Male"
             gb_label = "Female"
-            group_a = pd.Series(df["sex"] == 1, name="group_a")
-            group_b = pd.Series(df["sex"] == 0, name="group_b")
+            group_a = pd.Series(df["sex"] == ga_label, name="group_a")
+            group_b = pd.Series(df["sex"] == gb_label, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "Causasian"
+            gb_label = "Non-Caucasian"
+            group_a = pd.Series(df["race"] == 1, name="group_a")
+            group_b = pd.Series(df["race"] == 2, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+    """
+    Processes the compas dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+    Target: 2-year recidivism
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_compas_is_recid()
+    protected_attributes = ["race", "sex", "age"]
+    output_column = "is_recid"
+
+    df = data.copy()
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["sex"] == ga_label, name="group_a")
+            group_b = pd.Series(df["sex"] == gb_label, name="group_b")
         elif protected_attribute == "race":
             ga_label = "Causasian"
             gb_label = "Non-Caucasian"
@@ -854,7 +908,8 @@ ProcessedDatasets = Literal[
     "german_credit",
     "census_kdd",
     "bank_marketing",
-    "compass",
+    "compas_two_year_recid",
+    "compas_is_recid",
     "diabetes",
     "acsincome",
     "acspublic",
@@ -911,8 +966,10 @@ def load_dataset(
         return load_census_kdd_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "bank_marketing":
         return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
-    if dataset_name == "compass":
-        return load_compass_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "compas_two_year_recid":
+        return load_compas_two_year_recid_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "compas_is_recid":
+        return load_compas_is_recid_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "diabetes":
         return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "acsincome":
@@ -986,11 +1043,17 @@ def _load_dataset_benchmark(
     if dataset_name == "bank_marketing_marital":
         return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute="marital")
 
-    if dataset_name == "compass_sex":
-        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "compas_two_year_recid_sex":
+        return load_compas_two_year_recid(preprocessed=preprocessed, protected_attribute="sex")
 
-    if dataset_name == "compass_race":
-        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="race")
+    if dataset_name == "compas_two_year_recid_race":
+        return load_compas_two_year_recid(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "compas_is_recid_sex":
+        return load_compas_is_recid(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "compas_is_recid_race":
+        return load_compas_is_recid(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "diabetes_sex":
         return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="sex")

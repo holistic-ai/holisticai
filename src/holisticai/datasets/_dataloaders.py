@@ -2,6 +2,8 @@
 from os import environ, makedirs
 from os.path import expanduser, join
 
+import pandas as pd
+
 # sklearn imports
 from sklearn.datasets import fetch_openml
 
@@ -104,8 +106,70 @@ def load_bank_marketing(data_home=None, return_X_y=False, as_frame=True):
     return load_openml("bank-marketing", 9, data_home, return_X_y, as_frame)
 
 
-def load_compass(data_home=None, return_X_y=False, as_frame=True):
-    return load_openml("compass", 3, data_home, return_X_y, as_frame)
+def load_compas_two_year_recid():
+    data = pd.read_csv(
+        "https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv"
+    )
+    df = data.loc[
+        (data["days_b_screening_arrest"] <= 30)
+        & (data["days_b_screening_arrest"] >= -30)
+        & (data["is_recid"] != -1)
+        & (data["c_charge_degree"] != "O")
+        & (data["score_text"] != "N/A"),
+        [
+            "age",
+            "c_charge_degree",
+            "race",
+            "age_cat",
+            "score_text",
+            "sex",
+            "priors_count",
+            "days_b_screening_arrest",
+            "decile_score",
+            "juv_fel_count",
+            "juv_misd_count",
+            "juv_other_count",
+            "v_type_of_assessment",
+            "c_days_from_compas",
+            "v_score_text",
+            "v_decile_score",
+            "two_year_recid",
+        ],
+    ]
+    return df
+
+
+def load_compas_is_recid():
+    data = pd.read_csv(
+        "https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv"
+    )
+    df = data.loc[
+        (data["days_b_screening_arrest"] <= 30)
+        & (data["days_b_screening_arrest"] >= -30)
+        & (data["is_recid"] != -1)
+        & (data["c_charge_degree"] != "O")
+        & (data["score_text"] != "N/A"),
+        [
+            "age",
+            "c_charge_degree",
+            "race",
+            "age_cat",
+            "score_text",
+            "sex",
+            "priors_count",
+            "days_b_screening_arrest",
+            "decile_score",
+            "juv_fel_count",
+            "juv_misd_count",
+            "juv_other_count",
+            "v_type_of_assessment",
+            "c_days_from_compas",
+            "v_score_text",
+            "v_decile_score",
+            "is_recid",
+        ],
+    ]
+    return df
 
 
 def load_diabetes(data_home=None, return_X_y=False, as_frame=True):
