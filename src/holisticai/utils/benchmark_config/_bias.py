@@ -66,9 +66,7 @@ DATASETS = {
         "student_sex",
         "german_credit_sex",
         "compas_two_year_recid_sex",
-        "compas_two_year_recid_race",
         "compas_is_recid_sex",
-        "compas_is_recid_race",
         "adult_sex",
     ],
 }
