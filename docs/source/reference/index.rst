@@ -1,5 +1,3 @@
-.. _api:
-
 =============
 API Reference
 =============
@@ -11,157 +9,76 @@ Below is a list of key modules in ``holisticai``:
 Tools
 -----
 
-The following tools are available to support the construction and deployment of machine learning solutions:
+The following tools support the construction and deployment of machine learning solutions:
 
-.. grid:: 3 3 3 3
-    :gutter: 4
-    :padding: 2 2 0 0
-    :class-container: sd-text-center
+.. list-table:: Tools
+   :header-rows: 1
 
-    .. grid-item-card:: Pipeline
-        :link: pipeline.html
-        :shadow: md
-
-        A framework for building and deploying machine learning pipelines.
-
-    .. grid-item-card:: Datasets
-        :link: datasets.html
-        :shadow: md
-
-        Datasets for experimentation and testing.
-
-.. If you update this toctree, also update the manual toctree in the
-.. main index.rst.template
-
-.. toctree::
-   :hidden:
-
-   pipeline
-   datasets
+   * - Module
+     - Description
+   * - `Pipeline <pipeline.html>`_
+     - A framework for building and deploying machine learning pipelines.
+   * - `Datasets <datasets.html>`_
+     - Datasets for experimentation and testing.
 
 Bias
 ----
 
 Bias in machine learning refers to unfair discrimination based on characteristics such as race, gender, age, or socioeconomic status. Addressing bias is crucial for ensuring fairness, transparency, and accountability in AI systems.
 
-.. grid:: 3 3 3 3
-    :gutter: 4
-    :padding: 2 2 0 0
-    :class-container: sd-text-center
+.. list-table:: Bias
+   :header-rows: 1
 
-    .. grid-item-card:: Metrics
-        :link: bias/metrics.html
-        :shadow: md
-
-        Metrics for evaluating bias in classification, regression, clustering, and recommender systems.
-
-    .. grid-item-card:: Mitigation
-        :link: bias/mitigation.html
-        :shadow: md
-
-        Strategies to enhance fairness across various learning tasks.
-
-    .. grid-item-card:: Plots
-        :link: bias/plots.html
-        :shadow: md
-
-        Tools for visualizing bias in different learning tasks.
-
-.. toctree::
-   :hidden:
-   :maxdepth: 3
-
-   bias/metrics
-   bias/mitigation
-   bias/plots
-
+   * - Module
+     - Description
+   * - `Metrics <bias/metrics.html>`_
+     - Metrics for evaluating bias in classification, regression, clustering, and recommender systems.
+   * - `Mitigation <bias/mitigation.html>`_
+     - Strategies to enhance fairness across various learning tasks.
+   * - `Plots <bias/plots.html>`_
+     - Tools for visualizing bias in different learning tasks.
 
 Explainability
 --------------
 
 Explainability in machine learning is the ability to understand and interpret the decisions and predictions made by AI models. It is essential for ensuring transparency, trust, and accountability in AI systems.
 
-.. grid:: 3 3 3 3
-    :gutter: 4
-    :padding: 2 2 0 0
-    :class-container: sd-text-center
+.. list-table:: Explainability
+   :header-rows: 1
 
-    .. grid-item-card:: Metrics
-        :link: explainability/metrics.html
-        :shadow: md
-
-        Metrics for assessing explainability in classification, regression, clustering, and recommender systems.
-
-    .. grid-item-card:: Plots
-        :link: explainability/plots.html
-        :shadow: md
-
-        Visualization tools for explaining AI decisions across various learning tasks.
-
-.. toctree::
-   :hidden:
-
-   explainability/metrics
-   explainability/plots
-
+   * - Module
+     - Description
+   * - `Metrics <explainability/metrics.html>`_
+     - Metrics for assessing explainability in classification, regression, clustering, and recommender systems.
+   * - `Plots <explainability/plots.html>`_
+     - Visualization tools for explaining AI decisions across various learning tasks.
 
 Security
 --------
 
 Security in machine learning involves practices and measures to protect AI models and systems from malicious attacks, unauthorized access, and vulnerabilities. Ensuring security is vital for maintaining the integrity, confidentiality, and availability of AI systems, thereby fostering trust and reliability.
 
-.. grid:: 3 3 3 3
-    :gutter: 4
-    :padding: 2 2 0 0
-    :class-container: sd-text-center
+.. list-table:: Security
+   :header-rows: 1
 
-    .. grid-item-card:: Metrics
-        :link: security/metrics.html
-        :shadow: md
-
-        Metrics for evaluating security in classification and regression tasks.
-
-    .. grid-item-card:: Mitigation
-        :link: security/mitigation.html
-        :shadow: md
-
-        Strategies for enhancing security and robustness in learning tasks.
-
-.. toctree::
-   :hidden:
-   :maxdepth: 3
-
-   security/metrics
-   security/mitigation
-
+   * - Module
+     - Description
+   * - `Metrics <security/metrics.html>`_
+     - Metrics for evaluating security in classification and regression tasks.
+   * - `Mitigation <security/mitigation.html>`_
+     - Strategies for enhancing security and robustness in learning tasks.
 
 Robustness
 ----------
 
 Robustness in machine learning refers to the ability of AI models to perform well under various conditions, including noisy data, adversarial attacks, and distribution shifts. Enhancing robustness is essential for ensuring the reliability, generalization, and resilience of AI systems.
 
-.. grid:: 3 3 3 3
-    :gutter: 4
-    :padding: 2 2 0 0
-    :class-container: sd-text-center
+.. list-table:: Robustness
+   :header-rows: 1
 
-    .. grid-item-card:: Metrics
-        :link: robustness/metrics.html
-        :shadow: md
-
-        Metrics to evaluate the stability and robustness of models in various learning tasks.
-
-    .. grid-item-card:: Attackers
-        :link: robustness/attackers.html
-        :shadow: md
-
-        Techniques and strategies to simulate adversarial attacks and test model robustness.
-
-.. toctree::
-   :hidden:
-   :maxdepth: 3
-
-   robustness/metrics
-   robustness/attackers
-
-
+   * - Module
+     - Description
+   * - `Metrics <robustness/metrics.html>`_
+     - Metrics to evaluate the stability and robustness of models in various learning tasks.
+   * - `Attackers <robustness/attackers.html>`_
+     - Techniques and strategies to simulate adversarial attacks and test model robustness.
