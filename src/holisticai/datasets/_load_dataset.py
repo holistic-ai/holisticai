@@ -615,6 +615,7 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
+<<<<<<< HEAD
 def load_compas_two_year_recid_dataset(
     preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"
 ):
@@ -673,6 +674,9 @@ def load_compas_two_year_recid_dataset(
 
 
 def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+=======
+def load_compass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+>>>>>>> main
     """
     Processes the compas dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
     Target: 2-year recidivism
@@ -693,8 +697,18 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
     data = load_compas_is_recid()
     protected_attributes = ["race", "sex", "age"]
     output_column = "is_recid"
+<<<<<<< HEAD
 
     df = data.copy()
+=======
+    data["target"] = data["target"].astype(int).map({0: 0, -1: 1})  # map -1 to 1 for binary classification
+
+    df = pd.concat([data["data"], data["target"]], axis=1)
+    df["sex"] = df["sex"].astype(int)
+    df["race"] = df["race"].astype(int)
+    df["race"] = [1 if x == 0 else 2 for x in df["race"]]
+
+>>>>>>> main
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
     X = df.drop(columns=remove_columns)
@@ -1043,6 +1057,7 @@ def _load_dataset_benchmark(
     if dataset_name == "bank_marketing_marital":
         return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute="marital")
 
+<<<<<<< HEAD
     if dataset_name == "compas_two_year_recid_sex":
         return load_compas_two_year_recid(preprocessed=preprocessed, protected_attribute="sex")
 
@@ -1054,6 +1069,13 @@ def _load_dataset_benchmark(
 
     if dataset_name == "compas_is_recid_race":
         return load_compas_is_recid(preprocessed=preprocessed, protected_attribute="race")
+=======
+    if dataset_name == "compass_sex":
+        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "compass_race":
+        return load_compass_dataset(preprocessed=preprocessed, protected_attribute="race")
+>>>>>>> main
 
     if dataset_name == "diabetes_sex":
         return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="sex")

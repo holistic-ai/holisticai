@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.7] - 2024-11-01
+
+### 📚 Documentation
+
+- Update Documentation (#235)
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix documentation (#233)
+
+### Merge
+
+- Develop -> main (#260)
+
 ## [1.0.6] - 2024-09-23
 
 ### 🚀 Features
