@@ -4,6 +4,7 @@ import pandas as pd
 
 # utils
 from holisticai.utils._validation import _multiclass_checks
+from sklearn.metrics import accuracy_score
 
 
 def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
@@ -672,6 +673,68 @@ def multiclass_true_rates(p_attr, y_pred, y_true, groups=None, classes=None, agg
             dist_mat[k, j] = np.abs(np.diag(confmat_k - confmat_j)).mean()
 
     return np.max(dist_mat) if aggregation_fun == "max" else np.sum(dist_mat) / (num_groups * (num_groups - 1) / 2)
+
+
+def balanced_fairness_score_multiclass(p_attr, y_pred, y_true, groups=None, classes=None, alpha=0.5):
+    """Balanced Fairness Score Multiclass (BFSM).
+
+    This function computes a metric that balances statistical parity and accuracy.
+
+    Interpretation
+    --------------
+    A higher value indicates better balance between fairness and accuracy.
+    The score ranges from 0 to 1, where 1 is the best possible score.
+
+    Parameters
+    ----------
+    group_a : array-like
+        Group membership vector (binary)
+    group_b : array-like
+        Group membership vector (binary)
+    y_pred : array-like
+        Predictions vector (binary)
+    y_true : array-like
+        True labels vector (binary)
+    alpha : float, optional
+        Weight for balancing fairness and accuracy (default is 0.5)
+
+    Returns
+    -------
+    float
+        Balanced Fairness Score
+
+    Notes
+    -----
+    BFS = (1 - alpha) * accuracy + alpha * (1 - abs(statistical_parity))
+
+    Where:
+    - accuracy is the overall prediction accuracy
+    - statistical_parity is as defined in the original function
+    - alpha is a parameter between 0 and 1 that determines the weight of fairness vs. accuracy
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> group_a = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+    >>> group_b = np.array([0, 0, 0, 0, 1, 1, 1, 1, 1, 1])
+    >>> y_pred = np.array([1, 1, 1, 0, 1, 1, 0, 0, 0, 0])
+    >>> y_true = np.array([1, 1, 1, 1, 1, 1, 0, 0, 0, 0])
+    >>> balanced_fairness_score(group_a, group_b, y_pred, y_true)
+    0.7916666666666666
+    """
+    p_attr, y_pred, y_true, groups, classes = _multiclass_checks(
+        p_attr=p_attr,
+        y_pred=y_pred,
+        y_true=y_true,
+        groups=groups,
+        classes=classes,
+    )
+
+    sp = multiclass_statistical_parity(p_attr, y_pred)
+    acc = accuracy_score(y_true, y_pred)
+    bfsm = (1 - alpha) * acc + alpha * (1 - abs(sp))
+
+    return bfsm
 
 
 def multiclass_statistical_parity(p_attr, y_pred, groups=None, classes=None, aggregation_fun="mean"):

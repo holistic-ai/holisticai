@@ -65,6 +65,15 @@ Welcome to the Holistic AI library! This is an open-source tool to assess and im
 
         Learn how to contribute to the library
 
+    .. grid-item-card:: Bias Mitigation Benchmark (BMBENCH)
+        :img-top: _static/contributor.svg
+        :class-card: intro-card
+        :link: bmbench/index.html
+        :link-alt: bmbench
+        :shadow: md
+
+        Bias mitigation benchmark for AI systems
+
 .. admonition:: Learn more about the Holistic AI company
         :class: dropdown admonition-youtube
 

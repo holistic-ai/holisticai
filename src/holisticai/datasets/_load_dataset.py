@@ -622,6 +622,8 @@ def load_compas_two_year_recid_dataset(
     protected_attributes = ["race", "sex", "age"]
     output_column = "two_year_recid"
 
+    data["race"] = [1 if x == "Caucasian" else 0 for x in data["race"]]
+
     df = data.copy()
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
@@ -643,7 +645,7 @@ def load_compas_two_year_recid_dataset(
             ga_label = "Causasian"
             gb_label = "Non-Caucasian"
             group_a = pd.Series(df["race"] == 1, name="group_a")
-            group_b = pd.Series(df["race"] == 2, name="group_b")
+            group_b = pd.Series(df["race"] == 0, name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
@@ -677,6 +679,8 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
     protected_attributes = ["race", "sex", "age"]
     output_column = "is_recid"
 
+    data["race"] = [1 if x == "Caucasian" else 0 for x in data["race"]]
+
     df = data.copy()
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
@@ -698,7 +702,7 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
             ga_label = "Causasian"
             gb_label = "Non-Caucasian"
             group_a = pd.Series(df["race"] == 1, name="group_a")
-            group_b = pd.Series(df["race"] == 2, name="group_b")
+            group_b = pd.Series(df["race"] == 0, name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"

@@ -10,6 +10,7 @@ from holisticai.bias.metrics._classification import (
     abroca,
     accuracy_diff,
     average_odds_diff,
+    balanced_fairness_score,
     classification_bias_metrics,
     coefficient_of_variation,
     cohen_d,
@@ -39,6 +40,7 @@ from holisticai.bias.metrics._clustering import (
 )
 from holisticai.bias.metrics._multiclass import (
     accuracy_matrix,
+    balanced_fairness_score_multiclass,
     confusion_matrix,
     confusion_tensor,
     frequency_matrix,
@@ -70,6 +72,7 @@ from holisticai.bias.metrics._recommender import (
 from holisticai.bias.metrics._regression import (
     avg_score_diff,
     avg_score_ratio,
+    balanced_fairness_score_error,
     correlation_diff,
     disparate_impact_regression,
     jain_index,
@@ -87,6 +90,7 @@ from holisticai.bias.metrics._regression import (
 # All bias functions and classes
 __all__ = [
     "statistical_parity",
+    "balanced_fairness_score",
     "disparate_impact",
     "four_fifths",
     "cohen_d",
@@ -95,6 +99,7 @@ __all__ = [
     "true_negative_rate_diff",
     "abroca",
     "statistical_parity_regression",
+    "balanced_fairness_score_error",
     "disparate_impact_regression",
     "success_rate_regression",
     "success_rate",
@@ -143,6 +148,7 @@ __all__ = [
     "multiclass_average_odds",
     "multiclass_true_rates",
     "multiclass_statistical_parity",
+    "balanced_fairness_score_multiclass",
     "multiclass_bias_metrics",
     "z_test_diff",
     "z_test_ratio",
