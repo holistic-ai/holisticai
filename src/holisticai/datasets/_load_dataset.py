@@ -5,21 +5,7 @@ from typing import Literal, Optional
 import numpy as np
 import pandas as pd
 
-from holisticai.datasets._dataloaders import (
-    load_acsincome,
-    load_acspublic,
-    load_adult,
-    load_bank_marketing,
-    load_census_kdd,
-    load_compas_is_recid,
-    load_compas_two_year_recid,
-    load_diabetes,
-    load_german_credit,
-    load_last_fm,
-    load_law_school,
-    load_student,
-    load_us_crime,
-)
+from holisticai.datasets._dataloaders import load_hai_datasets
 from holisticai.datasets._dataset import Dataset
 from holisticai.datasets._utils import convert_float_to_categorical, get_protected_values
 
@@ -76,8 +62,8 @@ def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "
     }
     output_variable = "class"
 
-    data = load_adult()
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    data = load_hai_datasets(dataset_name="adult")
+    df = data.copy()
     df = df.dropna().reset_index(drop=True)
     p_attrs = df[sensitive_attribute]
     if preprocessed:
@@ -111,11 +97,11 @@ def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "
 
 
 def load_law_school_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "sex", preprocessed: bool = True):
-    bunch = load_law_school()
+    data = load_hai_datasets(dataset_name="law_school")
     sensitive_attribute = ["race1", "gender", "age"]
     output_variable = "bar"
     drop_columns = ["ugpagt3", "bar", *sensitive_attribute]
-    df = bunch["frame"]
+    df = data.copy()
     df = df.dropna()
     p_attrs = df[sensitive_attribute]
     y = df[output_variable]
@@ -150,8 +136,8 @@ def load_student_multiclass_dataset(
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     output_column = "G3"
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
-    bunch = load_student()
-    df = bunch["frame"]
+    data = load_hai_datasets(dataset_name="student")
+    df = data.copy()
 
     # we don't want to encode protected attributes
     df = df.dropna()
@@ -204,9 +190,9 @@ def load_student_dataset(
 
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
-    bunch = load_student()
+    data = load_hai_datasets(dataset_name="student")
 
-    df = bunch["frame"]
+    df = data.copy()
     for col in ["sex", "address", "Mjob", "Fjob"]:
         df[col] = df[col].apply(lambda x: x.replace("'", ""))
 
@@ -248,9 +234,9 @@ def load_student_dataset(
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_lastfm_dataset():
+def load_last_fm_dataset():
     """
-    Processes the lastfm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
+    Processes the last_fm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
     Parameters
     ----------
@@ -264,8 +250,8 @@ def load_lastfm_dataset():
     p_attr : np.ndarray
         The protected attribute
     """
-    bunch = load_last_fm()
-    df = bunch["frame"]
+    data = load_hai_datasets(dataset_name="last_fm")
+    df = data.copy()
     user_column = "user"
     item_column = "artist"
     protected_attribute = "sex"
@@ -305,12 +291,12 @@ def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Liter
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
     min_nonan_values = 1000
-    data = load_us_crime()
+    data = load_hai_datasets(dataset_name="us_crime")
     protected_attributes = ["racePctWhite"]
     mapping_name2column = {"race": "racePctWhite"}
     protected_attribute_column = mapping_name2column.get(protected_attribute)
     output_variable = "ViolentCrimesPerPop"
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    df = data.copy()
     df = df.iloc[:, [i for i, n in enumerate(df.isna().sum(axis=0).T.values) if n < min_nonan_values]]
     df = df.dropna()
     p_attrs = df[protected_attributes]
@@ -356,12 +342,12 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Opt
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_us_crime()
+    data = load_hai_datasets(dataset_name="us_crime")
     protected_attributes = ["racePctWhite"]
     mapping_name2column = {"race": "racePctWhite"}
     protected_attribute_column = mapping_name2column.get(protected_attribute)
     output_column = "ViolentCrimesPerPop"
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    df = data.copy()
     remove_columns = [*protected_attributes, output_column]
     df = df.dropna()
     df.reset_index(drop=True, inplace=True)
@@ -408,9 +394,7 @@ def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] 
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    df = pd.read_csv(
-        "https://archive.ics.uci.edu/ml/machine-learning-databases/00519/heart_failure_clinical_records_dataset.csv"
-    )
+    df = load_hai_datasets(dataset_name="clinical_records")
     protected_attributes = ["age", "sex"]
     output_variable = "DEATH_EVENT"
     drop_columns = ["age", "sex", "DEATH_EVENT"]
@@ -450,12 +434,12 @@ def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_german_credit()
+    data = load_hai_datasets(dataset_name="german_credit")
     protected_attributes = ["Sex", "Age"]
     output_column = "Risk"
     # change risk to binary
-    data["target"] = data["target"].map({"good": 0, "bad": 1})
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    data[output_column] = data[output_column].map({"good": 0, "bad": 1})
+    df = data.copy()
     remove_columns = [*protected_attributes, output_column]
     df = df.ffill()
     df.reset_index(drop=True, inplace=True)
@@ -500,12 +484,12 @@ def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Lit
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_census_kdd()
+    data = load_hai_datasets(dataset_name="census_kdd")
     protected_attributes = ["race", "sex"]
     output_column = "income_50k"
     # change risk to binary
-    data["target"] = data["target"].map({"' - 50000.'": 0, "' 50000+.'": 1})
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    data[output_column] = data[output_column].map({"' - 50000.'": 0, "' 50000+.'": 1})
+    df = data.copy()
     remove_columns = [*protected_attributes, output_column]
     df = df.dropna(axis=0)
     df.reset_index(drop=True, inplace=True)
@@ -559,10 +543,10 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_bank_marketing()
+    data = load_hai_datasets(dataset_name="bank_marketing")
     protected_attributes = ["marital", "age"]
     output_column = "class"
-    data["target"] = data["target"].map({1: 0, 2: 1})
+    data[output_column] = data[output_column].map({1: 0, 2: 1})
 
     rename_columns = {
         "V1": "age",
@@ -582,10 +566,9 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
         "V15": "previous",
         "V16": "poutcome",
     }
-    data["data"] = data["data"].copy()
-    data["data"].rename(columns=rename_columns, inplace=True)
+    df = data.copy()
+    df.rename(columns=rename_columns, inplace=True)
 
-    df = pd.concat([data["data"], data["target"]], axis=1)
     df["marital"] = [1 if x == "married" else 0 for x in df["marital"]]
     remove_columns = [*protected_attributes, output_column]
     df = df.dropna(axis=0)
@@ -635,7 +618,7 @@ def load_compas_two_year_recid_dataset(
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_compas_two_year_recid()
+    data = load_hai_datasets(dataset_name="compas_two_year_recid")
     protected_attributes = ["race", "sex", "age"]
     output_column = "two_year_recid"
 
@@ -690,7 +673,7 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_compas_is_recid()
+    data = load_hai_datasets(dataset_name="compas_is_recid")
     protected_attributes = ["race", "sex", "age"]
     output_column = "is_recid"
 
@@ -744,12 +727,12 @@ def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Liter
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_diabetes()
+    data = load_hai_datasets(dataset_name="diabetes")
     protected_attributes = ["race", "gender", "age"]
     output_column = "readmit_30_days"
-    data["target"] = data["target"].astype(int)
+    data[output_column] = data[output_column].astype(int)
 
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    df = data.copy()
     df["race"] = ["Caucasian" if x == "Caucasian" else "Non-Caucasian" for x in df["race"]]
     # drop gender row with "unknown/invalid" value
     df = df[~df["gender"].isin(["Unknown/Invalid"])]
@@ -802,12 +785,12 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_acsincome()
+    data = load_hai_datasets(dataset_name="acsincome")
     protected_attributes = ["AGEP", "RAC1P", "SEX"]
     output_column = "PINCP"  # Total person's income
-    data["target"] = (data["target"] > 50000).astype(int)  # map income to binary
+    data[output_column] = (data[output_column] > 50000).astype(int)  # map income to binary
 
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    df = data.copy()
     df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
@@ -858,11 +841,11 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
-    data = load_acspublic()
+    data = load_hai_datasets(dataset_name="acspublic")
     protected_attributes = ["AGEP", "RAC1P", "SEX"]
     output_column = "PUBCOV"  # public health coverage : an individual's label is 1 if PUBCOV == 1 (with public health coverage), otherwise 0.
 
-    df = pd.concat([data["data"], data["target"]], axis=1)
+    df = data.copy()
     df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
@@ -896,6 +879,118 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
+def load_mw_medium_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+    """
+    Processes the Minimum Wage Medium dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+    Target: contracted_hours
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_hai_datasets(dataset_name="mw_medium")
+    protected_attributes = ["race", "sex", "age_group", "education_level", "age"]
+    output_column = "class"
+
+    df = data.copy()
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        for col in X.select_dtypes(include=["category", "object"]).columns:
+            X[col] = pd.factorize(X[col])[0]
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["sex"] == ga_label, name="group_a")
+            group_b = pd.Series(df["sex"] == gb_label, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Black"
+            group_a = pd.Series(df["race"] == ga_label, name="group_a")
+            group_b = pd.Series(df["race"] == gb_label, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_mw_small_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+    """
+    Processes the Minimum Wage Small dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+    Target: contracted_hours
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_hai_datasets(dataset_name="mw_small")
+    protected_attributes = ["race", "sex", "age_group", "education_level", "age"]
+    output_column = "class"
+
+    df = data.copy()
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        for col in X.select_dtypes(include=["category", "object"]).columns:
+            X[col] = pd.factorize(X[col])[0]
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["sex"] == ga_label, name="group_a")
+            group_b = pd.Series(df["sex"] == gb_label, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Black"
+            group_a = pd.Series(df["race"] == ga_label, name="group_a")
+            group_b = pd.Series(df["race"] == gb_label, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
 ProcessedDatasets = Literal[
     "adult",
     "law_school",
@@ -913,6 +1008,8 @@ ProcessedDatasets = Literal[
     "diabetes",
     "acsincome",
     "acspublic",
+    "mw_medium",
+    "mw_small",
 ]
 
 
@@ -952,8 +1049,8 @@ def load_dataset(
         return load_student_multiclass_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "student":
         return load_student_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute, target=target)
-    if dataset_name == "lastfm":
-        return load_lastfm_dataset()
+    if dataset_name == "last_fm":
+        return load_last_fm_dataset()
     if dataset_name == "us_crime":
         return load_us_crime_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "us_crime_multiclass":
@@ -976,6 +1073,10 @@ def load_dataset(
         return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "acspublic":
         return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "mw_medium":
+        return load_mw_medium_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "mw_small":
+        return load_mw_small_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     raise NotImplementedError
 
 
@@ -1044,16 +1145,16 @@ def _load_dataset_benchmark(
         return load_bank_marketing_dataset(preprocessed=preprocessed, protected_attribute="marital")
 
     if dataset_name == "compas_two_year_recid_sex":
-        return load_compas_two_year_recid(preprocessed=preprocessed, protected_attribute="sex")
+        return load_compas_two_year_recid_dataset(preprocessed=preprocessed, protected_attribute="sex")
 
     if dataset_name == "compas_two_year_recid_race":
-        return load_compas_two_year_recid(preprocessed=preprocessed, protected_attribute="race")
+        return load_compas_two_year_recid_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "compas_is_recid_sex":
-        return load_compas_is_recid(preprocessed=preprocessed, protected_attribute="sex")
+        return load_compas_is_recid_dataset(preprocessed=preprocessed, protected_attribute="sex")
 
     if dataset_name == "compas_is_recid_race":
-        return load_compas_is_recid(preprocessed=preprocessed, protected_attribute="race")
+        return load_compas_is_recid_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "diabetes_sex":
         return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="sex")
@@ -1072,5 +1173,15 @@ def _load_dataset_benchmark(
 
     if dataset_name == "acspublic_race":
         return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute="race")
+
+    if dataset_name == "mw_medium_race":
+        return load_mw_medium_dataset(preprocessed=preprocessed, protected_attribute="race")
+    if dataset_name == "mw_medium_sex":
+        return load_mw_medium_dataset(preprocessed=preprocessed, protected_attribute="sex")
+
+    if dataset_name == "mw_small_race":
+        return load_mw_small_dataset(preprocessed=preprocessed, protected_attribute="race")
+    if dataset_name == "mw_small_sex":
+        return load_mw_small_dataset(preprocessed=preprocessed, protected_attribute="sex")
 
     raise NotImplementedError
