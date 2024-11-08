@@ -17,7 +17,6 @@ from holisticai.bias.mitigation import (
     ExponentiatedGradientReduction,
     FairKCenterClustering,
     FairletClusteringPreprocessing,
-    FairScoreClassifier,
     GridSearchReduction,
     LearningFairRepresentation,
     LPDebiaserBinary,
@@ -50,6 +49,10 @@ DATASETS = {
         "acsincome_race",
         "acspublic_sex",
         "acspublic_race",
+        "mw_small_race",
+        "mw_small_sex",
+        "mw_medium_race",
+        "mw_medium_sex",
     ],
     "multiclass": [
         "us_crime_multiclass_race",
@@ -104,7 +107,7 @@ MITIGATORS = {
     },
     "multiclass": {
         "preprocessing": [CorrelationRemover(), DisparateImpactRemover(), Reweighing()],
-        "inprocessing": [FairScoreClassifier],
+        "inprocessing": [],
         "postprocessing": [
             LPDebiaserMulticlass(),
             MLDebiaser(),

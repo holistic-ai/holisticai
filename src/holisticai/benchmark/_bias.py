@@ -69,11 +69,10 @@ class BiasMitigationBenchmark:
         pd.DataFrame
             Benchmark results.
         """
-        data = pd.read_csv(
-            f"https://huggingface.co/datasets/holistic-ai/bias_mitigation_benchmark/resolve/main/benchmark_{self.task_type}_{self.stage}.csv",
-            index_col=0,
+        data = pd.read_parquet(
+            f"https://huggingface.co/datasets/holistic-ai/bias_mitigation_benchmark/resolve/main/data/benchmark_{self.task_type}_{self.stage}.parquet",
         )
-        return data
+        return data.set_index("Unnamed: 0").rename_axis("")
 
     def get_heatmap(self, fig_size=(10, 5), output_path=None):
         """
@@ -360,7 +359,6 @@ class BiasMitigationBenchmark:
                 constraints="BoundedGroupLoss", loss="Square", min_val=-0.1, max_val=1.3, eps=0.01
             ).transform_estimator(self.MODELS[self.task_type]),
             "FairKCenterClustering": lambda: mitigator(req_nr_per_group=(1, 1), nr_initially_given=0, seed=42),
-            "FairScoreClassifier": lambda: mitigator(objectives="ba", constraints={}, time_limit=200),
         }
         try:
             return config.get(mitigator_name, lambda: mitigator(**kwargs))()
