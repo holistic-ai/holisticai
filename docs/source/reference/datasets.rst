@@ -33,8 +33,4 @@
     :template: function.rst
     :toctree: .generated/
 
-    load_adult
-    load_last_fm
-    load_law_school
-    load_student
-    load_us_crime
+    load_hai_datasets

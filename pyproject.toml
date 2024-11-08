@@ -30,6 +30,7 @@ dependencies = [
   "seaborn",
   "numpy>=1.25",
   "pybind11>=2.12",
+  "pyarrow"
   ]
 
 [project.optional-dependencies]
@@ -83,6 +84,7 @@ dependencies = [
   "pandas",
   "numpy==1.26",
   "pybind11>=2.12",
+  "pyarrow",
 
   "jax",
   "jaxopt",
