@@ -33,7 +33,7 @@ def get_data_home(data_home=None):
 
 def load_hai_datasets(dataset_name, data_home=None):
     """
-    Generic function to load datasets from openhai datasets.
+    Generic function to load datasets from holisticai datasets repository.
 
     Available datasets:
     - adult
@@ -56,7 +56,7 @@ def load_hai_datasets(dataset_name, data_home=None):
     Parameters
     ----------
     name : str
-        Name of the dataset on OpenML.
+        Name of the dataset.
     version : int
         Version of the dataset.
     data_home : str, optional
@@ -65,7 +65,12 @@ def load_hai_datasets(dataset_name, data_home=None):
     Returns
     -------
     data : pd.DataFrame
-        The dataset from openhai datasets.
+        The dataset from holisticai datasets.
+
+    References
+    ----------
+    .. [1] https://huggingface.co/datasets/holistic-ai/holisticai-datasets
+
     """
     if data_home is None:
         data_home = get_data_home()
