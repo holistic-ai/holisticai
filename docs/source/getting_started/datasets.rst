@@ -22,9 +22,9 @@ For example, if we want to load the Adult dataset, we can use the following code
 
 .. code-block:: python
 
-   from holisticai.datasets import load_adult
+    from holisticai.datasets import load_hai_datasets
     
-    data, target = load_adult(return_X_y=True)
+    data, target = load_hai_datasets(dataset_name="adult")
 
 .. _processed_datasets:
 
@@ -49,4 +49,4 @@ You can use this processed datasets using the function load_dataset from holisti
 
    from holisticai.datasets import load_dataset
     
-    dataset = load_dataset(dataset_name="adult", processed=True, protected_attribute="sex")
+    dataset = load_dataset(dataset_name="adult", preprocessed=True, protected_attribute="sex")
