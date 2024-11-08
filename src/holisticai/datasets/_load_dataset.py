@@ -234,7 +234,7 @@ def load_student_dataset(
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_last_fm_dataset():
+def load_lastfm_dataset():
     """
     Processes the last_fm dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -250,7 +250,7 @@ def load_last_fm_dataset():
     p_attr : np.ndarray
         The protected attribute
     """
-    data = load_hai_datasets(dataset_name="last_fm")
+    data = load_hai_datasets(dataset_name="lastfm")
     df = data.copy()
     user_column = "user"
     item_column = "artist"
@@ -1049,8 +1049,8 @@ def load_dataset(
         return load_student_multiclass_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "student":
         return load_student_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute, target=target)
-    if dataset_name == "last_fm":
-        return load_last_fm_dataset()
+    if dataset_name == "lastfm":
+        return load_lastfm_dataset()
     if dataset_name == "us_crime":
         return load_us_crime_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "us_crime_multiclass":
