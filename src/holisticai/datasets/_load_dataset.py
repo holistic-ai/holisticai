@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from holisticai.datasets._dataloaders import load_hai_datasets
+
 from holisticai.datasets._dataset import Dataset
 from holisticai.datasets._utils import convert_float_to_categorical, get_protected_values
 
@@ -618,6 +619,7 @@ def load_compas_two_year_recid_dataset(
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
+
     data = load_hai_datasets(dataset_name="compas_two_year_recid")
     protected_attributes = ["race", "sex", "age"]
     output_column = "two_year_recid"
@@ -676,7 +678,6 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
     data = load_hai_datasets(dataset_name="compas_is_recid")
     protected_attributes = ["race", "sex", "age"]
     output_column = "is_recid"
-
     df = data.copy()
     remove_columns = [*protected_attributes, output_column]
     df.reset_index(drop=True, inplace=True)
