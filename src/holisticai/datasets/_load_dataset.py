@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 
 from holisticai.datasets._dataloaders import load_hai_datasets
-
 from holisticai.datasets._dataset import Dataset
 from holisticai.datasets._utils import convert_float_to_categorical, get_protected_values
 
