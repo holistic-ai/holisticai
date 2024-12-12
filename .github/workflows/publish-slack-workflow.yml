@@ -1,4 +1,4 @@
-name: Publish and Notification
+name: Slack Notification
 
 on:
     workflow_dispatch:
