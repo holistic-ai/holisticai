@@ -53,10 +53,11 @@ jobs:
           channel-id: "${{ vars.SLACK_CHANNEL_ID }}"
           payload: |
             {
+              "channel": "${{ vars.SLACK_CHANNEL_ID }}",
+              "text": "Release holisticai *v${{env.tag}}* is on the way :rocket:",
               "attachments": [
               {
                 "color": "#36a64f",
-                "pretext": "Release holisticai *v${{env.tag}}* is on the way :rocket:",
                 "fields": [
                   {
                     "title": "Release Notes",
