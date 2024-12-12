@@ -1,0 +1,63 @@
+name: Publish and Notification
+
+on:
+    workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.APPLICATION_ID }}
+          private-key: ${{ secrets.APPLICATION_PRIVATE_KEY }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+          ref: main
+          token: ${{ steps.app-token.outputs.token }} # Needed to trigger other actions
+
+      - name: Get Latest Release Version
+        id: get_release
+        run: |
+            latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+            echo "Latest release version: $latest_tag"
+            echo "tag=$latest_tag" >> $GITHUB_ENV # Save the tag to an environment variable
+
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          payload: |
+            {
+              "channel": "${{ vars.SLACK_CHANNEL_ID }}",
+              "text": "Release holisticai *v${{env.tag}}* is on the way :rocket:",
+              "attachments": [
+              {
+                "color": "#36a64f",
+                "fields": [
+                  {
+                    "title": "Release Notes",
+                    "value": "https://github.com/${{ github.repository }}/releases/tag/${{env.tag}}",
+                    "short": false
+                  },
+                  {
+                    "title": "Repository",
+                    "value": "https://github.com/${{ github.repository }}",
+                    "short": false
+                  },
+                  {
+                    "title": "Documentation",
+                    "value": "https://holisticai.readthedocs.io/en/latest/",
+                    "short": false
+                  }
+                ]
+              }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

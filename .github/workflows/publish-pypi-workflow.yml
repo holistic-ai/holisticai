@@ -46,40 +46,6 @@ jobs:
             hatch build
             hatch publish
 
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          channel-id: "${{ vars.SLACK_CHANNEL_ID }}"
-          payload: |
-            {
-              "attachments": [
-              {
-                "color": "#36a64f",
-                "pretext": "Release holisticai *v${{env.tag}}* is on the way :rocket:",
-                "fields": [
-                  {
-                    "title": "Release Notes",
-                    "value": "https://github.com/${{ github.repository }}/releases/tag/${{env.tag}}",
-                    "short": false
-                  },
-                  {
-                    "title": "Repository",
-                    "value": "https://github.com/${{ github.repository }}",
-                    "short": false
-                  },
-                  {
-                    "title": "Documentation",
-                    "value": "https://holisticai.readthedocs.io/en/latest/",
-                    "short": false
-                  }
-                ]
-              }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-
 
 
         
