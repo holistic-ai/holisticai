@@ -27,7 +27,7 @@ environments where test data may change or reduce in size.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -37,6 +37,41 @@ from sklearn.neighbors import NearestNeighbors
 # Constants
 STEP_SIZE = 0.05
 DECISION_COLUMN = "decision"
+
+def pre_process_data(
+    X: Union[np.ndarray, pd.DataFrame],
+    y: Union[np.ndarray, pd.Series, pd.DataFrame],
+    test_size: float = 0.3,
+    random_state: int = 42,
+):
+    import numpy as np
+    from sklearn.model_selection import train_test_split
+
+    # Check if input is a DataFrame or NumPy array
+    if isinstance(X, (np.ndarray, pd.DataFrame)) and isinstance(y, (np.ndarray, pd.Series, pd.DataFrame)):
+        # Array of indices
+        indices = np.arange(X.shape[0])
+
+        # Split the indices
+        train_indices, test_indices = train_test_split(indices, test_size=test_size, random_state=random_state)
+
+        # Split the data using the indices
+        if isinstance(X, pd.DataFrame):
+            X_train, X_test = X.iloc[train_indices], X.iloc[test_indices]
+        else:
+            X_train, X_test = X[train_indices], X[test_indices]
+
+        if isinstance(y, (pd.Series, pd.DataFrame)):
+            y_train, y_test = y.iloc[train_indices], y.iloc[test_indices]
+        else:
+            y_train, y_test = y[train_indices], y[test_indices]
+
+    else:
+        raise TypeError(
+            "X must be a NumPy array or pandas DataFrame, and y must be a NumPy array, pandas Series, or DataFrame."
+        )
+
+    return X_train, X_test, y_train, y_test, test_indices
 
 
 def accuracy_degradation_factor(df: pd.DataFrame) -> float:
