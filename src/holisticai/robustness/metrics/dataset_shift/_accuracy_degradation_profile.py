@@ -3,7 +3,6 @@ Module description:
 -------------------
 - This module contains functions to calculate the accuracy degradation profile of a model.
 
-
 This module provides tools to evaluate and visualize the robustness of machine
 learning models under conditions of dataset shift by analyzing accuracy
 degradation. It includes methods for generating degradation profiles and
@@ -37,6 +36,7 @@ from sklearn.neighbors import NearestNeighbors
 # Constants
 STEP_SIZE = 0.05
 DECISION_COLUMN = "decision"
+
 
 def pre_process_data(
     X: Union[np.ndarray, pd.DataFrame],
