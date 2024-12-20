@@ -79,7 +79,7 @@ class InputFilter(abc.ABCMeta):  # pragma: no cover
                 setattr(cls, item, new_function)
 
 
-class Attack(abc.ABC):
+class Attack(abc.ABC):  # noqa: B024
     """
     Abstract base class for all attack abstract base classes.
 
