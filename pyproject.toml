@@ -34,10 +34,10 @@ dependencies = [
   ]
 
 [project.optional-dependencies]
-bias = ["networkx>=3.1", "pygad==3.3.1", "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
+bias = ["networkx>=3.1", "pygad==3.4.0", "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
 explainability = ["lime>=0.2.0.1", "shap>=0.42.1"]
 security = ["jax>=0.4.30", "jaxopt>=0.8.3"]
-all = ["networkx>=3.1", "pygad==3.3.1", "lime>=0.2.0.1", "shap>=0.42.1",  "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
+all = ["networkx>=3.1", "pygad==3.4.0", "lime>=0.2.0.1", "shap>=0.42.1",  "jax>=0.4.30", "jaxopt>=0.8.3", "optax>=0.2.3", "flax>=0.8.5"]
 
 [project.urls]
 Documentation = "https://github.com/holistic-ai/holisticai#readme"
