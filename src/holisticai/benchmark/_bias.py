@@ -27,12 +27,29 @@ class BiasMitigationBenchmark:
     MITIGATORS = MITIGATORS
     MODELS = MODELS
 
+
     def __init__(self, task_type: str, stage: str):
         if task_type not in self.MODELS:
             raise ValueError(f"Invalid task type. Choose from {list(self.DATASETS.keys())}")
         self.task_type = task_type
         self.metric = self.METRICS[task_type]
         self.stage = stage
+
+    def available_settings(self):
+        """
+        Get the available settings for the benchmark.
+
+        Returns
+        -------
+        dict
+            Available settings.
+        """
+        
+        data = list(self.DATASETS[self.task_type])
+        mitigator = list(obj.__class__.__name__ for obj in self.MITIGATORS[self.task_type][self.stage])
+    
+        print(f"Available datasets for {self.task_type}: {data}")
+        print(f"Available mitigators for {self.task_type} with {self.stage}: {mitigator}")
 
     def get_datasets(self):
         """
@@ -240,7 +257,8 @@ class BiasMitigationBenchmark:
         return result
 
     def submit(self):
-        pass
+        import webbrowser
+        return webbrowser.open("https://forms.office.com/e/8nLjA7Y38w")
 
     def _retry_with_backoff(self, func, max_attempts=5, initial_wait=1, backoff_factor=2):
         def wrapper(*args, **kwargs):
