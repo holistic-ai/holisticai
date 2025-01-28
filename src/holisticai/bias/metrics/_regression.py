@@ -7,6 +7,7 @@ import pandas as pd
 # utils
 from holisticai.utils._formatting import slice_arrays_by_quantile
 from holisticai.utils._validation import _check_non_empty, _regression_checks
+from sklearn.metrics import mean_absolute_percentage_error
 
 
 def _calc_success_rate(group_membership: np.array, threshold=float):
@@ -121,6 +122,68 @@ def disparate_impact_regression(group_a, group_b, y_pred, q=0.8):
         disp_impact[i] = sr_a / sr_b
 
     return np.squeeze(disp_impact)[()]
+
+
+def balanced_fairness_score_error(group_a, group_b, y_pred, y_true, alpha=0.5):
+    """Balanced Fairness Score Error (BFSE) for Regression Tasks.
+
+    This function computes a metric that balances statistical parity and prediction error
+    for regression tasks.
+
+    Interpretation
+    --------------
+    A higher value indicates better balance between fairness and accuracy.
+    The score ranges from 0 to 1, where 1 is the best possible score.
+
+    Parameters
+    ----------
+    group_a : array-like
+        Group membership vector (binary)
+    group_b : array-like
+        Group membership vector (binary)
+    y_pred : array-like
+        Predicted values (continuous)
+    y_true : array-like
+        True values (continuous)
+    alpha : float, optional
+        Weight for balancing fairness and accuracy (default is 0.5)
+
+    Returns
+    -------
+    float
+        Balanced Fairness Score Error
+
+    Notes
+    -----
+    BFSE = (1 - alpha) * MAPE + alpha * abs(statistical_parity)
+
+    Where:
+    - MAPE is the Mean Absolute Percentage Error
+    - statistical_parity is adapted for regression tasks
+    - alpha is a parameter between 0 and 1 that determines the weight of fairness vs. accuracy
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> group_a = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0])
+    >>> group_b = np.array([0, 0, 0, 0, 1, 1, 1, 1, 1, 1])
+    >>> y_pred = np.array([2.5, 3.2, 2.8, 3.0, 1.8, 2.2, 1.5, 1.7, 2.0, 1.9])
+    >>> y_true = np.array([2.3, 3.0, 2.9, 3.1, 2.0, 2.1, 1.6, 1.8, 1.9, 2.0])
+    >>> balanced_fairness_score_error(group_a, group_b, y_pred, y_true)
+    0.0875
+    """
+    group_a, group_b, y_pred, y_true, q = _regression_checks(group_a, group_b, y_pred, y_true)
+
+    sp = statistical_parity_regression(group_a, group_b, y_pred)
+    mape = mean_absolute_percentage_error(y_true, y_pred)
+
+    max_sp = np.max(y_pred) - np.min(y_pred)
+    normalized_sp = abs(sp) / max_sp if max_sp != 0 else 0
+    normalized_mape = 2 / (1 + np.exp(-mape)) - 1  # sigmoid
+
+    bfs = (1 - alpha) * normalized_mape + alpha * normalized_sp
+
+    return 1 - bfs
 
 
 def statistical_parity_regression(group_a, group_b, y_pred, q=0.5):
