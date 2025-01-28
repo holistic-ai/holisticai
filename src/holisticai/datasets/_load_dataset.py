@@ -618,6 +618,7 @@ def load_compas_two_year_recid_dataset(
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
+
     data = load_hai_datasets(dataset_name="compas_two_year_recid")
     protected_attributes = ["race", "sex", "age"]
     output_column = "two_year_recid"
