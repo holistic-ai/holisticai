@@ -1,13 +1,13 @@
 try:
     import jax.numpy as jnp
-    from jax.nn import one_hot
+    from jax import vmap
 except ImportError:
     jnp = None
-    one_hot = None
+    vmap = None
 
 class KNeighborsClassifier:
     def __init__(self):
-        if jnp is None or one_hot is None:
+        if jnp is None or vmap is None:
             raise ImportError("jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`.")
 
     def fit(self, X_train, y_train):
