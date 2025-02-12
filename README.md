@@ -30,6 +30,7 @@ Holistic AI currently focuses on five verticals of AI trustworthiness:
 
 ```bash
 pip install holisticai  # Basic installation
+pip install holisticai[datasets]  # add datasets and plot dependencies
 pip install holisticai[bias]  # Bias mitigation support
 pip install holisticai[explainability]  # For explainability metrics and plots
 pip install holisticai[all]  # Install all packages for bias and explainability
