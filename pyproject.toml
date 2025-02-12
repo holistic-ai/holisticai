@@ -114,7 +114,9 @@ dependencies = [
   "jax",
   "jaxopt",
   "optax",
-  "flax"
+  "flax",
+  "pyarrow==19.0.0", 
+  "fastparquet"
 ]
 env-vars = { PYTHONPATH = "src" }
 
