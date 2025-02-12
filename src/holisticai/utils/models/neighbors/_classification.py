@@ -5,6 +5,7 @@ except ImportError:
     jnp = None
     vmap = None
 
+
 class KNeighborsClassifier:
     def __init__(self):
         if jnp is None or vmap is None:
