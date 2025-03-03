@@ -58,8 +58,15 @@ tests = ["tests", "*/holisticai/tests"]
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
-[tool.hatch.envs.hatch-static-analysis]
+[tool.hatch.envs.fmt]
 config-path = "ruff_default.toml"
+dependencies = [
+  "ruff==0.4.5"
+]
+env-vars = { PYTHONHTTPSVERIFY = "0", PYTHONPATH = "src" }
+
+[tool.hatch.envs.fmt.scripts]
+check = ["ruff format .", "ruff check . --fix"]
 
 [tool.ruff]
 extend = "ruff_default.toml"

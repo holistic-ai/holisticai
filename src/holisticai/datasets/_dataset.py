@@ -3,9 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Union
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
-
 from holisticai.utils.obj_rep.object_repr import DatasetReprObj
+from sklearn.model_selection import train_test_split
 
 if TYPE_CHECKING:
     from collections.abc import Iterable

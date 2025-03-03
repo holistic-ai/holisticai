@@ -4,11 +4,10 @@ from typing import Literal, Optional
 
 import numpy as np
 import pandas as pd
-from numpy.random import RandomState
-from sklearn.metrics import accuracy_score, mean_squared_error
-
 from holisticai.utils.obj_rep.object_repr import ReprObj
 from holisticai.utils.surrogate_models._base import SurrogateBase
+from numpy.random import RandomState
+from sklearn.metrics import accuracy_score, mean_squared_error
 
 
 def validate_input(X, y=None):
