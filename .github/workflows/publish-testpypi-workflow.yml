@@ -38,12 +38,18 @@ jobs:
           echo "Latest release version: $latest_tag"
           echo "tag=$latest_tag" >> $GITHUB_ENV # Save the tag to an environment variable
 
+      - name: Create .pypirc file
+        run: |
+          echo "[distutils]" > ~/.pypirc
+          echo "index-servers =" >> ~/.pypirc
+          echo "    testpypi" >> ~/.pypirc
+          echo "" >> ~/.pypirc
+          echo "[test]" >> ~/.pypirc
+          echo "repository = https://test.pypi.org/legacy/" >> ~/.pypirc
+          echo "username = __token__" >> ~/.pypirc
+          echo "password = ${{ secrets.TEST_PYPI_API_TOKEN }}" >> ~/.pypirc
+
       - name: Publish to TestPyPI
-        env:
-          HATCH_INDEX_USER: __token__
-          HATCH_INDEX_AUTH: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           hatch build
-          hatch publish --repo testpypi
-
-      
+          hatch publish --repo test
