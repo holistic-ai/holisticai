@@ -25,5 +25,4 @@ def p_vec(y, flatten=True):
 def pars_to_cpmat(opt, n_groups=3, n_classes=3):
     """Reshapes the LP parameters as an n_group * n_class * n_class array"""
     shaped = np.reshape(opt.x, (n_groups, n_classes, n_classes))
-    flipped = np.array([m.T for m in shaped])
-    return flipped
+    return np.array([m.T for m in shaped])

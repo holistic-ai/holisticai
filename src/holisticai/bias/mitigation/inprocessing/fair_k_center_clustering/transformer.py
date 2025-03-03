@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 from holisticai.bias.mitigation.inprocessing.fair_k_center_clustering.algorithms import (
     fair_k_center_approx,
@@ -63,10 +61,10 @@ class FairKCenterClustering(BaseEstimator, BMImp):
 
     def __init__(
         self,
-        req_nr_per_group: Optional[list] = None,
-        nr_initially_given: Optional[int] = 100,
-        strategy: Optional[str] = "Fair K-Center",
-        seed: Optional[int] = None,
+        req_nr_per_group: list | None = None,
+        nr_initially_given: int | None = 100,
+        strategy: str | None = "Fair K-Center",
+        seed: int | None = None,
     ):
         if req_nr_per_group is None:
             req_nr_per_group = [200, 200]

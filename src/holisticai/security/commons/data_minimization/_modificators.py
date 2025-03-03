@@ -22,7 +22,8 @@ class ModifierHandler:
             return replace_data_with_average(x, indexes)
         if method_name == "Permutation":
             return replace_data_with_permutation(x, indexes)
-        raise NotImplementedError(f"Method {method_name} not implemented")
+        msg = f"Method {method_name} not implemented"
+        raise NotImplementedError(msg)
 
 
 def replace_data_with_average(x, important_feature_names):

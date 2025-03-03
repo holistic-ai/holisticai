@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 import logging
-from typing import Literal, get_args
+from typing import TYPE_CHECKING, Literal, get_args
 
 import numpy as np
-import pandas as pd
 from holisticai.inspection import compute_permutation_importance
-from holisticai.utils import Importances, ModelProxy
 from sklearn.feature_selection import (
     SelectPercentile,
     VarianceThreshold,
     f_classif,
     f_regression,
 )
+
+if TYPE_CHECKING:
+    import pandas as pd
+    from holisticai.utils import Importances, ModelProxy
 
 logger = logging.getLogger(__name__)
 SelectorbyData = Literal["Percentile", "Variance"]
@@ -25,7 +27,8 @@ def get_score_fn(learning_task: str):
         return f_classif
     if learning_task == "regression":
         return f_regression
-    raise ValueError(f"Learning task {learning_task} not supported")
+    msg = f"Learning task {learning_task} not supported"
+    raise ValueError(msg)
 
 
 class SelectorsHandler:
@@ -53,7 +56,8 @@ class SelectorsHandler:
             for p in variance_thresholds:
                 methods[f"Variance >{p}"] = VarianceThreshold(threshold=p / 100)
             return methods
-        raise ValueError(f"Selector type {selector_type} not supported")
+        msg = f"Selector type {selector_type} not supported"
+        raise ValueError(msg)
 
     def _get_selectors_from_importances(self, selector_type: SelectorbyImportance):
         if selector_type == "FImportance":
@@ -61,7 +65,8 @@ class SelectorsHandler:
             for p in self.importance_thresholds:
                 methods[f"FImportance >{p}"] = SelectFromFeatureImportance(threshold=p / 100)
             return methods
-        raise ValueError(f"Selector type {selector_type} not supported")
+        msg = f"Selector type {selector_type} not supported"
+        raise ValueError(msg)
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
         selectors_by_data = {}

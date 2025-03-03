@@ -73,7 +73,8 @@ def confusion_matrix(y_pred, y_true, classes=None, normalize=None):
         confmat = confmat / np.sum(confmat, axis=0).reshape(1, -1)
 
     else:
-        raise ValueError('normalize should be one of None, "pred" or "true"')
+        msg = 'normalize should be one of None, "pred" or "true"'
+        raise ValueError(msg)
 
     return pd.DataFrame(confmat, columns=classes).set_index(np.array(classes))
 

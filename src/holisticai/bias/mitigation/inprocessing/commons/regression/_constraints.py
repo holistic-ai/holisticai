@@ -97,7 +97,8 @@ class RegressionConstraint(BaseMoment):
             A vector of bounds on group-level losses
         """
         if self.upper_bound is None:
-            raise ValueError("No Upper Bound")
+            msg = "No Upper Bound"
+            raise ValueError(msg)
         return pd.Series(self.upper_bound, index=self.index)
 
     def project_lambda(self, lambda_vec):

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Union
-
 import numpy as np
 import pandas as pd
 
@@ -14,7 +12,7 @@ def x_to_nd_array(x: pd.DataFrame):
     return np.array(x)
 
 
-def to_categorical(labels: Union[np.ndarray, list[float]], nb_classes: Optional[int] = None) -> np.ndarray:
+def to_categorical(labels: np.ndarray | list[float], nb_classes: int | None = None) -> np.ndarray:
     """
     Convert an array of labels to binary class matrix.
 

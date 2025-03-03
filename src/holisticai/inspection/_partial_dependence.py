@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import numbers
+from typing import TYPE_CHECKING
 
 import numpy as np
-import pandas as pd
+from holisticai.utils._commons import get_columns
+from holisticai.utils._definitions import ModelProxy, PartialDependence
 from joblib import Parallel, delayed
 from sklearn.inspection import partial_dependence
 from sklearn.metrics import accuracy_score, r2_score
 
-from holisticai.utils._commons import get_columns
-from holisticai.utils._definitions import ModelProxy, PartialDependence
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def get_partial_dependence(
@@ -180,7 +182,8 @@ def wrap_sklearn_model(proxy: ModelProxy):
 def compute_partial_dependence(X: pd.DataFrame, features: list[str], proxy: ModelProxy) -> PartialDependence:
     supported_learning_tasks = ["binary_classification", "regression", "multi_classification"]
     if proxy.learning_task not in supported_learning_tasks:
-        raise ValueError(f"Learning task {proxy.learning_task} is not supported for partial dependence computation")
+        msg = f"Learning task {proxy.learning_task} is not supported for partial dependence computation"
+        raise ValueError(msg)
 
     model = wrap_sklearn_model(proxy)
     feature_names = np.array(get_columns(X))

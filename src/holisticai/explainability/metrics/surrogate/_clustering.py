@@ -32,8 +32,7 @@ class AccuracyDegradation:
         Pb = accuracy_score(y, y_pred)
         y_pred_surrogate = surrogate.predict(X)
         Pt = accuracy_score(y, y_pred_surrogate)
-        D = Pb - Pt
-        return D
+        return Pb - Pt
 
 
 def accuracy_difference(X, y, proxy, surrogate):

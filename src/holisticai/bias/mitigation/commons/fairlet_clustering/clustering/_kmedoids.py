@@ -128,7 +128,8 @@ class KMedoids:
         """
         negative = value is None or value <= 0 if strict else value is None or value < 0
         if negative or not isinstance(value, (int, np.integer)):
-            raise ValueError(f"{desc} should be a nonnegative integer. " f"{value} was given")
+            msg = f"{desc} should be a nonnegative integer. " f"{value} was given"
+            raise ValueError(msg)
 
     def _check_init_args(self):
         """
@@ -366,9 +367,7 @@ class KMedoids:
 
         # Define inertia as the sum of the sample-distances
         # to closest cluster centers
-        inertia = np.sum(np.min(distances, axis=1))
-
-        return inertia
+        return np.sum(np.min(distances, axis=1))
 
     def _initialize_medoids(self, D, n_clusters, random_state_):
         """
@@ -399,7 +398,8 @@ class KMedoids:
             # to every other point. These are the initial medoids.
             medoids = np.argpartition(np.sum(D, axis=1), n_clusters - 1)[:n_clusters]
         else:
-            raise ValueError(f"init value '{self.init}' not recognized")
+            msg = f"init value '{self.init}' not recognized"
+            raise ValueError(msg)
 
         return medoids
 

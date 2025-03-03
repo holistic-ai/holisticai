@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Union
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
-
 from holisticai.utils.obj_rep.object_repr import DatasetReprObj
+from sklearn.model_selection import train_test_split
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from numpy.random import RandomState
+
 
 import numpy as np
-from numpy.random import RandomState
 
 
 class DatasetDict(dict, DatasetReprObj):
@@ -429,7 +429,8 @@ class Dataset(DatasetReprObj):
 
     def __setitem__(self, key, value):
         if not isinstance(key, str):
-            raise TypeError("Key must be a string.")
+            msg = "Key must be a string."
+            raise TypeError(msg)
 
         feature_exists = key in self.data.columns.get_level_values(0)
         existing_subfeatures = self.data[key].columns if feature_exists else []
@@ -481,7 +482,7 @@ def apply_fn_to_multilevel_df(df, fn):
     return result_df
 
 
-def sample_n(group: pd.DataFrame, n: int, random_state: Union[RandomState, None] = None) -> pd.DataFrame:
+def sample_n(group: pd.DataFrame, n: int, random_state: RandomState | None = None) -> pd.DataFrame:
     if len(group) < n:
         return group
     return group.sample(n=n, replace=False, random_state=random_state)

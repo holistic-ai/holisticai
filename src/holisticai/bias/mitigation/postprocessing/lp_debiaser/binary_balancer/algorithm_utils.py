@@ -19,8 +19,7 @@ class CLFRates:
 
 
 def from_top(roc_point, round=4):  # noqa: A002, ARG001
-    d = np.sqrt(roc_point[0] ** 2 + (roc_point[1] - 1) ** 2)
-    return d
+    return np.sqrt(roc_point[0] ** 2 + (roc_point[1] - 1) ** 2)
 
 
 def loss_from_roc(y, probs, roc):

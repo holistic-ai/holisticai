@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Literal, Optional, Union
+from typing import TYPE_CHECKING, Callable, Literal, Union
 
 import numpy as np
 import pandas as pd
-
 from holisticai.utils._commons import get_number_of_feature_above_threshold_importance
 from holisticai.utils._validation import _array_like_to_numpy
 from holisticai.utils.obj_rep.object_repr import ReprObj
@@ -19,8 +18,8 @@ class BinaryClassificationProxy(ReprObj):
     def __init__(
         self,
         predict: Callable,
-        predict_proba: Optional[Callable] = None,
-        classes: Union[list, None] = None,
+        predict_proba: Callable | None = None,
+        classes: list | None = None,
     ):
         if classes is None:
             classes = [0, 1]
@@ -100,15 +99,14 @@ def create_proxy(**kargs) -> ModelProxy:
         return RegressionProxy(**kargs)
     if task == "clustering":
         return ClusteringProxy(**kargs)
-    raise ValueError("Unknown learning task type")
+    msg = "Unknown learning task type"
+    raise ValueError(msg)
 
 
 class Importances(ReprObj):
     _theme = "blue"
 
-    def __init__(
-        self, values: ArrayLike, feature_names: list[str], extra_attrs: Union[dict, None] = None, normalize=True
-    ):
+    def __init__(self, values: ArrayLike, feature_names: list[str], extra_attrs: dict | None = None, normalize=True):
         if extra_attrs is None:
             extra_attrs = {}
         values_ = np.abs(_array_like_to_numpy(values))
@@ -125,7 +123,8 @@ class Importances(ReprObj):
             return self.values[idx]
         if isinstance(idx, str):
             return self.values[self.feature_names.index(idx)]
-        raise ValueError(f"Invalid index type: {type(idx)}")
+        msg = f"Invalid index type: {type(idx)}"
+        raise ValueError(msg)
 
     def select(self, idx: list[int]):
         data = pd.DataFrame({"feature_names": self.feature_names, "values": self.values})
@@ -224,7 +223,8 @@ class LocalImportances(ReprObj):
 
     def __add__(self, other):
         if not isinstance(other, LocalImportances):
-            raise TypeError("Both operands must be instances of LocalImportances")
+            msg = "Both operands must be instances of LocalImportances"
+            raise TypeError(msg)
 
         data = self.data.droplevel(0, axis=1)
         serie = data["condition"]
@@ -281,7 +281,7 @@ class LocalConditionalImportances:
 
 
 class PartialDependence(ReprObj):
-    def __init__(self, values: list[list[dict]], feature_names: Optional[list[str]] = None):
+    def __init__(self, values: list[list[dict]], feature_names: list[str] | None = None):
         self.values = values
         if feature_names is None:
             feature_names = [f"Feature {i}" for i in range(len(values))]

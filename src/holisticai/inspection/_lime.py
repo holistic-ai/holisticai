@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 import warnings
-from typing import Union
 
 import numpy as np
 import pandas as pd
-from numpy.random import RandomState
-
 from holisticai.datasets._dataset import Dataset
 from holisticai.inspection._utils import group_mask_samples_by_learning_task
 from holisticai.utils._definitions import LocalImportances, ModelProxy
+from numpy.random import RandomState
 
 warnings.filterwarnings("ignore")
 
@@ -18,8 +16,8 @@ def compute_lime_feature_importance(
     X: pd.DataFrame,
     y: pd.Series,
     proxy: ModelProxy,
-    max_samples: Union[int, None] = None,
-    random_state: Union[RandomState, None] = None,
+    max_samples: int | None = None,
+    random_state: RandomState | None = None,
 ) -> LocalImportances:
     if random_state is None:
         random_state = RandomState(42)
@@ -36,8 +34,7 @@ def compute_lime_feature_importance(
     # y_: pd.Series = pd.Series(ds["y"])
     y_ = pd.Series(proxy.predict(ds["X"]))
     condition = group_mask_samples_by_learning_task(y_, proxy.learning_task)
-    local_importances = LocalImportances(data=data, cond=condition)
-    return local_importances
+    return LocalImportances(data=data, cond=condition)
 
 
 class LIMEImportanceCalculator:
@@ -48,7 +45,8 @@ class LIMEImportanceCalculator:
             import lime  # type: ignore
             import lime.lime_tabular  # type: ignore
         except ImportError:
-            raise ImportError("LIME is not installed. Please install it using 'pip install lime'") from None
+            msg = "LIME is not installed. Please install it using 'pip install lime'"
+            raise ImportError(msg) from None
 
         if proxy.learning_task == "regression":
             self.explainer = lime.lime_tabular.LimeTabularExplainer(
@@ -72,7 +70,8 @@ class LIMEImportanceCalculator:
             self.predict_function = proxy.predict_proba
             self.feature_names = list(X.columns)
         else:
-            raise ValueError("Learning task must be regression or classification")
+            msg = "Learning task must be regression or classification"
+            raise ValueError(msg)
 
     def compute_importances(self, ds: Dataset, proxy: ModelProxy) -> pd.DataFrame:
         X = pd.DataFrame(ds["X"].astype(np.float64))

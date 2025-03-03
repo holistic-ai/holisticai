@@ -26,8 +26,7 @@ def normalizefea(X):
     L2 normalize
     """
     feanorm = np.maximum(1e-14, np.sum(X**2, axis=1))
-    X_out = X / (feanorm[:, None] ** 0.5)
-    return X_out
+    return X / (feanorm[:, None] ** 0.5)
 
 
 def get_V_jl(x, L, N, K):  # noqa: N802
@@ -35,8 +34,7 @@ def get_V_jl(x, L, N, K):  # noqa: N802
     temp = np.zeros((N, K))
     index_cluster = L[x]
     temp[(x, index_cluster)] = 1
-    temp = temp.sum(0)
-    return temp
+    return temp.sum(0)
 
 
 def get_fair_accuracy(group_prob, groups_ids, L, K):

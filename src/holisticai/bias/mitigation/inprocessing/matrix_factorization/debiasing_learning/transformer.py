@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 import scipy
 from holisticai.bias.mitigation.inprocessing.matrix_factorization.debiasing_learning.algorithm import (
@@ -66,14 +64,14 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
 
     def __init__(
         self,
-        K: Optional[int] = 10,
-        normalization: Optional[str] = "Vanilla",
-        lamda: Optional[float] = 0.02,
-        metric: Optional[str] = "mse",
-        bias_mode: Optional[str] = None,
-        clip_val: Optional[float] = -1,
-        seed: Optional[int] = None,
-        verbose: Optional[int] = 0,
+        K: int | None = 10,
+        normalization: str | None = "Vanilla",
+        lamda: float | None = 0.02,
+        metric: str | None = "mse",
+        bias_mode: str | None = None,
+        clip_val: float | None = -1,
+        seed: int | None = None,
+        verbose: int | None = 0,
     ):
         self.seed = seed
         self.normalization = normalization
@@ -94,7 +92,7 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
         )
         # self.params = [lamda, K, clipVal, bias_mode]
 
-    def fit(self, X: Optional[np.ndarray], propensities: Optional[np.ndarray] = None):
+    def fit(self, X: np.ndarray | None, propensities: np.ndarray | None = None):
         """
         Fit model
 
@@ -144,5 +142,4 @@ class DebiasingLearningMF(BMImp, RecommenderSystemBase):
         Q = np.transpose(np.multiply(vt, s[:, None]))
         userBias = np.zeros(numUsers)
         itemBias = np.zeros(numItems)
-        params0 = (P, Q, userBias, itemBias, averageObservedRating)
-        return params0
+        return (P, Q, userBias, itemBias, averageObservedRating)

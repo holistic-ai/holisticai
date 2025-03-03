@@ -8,10 +8,9 @@ gradients.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import pandas as pd
 from holisticai.robustness.attackers.classification.commons import (
     format_function_predict_proba,
     to_categorical,
@@ -19,6 +18,9 @@ from holisticai.robustness.attackers.classification.commons import (
     x_to_nd_array,
 )
 from scipy.ndimage import zoom
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 BATCH_SIZE = 1
 
@@ -132,10 +134,11 @@ class ZooAttack:
         if len(self.input_shape) == 1:
             self.input_is_feature_vector = True
             if self.batch_size != 1:
-                raise ValueError(
+                msg = (
                     "The current implementation of Zeroth-Order Optimisation attack only supports "
                     "`batch_size=1` with feature vectors as input."
                 )
+                raise ValueError(msg)
         else:
             self.input_is_feature_vector = False
 
@@ -196,7 +199,7 @@ class ZooAttack:
 
         return preds, l2dist, c_weight * loss + l2dist
 
-    def generate(self, x_df: pd.DataFrame, y: Optional[np.ndarray] = None) -> pd.DataFrame:
+    def generate(self, x_df: pd.DataFrame, y: np.ndarray | None = None) -> pd.DataFrame:
         """
         Generate adversarial samples and return them in an array.
 
@@ -225,16 +228,16 @@ class ZooAttack:
 
         # Check that `y` is provided for targeted attacks
         if self.targeted and y is None:  # pragma: no cover
-            raise ValueError("Target labels `y` need to be provided for a targeted attack.")
+            msg = "Target labels `y` need to be provided for a targeted attack."
+            raise ValueError(msg)
 
         # No labels provided, use model prediction as correct class
         if y is None:
             y = self.predict_proba(x)
 
         if self.nb_classes == 2 and y.shape[1] == 1:  # pragma: no cover
-            raise ValueError(
-                "This attack has not yet been tested for binary classification with a single output classifier."
-            )
+            msg = "This attack has not yet been tested for binary classification with a single output classifier."
+            raise ValueError(msg)
 
         # Compute adversarial examples with implicit batching
         nb_batches = int(np.ceil(x.shape[0] / float(self.batch_size)))
@@ -526,10 +529,11 @@ class ZooAttack:
                 )
             except ValueError as error:  # pragma: no cover
                 if "Cannot take a larger sample than population when 'replace=False'" in str(error):
-                    raise ValueError(
+                    msg = (
                         "Too many samples are requested for the random indices. Try to reduce the number of parallel"
                         "coordinate updates `nb_parallel`."
-                    ) from error
+                    )
+                    raise ValueError(msg) from error
 
                 raise
 
@@ -560,7 +564,8 @@ class ZooAttack:
                 True,
             )
         else:
-            raise ValueError("Unexpected `None` in `adam_mean`, `adam_var` or `adam_epochs` detected.")
+            msg = "Unexpected `None` in `adam_mean`, `adam_var` or `adam_epochs` detected."
+            raise ValueError(msg)
 
         if self.use_importance and self._current_noise.shape[2] > self._init_size:
             self._sample_prob = self._get_prob(self._current_noise).flatten()
@@ -626,7 +631,7 @@ class ZooAttack:
 
         return current_noise.reshape(orig_shape)
 
-    def _reset_adam(self, nb_vars: int, indices: Optional[np.ndarray] = None) -> None:
+    def _reset_adam(self, nb_vars: int, indices: np.ndarray | None = None) -> None:
         """
         Reset the ADAM optimizer.
 

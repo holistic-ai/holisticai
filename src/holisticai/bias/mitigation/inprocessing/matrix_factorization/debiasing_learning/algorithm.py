@@ -33,10 +33,9 @@ class DebiasingLearningAlgorithm:
             if self.clip_val >= 0:
                 tempInvPropensities = np.clip(tempInvPropensities, a_min=0, a_max=self.clip_val)
 
-        parameters = self.optimize_debiasing_parameters(
+        return self.optimize_debiasing_parameters(
             train_observations, tempInvPropensities, self.lamda, start_vec=start_vector
         )
-        return parameters
 
     def optimize_debiasing_parameters(self, observed_ratings, inverse_propensities, l2_regularization, start_vec=None):
         metricMode = get_metric_mode(self.metric)

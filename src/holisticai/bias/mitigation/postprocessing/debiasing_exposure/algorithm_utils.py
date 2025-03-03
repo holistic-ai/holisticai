@@ -9,8 +9,7 @@ def filter_invalid_examples(rankings, query_col, group_col):
     for _, ranking in rankings.groupby(query_col):
         if (ranking[group_col].sum() > 0).any():
             new_rankings.append(ranking)
-    new_rankings = pd.concat(new_rankings, axis=0).reset_index(drop=True)
-    return new_rankings
+    return pd.concat(new_rankings, axis=0).reset_index(drop=True)
 
 
 def exposure_metric(rankings, group_col: str, query_col: str, score_col: str):
@@ -56,9 +55,7 @@ def exposure_diff(data_per_query, prot_idx_per_query):
 
     exposure_prot = normalized_exposure(protected_items_per_query, judgments_per_query)
     exposure_nprot = normalized_exposure(nonprotected_items_per_query, judgments_per_query)
-    exposure_diff = np.maximum(0, (exposure_nprot - exposure_prot))
-
-    return exposure_diff
+    return np.maximum(0, (exposure_nprot - exposure_prot))
 
 
 def exposure_ratio(data_per_query, prot_idx_per_query):
@@ -87,15 +84,14 @@ def exposure_ratio(data_per_query, prot_idx_per_query):
 
     exposure_prot = normalized_exposure(protected_items_per_query, judgments_per_query)
     exposure_nprot = normalized_exposure(nonprotected_items_per_query, judgments_per_query)
-    exposure_diff = exposure_nprot / exposure_prot
-
-    return exposure_diff
+    return exposure_nprot / exposure_prot
 
 
 def find_items_per_group_per_query(data, protected_feature):
     data_per_query = np.array(data).astype(np.float32)
     if np.any(np.isnan(data_per_query)):
-        raise ValueError("data has NaN values!!, fix your data or normalize it before training.")
+        msg = "data has NaN values!!, fix your data or normalize it before training."
+        raise ValueError(msg)
     if len(data_per_query.shape) == 1:
         data_per_query = data_per_query[:, None]
     protected_feature = np.array(protected_feature)
@@ -149,8 +145,7 @@ def normalized_topp_prot_deriv_per_group(group_features, all_features, group_pre
     numpy array of float values.
     """
     derivative = topp_prot_first_derivative(group_features, all_features, group_predictions, all_predictions)
-    result = (np.sum(derivative / np.log(2), axis=0)) / group_predictions.size
-    return result
+    return (np.sum(derivative / np.log(2), axis=0)) / group_predictions.size
 
 
 def topp_prot(group_items, all_items):

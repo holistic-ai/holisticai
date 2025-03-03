@@ -96,9 +96,11 @@ class GeneticAlgorithm:
                 self.var_type = np.array([["int"]] * self.dim)
         else:
             if type(variable_type_mixed).__module__ != "numpy":
-                raise ValueError("variable_type must be numpy array")
+                msg = "variable_type must be numpy array"
+                raise ValueError(msg)
             if len(variable_type_mixed) != self.dim:
-                raise ValueError("variable_type must have a length equal to dimension.")
+                msg = "variable_type must have a length equal to dimension."
+                raise ValueError(msg)
 
             for i in variable_type_mixed:
                 assert i in ("real", "int"), (
@@ -112,10 +114,12 @@ class GeneticAlgorithm:
         # input variables' boundaries
         if variable_type != "bool" or type(variable_type_mixed).__module__ == "numpy":
             if type(variable_boundaries).__module__ != "numpy":
-                raise ValueError("variable_boundaries must be numpy array")
+                msg = "variable_boundaries must be numpy array"
+                raise ValueError(msg)
 
             if len(variable_boundaries) != self.dim:
-                raise ValueError("variable_boundaries must have a length equal to dimension.")
+                msg = "variable_boundaries must have a length equal to dimension."
+                raise ValueError(msg)
 
             for i in variable_boundaries:
                 assert len(i) == 2, "\n boundary for each variable must be a tuple of length two."
@@ -130,7 +134,8 @@ class GeneticAlgorithm:
         self.pop_s = int(self.param["population_size"])
 
         if not (0 <= self.param["parents_portion"] <= 1):
-            raise ValueError("parents_portion must be in range [0,1]")
+            msg = "parents_portion must be in range [0,1]"
+            raise ValueError(msg)
 
         self.par_s = int(self.param["parents_portion"] * self.pop_s)
         trl = self.pop_s - self.par_s
@@ -140,7 +145,8 @@ class GeneticAlgorithm:
         self.prob_mut = self.param["mutation_probability"]
 
         if not (0 <= self.prob_mut <= 1):
-            raise ValueError("mutation_probability must be in range [0,1]")
+            msg = "mutation_probability must be in range [0,1]"
+            raise ValueError(msg)
 
         self.prob_cross = self.param["crossover_probability"]
         assert self.prob_cross <= 1, "mutation_probability must be less than or equal to 1"

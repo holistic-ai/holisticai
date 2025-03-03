@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Union
-
 import numpy as np
 from holisticai.bias.mitigation.commons.fairlet_clustering.decompositions import (
     DecompositionMixin,
@@ -57,10 +55,10 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
 
     def __init__(
         self,
-        decomposition: Union[str, DecompositionMixin] = "Vanilla",
-        p: Optional[str] = 1,
-        q: Optional[float] = 3,
-        seed: Optional[int] = None,
+        decomposition: str | DecompositionMixin = "Vanilla",
+        p: str | None = 1,
+        q: float | None = 3,
+        seed: int | None = None,
     ):
         self.decomposition = DECOMPOSITION_CATALOG[decomposition](p=p, q=q)
         self.p = p
@@ -72,7 +70,7 @@ class FairletClusteringPreprocessing(BaseEstimator, BMPre):
         X: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        sample_weight: Optional[np.ndarray] = None,
+        sample_weight: np.ndarray | None = None,
     ):
         """
         Fits the model by learning a fair cluster.

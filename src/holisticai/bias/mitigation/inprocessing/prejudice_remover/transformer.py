@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 from holisticai.bias.mitigation.inprocessing.prejudice_remover.algorithm import PrejudiceRemoverAlgorithm
 from holisticai.bias.mitigation.inprocessing.prejudice_remover.algorithm_utils import ObjectiveFunction, PRLogger
@@ -63,14 +61,14 @@ class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):
 
     def __init__(
         self,
-        eta: Optional[float] = 1.0,
-        C: Optional[float] = 1.0,
-        fit_intercept: Optional[bool] = True,
-        penalty: Optional[str] = "l2",
-        init_type: Optional[str] = "Zero",
-        maxiter: Optional[int] = 1000,
-        verbose: Optional[int] = 0,
-        print_interval: Optional[int] = 20,
+        eta: float | None = 1.0,
+        C: float | None = 1.0,
+        fit_intercept: bool | None = True,
+        penalty: str | None = "l2",
+        init_type: str | None = "Zero",
+        maxiter: int | None = 1000,
+        verbose: int | None = 0,
+        print_interval: int | None = 20,
     ):
         # Default estimator parameters
         self.eta = eta

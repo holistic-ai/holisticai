@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import Literal, Optional, Union, overload
+from typing import Literal, overload
 
 import numpy as np
 import pandas as pd
+from holisticai.inspection._utils import group_index_samples_by_learning_task
+from holisticai.utils._definitions import ConditionalImportances, Importances, ModelProxy
 from numpy.random import RandomState
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error
-
-from holisticai.inspection._utils import group_index_samples_by_learning_task
-from holisticai.utils._definitions import ConditionalImportances, Importances, ModelProxy
 
 metric_scores = {
     "binary_classification": accuracy_score,
@@ -22,8 +21,8 @@ metric_scores = {
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: Optional[pd.Series] = None,
-    random_state: Optional[Union[RandomState, int]] = None,
+    y: pd.Series | None = None,
+    random_state: RandomState | int | None = None,
 ) -> Importances: ...
 
 
@@ -31,8 +30,8 @@ def compute_surrogate_feature_importance(
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: Optional[pd.Series] = None,
-    random_state: Union[RandomState, int, None] = None,
+    y: pd.Series | None = None,
+    random_state: RandomState | int | None = None,
     importance_type: Literal["conditional"] = "conditional",
 ) -> Importances: ...
 
@@ -40,10 +39,10 @@ def compute_surrogate_feature_importance(
 def compute_surrogate_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    y: Optional[pd.Series] = None,
-    random_state: Optional[Union[RandomState, int]] = None,
+    y: pd.Series | None = None,
+    random_state: RandomState | int | None = None,
     importance_type: Literal["conditional", "standard"] = "standard",
-) -> Union[Importances, ConditionalImportances]:
+) -> Importances | ConditionalImportances:
     pfi = SurrogateFeatureImportanceCalculator(random_state=random_state)
     if importance_type == "conditional":
         y = pd.Series(proxy.predict(X)) if y is None else y
@@ -59,7 +58,7 @@ def compute_surrogate_feature_importance(
 class SurrogateFeatureImportanceCalculator:
     def __init__(
         self,
-        random_state: Union[RandomState, int, None] = None,
+        random_state: RandomState | int | None = None,
         importance_type: str = "global",
     ):
         if random_state is None:
@@ -92,7 +91,8 @@ class SurrogateFeatureImportanceCalculator:
                     best_tree = tree
 
         if best_tree is None:
-            raise ValueError(f"Surrogate model could not be created for learning task {learning_task}")
+            msg = f"Surrogate model could not be created for learning task {learning_task}"
+            raise ValueError(msg)
 
         return best_tree
 

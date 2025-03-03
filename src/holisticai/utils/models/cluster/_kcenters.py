@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import Union
-
 from holisticai.utils.models.cluster._utils import distance
 from numpy.random import RandomState
 
 
 class KCenters:
-    def __init__(self, n_clusters=5, random_state: Union[RandomState, int] = 42):
+    def __init__(self, n_clusters=5, random_state: RandomState | int = 42):
         """
         k (int) : Number of centers to be identified
         """

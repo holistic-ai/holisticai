@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
@@ -34,7 +32,7 @@ class Reweighing(BMPre):
         y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        sample_weight: Optional[np.ndarray] = None,
+        sample_weight: np.ndarray | None = None,
     ):
         """
         Fit the Reweighing model to the data. This method calculates the sample weights to ensure that the \
@@ -110,7 +108,7 @@ class Reweighing(BMPre):
         y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        sample_weight: Optional[np.ndarray] = None,
+        sample_weight: np.ndarray | None = None,
     ):
         """
         Fit the Reweighing model to the data. This method calculates the sample weights to ensure that the \

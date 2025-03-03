@@ -84,5 +84,4 @@ class BinaryBalancerAlgorithm:
                 y_pred[group_ids[g]] = tools.threshold(probs[group_ids[g]], cut)
 
         # Returning the adjusted predictions
-        adj = tools.pred_from_pya(y_pred, p_attr, self.pya, binom)
-        return adj
+        return tools.pred_from_pya(y_pred, p_attr, self.pya, binom)

@@ -39,8 +39,7 @@ class KUtils:
 
 class KmeansUtils(KUtils):
     def compute_a_p(self, L, C):  # noqa: ARG002
-        a_p = ecdist(self.X, C, squared=True)
-        return a_p
+        return ecdist(self.X, C, squared=True)
 
     def step(self, L, C):
         tmp_list = [np.where(k == L)[0] for k in range(self.K)]
@@ -53,15 +52,12 @@ class KmeansUtils(KUtils):
     def kmeans_update(self, tmp):
         """ """
         X_tmp = self.X[tmp, :]
-        c1 = X_tmp.mean(axis=0)
-
-        return c1
+        return X_tmp.mean(axis=0)
 
 
 class KmedianUtils(KUtils):
     def compute_a_p(self, L, C):  # noqa: ARG002
-        a_p = ecdist(self.X, C)
-        return a_p
+        return ecdist(self.X, C)
 
     def step(self, L, C):
         tmp_list = [np.where(k == L)[0] for k in range(self.K)]
@@ -77,8 +73,7 @@ class KmedianUtils(KUtils):
         D = pdist_chunk(X_tmp, reduce_func=reduce_func)
         J = next(D)
         j = np.argmin(J)
-        c1 = X_tmp[j, :]
-        return c1
+        return X_tmp[j, :]
 
 
 class NCutUtils:
@@ -101,8 +96,7 @@ class NCutUtils:
         S = get_S_discrete(L, self.N, self.K)
         sqdist_list = [KernelBound_k(self.A, self.d, S[:, k], self.N) for k in range(self.K)]
         sqdist = np.asarray(np.vstack(sqdist_list).T)
-        a_p = sqdist.copy()
-        return a_p
+        return sqdist.copy()
 
     def update(self, a_p, L, C):  # noqa: ARG002
         L = a_p.argmin(axis=1)

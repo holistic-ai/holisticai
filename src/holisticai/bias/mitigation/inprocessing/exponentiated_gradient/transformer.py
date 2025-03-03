@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 from holisticai.bias.mitigation.inprocessing.commons.classification import _constraints as cc
@@ -93,15 +93,15 @@ class ExponentiatedGradientReduction(BaseEstimator, ClassifierMixin, BMImp):
     def __init__(
         self,
         constraints: str = "EqualizedOdds",
-        eps: Optional[float] = 0.01,
-        max_iter: Optional[int] = 50,
-        nu: Optional[float] = None,
-        eta0: Optional[float] = 2.0,
+        eps: float | None = 0.01,
+        max_iter: int | None = 50,
+        nu: float | None = None,
+        eta0: float | None = 2.0,
         loss: str = "ZeroOne",
-        min_val: Optional[float] = None,
-        max_val: Optional[float] = None,
+        min_val: float | None = None,
+        max_val: float | None = None,
         upper_bound: float = 0.01,
-        verbose: Optional[int] = 0,
+        verbose: int | None = 0,
         estimator=None,
         seed: int = 0,
     ):
