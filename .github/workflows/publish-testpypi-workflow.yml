@@ -44,6 +44,6 @@ jobs:
           HATCH_INDEX_AUTH: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           hatch build
-          hatch publish --repo test
+          hatch publish --repo testpypi
 
       
