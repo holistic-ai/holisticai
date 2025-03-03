@@ -40,14 +40,11 @@ jobs:
 
       - name: Create .pypirc file
         run: |
-          echo "[distutils]" > ~/.pypirc
-          echo "index-servers =" >> ~/.pypirc
-          echo "    testpypi" >> ~/.pypirc
-          echo "" >> ~/.pypirc
-          echo "[test]" >> ~/.pypirc
+          echo "[test]" > ~/.pypirc
           echo "repository = https://test.pypi.org/legacy/" >> ~/.pypirc
           echo "username = __token__" >> ~/.pypirc
           echo "password = ${{ secrets.TEST_PYPI_API_TOKEN }}" >> ~/.pypirc
+          chmod 600 ~/.pypirc
 
       - name: Publish to TestPyPI
         run: |
