@@ -38,10 +38,12 @@ jobs:
           echo "Latest release version: $latest_tag"
           echo "tag=$latest_tag" >> $GITHUB_ENV # Save the tag to an environment variable
 
-      - name: Publish to PyPI
+      - name: Publish to TestPyPI
         env:
           HATCH_INDEX_USER: __token__
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
+          HATCH_INDEX_AUTH: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           hatch build
           hatch publish --repo test
+
+      
