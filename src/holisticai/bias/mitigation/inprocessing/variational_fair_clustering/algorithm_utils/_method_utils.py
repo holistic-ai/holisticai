@@ -13,8 +13,7 @@ SKLEARN_CURRENT_VERSION = sklearn.__version__
 
 
 def reduce_func(D_chunk, start):  # noqa: ARG001
-    J = np.mean(D_chunk, axis=1)
-    return J
+    return np.mean(D_chunk, axis=1)
 
 
 def NormalizedCutEnergy(A, S, clustering):  # noqa: N802
@@ -38,9 +37,7 @@ def NormalizedCutEnergy(A, S, clustering):  # noqa: N802
         elif isinstance(A, sparse.csc_matrix):
             nassoc_e = nassoc_e + np.dot(np.transpose(S_k), A.dot(S_k)) / np.dot(np.transpose(d), S_k)
             nassoc_e = nassoc_e[0, 0]
-    ncut_e = num_cluster - nassoc_e
-
-    return ncut_e
+    return num_cluster - nassoc_e
 
 
 def NormalizedCutEnergy_discrete(A, clustering):  # noqa: N802
@@ -64,9 +61,7 @@ def NormalizedCutEnergy_discrete(A, clustering):  # noqa: N802
         elif isinstance(A, sparse.csc_matrix):
             nassoc_e = nassoc_e + np.dot(np.transpose(S_k), A.dot(S_k)) / np.dot(np.transpose(d), S_k)
             nassoc_e = nassoc_e[0, 0]
-    ncut_e = num_cluster - nassoc_e
-
-    return ncut_e
+    return num_cluster - nassoc_e
 
 
 def KernelBound_k(A, d, S_k, N):  # noqa: N802
@@ -86,9 +81,7 @@ def km_le(X, M):
 
     """
     e_dist = ecdist(X, M)
-    L = e_dist.argmin(axis=1)
-
-    return L
+    return e_dist.argmin(axis=1)
 
 
 # Fairness term calculation
@@ -96,8 +89,7 @@ def fairness_term_V_j(u_j, S, V_j):  # noqa: N802
     V_j = V_j.astype("float")
     S_term = np.maximum(np.dot(V_j, S), 1e-20)
     S_sum = np.maximum(S.sum(0), 1e-20)
-    S_term = u_j * (np.log(S_sum) - np.log(S_term))
-    return S_term
+    return u_j * (np.log(S_sum) - np.log(S_term))
 
 
 def km_discrete_energy(e_dist, L, k):
@@ -110,8 +102,7 @@ def compute_fairness_energy(group_prob, groups_ids, S, bound_lambda):
     compute fair clustering energy
     """
     fairness_E = [fairness_term_V_j(group_prob.loc[g], S, groups_ids[f"{g}"]) for g in group_prob.index]
-    fairness_E = (bound_lambda * sum(fairness_E)).sum()
-    return fairness_E
+    return (bound_lambda * sum(fairness_E)).sum()
 
 
 def _is_arraylike(x):

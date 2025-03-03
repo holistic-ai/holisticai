@@ -1,10 +1,10 @@
 import numpy as np
 
-# scikit
-from sklearn.metrics import f1_score, precision_score, recall_score
-
 # Formatting
 from holisticai.utils import mat_to_binary
+
+# scikit
+from sklearn.metrics import f1_score, precision_score, recall_score
 
 
 def avg_precision(mat_pred, mat_true, top=None, thresh=0.5):

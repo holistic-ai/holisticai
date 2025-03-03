@@ -47,10 +47,10 @@ class FeatureStability:
         if strategy == "variance":
             jsd_std = np.std(densities)
             jsd_max = np.max(densities)
-            stability = 1 - (jsd_std / jsd_max)
-            return stability
+            return 1 - (jsd_std / jsd_max)
         if strategy == "entropy":
             num_samples = len(densities)
             feature_equal_weight = np.array([1.0 / num_samples] * num_samples)
             return 1 - jensenshannon(densities, feature_equal_weight, base=2)
-        raise ValueError(f"Invalid strategy: {strategy}")
+        msg = f"Invalid strategy: {strategy}"
+        raise ValueError(msg)

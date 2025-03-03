@@ -30,8 +30,7 @@ class AccuracyDegradation:
     def __call__(self, y, y_pred, y_surrogate):
         Pb = accuracy_score(y, y_pred)
         Ps = accuracy_score(y, y_surrogate)
-        D = 2 * (Pb - Ps) / (Pb + Ps)  # Normalized difference between the two SMAPE values
-        return D
+        return 2 * (Pb - Ps) / (Pb + Ps)  # Normalized difference between the two SMAPE values
 
 
 def surrogate_accuracy_degradation(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):
@@ -124,7 +123,8 @@ def classification_surrogate_explainability_metrics(
     elif len(np.unique(y_pred)) > 2:
         surrogate = MultiClassificationSurrogate(X, y_pred=y_pred, model_type=surrogate_type)
     else:
-        raise ValueError("y_pred must have at least two unique values")
+        msg = "y_pred must have at least two unique values"
+        raise ValueError(msg)
 
     y_surrogate = surrogate.predict(X)
     results = {}

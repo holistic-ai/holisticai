@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.utils import get_class_count, get_class_indexes
@@ -26,7 +25,7 @@ class FairScoreClassifierAlgorithm:
         objectives: str,
         fairness_groups: list,
         fairness_labels: list,
-        constraints: Optional[dict] = None,
+        constraints: dict | None = None,
         lambda_bound: int = 9,
         time_limit: int = 100,
         verbose: int = 0,

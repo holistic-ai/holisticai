@@ -88,7 +88,8 @@ class KMedoids:
         """Validates if value is a valid integer > 0"""
         negative = value is None or value <= 0 if strict else value is None or value < 0
         if negative or not isinstance(value, (int, np.integer)):
-            raise ValueError(f"{desc} should be a nonnegative integer. " f"{value} was given")
+            msg = f"{desc} should be a nonnegative integer. " f"{value} was given"
+            raise ValueError(msg)
 
     def _check_init_args(self):
         """Validates the input arguments."""
@@ -289,7 +290,8 @@ class KMedoids:
             # to every other point. These are the initial medoids.
             medoids = np.argpartition(np.sum(D, axis=1), n_clusters - 1)[:n_clusters]
         else:
-            raise ValueError(f"init value '{self.init}' not recognized")
+            msg = f"init value '{self.init}' not recognized"
+            raise ValueError(msg)
 
         return medoids
 

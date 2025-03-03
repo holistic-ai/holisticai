@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Literal, Union, overload
+from typing import Any, Literal, overload
 
 import numpy as np
 import pandas as pd
-from numpy.random import RandomState
-from sklearn.metrics import accuracy_score, mean_squared_error
-
 from holisticai.inspection._utils import group_index_samples_by_learning_task
 from holisticai.utils._commons import get_columns, get_item
 from holisticai.utils._definitions import (
@@ -14,6 +11,8 @@ from holisticai.utils._definitions import (
     Importances,
     ModelProxy,
 )
+from numpy.random import RandomState
+from sklearn.metrics import accuracy_score, mean_squared_error
 
 metric_scores = {
     "binary_classification": accuracy_score,
@@ -29,7 +28,7 @@ def compute_permutation_importance(
     y: pd.Series,
     n_repeats: int = 5,
     n_jobs: int = -1,
-    random_state: Union[RandomState, int, None] = None,
+    random_state: RandomState | int | None = None,
     importance_type: Literal["conditional"] = "conditional",
 ) -> ConditionalImportances: ...
 
@@ -41,7 +40,7 @@ def compute_permutation_importance(
     y: pd.Series,
     n_repeats: int = 5,
     n_jobs: int = -1,
-    random_state: Union[RandomState, int, None] = None,
+    random_state: RandomState | int | None = None,
 ) -> Importances: ...
 
 
@@ -51,9 +50,9 @@ def compute_permutation_importance(
     y: pd.Series,
     n_repeats: int = 5,
     n_jobs: int = -1,
-    random_state: Union[RandomState, int, None] = None,
+    random_state: RandomState | int | None = None,
     importance_type: Literal["standard", "conditional"] = "standard",
-) -> Union[Importances, ConditionalImportances]:
+) -> Importances | ConditionalImportances:
     pfi = PermutationFeatureImportanceCalculator(n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state)
     if importance_type == "conditional":
         return compute_conditional_permutation_importance(
@@ -68,8 +67,8 @@ def compute_conditional_permutation_importance(
     y: pd.Series,
     n_repeats: int = 5,
     n_jobs: int = -1,
-    random_state: Union[RandomState, int, None] = None,
-) -> Union[Importances, ConditionalImportances]:
+    random_state: RandomState | int | None = None,
+) -> Importances | ConditionalImportances:
     pfi = PermutationFeatureImportanceCalculator(n_repeats=n_repeats, n_jobs=n_jobs, random_state=random_state)
     sample_groups = group_index_samples_by_learning_task(y, proxy.learning_task)
     values = {}
@@ -108,7 +107,7 @@ class PermutationFeatureImportanceCalculator:
         self,
         n_repeats: int = 5,
         n_jobs: int = -1,
-        random_state: Union[RandomState, int, None] = None,
+        random_state: RandomState | int | None = None,
         importance_type: str = "global",
     ):
         if random_state is None:

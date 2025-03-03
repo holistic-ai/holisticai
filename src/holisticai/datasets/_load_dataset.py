@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 import pandas as pd
-
 from holisticai.datasets._dataloaders import load_hai_datasets
 from holisticai.datasets._dataset import Dataset
 from holisticai.datasets._utils import convert_float_to_categorical, get_protected_values
@@ -32,7 +31,7 @@ def create_preprocessor(X, numerical_transform: bool = True, categorical_transfo
     return ColumnTransformer(transformers=transformers)
 
 
-def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "sex", preprocessed: bool = True):
+def load_adult_dataset(protected_attribute: Literal["race", "sex"] | None = "sex", preprocessed: bool = True):
     sensitive_attribute = ["race", "sex"]
     feature_names = [
         "age",
@@ -88,7 +87,8 @@ def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "
             group_a = pd.Series(get_protected_values(df, protected_attribute, ga_label), name="group_a")
             group_b = pd.Series(get_protected_values(df, protected_attribute, gb_label), name="group_b")
         else:
-            raise ValueError("The protected attribute must be: race or sex")
+            msg = "The protected attribute must be: race or sex"
+            raise ValueError(msg)
 
         if protected_attribute is not None:
             metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -96,7 +96,7 @@ def load_adult_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "
     return Dataset(X=xt, y=y, p_attrs=p_attrs)
 
 
-def load_law_school_dataset(protected_attribute: Optional[Literal["race", "sex"]] = "sex", preprocessed: bool = True):
+def load_law_school_dataset(protected_attribute: Literal["race", "sex"] | None = "sex", preprocessed: bool = True):
     data = load_hai_datasets(dataset_name="law_school")
     sensitive_attribute = ["race1", "gender", "age"]
     output_variable = "bar"
@@ -122,7 +122,8 @@ def load_law_school_dataset(protected_attribute: Optional[Literal["race", "sex"]
             group_a = pd.Series(get_protected_values(df, "gender", ga_label), name="group_a")
             group_b = pd.Series(get_protected_values(df, "gender", gb_label), name="group_b")
         else:
-            raise ValueError("The protected attribute must be one of: race or gender")
+            msg = "The protected attribute must be one of: race or gender"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -130,9 +131,7 @@ def load_law_school_dataset(protected_attribute: Optional[Literal["race", "sex"]
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_student_multiclass_dataset(
-    protected_attribute: Optional[Literal["sex", "address"]] = "sex", preprocessed=True
-):
+def load_student_multiclass_dataset(protected_attribute: Literal["sex", "address"] | None = "sex", preprocessed=True):
     sensitive_attributes = ["sex", "address", "Mjob", "Fjob"]
     output_column = "G3"
     drop_columns = ["G1", "G2", "G3", "sex", "address", "Mjob", "Fjob"]
@@ -172,7 +171,8 @@ def load_student_multiclass_dataset(
             group_a = pd.Series(df["address"] == ga_label, name="group_a")
             group_b = ~group_a
         else:
-            raise ValueError("The protected attribute must be one sex or address")
+            msg = "The protected attribute must be one sex or address"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -181,9 +181,9 @@ def load_student_multiclass_dataset(
 
 
 def load_student_dataset(
-    target: Optional[Literal["G1", "G2", "G3"]] = None,
+    target: Literal["G1", "G2", "G3"] | None = None,
     preprocessed: bool = True,
-    protected_attribute: Optional[Literal["sex", "address"]] = "sex",
+    protected_attribute: Literal["sex", "address"] | None = "sex",
 ):
     if target is None:
         target = "G3"
@@ -215,7 +215,8 @@ def load_student_dataset(
             group_a = pd.Series(df["address"] == "U", name="group_a")
             group_b = pd.Series(df["address"] == "R", name="group_b")
         else:
-            raise ValueError("The protected attribute doesn't exist or not implemented")
+            msg = "The protected attribute doesn't exist or not implemented"
+            raise ValueError(msg)
     df = df.drop(drop_columns, axis=1)
 
     if preprocessed:
@@ -273,7 +274,7 @@ def load_lastfm_dataset():
     return Dataset(data_pivot=df_pivot, p_attr=pd.Series(p_attr))
 
 
-def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = "race"):
+def load_us_crime_dataset(preprocessed=True, protected_attribute: Literal["race"] | None = "race"):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and \
     protected group B as numerical arrays or as dataframe if needed
@@ -316,9 +317,8 @@ def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Liter
             group_a = pd.Series(df[protected_attribute_column] > threshold, name="group_a")
             group_b = pd.Series(~group_a, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attributes}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attributes}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -326,7 +326,7 @@ def load_us_crime_dataset(preprocessed=True, protected_attribute: Optional[Liter
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Optional[Literal["race"]] = "race"):
+def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Literal["race"] | None = "race"):
     """
     Processes the US crime dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -370,9 +370,8 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Opt
             group_a = pd.Series(df[protected_attribute_column] > threshold, name="group_a")
             group_b = pd.Series(~group_a, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -380,7 +379,7 @@ def load_us_crime_multiclass_dataset(preprocessed=True, protected_attribute: Opt
     return Dataset(X=X, y=y_cat, p_attrs=p_attrs)
 
 
-def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] = "sex"):
+def load_clinical_records_dataset(protected_attribute: Literal["sex"] | None = "sex"):
     """
     Processes the heart dataset and returns the data, output variable, protected group A and protected group B as numerical arrays
 
@@ -410,7 +409,8 @@ def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] 
             group_a = pd.Series(df[protected_attribute] == ga_label, name="group_a")
             group_b = pd.Series(df[protected_attribute] == gb_label, name="group_b")
         else:
-            raise ValueError("The protected attribute doesn't exist or not implemented. Please use: sex")
+            msg = "The protected attribute doesn't exist or not implemented. Please use: sex"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -418,7 +418,7 @@ def load_clinical_records_dataset(protected_attribute: Optional[Literal["sex"]] 
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = "sex"):
+def load_german_credit_dataset(preprocessed=True, protected_attribute: Literal["sex"] | None = "sex"):
     """
     Processes the german credit dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -458,9 +458,8 @@ def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[
             group_a = pd.Series(df["Sex"] == "male", name="group_a")
             group_b = pd.Series(df["Sex"] == "female", name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -468,7 +467,7 @@ def load_german_credit_dataset(preprocessed=True, protected_attribute: Optional[
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Literal["sex"]] = "sex"):
+def load_census_kdd_dataset(preprocessed=True, protected_attribute: Literal["sex"] | None = "sex"):
     """
     Processes the Census KDD dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -516,9 +515,8 @@ def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Lit
             group_a = pd.Series(df["race"] == 1, name="group_a")
             group_b = pd.Series(df["race"] == 0, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -526,7 +524,7 @@ def load_census_kdd_dataset(preprocessed=True, protected_attribute: Optional[Lit
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional[Literal["marital"]] = "marital"):
+def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Literal["marital"] | None = "marital"):
     """
     Processes the Banking Marketing dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -588,9 +586,8 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
             group_a = pd.Series(df["marital"] == 1, name="group_a")
             group_b = pd.Series(df["marital"] == 0, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -598,9 +595,7 @@ def load_bank_marketing_dataset(preprocessed=True, protected_attribute: Optional
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_compas_two_year_recid_dataset(
-    preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"
-):
+def load_compas_two_year_recid_dataset(preprocessed=True, protected_attribute: Literal["race", "sex"] | None = "race"):
     """
     Processes the compas dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
     Target: 2-year recidivism
@@ -646,9 +641,8 @@ def load_compas_two_year_recid_dataset(
             group_a = pd.Series(df["race"] == 1, name="group_a")
             group_b = pd.Series(df["race"] == 2, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -656,7 +650,7 @@ def load_compas_two_year_recid_dataset(
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Literal["race", "sex"] | None = "race"):
     """
     Processes the compas dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
     Target: 2-year recidivism
@@ -700,9 +694,8 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
             group_a = pd.Series(df["race"] == 1, name="group_a")
             group_b = pd.Series(df["race"] == 2, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -710,7 +703,7 @@ def load_compas_is_recid_dataset(preprocessed=True, protected_attribute: Optiona
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "sex"):
+def load_diabetes_dataset(preprocessed=True, protected_attribute: Literal["race", "sex"] | None = "sex"):
     """
     Processes the Diabetes dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -758,9 +751,8 @@ def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Liter
             group_a = pd.Series(df["race"] == "Caucasian", name="group_a")
             group_b = pd.Series(df["race"] == "Non-Caucasian", name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -768,7 +760,7 @@ def load_diabetes_dataset(preprocessed=True, protected_attribute: Optional[Liter
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "sex"):
+def load_acsincome_dataset(preprocessed=True, protected_attribute: Literal["race", "sex"] | None = "sex"):
     """
     Processes the ACSIncome dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -814,9 +806,8 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
             group_a = pd.Series(df["RAC1P"] == "White", name="group_a")
             group_b = pd.Series(df["RAC1P"] == "Non-White", name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -824,7 +815,7 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "sex"):
+def load_acspublic_dataset(preprocessed=True, protected_attribute: Literal["race", "sex"] | None = "sex"):
     """
     Processes the ACSPublicCoverage dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
 
@@ -869,9 +860,8 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
             group_a = pd.Series(df["RAC1P"] == "White", name="group_a")
             group_b = pd.Series(df["RAC1P"] == "Non-White", name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -879,7 +869,7 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_mw_medium_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+def load_mw_medium_dataset(preprocessed=True, protected_attribute: Literal["race", "sex"] | None = "race"):
     """
     Processes the Minimum Wage Medium dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
     Target: contracted_hours
@@ -925,9 +915,8 @@ def load_mw_medium_dataset(preprocessed=True, protected_attribute: Optional[Lite
             group_a = pd.Series(df["race"] == ga_label, name="group_a")
             group_b = pd.Series(df["race"] == gb_label, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -935,7 +924,7 @@ def load_mw_medium_dataset(preprocessed=True, protected_attribute: Optional[Lite
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 
-def load_mw_small_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
+def load_mw_small_dataset(preprocessed=True, protected_attribute: Literal["race", "sex"] | None = "race"):
     """
     Processes the Minimum Wage Small dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
     Target: contracted_hours
@@ -981,9 +970,8 @@ def load_mw_small_dataset(preprocessed=True, protected_attribute: Optional[Liter
             group_a = pd.Series(df["race"] == ga_label, name="group_a")
             group_b = pd.Series(df["race"] == gb_label, name="group_b")
         else:
-            raise ValueError(
-                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
-            )
+            msg = f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            raise ValueError(msg)
 
     if protected_attribute is not None:
         metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
@@ -1016,8 +1004,8 @@ ProcessedDatasets = Literal[
 def load_dataset(
     dataset_name: ProcessedDatasets,
     preprocessed: bool = True,
-    protected_attribute: Optional[str] = None,
-    target: Optional[str] = None,
+    protected_attribute: str | None = None,
+    target: str | None = None,
 ) -> Dataset:
     """
     Load a specific dataset based on the given dataset name.

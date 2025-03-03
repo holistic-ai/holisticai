@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import jax
 import jax.numpy as jnp
@@ -73,9 +72,7 @@ class ObjectiveFunction:
 
         loss = jnp.array([loss_x, loss_y, loss_z])
 
-        total_loss = jnp.dot(self.A, loss)
-
-        return total_loss
+        return jnp.dot(self.A, loss)
 
 
 class LearningFairRepresentation(BMPreprocessing):
@@ -117,14 +114,14 @@ class LearningFairRepresentation(BMPreprocessing):
 
     def __init__(
         self,
-        k: Optional[int] = 5,
-        Ax: Optional[float] = 0.01,
-        Ay: Optional[float] = 1.0,
-        Az: Optional[float] = 50.0,
-        maxiter: Optional[int] = 5000,
-        maxfun: Optional[int] = 5000,
-        verbose: Optional[int] = 0,
-        seed: Optional[int] = None,
+        k: int | None = 5,
+        Ax: float | None = 0.01,
+        Ay: float | None = 1.0,
+        Az: float | None = 50.0,
+        maxiter: int | None = 5000,
+        maxfun: int | None = 5000,
+        verbose: int | None = 0,
+        seed: int | None = None,
     ):
         self.seed = seed
         self.k = k

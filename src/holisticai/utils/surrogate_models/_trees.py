@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 import pandas as pd
-from numpy.random import RandomState
-from sklearn.metrics import accuracy_score, mean_squared_error
-
 from holisticai.utils.obj_rep.object_repr import ReprObj
 from holisticai.utils.surrogate_models._base import SurrogateBase
+from sklearn.metrics import accuracy_score, mean_squared_error
+
+if TYPE_CHECKING:
+    from numpy.random import RandomState
 
 
 def validate_input(X, y=None):
@@ -72,7 +73,7 @@ class DecisionTreeClassifier(OptimalTreeBase, ReprObj):
         self,
         learning_task: Literal["binary_classification", "multi_classification", "clustering"],
         model_type: Literal["shallow_tree", "tree"] = "shallow_tree",
-        random_state: Optional[RandomState] = None,
+        random_state: RandomState | None = None,
     ):
         self.random_state = random_state
         self.model_type = model_type
@@ -89,7 +90,8 @@ class DecisionTreeClassifier(OptimalTreeBase, ReprObj):
         elif self.model_type == "tree":
             rf = RandomForestClassifier(n_estimators=100, random_state=self.random_state)
         else:
-            raise ValueError(f"Model type {self.model_type} not supported")
+            msg = f"Model type {self.model_type} not supported"
+            raise ValueError(msg)
         rf.fit(X, y)
         best_score = -np.inf
         for tree in rf.estimators_:
@@ -123,7 +125,7 @@ class DecisionTreeRegressor(OptimalTreeBase, ReprObj):
         self,
         learning_task: Literal["regression"],
         model_type: Literal["shallow_tree", "tree"] = "shallow_tree",
-        random_state: Optional[RandomState] = None,
+        random_state: RandomState | None = None,
     ):
         self.model_type = model_type
         self.random_state = random_state
@@ -140,7 +142,8 @@ class DecisionTreeRegressor(OptimalTreeBase, ReprObj):
         elif self.model_type == "tree":
             rf = RandomForestRegressor(n_estimators=100, random_state=self.random_state)
         else:
-            raise ValueError(f"Model type {self.model_type} not supported")
+            msg = f"Model type {self.model_type} not supported"
+            raise ValueError(msg)
         rf.fit(X, y)
         best_score = np.inf
         for tree in rf.estimators_:

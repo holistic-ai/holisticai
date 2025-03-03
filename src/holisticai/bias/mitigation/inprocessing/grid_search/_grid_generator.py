@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -18,7 +17,7 @@ class GridGenerator:
         self,
         grid_size: int = 5,
         grid_limit: float = 2.0,
-        neg_allowed: Optional[np.ndarray] = None,
+        neg_allowed: np.ndarray | None = None,
         force_L1_norm: bool = True,
     ):
         """
@@ -73,8 +72,7 @@ class GridGenerator:
         neg_coefs = -pos_coefs.copy()
         pos_coefs[pos_coefs < 0] = 0.0
         neg_coefs[neg_coefs < 0] = 0.0
-        lambda_vector = {"+": pos_coefs, "-": neg_coefs}
-        return lambda_vector
+        return {"+": pos_coefs, "-": neg_coefs}
 
     def _build_grid(self, n_units):
         """
@@ -93,8 +91,7 @@ class GridGenerator:
                 f"Warning: The desired grid size was not reached. {len(self.accumulator)} points were generated."
             )
 
-        xs = np.array(self.accumulator) * self.grid_limit / n_units
-        return xs
+        return np.array(self.accumulator) * self.grid_limit / n_units
 
     def _accumulate_integer_grid(self, index, max_val):
         """

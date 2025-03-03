@@ -109,12 +109,10 @@ def generate_html_for_generic_object(obj, feature_columns=5, theme="blue"):
         nested_objects_html += generate_html_for_generic_object(nested_obj, feature_columns, theme)
 
     header = f"[{obj_type}]" if name in ("N/A", "") else f"{name} [{obj_type}]"
-    html_output = html_template.format(
+    return html_template.format(
         header=header,
         attributes=attributes_html,
         nested_objects=nested_objects_html,
         css_template=css_template,
         theme=theme,
     )
-
-    return html_output

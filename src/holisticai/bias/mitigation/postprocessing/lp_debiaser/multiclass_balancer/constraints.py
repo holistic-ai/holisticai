@@ -7,8 +7,7 @@ import numpy as np
 class MacroLosses:
     def __call__(self, cp_mats):
         off_loss = [[np.delete(a, i, 0).sum(0) for i in range(self.n_classes)] for a in cp_mats]
-        obj = np.array(off_loss).flatten()
-        return obj
+        return np.array(off_loss).flatten()
 
 
 class MicroLosses:
@@ -16,8 +15,7 @@ class MicroLosses:
         u = np.array([[np.delete(a, i, 0) for i in range(self.n_classes)] for a in cp_mats])
         p = np.array([[np.delete(a, i).reshape(-1, 1) for i in range(self.n_classes)] for a in self.p_vecs])
         w = np.array([[p[i, j] * u[i, j] for j in range(self.n_classes)] for i in range(self.n_groups)])
-        obj = w.sum(2).flatten()
-        return obj
+        return w.sum(2).flatten()
 
 
 class ConstraintBase:

@@ -30,8 +30,7 @@ class StatisticalRate:
     def _gradient(self, a, b, t, c, l):
         _t = t * c / np.sqrt(t**2 + self.mu**2)
         exp = np.mean(_t)
-        dl = exp - b + (b - a) / 2 + (b - a) * l / (2 * np.sqrt(l**2 + self.mu**2))
-        return dl
+        return exp - b + (b - a) / 2 + (b - a) * l / (2 * np.sqrt(l**2 + self.mu**2))
 
     def expected_gradient(self, P, params, a, b):
         l_1, l_2 = params

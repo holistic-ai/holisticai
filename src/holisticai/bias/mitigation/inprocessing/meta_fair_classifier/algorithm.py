@@ -169,5 +169,4 @@ class MetaFairClassifierAlgorithm:
             probability output per sample.
         """
         t = self.predictor(X)
-        scores = ((t + 1) / 2).reshape((-1, 1))
-        return scores
+        return ((t + 1) / 2).reshape((-1, 1))

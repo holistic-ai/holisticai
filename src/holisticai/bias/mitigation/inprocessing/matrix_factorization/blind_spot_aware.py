@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
@@ -54,11 +53,11 @@ class BlindSpotAwareMF(BMImp, RecommenderSystemBase):
     def __init__(
         self,
         K: int = 10,
-        beta: Optional[float] = 0.002,
-        steps: Optional[int] = 200,
-        alpha: Optional[float] = 0.002,
-        lamda: Optional[float] = 0.2,
-        verbose: Optional[int] = 0,
+        beta: float | None = 0.002,
+        steps: int | None = 200,
+        alpha: float | None = 0.002,
+        lamda: float | None = 0.2,
+        verbose: int | None = 0,
     ):
         self.beta = beta
         self.steps = steps

@@ -27,5 +27,4 @@ class ErrorRate(BaseMoment):
         if isinstance(pred, np.ndarray):
             pred = np.squeeze(pred)
 
-        error = pd.Series(data=(self.tags[_LABEL] - pred).abs().mean(), index=self.index)
-        return error
+        return pd.Series(data=(self.tags[_LABEL] - pred).abs().mean(), index=self.index)

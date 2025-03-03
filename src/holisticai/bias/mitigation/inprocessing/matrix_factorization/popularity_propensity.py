@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import numpy as np
 from holisticai.bias.mitigation.inprocessing.matrix_factorization.common_utils.propensity_utils import (
@@ -48,17 +47,17 @@ class PopularityPropensityMF(BMImp, RecommenderSystemBase):
 
     def __init__(
         self,
-        K: Optional[int] = 10,
-        beta: Optional[float] = 0.02,
-        steps: Optional[int] = 100,
-        verbose: Optional[int] = 0,
+        K: int | None = 10,
+        beta: float | None = 0.02,
+        steps: int | None = 100,
+        verbose: int | None = 0,
     ):
         self.K = K
         self.beta = beta
         self.steps = steps
         self.verbose = verbose
 
-    def fit(self, X: Optional[np.ndarray], **kargs):
+    def fit(self, X: np.ndarray | None, **kargs):
         """
         Fit model
 

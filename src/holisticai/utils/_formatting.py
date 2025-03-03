@@ -1,6 +1,5 @@
 # Base Imports
 import numpy as np
-
 from holisticai.utils._validation import _array_like_to_numpy
 
 

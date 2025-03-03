@@ -283,5 +283,4 @@ def privacy_risk_score(shadow_train, shadow_test, target_train):
     tr_distrs, te_distrs, all_bins = distrs_compute(
         shadow_train_m_entr, shadow_test_m_entr, shadow_train_labels, shadow_test_labels, num_bins=5, log_bins=True
     )
-    risk_score = _risk_score_compute(tr_distrs, te_distrs, all_bins, target_train_m_entr, target_train_labels)
-    return risk_score
+    return _risk_score_compute(tr_distrs, te_distrs, all_bins, target_train_m_entr, target_train_labels)

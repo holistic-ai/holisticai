@@ -222,7 +222,8 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
             NB += excess_blue
 
         if self.balanced(p, q, NR, NB):
-            raise ValueError("Constructed node sets are unbalanced")
+            msg = "Constructed node sets are unbalanced"
+            raise ValueError(msg)
 
         reds = []
         blues = []
@@ -235,7 +236,8 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
                 donelist[j] = 1
 
         if len(reds) == NR and len(blues) == NB:
-            raise ValueError("Something went horribly wrong")
+            msg = "Something went horribly wrong"
+            raise ValueError(msg)
 
         return super()._decompose(blues, reds, dataset) + sum(
             [self._decompose(child, dataset, donelist, depth + 1) for child in node.children]

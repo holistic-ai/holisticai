@@ -130,4 +130,14 @@ foo = ["which python"]
 env-vars = { PYTHONPATH = "src" }
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/holisticai"]
+packages = [
+  "src/holisticai/bias",
+  "src/holisticai/explainability",
+  "src/holisticai/robustness",
+  "src/holisticai/efficacy",
+  "src/holisticai/inspection",
+  "src/holisticai/pipeline",
+  "src/holisticai/security",
+  "src/holisticai/typing",
+  "src/holisticai/utils"
+]
