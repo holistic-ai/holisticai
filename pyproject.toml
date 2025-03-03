@@ -69,7 +69,6 @@ env-vars = { PYTHONHTTPSVERIFY = "0", PYTHONPATH = "src" }
 check = ["ruff format .", "ruff check . --fix"]
 
 [tool.ruff]
-extend = "ruff_default.toml"
 exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/utils/trade_off_analysers/**"]
 
 [tool.hatch.envs.sphinx]
