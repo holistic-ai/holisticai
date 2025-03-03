@@ -141,3 +141,9 @@ packages = [
   "src/holisticai/typing",
   "src/holisticai/utils"
 ]
+
+[tool.hatch.indexes]
+testpypi = "https://test.pypi.org/legacy/"
+
+[tool.hatch.publish]
+default = "testpypi"
