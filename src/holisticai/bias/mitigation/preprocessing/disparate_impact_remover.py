@@ -50,7 +50,8 @@ class DisparateImpactRemover(BMPre):
             If repair_level is not between 0.0 and 1.0
         """
         if not 0.0 <= repair_level <= 1.0:
-            raise ValueError("'repair_level' must be between 0.0 and 1.0.")
+            msg = "'repair_level' must be between 0.0 and 1.0."
+            raise ValueError(msg)
 
     def repair_data(self, X, group_a, group_b):
         """

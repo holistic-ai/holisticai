@@ -55,18 +55,22 @@ def prepare_to_plot(
 
     # Check if X is a DataFrame and y is a NumPy array
     if not isinstance(X, pd.DataFrame):
-        raise TypeError("X must be a pandas DataFrame.")
+        msg = "X must be a pandas DataFrame."
+        raise TypeError(msg)
     if not isinstance(y, np.ndarray):
-        raise TypeError("y must be a NumPy array.")
+        msg = "y must be a NumPy array."
+        raise TypeError(msg)
 
     # Check if all the features are present in X
     missing_features = [feature for feature in features_to_plot if feature not in X.columns]
     if missing_features:
-        raise KeyError(f"The following features are missing from X: {', '.join(missing_features)}")
+        msg = f"The following features are missing from X: {', '.join(missing_features)}"
+        raise KeyError(msg)
 
     # Check if the length of X and y match
     if len(X) != len(y):
-        raise ValueError("The length of X and y must match.")
+        msg = "The length of X and y must match."
+        raise ValueError(msg)
 
     # Select only the columns for the chosen features to plot
     X_selected = X[features_to_plot]

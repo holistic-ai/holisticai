@@ -8,8 +8,7 @@ from numpy.linalg import inv
 def calculate_popularity_model(ratings):
     propensity_score = [float(np.count_nonzero(ratings[:, i])) / ratings.shape[0] for i in range(ratings.shape[1])]
     temp = np.array(propensity_score)
-    temp = temp.reshape((1, len(temp)))
-    return temp
+    return temp.reshape((1, len(temp)))
 
 
 def erros(P_s, Q_s, R_s, W_s, lamda, beta):

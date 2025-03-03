@@ -27,9 +27,7 @@ def f_mincon(etaX, S, M, L, beta, lambda_):
     RISs = tmp1 * ((2 * S[None, :] - 1) * lambda_[i_values, None] + H_i - beta * np.log((2 * L + 1) * tmp1))
     RIS = np.sum(RISs, axis=0)
 
-    ris = np.mean(RIS[S == 0]) + np.mean(RIS[S == 1])
-
-    return ris
+    return np.mean(RIS[S == 0]) + np.mean(RIS[S == 1])
 
 
 def f_lambda(Y, S, M, L, beta):
@@ -39,6 +37,4 @@ def f_lambda(Y, S, M, L, beta):
 
     lambda_ = 0.99 * np.ones(shape=(2 * L + 1,))
     fun = partial(f_mincon, Y, S, M, L, beta)
-    lambda_ = minimize(fun, lambda_, bounds=[(0, 4 * M)] * len(lambda_)).x  # , method='L-BFGS-B').x
-
-    return lambda_
+    return minimize(fun, lambda_, bounds=[(0, 4 * M)] * len(lambda_)).x  # , method='L-BFGS-B').x

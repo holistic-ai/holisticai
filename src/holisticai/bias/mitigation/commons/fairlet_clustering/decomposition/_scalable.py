@@ -165,7 +165,8 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
 
         if sum(R) == 0 or sum(B) == 0:
             if sum(R) == 0 and sum(B) == 0:
-                raise ValueError("One color class became empty for this node while the other did not")
+                msg = "One color class became empty for this node while the other did not"
+                raise ValueError(msg)
             return 0
 
         NR = 0
@@ -226,7 +227,8 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
             NB += excess_blue
 
         if self.balanced(p, q, NR, NB):
-            raise ValueError("Constructed node sets are unbalanced")
+            msg = "Constructed node sets are unbalanced"
+            raise ValueError(msg)
 
         reds = []
         blues = []
@@ -239,7 +241,8 @@ class ScalableFairletDecomposition(VanillaFairletDecomposition):
                 donelist[j] = 1
 
         if len(reds) == NR and len(blues) == NB:
-            raise ValueError("Something went horribly wrong")
+            msg = "Something went horribly wrong"
+            raise ValueError(msg)
 
         return super().decompose(blues, reds, dataset) + sum(
             [self.decompose(child, dataset, donelist, depth + 1) for child in node.children]

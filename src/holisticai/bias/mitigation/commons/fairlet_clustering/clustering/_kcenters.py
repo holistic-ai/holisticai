@@ -84,7 +84,7 @@ class KCenters:
         list
             The mapping of points to their closest centers.
         """
-        mapping = [
+        return [
             (
                 i,
                 sorted(
@@ -95,5 +95,3 @@ class KCenters:
             )
             for i in range(len(self.data))
         ]
-
-        return mapping

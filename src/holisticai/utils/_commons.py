@@ -30,7 +30,8 @@ def get_item(obj, key):
         return obj.loc[key]
     if isinstance(obj, np.ndarray):
         return obj[key]
-    raise ValueError(f"Type {type(obj)} not supported")
+    msg = f"Type {type(obj)} not supported"
+    raise ValueError(msg)
 
 
 def get_columns(obj):
@@ -38,4 +39,5 @@ def get_columns(obj):
         return obj.columns
     if isinstance(obj, np.ndarray):
         return [f"feature_{i}" for i in range(obj.shape[1])]
-    raise ValueError(f"Type {type(obj)} not supported")
+    msg = f"Type {type(obj)} not supported"
+    raise ValueError(msg)

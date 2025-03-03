@@ -74,9 +74,11 @@ class DebiasingExposure:
 
         # check if mandatory parameters are present
         if group_col is None:
-            raise ValueError("The name of column in data `group_col` must be initialized")
+            msg = "The name of column in data `group_col` must be initialized"
+            raise ValueError(msg)
         if gamma is None:
-            raise ValueError("The `gamma` parameter must be initialized")
+            msg = "The `gamma` parameter must be initialized"
+            raise ValueError(msg)
 
         # initialize the protected_feature index to -1
 
@@ -110,8 +112,7 @@ class DebiasingExposure:
         for _, ranking in rankings.groupby(self.query_col):
             if (ranking[self.group_col].sum() > 0).any():
                 new_rankings.append(ranking)
-        new_rankings = pd.concat(new_rankings, axis=0).reset_index(drop=True)
-        return new_rankings
+        return pd.concat(new_rankings, axis=0).reset_index(drop=True)
 
     def fit(self, rankings: pd.DataFrame):
         """
@@ -164,7 +165,8 @@ class DebiasingExposure:
         """
 
         if self._omega is None:
-            raise SystemError("You need to train a model first!")
+            msg = "You need to train a model first!"
+            raise SystemError(msg)
 
         # prepare data
         query_ids, doc_ids, protected_attributes, feature_matrix = self._prepare_data(rankings, has_judgment=False)
@@ -187,9 +189,7 @@ class DebiasingExposure:
         )
 
         # sort by the score in descending order
-        result = result.sort_values([self.score_col], ascending=[0])
-
-        return result
+        return result.sort_values([self.score_col], ascending=[0])
 
     def _prepare_data(self, data, has_judgment=False):
         """

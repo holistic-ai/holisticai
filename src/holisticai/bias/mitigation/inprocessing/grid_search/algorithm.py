@@ -101,7 +101,8 @@ class GridSearchAlgorithm:
             )
         )
         if not results:
-            raise ValueError("No results were generated. This is likely due to an issue with the grid.")
+            msg = "No results were generated. This is likely due to an issue with the grid."
+            raise ValueError(msg)
 
         def loss_fct(result):
             return (1 - self.constraint_weight) * result["objective"] + self.constraint_weight * result["gamma"].max()
@@ -164,8 +165,7 @@ class GridSearchAlgorithm:
 
         # Generar la grid de coeficientes
         grid = generator.generate_grid(self.constraint)
-        grid = grid.loc[:, ~(grid == 0).all(axis=0)]
-        return grid
+        return grid.loc[:, ~(grid == 0).all(axis=0)]
 
     def _fit_estimator(self, X: Any, lambda_vec: Any):
         weights = self._compute_weights(lambda_vec)

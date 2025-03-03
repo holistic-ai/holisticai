@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Union
-
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -86,7 +84,8 @@ def get_learning_task(y_true: pd.Series):
         return "classification"
     if y_true.dtype.kind in ["f"]:
         return "regression"
-    raise ValueError(f"Unknown learning task. dtype: {y_true.dtype.kind}")
+    msg = f"Unknown learning task. dtype: {y_true.dtype.kind}"
+    raise ValueError(msg)
 
 
 def data_minimization_score(
@@ -94,7 +93,7 @@ def data_minimization_score(
     y_pred: pd.Series,
     y_pred_dm: dict[str, pd.Series],
     return_results=False,
-    learning_task: Union[str, None] = None,
+    learning_task: str | None = None,
 ):
     """
     Calculate the accuracy ratio for data minimization. The accuracy ratio is the ratio of the accuracy of the data minimization model to the accuracy of the original model.

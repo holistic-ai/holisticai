@@ -121,8 +121,7 @@ class LinRegGDPoisoner(GDPoisoner):
             The covariance matrix.
         """
         sigma = np.dot(np.transpose(self.trnx), self.trnx)
-        sigma = sigma / self.trnx.shape[0]
-        return sigma
+        return sigma / self.trnx.shape[0]
 
     def _compute_mu(self):
         """
@@ -133,8 +132,7 @@ class LinRegGDPoisoner(GDPoisoner):
         array-like, shape (n_features,)
             The mean of the input samples.
         """
-        mu = np.mean(np.matrix(self.trnx), axis=0)
-        return mu
+        return np.mean(np.matrix(self.trnx), axis=0)
 
     def _compute_m(self, clf, poisxelem, poisyelem):
         """
@@ -159,8 +157,7 @@ class LinRegGDPoisoner(GDPoisoner):
         wtransp = np.reshape(w, (1, self.feanum))
         errterm = (np.dot(w, poisxelemtransp) + b - poisyelem).reshape((1, 1))
         first = np.dot(poisxelemtransp, wtransp)
-        m = first + errterm[0, 0] * np.identity(self.feanum)
-        return m
+        return first + errterm[0, 0] * np.identity(self.feanum)
 
     def _compute_wb_zc(self, eq7lhs, mu, w, m, n, poisxelem):  # noqa: ARG002
         """
@@ -220,8 +217,7 @@ class LinRegGDPoisoner(GDPoisoner):
         array-like, shape (1, n_features)
             The regularization term.
         """
-        r = np.zeros((1, self.feanum))
-        return r
+        return np.zeros((1, self.feanum))
 
     def _comp_obj_trn(self, clf, lam, otherargs):  # noqa: ARG002
         """
@@ -242,9 +238,7 @@ class LinRegGDPoisoner(GDPoisoner):
             The objective value.
         """
         errs = clf.predict(np.asarray(self.trnx)) - self.trny
-        mse = np.linalg.norm(errs) ** 2 / self.samplenum
-
-        return mse
+        return np.linalg.norm(errs) ** 2 / self.samplenum
 
     def _comp_attack_trn(self, clf, wxc, bxc, wyc, byc, otherargs):  # noqa: ARG002
         """
@@ -458,8 +452,7 @@ class RidgeGDPoisoner(GDPoisoner):
         """
         basesigma = np.dot(np.transpose(self.trnx), self.trnx)
         basesigma = basesigma / self.trnx.shape[0]
-        sigma = basesigma + self.initlam * np.eye(self.feanum)
-        return sigma
+        return basesigma + self.initlam * np.eye(self.feanum)
 
     def learn_model(self, x, y, clf, lam=None):
         """
@@ -495,8 +488,7 @@ class RidgeGDPoisoner(GDPoisoner):
         array-like, shape (n_features,)
             The mean of the input samples.
         """
-        mu = np.mean(np.matrix(self.trnx), axis=0)
-        return mu
+        return np.mean(np.matrix(self.trnx), axis=0)
 
     def _compute_m(self, clf, poisxelem, poisyelem):
         """
@@ -521,8 +513,7 @@ class RidgeGDPoisoner(GDPoisoner):
         wtransp = np.reshape(w, (1, self.feanum))
         errterm = (np.dot(w, poisxelemtransp) + b - poisyelem).reshape((1, 1))
         first = np.dot(poisxelemtransp, wtransp)
-        m = first + errterm[0, 0] * np.identity(self.feanum)
-        return m
+        return first + errterm[0, 0] * np.identity(self.feanum)
 
     def _compute_wb_zc(self, eq7lhs, mu, w, m, n, poisxelem):  # noqa: ARG002
         """

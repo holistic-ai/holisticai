@@ -9,7 +9,8 @@ except ImportError:
 class KNeighborsClassifier:
     def __init__(self):
         if jnp is None or vmap is None:
-            raise ImportError("jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`.")
+            msg = "jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`."
+            raise ImportError(msg)
 
     def fit(self, X_train, y_train):
         self.X_train = jnp.array(X_train)
@@ -57,5 +58,4 @@ class KNeighborsClassifier:
 
     def predict(self, X):
         # Vectorize prediction for all input points
-        predictions = vmap(self._predict_single)(jnp.array(X))
-        return predictions
+        return vmap(self._predict_single)(jnp.array(X))

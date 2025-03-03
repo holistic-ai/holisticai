@@ -58,17 +58,11 @@ tests = ["tests", "*/holisticai/tests"]
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
 
-[tool.hatch.envs.fmt]
+[tool.hatch.envs.hatch-static-analysis]
 config-path = "ruff_default.toml"
-dependencies = [
-  "ruff==0.4.5"
-]
-env-vars = { PYTHONHTTPSVERIFY = "0", PYTHONPATH = "src" }
-
-[tool.hatch.envs.fmt.scripts]
-check = ["ruff format .", "ruff check . --fix"]
 
 [tool.ruff]
+extend = "ruff_default.toml"
 exclude = ["docs/**", "tests/**", "tutorials/**", "src/holisticai/utils/trade_off_analysers/**"]
 
 [tool.hatch.envs.sphinx]
@@ -136,4 +130,14 @@ foo = ["which python"]
 env-vars = { PYTHONPATH = "src" }
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/holisticai"]
+packages = [
+  "src/holisticai/bias",
+  "src/holisticai/explainability",
+  "src/holisticai/robustness",
+  "src/holisticai/efficacy",
+  "src/holisticai/inspection",
+  "src/holisticai/pipeline",
+  "src/holisticai/security",
+  "src/holisticai/typing",
+  "src/holisticai/utils"
+]

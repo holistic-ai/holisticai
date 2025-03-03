@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 from holisticai.bias.mitigation.postprocessing.lp_debiaser.binary_balancer.algorithm import BinaryBalancerAlgorithm
@@ -35,7 +35,7 @@ class LPDebiaserBinary(BMPost):
 
     def __init__(
         self,
-        constraint: Optional[CONSTRAINT] = "EqualizedOdds",
+        constraint: CONSTRAINT | None = "EqualizedOdds",
     ):
         self.constraint = constraint
         self._sensgroups = SensitiveGroups()
@@ -45,8 +45,8 @@ class LPDebiaserBinary(BMPost):
         y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        y_pred: Optional[np.ndarray] = None,
-        y_proba: Optional[np.ndarray] = None,
+        y_pred: np.ndarray | None = None,
+        y_proba: np.ndarray | None = None,
     ):
         """
         Compute parameters for Linear Programming Debiaser.\
@@ -105,8 +105,8 @@ class LPDebiaserBinary(BMPost):
         self,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        y_pred: Optional[np.ndarray] = None,
-        y_proba: Optional[np.ndarray] = None,
+        y_pred: np.ndarray | None = None,
+        y_proba: np.ndarray | None = None,
     ):
         """
         Apply transform function to predictions and likelihoods
@@ -148,8 +148,8 @@ class LPDebiaserBinary(BMPost):
         y: np.ndarray,
         group_a: np.ndarray,
         group_b: np.ndarray,
-        y_pred: Optional[np.ndarray] = None,
-        y_proba: Optional[np.ndarray] = None,
+        y_pred: np.ndarray | None = None,
+        y_proba: np.ndarray | None = None,
     ):
         """
         Fit and transform

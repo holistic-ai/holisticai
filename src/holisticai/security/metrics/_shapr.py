@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
-import pandas as pd
 from holisticai.typing import ArrayLike
 from holisticai.utils.models.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder
@@ -17,6 +16,7 @@ except ImportError:
 
 
 if TYPE_CHECKING:
+    import pandas as pd
     from numpy.typing import ArrayLike
 
 
@@ -62,7 +62,8 @@ def check_and_transform_label_format(labels: np.ndarray):
     :return: Labels with shape `(nb_samples, nb_classes)` (one-hot) or `(nb_samples,)` (index).
     """
     if one_hot is None or jnp is None:
-        raise ImportError("jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`.")
+        msg = "jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`."
+        raise ImportError(msg)
 
     labels = jnp.array(labels)
     return_one_hot = True
@@ -110,9 +111,10 @@ class ShaprScore:
         batch_size=500,
         train_size=1.0,
         aggregated=True,
-    ) -> Union[np.ndarray, float]:
+    ) -> np.ndarray | float:
         if one_hot is None or jnp is None:
-            raise ImportError("jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`.")
+            msg = "jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`."
+            raise ImportError(msg)
 
         y_train, le = transform_label_to_numerical_label(y_train)
         y_test = transform_label_to_numerical_label(y_test, le)

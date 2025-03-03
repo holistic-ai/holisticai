@@ -6,8 +6,7 @@ from jax import jit
 @jit
 def _fit(X, sensitive_features, sensitive_mean):
     sensitive_features_center = sensitive_features - sensitive_mean
-    beta = jnp.linalg.lstsq(sensitive_features_center, X, rcond=None)[0]
-    return beta
+    return jnp.linalg.lstsq(sensitive_features_center, X, rcond=None)[0]
 
 
 @jit
@@ -97,8 +96,7 @@ class CorrelationRemover(BMPre):
         group_b = params["group_b"]
 
         sensitive_features = jnp.stack([group_a, group_b], axis=1).astype(jnp.int32)
-        x_filtered = _transform(x, sensitive_features, self.beta_, self.alpha, self.sensitive_mean_)
-        return x_filtered
+        return _transform(x, sensitive_features, self.beta_, self.alpha, self.sensitive_mean_)
 
     def fit_transform(self, X: jnp.ndarray, group_a: jnp.ndarray, group_b: jnp.ndarray):
         """

@@ -27,8 +27,7 @@ def smape(y_true, y_pred):
     numerator = np.abs(y_true - y_pred)
     # Avoid division by zero by adding a small constant (epsilon) to the denominator
     epsilon = 1e-10
-    smape_value = np.mean(numerator / (denominator + epsilon))
-    return smape_value
+    return np.mean(numerator / (denominator + epsilon))
 
 
 def surrogate_fidelity(y_pred, y_surrogate):

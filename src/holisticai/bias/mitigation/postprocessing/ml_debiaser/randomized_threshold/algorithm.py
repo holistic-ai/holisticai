@@ -97,7 +97,8 @@ class RandomizedThresholdAlgorithm:
                 self.rho = self.avrg_y_score / 2.0 + 0.5
 
         if self.rho <= 0:
-            raise ValueError("rho must be either None or a strictly positive number.")
+            msg = "rho must be either None or a strictly positive number."
+            raise ValueError(msg)
 
         num_groups = len(set(groups_num))
         eps0 = self.eps / 2.0

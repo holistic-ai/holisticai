@@ -71,7 +71,8 @@ def _validate_and_extract_data(data):
     # Check if data is a pandas DataFrame
     if isinstance(data, pd.DataFrame):
         if data.shape[1] != 2:
-            raise ValueError("Data should have exactly two columns.")
+            msg = "Data should have exactly two columns."
+            raise ValueError(msg)
         data_vals = data.values  # Convert DataFrame to NumPy array
     # Check if data is a pandas Series
     elif isinstance(data, pd.Series):
@@ -82,7 +83,8 @@ def _validate_and_extract_data(data):
 
     # Raise error if the data is not a DataFrame or NumPy array
     else:
-        raise TypeError("Data must be either a pandas DataFrame or a NumPy array.")
+        msg = "Data must be either a pandas DataFrame or a NumPy array."
+        raise TypeError(msg)
 
     return data_vals
 
@@ -212,7 +214,8 @@ def plot_2d(X, y, highlight_group=None, show_just_group=None, features_to_plot=N
         # If highlight_group is provided, outline the selected points
         if highlight_group is not None:
             if not isinstance(highlight_group, (np.ndarray, list)):
-                raise TypeError("highlight_group must be either a list or a NumPy array.")
+                msg = "highlight_group must be either a list or a NumPy array."
+                raise TypeError(msg)
 
             plt.scatter(
                 X_vals[highlight_group, 0],
@@ -485,7 +488,8 @@ def plot_neighborhood(
 
     for sample_index in points_of_interest:
         if sample_index not in indices_show:
-            raise ValueError(f"The point {sample_index} is not a point in 'indices_show'.")
+            msg = f"The point {sample_index} is not a point in 'indices_show'."
+            raise ValueError(msg)
 
         # Find the position of sample_index in indices_show
         position = np.where(indices_show == sample_index)[0]

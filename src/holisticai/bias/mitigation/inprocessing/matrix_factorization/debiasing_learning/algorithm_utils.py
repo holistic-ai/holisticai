@@ -16,7 +16,7 @@ def process_propensities(observed_ratings, inverse_propensities):
     else:
         inversePropensities = np.array(inverse_propensities, dtype=np.longdouble, copy=True)
 
-    inversePropensities = np.ma.array(
+    return np.ma.array(
         inversePropensities,
         dtype=np.longdouble,
         copy=False,
@@ -24,14 +24,12 @@ def process_propensities(observed_ratings, inverse_propensities):
         fill_value=0,
         hard_mask=True,
     )
-    return inversePropensities
 
 
 def predict_scores(user_vectors, item_vectors, user_biases, item_biases, global_bias, use_bias=True):
     rawScores = np.dot(user_vectors, item_vectors.T)
     if use_bias:
-        biasedScores = rawScores + user_biases[:, None] + item_biases[None, :] + global_bias
-        return biasedScores
+        return rawScores + user_biases[:, None] + item_biases[None, :] + global_bias
     return rawScores
 
 

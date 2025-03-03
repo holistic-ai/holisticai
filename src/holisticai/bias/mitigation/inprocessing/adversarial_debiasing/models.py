@@ -71,8 +71,7 @@ def train_step(cls_state, adv_state, batch, use_debias, adversary_loss_weight: f
         _, y_logits = cls_state.apply_fn({"params": classifier_params}, x, trainable=True, rngs=rngs)
         _, z_logits = adv_state.apply_fn({"params": adversarial_params}, y_logits, y, trainable=True, rngs=rngs)
 
-        loss_adv = optax.sigmoid_binary_cross_entropy(z_logits, group).mean()
-        return loss_adv
+        return optax.sigmoid_binary_cross_entropy(z_logits, group).mean()
 
     (loss, (loss_cls, loss_adv)), grads = jax.value_and_grad(loss_fn, argnums=(0), has_aux=True)(
         cls_state.params, adv_state.params, batch, rng

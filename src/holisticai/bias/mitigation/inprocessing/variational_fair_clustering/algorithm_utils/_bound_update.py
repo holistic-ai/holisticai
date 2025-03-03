@@ -6,20 +6,16 @@ def normalize(S_in):
     S_in = S_in - maxcol
     S_out = np.exp(S_in)
     S_out_sum = np.sum(S_out, axis=1, keepdims=True)
-    S_out = S_out / S_out_sum
-
-    return S_out
+    return S_out / S_out_sum
 
 
 def normalize_2(S_in):
     S_in_sum = np.sum(S_in, axis=1, keepdims=True)
-    S_in = S_in / S_in_sum
-    return S_in
+    return S_in / S_in_sum
 
 
 def bound_energy(S, S_in, a_term, b_term):
-    E = np.nansum(S * np.log(np.maximum(S, 1e-15)) - S * np.log(np.maximum(S_in, 1e-15)) + a_term * S + b_term * S)
-    return E
+    return np.nansum(S * np.log(np.maximum(S, 1e-15)) - S * np.log(np.maximum(S_in, 1e-15)) + a_term * S + b_term * S)
 
 
 def get_S_discrete(L, N, K):  # noqa: N802

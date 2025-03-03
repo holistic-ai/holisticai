@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 import pandas as pd
 from holisticai.bias.mitigation.inprocessing.two_sided_fairness.algorithm import FairRecAlg
@@ -33,7 +31,7 @@ class FairRec(BMImp):
         recommendations in two-sided platforms." Proceedings of The Web Conference 2020. 2020.
     """
 
-    def __init__(self, rec_size: Optional[int] = 10, MMS_fraction: Optional[float] = 0.5):
+    def __init__(self, rec_size: int | None = 10, MMS_fraction: float | None = 0.5):
         self.rec_size = rec_size
         self.MMS_fraction = MMS_fraction
 
@@ -54,7 +52,7 @@ class FairRec(BMImp):
         self.recommendation = algorithm.rank(X)
         return self
 
-    def predict(self, X: Optional[np.ndarray], top_n: Optional[int] = None):
+    def predict(self, X: np.ndarray | None, top_n: int | None = None):
         """
         Fit model
 

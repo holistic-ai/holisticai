@@ -30,13 +30,11 @@ class KMediamClusteringAlgorithm:
         for gid in self.group_ids:
             group_cost = np.mean(np.amin(self.distances[np.ix_(self.p_attr == gid, centers)], axis=1))
             group_costs.append(group_cost)
-        cost = np.max(group_costs)
-        return cost
+        return np.max(group_costs)
 
     def _compute_new_assigment(self, centers):
         centers = np.array(centers, dtype=np.int32)
-        assignment = centers[np.argmin(self.distances[np.ix_(np.arange(self.n), centers)], axis=1)]
-        return assignment
+        return centers[np.argmin(self.distances[np.ix_(np.arange(self.n), centers)], axis=1)]
 
     def fit(self, X, p_attr):
         self.n = len(X)

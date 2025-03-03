@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -48,7 +48,7 @@ class FairScoreClassifier(BaseEstimator, BMImp):
     def __init__(
         self,
         objectives: Literal["a", "ab"],
-        constraints: Optional[dict] = None,
+        constraints: dict | None = None,
         lambda_bound: int = 9,
         time_limit: int = 100,
         verbose: int = 0,

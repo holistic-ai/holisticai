@@ -154,7 +154,8 @@ def statistical_parity_curve(group_a, group_b, y_pred, x_axis="score", ax=None, 
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : quantile, score")
+        msg = "x_axis is not one of : quantile, score"
+        raise ValueError(msg)
 
     return ax
 
@@ -239,7 +240,8 @@ def disparate_impact_curve(group_a, group_b, y_pred, x_axis="score", ax=None, si
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : score, quantile")
+        msg = "x_axis is not one of : score, quantile"
+        raise ValueError(msg)
 
     return ax
 
@@ -335,7 +337,8 @@ def success_rate_curves(p_attr, y_pred, groups=None, x_axis="score", ax=None, si
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : score, quantile")
+        msg = "x_axis is not one of : score, quantile"
+        raise ValueError(msg)
 
     return ax
 

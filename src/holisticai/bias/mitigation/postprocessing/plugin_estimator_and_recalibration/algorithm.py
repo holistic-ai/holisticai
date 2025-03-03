@@ -92,5 +92,4 @@ class PluginEstimationAndCalibrationAlgorithm:
         )
         min_indices = np.argmin(minimizing_values, axis=1)
         output_predictions = index_range[min_indices] * self.multiplier / self.length
-        output_predictions = (output_predictions + 1) / 2
-        return output_predictions
+        return (output_predictions + 1) / 2

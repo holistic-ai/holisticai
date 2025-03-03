@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-import pandas as pd
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def quantil_classify(q1, q2, q3, labels, x):
@@ -33,4 +37,5 @@ def group_mask_samples_by_learning_task(
         v = np.array(y.quantile(labels_values)).squeeze()
         return y.map(lambda x: quantil_classify(v[1], v[2], v[3], labels, x))
 
-    raise ValueError(f"Learning task {learning_task} not supported")
+    msg = f"Learning task {learning_task} not supported"
+    raise ValueError(msg)
