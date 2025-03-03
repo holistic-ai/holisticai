@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2025-02-12
+
+### 🐛 Bug Fixes
+
+- Update publish-workflow.yml (#283)
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Workflow Names (#284)
+
 ## [1.0.11] - 2024-12-12
 
 ### ⚙️ Miscellaneous Tasks
