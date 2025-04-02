@@ -44,6 +44,9 @@ def load_hai_datasets(dataset_name, data_home=None):
     - clinical_records
     - acsincome
     - acspublic
+    - acsemployment
+    - acsmobility
+    - acstraveltime
     - compass_two_year_recid
     - compass_is_recid
     - german_credit
