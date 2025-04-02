@@ -785,13 +785,17 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
         If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
         Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
 
+    References
+    ----------
+    [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021). Retiring adult: New datasets for fair machine learning. Advances in neural information processing systems, 34, 6478-6490.
+
     Returns
     -------
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
     data = load_hai_datasets(dataset_name="acsincome")
-    protected_attributes = ["AGEP", "RAC1P", "SEX"]
+    protected_attributes = ["RAC1P", "SEX"]
     output_column = "PINCP"  # Total person's income
     data[output_column] = (data[output_column] > 50000).astype(int)  # map income to binary
 
@@ -815,9 +819,9 @@ def load_acsincome_dataset(preprocessed=True, protected_attribute: Optional[Lite
             group_b = pd.Series(df["SEX"] == 2, name="group_b")
         elif protected_attribute == "race":
             ga_label = "White"
-            gb_label = "Non_White"
-            group_a = pd.Series(df["RAC1P"] == "White", name="group_a")
-            group_b = pd.Series(df["RAC1P"] == "Non-White", name="group_b")
+            gb_label = "Non-White"
+            group_a = pd.Series(df["RAC1P"] == ga_label, name="group_a")
+            group_b = pd.Series(df["RAC1P"] == gb_label, name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
@@ -841,13 +845,17 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
         If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
         Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
 
+    References
+    ----------
+    [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021). Retiring adult: New datasets for fair machine learning. Advances in neural information processing systems, 34, 6478-6490.
+
     Returns
     -------
     tuple
         A tuple with two lists containing the data, output variable, protected group A and protected group B
     """
     data = load_hai_datasets(dataset_name="acspublic")
-    protected_attributes = ["AGEP", "RAC1P", "SEX"]
+    protected_attributes = ["RAC1P", "SEX"]
     output_column = "PUBCOV"  # public health coverage : an individual's label is 1 if PUBCOV == 1 (with public health coverage), otherwise 0.
 
     df = data.copy()
@@ -870,9 +878,9 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
             group_b = pd.Series(df["SEX"] == 2, name="group_b")
         elif protected_attribute == "race":
             ga_label = "White"
-            gb_label = "Non_White"
-            group_a = pd.Series(df["RAC1P"] == "White", name="group_a")
-            group_b = pd.Series(df["RAC1P"] == "Non-White", name="group_b")
+            gb_label = "Non-White"
+            group_a = pd.Series(df["RAC1P"] == ga_label, name="group_a")
+            group_b = pd.Series(df["RAC1P"] == gb_label, name="group_b")
         else:
             raise ValueError(
                 f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
@@ -883,6 +891,211 @@ def load_acspublic_dataset(preprocessed=True, protected_attribute: Optional[Lite
         return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
     return Dataset(X=X, y=y, p_attrs=p_attrs)
 
+def load_mobility_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex", "dis"]] = "sex"):
+    """
+    Processes the ACSMobility dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    References
+    ----------
+    [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021). Retiring adult: New datasets for fair machine learning. Advances in neural information processing systems, 34, 6478-6490.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_hai_datasets(dataset_name="acsmobility")
+    protected_attributes = ["RAC1P", "SEX", "DIS"]
+    output_column = "MIG"  # an individual’s label is 1 if MIG == 1, and 0 otherwise.
+
+    df = data.copy()
+    df["RAC1P"] = df["RAC1P"].astype(float)
+    df["SEX"] = df["SEX"].astype(float)
+    df["DIS"] = df["DIS"].astype(float)
+
+    df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
+    df["DIS"] = ["With disability" if x == 1 else "Without disability" for x in df["DIS"]]
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["SEX"] == 1, name="group_a")
+            group_b = pd.Series(df["SEX"] == 2, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Non-White"
+            group_a = pd.Series(df["RAC1P"] == ga_label, name="group_a")
+            group_b = pd.Series(df["RAC1P"] == gb_label, name="group_b")
+        elif protected_attribute == "dis":
+            ga_label = "With disability"
+            gb_label = "Without disability"
+            group_a = pd.Series(df["DIS"] == ga_label, name="group_a")
+            group_b = pd.Series(df["DIS"] == gb_label, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_employment_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex", "dis"]] = "sex"):
+    """
+    Processes the ACSEmployment dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+
+    References
+    ----------
+    [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021). Retiring adult: New datasets for fair machine learning. Advances in neural information processing systems, 34, 6478-6490.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_hai_datasets(dataset_name="acsemployment")
+    protected_attributes = ["RAC1P", "SEX", "DIS"]
+    output_column = "ESR"  # an individual’s label is 1 if ESR == 1, and 0 otherwise.
+
+    df = data.copy()
+    df["RAC1P"] = df["RAC1P"].astype(float)
+    df["SEX"] = df["SEX"].astype(float)
+    df["DIS"] = df["DIS"].astype(float)
+
+    df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
+    df["DIS"] = ["With disability" if x == 1 else "Without disability" for x in df["DIS"]]
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["SEX"] == 1, name="group_a")
+            group_b = pd.Series(df["SEX"] == 2, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Non-White"
+            group_a = pd.Series(df["RAC1P"] == ga_label, name="group_a")
+            group_b = pd.Series(df["RAC1P"] == gb_label, name="group_b")
+        elif protected_attribute == "dis":
+            ga_label = "With disability"
+            gb_label = "Without disability"
+            group_a = pd.Series(df["DIS"] == ga_label, name="group_a")
+            group_b = pd.Series(df["DIS"] == gb_label, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
+
+
+def load_traveltime_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex", "dis"]] = "sex"):
+    """
+    Processes the ACSTravelTime dataset and returns the data, output variable, protected group A and protected group B as numerical arrays or as dataframe if needed
+
+    Parameters
+    ----------
+    preprocessed : bool
+        Whether to return the preprocessed X and y.
+    protected_attribute : str
+        If this parameter is set, the dataset will be returned with the protected attribute as a binary column group_a and group_b.
+        Otherwise, the dataset will be returned with the protected attribute as a column p_attrs.
+    
+    References
+    ----------
+    [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021). Retiring adult: New datasets for fair machine learning. Advances in neural information processing systems, 34, 6478-6490.
+
+    Returns
+    -------
+    tuple
+        A tuple with two lists containing the data, output variable, protected group A and protected group B
+    """
+    data = load_hai_datasets(dataset_name="acstraveltime")
+    protected_attributes = ["RAC1P", "SEX", "DIS"]
+    output_column = "JWMNP"  # an individual’s label is 1 if JWMNP > 20, and 0 otherwise.
+
+    df = data.copy()
+    df["RAC1P"] = df["RAC1P"].astype(float)
+    df["SEX"] = df["SEX"].astype(float)
+    df["DIS"] = df["DIS"].astype(float)
+
+    df["RAC1P"] = ["White" if x == 1 else "Non-White" for x in df["RAC1P"]]
+    df["DIS"] = ["With disability" if x == 1 else "Without disability" for x in df["DIS"]]
+    remove_columns = [*protected_attributes, output_column]
+    df.reset_index(drop=True, inplace=True)
+    X = df.drop(columns=remove_columns)
+
+    if preprocessed:
+        X = pd.get_dummies(X, columns=X.select_dtypes(include=["category", "object"]).columns, dtype=float)
+
+    p_attrs = df[protected_attributes]
+    y = df[output_column]
+
+    if protected_attribute is not None:
+        if protected_attribute == "sex":
+            ga_label = "Male"
+            gb_label = "Female"
+            group_a = pd.Series(df["SEX"] == 1, name="group_a")
+            group_b = pd.Series(df["SEX"] == 2, name="group_b")
+        elif protected_attribute == "race":
+            ga_label = "White"
+            gb_label = "Non-White"
+            group_a = pd.Series(df["RAC1P"] == ga_label, name="group_a")
+            group_b = pd.Series(df["RAC1P"] == gb_label, name="group_b")
+        elif protected_attribute == "dis":
+            ga_label = "With disability"
+            gb_label = "Without disability"
+            group_a = pd.Series(df["DIS"] == ga_label, name="group_a")
+            group_b = pd.Series(df["DIS"] == gb_label, name="group_b")
+        else:
+            raise ValueError(
+                f"The protected attribute doesn't exist or not implemented. Please use: {protected_attribute}"
+            )
+
+    if protected_attribute is not None:
+        metadata = f"""{protected_attribute}: {{'group_a': '{ga_label}', 'group_b': '{gb_label}'}}"""
+        return Dataset(X=X, y=y, p_attrs=p_attrs, group_a=group_a, group_b=group_b, _metadata=metadata)
+    return Dataset(X=X, y=y, p_attrs=p_attrs)
 
 def load_mw_medium_dataset(preprocessed=True, protected_attribute: Optional[Literal["race", "sex"]] = "race"):
     """
@@ -1013,6 +1226,9 @@ ProcessedDatasets = Literal[
     "diabetes",
     "acsincome",
     "acspublic",
+    "acsemployment",
+    "acsmobility",
+    "acstraveltime",
     "mw_medium",
     "mw_small",
 ]
@@ -1078,6 +1294,12 @@ def load_dataset(
         return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "acspublic":
         return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "acsemployment":
+        return load_employment_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "acsmobility":
+        return load_mobility_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
+    if dataset_name == "acstraveltime":
+        return load_traveltime_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "mw_medium":
         return load_mw_medium_dataset(preprocessed=preprocessed, protected_attribute=protected_attribute)
     if dataset_name == "mw_small":
@@ -1111,6 +1333,7 @@ def _load_dataset_benchmark(
     NotImplementedError:
         If the specified dataset name is not supported.
     """
+    
     if dataset_name == "adult_sex":
         return load_adult_dataset(preprocessed=preprocessed, protected_attribute="sex")
     if dataset_name == "adult_race":
@@ -1133,7 +1356,6 @@ def _load_dataset_benchmark(
 
     if dataset_name == "us_crime_race":
         return load_us_crime_dataset(preprocessed=preprocessed, protected_attribute="race")
-
     if dataset_name == "us_crime_multiclass_race":
         return load_us_crime_multiclass_dataset(preprocessed=preprocessed, protected_attribute="race")
 
@@ -1151,33 +1373,49 @@ def _load_dataset_benchmark(
 
     if dataset_name == "compas_two_year_recid_sex":
         return load_compas_two_year_recid_dataset(preprocessed=preprocessed, protected_attribute="sex")
-
     if dataset_name == "compas_two_year_recid_race":
         return load_compas_two_year_recid_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "compas_is_recid_sex":
         return load_compas_is_recid_dataset(preprocessed=preprocessed, protected_attribute="sex")
-
     if dataset_name == "compas_is_recid_race":
         return load_compas_is_recid_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "diabetes_sex":
         return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="sex")
-
     if dataset_name == "diabetes_race":
         return load_diabetes_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "acsincome_sex":
         return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute="sex")
-
     if dataset_name == "acsincome_race":
         return load_acsincome_dataset(preprocessed=preprocessed, protected_attribute="race")
 
     if dataset_name == "acspublic_sex":
         return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute="sex")
-
     if dataset_name == "acspublic_race":
         return load_acspublic_dataset(preprocessed=preprocessed, protected_attribute="race")
+    
+    if dataset_name == "acsemployment_race":
+        return load_employment_dataset(preprocessed=preprocessed, protected_attribute="race")
+    if dataset_name == "acsemployment_sex":
+        return load_employment_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "acsemployment_dis":
+        return load_employment_dataset(preprocessed=preprocessed, protected_attribute="dis")
+    
+    if dataset_name == "acsmobility_race":
+        return load_mobility_dataset(preprocessed=preprocessed, protected_attribute="race")
+    if dataset_name == "acsmobility_sex":
+        return load_mobility_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "acsmobility_dis":
+        return load_mobility_dataset(preprocessed=preprocessed, protected_attribute="dis")
+    
+    if dataset_name == "acstraveltime_race":
+        return load_traveltime_dataset(preprocessed=preprocessed, protected_attribute="race")
+    if dataset_name == "acstraveltime_sex":
+        return load_traveltime_dataset(preprocessed=preprocessed, protected_attribute="sex")
+    if dataset_name == "acstraveltime_dis":
+        return load_traveltime_dataset(preprocessed=preprocessed, protected_attribute="dis")
 
     if dataset_name == "mw_medium_race":
         return load_mw_medium_dataset(preprocessed=preprocessed, protected_attribute="race")
