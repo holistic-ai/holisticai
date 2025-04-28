@@ -22,3 +22,7 @@ Privacy Risk Score
 Mitigation
 ----------
 - `Anonymization <security/mitigating_privacy_tutorials/anonymization_algorithm.ipynb>`_
+
+Attackers
+---------
+- `Membership Inference ML-leaks <security/attackers/ml_leaks.ipynb>`_
