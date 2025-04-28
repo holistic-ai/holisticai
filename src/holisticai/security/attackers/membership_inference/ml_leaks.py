@@ -28,6 +28,8 @@ class MLleaks:
     task : str, optional
         The type of task to perform. It can be either "binary" or "multiclass". \
         Default is "binary".
+    seed : int, optional
+        Random seed for reproducibility. Default is 42.
 
     References
     ----------
@@ -36,7 +38,14 @@ class MLleaks:
     Membership Inference Attacks and Defenses on Machine Learning Models.
     """
 
-    def __init__(self, target_model: BaseEstimator, target_dataset: tuple, shadow_dataset: tuple, task: str = "binary"):
+    def __init__(
+        self,
+        target_model: BaseEstimator,
+        target_dataset: tuple,
+        shadow_dataset: tuple,
+        task: str = "binary",
+        seed: int = 42,
+    ):
         if not isinstance(target_model, BaseEstimator):
             raise TypeError("target_model must be an instance of BaseEstimator.")
 
@@ -53,8 +62,10 @@ class MLleaks:
         self.target_model = target_model
         self.target_dataset = target_dataset
         self.shadow_dataset = shadow_dataset
+        # set random seed for reproducibility
+        np.random.seed(seed=seed)
 
-    def fit(self) -> tuple:
+    def generate_attack_dataset(self) -> tuple:
         """
         Trains the shadow model and generates the membership inference dataset to train the attacker model.
 
@@ -68,10 +79,40 @@ class MLleaks:
         target_train, target_test = self.target_dataset
         X_target_train, _ = target_train
         X_target_test, _ = target_test
+        print("Training shadow model...")
         X_mia_train, y_mia_train = self._train_shadow_model()
         target_train_preds, target_test_preds = self._get_probs(self.target_model, X_target_train, X_target_test)
+        print("Creating attacker dataset...")
         X_mia_test, y_mia_test = self._create_attacker_dataset(target_train_preds, target_test_preds)
-        return (X_mia_train, y_mia_train), (X_mia_test, y_mia_test)
+        self.train_attacker_data, self.test_attacker_data = (X_mia_train, y_mia_train), (X_mia_test, y_mia_test)
+        return self.train_attacker_data, self.test_attacker_data
+
+    def fit(self):
+        """
+        Trains the attacker model using the generated membership inference dataset.
+
+        This method should be called after `generate_attack_dataset` to train the \
+        attacker model on the generated dataset. The attacker model is trained using \
+        the training data and evaluated on the testing data.
+
+        Returns
+        -------
+        BaseEstimator
+            A trained instance of the attacker model.
+
+        Raises
+        -------
+        RuntimeError
+            If `generate_attack_dataset` has not been called before this method.
+        """
+        if not hasattr(self, "train_attacker_data") or not hasattr(self, "test_attacker_data"):
+            raise RuntimeError("You must call `generate_attack_dataset` before `fit`.")
+        X_mia_train, y_mia_train = self.train_attacker_data
+        X_mia_test, y_mia_test = self.test_attacker_data
+        # Here you would typically train your attacker model using X_mia_train and y_mia_train
+        # and evaluate it using X_mia_test and y_mia_test.
+        # For now, we just return the datasets.
+        return self.train_model(X_mia_train, y_mia_train)
 
     def _get_probs(self, model: BaseEstimator, X_train: np.ndarray, X_test: np.ndarray) -> tuple:
         """
