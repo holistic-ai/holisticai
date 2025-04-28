@@ -1,5 +1,9 @@
+import logging
+
 import numpy as np
 from sklearn.base import BaseEstimator, clone
+
+logger = logging.getLogger(__name__)
 
 
 class MLleaks:
@@ -79,10 +83,10 @@ class MLleaks:
         target_train, target_test = self.target_dataset
         X_target_train, _ = target_train
         X_target_test, _ = target_test
-        print("Training shadow model...")
+        logger.info("Training shadow model...")
         X_mia_train, y_mia_train = self._train_shadow_model()
         target_train_preds, target_test_preds = self._get_probs(self.target_model, X_target_train, X_target_test)
-        print("Creating attacker dataset...")
+        logger.info("Creating attacker dataset...")
         X_mia_test, y_mia_test = self._create_attacker_dataset(target_train_preds, target_test_preds)
         self.train_attacker_data, self.test_attacker_data = (X_mia_train, y_mia_train), (X_mia_test, y_mia_test)
         return self.train_attacker_data, self.test_attacker_data
@@ -109,9 +113,6 @@ class MLleaks:
             raise RuntimeError("You must call `generate_attack_dataset` before `fit`.")
         X_mia_train, y_mia_train = self.train_attacker_data
         X_mia_test, y_mia_test = self.test_attacker_data
-        # Here you would typically train your attacker model using X_mia_train and y_mia_train
-        # and evaluate it using X_mia_test and y_mia_test.
-        # For now, we just return the datasets.
         return self.train_model(X_mia_train, y_mia_train)
 
     def _get_probs(self, model: BaseEstimator, X_train: np.ndarray, X_test: np.ndarray) -> tuple:
