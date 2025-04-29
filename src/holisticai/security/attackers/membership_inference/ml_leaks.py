@@ -29,9 +29,6 @@ class MLleaks:
     shadow_dataset : tuple
         A tuple containing the shadow training and testing datasets. Each dataset \
         should be a tuple of (X, y), where X is the feature matrix and y is the target vector.
-    task : str, optional
-        The type of task to perform. It can be either "binary" or "multiclass". \
-        Default is "binary".
     seed : int, optional
         Random seed for reproducibility. Default is 42.
 
@@ -47,7 +44,6 @@ class MLleaks:
         target_model: BaseEstimator,
         target_dataset: tuple,
         shadow_dataset: tuple,
-        task: str = "binary",
         seed: int = 42,
     ):
         if not isinstance(target_model, BaseEstimator):
@@ -59,10 +55,12 @@ class MLleaks:
         if not isinstance(shadow_dataset, tuple) or len(shadow_dataset) != 2:
             raise ValueError("shadow_dataset must be a tuple with two elements (train and test datasets).")
 
-        if task not in ["binary", "multiclass"]:
-            raise ValueError("task must be either 'binary' or 'multiclass'.")
-
-        self.task = task
+        classes_tgt = np.unique(target_dataset[0][1])
+        classes_sdw = np.unique(shadow_dataset[0][1])
+        if max(len(classes_tgt), len(classes_sdw)) > 2:
+            self.task = "multiclass"
+        else:
+            self.task = "binary"
         self.target_model = target_model
         self.target_dataset = target_dataset
         self.shadow_dataset = shadow_dataset
@@ -112,7 +110,6 @@ class MLleaks:
         if not hasattr(self, "train_attacker_data") or not hasattr(self, "test_attacker_data"):
             raise RuntimeError("You must call `generate_attack_dataset` before `fit`.")
         X_mia_train, y_mia_train = self.train_attacker_data
-        X_mia_test, y_mia_test = self.test_attacker_data
         return self.train_model(X_mia_train, y_mia_train)
 
     def _get_probs(self, model: BaseEstimator, X_train: np.ndarray, X_test: np.ndarray) -> tuple:
@@ -217,7 +214,12 @@ class MLleaks:
             X_mia = np.concatenate((train_preds, test_preds), axis=0)
             y_mia = np.concatenate((np.ones(len(train_preds)), np.zeros(len(test_preds))), axis=0)
         elif self.task == "multiclass":
-            raise NotImplementedError("Multiclass MIA is not implemented yet.")
+            train_preds = [sorted(s, reverse=True)[0:3] for s in train_preds]
+            train_preds = np.array(train_preds)
+            test_preds = [sorted(s, reverse=True)[0:3] for s in test_preds]
+            test_preds = np.array(test_preds)
+            X_mia = np.concatenate((train_preds, test_preds), axis=0)
+            y_mia = np.concatenate((np.ones(len(train_preds)), np.zeros(len(test_preds))), axis=0)
         if shuffle:
             indices = np.arange(len(X_mia))
             np.random.shuffle(indices)
