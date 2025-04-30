@@ -8,6 +8,7 @@ from holisticai.security.commons.data_minimization._selectors import SelectorsHa
 
 if TYPE_CHECKING:
     import pandas as pd
+
     from holisticai.utils import ModelProxy
 
 logger = logging.getLogger(__name__)

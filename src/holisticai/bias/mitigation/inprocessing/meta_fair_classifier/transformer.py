@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+
 from holisticai.bias.mitigation.inprocessing.meta_fair_classifier.algorithm import MetaFairClassifierAlgorithm
 from holisticai.bias.mitigation.inprocessing.meta_fair_classifier.algorithm_utils import MFLogger
 from holisticai.bias.mitigation.inprocessing.meta_fair_classifier.constraints import FalseDiscovery, StatisticalRate

@@ -1,6 +1,7 @@
 import logging
 
 import numpy as np
+
 from holisticai.bias.mitigation.postprocessing.debiasing_exposure.algorithm_utils import (
     exposure_diff,
     find_items_per_group_per_query,

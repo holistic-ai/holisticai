@@ -5,6 +5,7 @@ The :mod:holisticai.privacy.metrics module includes attacks and privacy metrics
 from __future__ import annotations
 
 import pandas as pd
+
 from holisticai.security.metrics._anonymization import k_anonymity, l_diversity
 from holisticai.security.metrics._attribute_attack import AttributeAttackScore, attribute_attack_score
 from holisticai.security.metrics._data_minimization import (

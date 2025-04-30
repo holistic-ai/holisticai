@@ -1,6 +1,7 @@
 import inspect
 
 import numpy as np
+
 from holisticai.utils.obj_rep.object_repr import BMReprObj
 from holisticai.utils.transformers._transformer_base import BMTransformerBase
 

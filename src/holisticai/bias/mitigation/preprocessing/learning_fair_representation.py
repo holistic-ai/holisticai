@@ -5,9 +5,10 @@ import logging
 import jax
 import jax.numpy as jnp
 import numpy as np
-from holisticai.utils.transformers.bias import BMPreprocessing
 from jax.nn import softmax
 from scipy.optimize import minimize
+
+from holisticai.utils.transformers.bias import BMPreprocessing
 
 logger = logging.getLogger(__name__)
 

@@ -4,6 +4,10 @@ import warnings
 import numpy as np
 import pandas as pd
 
+# Efficacy metrics
+from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
+from sklearn.neighbors import NearestNeighbors
+
 # utils
 from holisticai.utils._validation import (
     _array_like_to_numpy,
@@ -12,10 +16,6 @@ from holisticai.utils._validation import (
     _matrix_like_to_numpy,
     _regression_checks,
 )
-
-# Efficacy metrics
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_auc_score
-from sklearn.neighbors import NearestNeighbors
 
 
 def _group_success_rate(g, y):

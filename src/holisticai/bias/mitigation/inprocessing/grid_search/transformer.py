@@ -3,12 +3,13 @@ from __future__ import annotations
 from typing import Literal
 
 import numpy as np
+from sklearn.base import BaseEstimator, clone
+
 from holisticai.bias.mitigation.inprocessing.commons.classification import _constraints as cc
 from holisticai.bias.mitigation.inprocessing.commons.regression import _constraints as rc
 from holisticai.bias.mitigation.inprocessing.commons.regression import _losses as rl
 from holisticai.bias.mitigation.inprocessing.grid_search.algorithm import GridSearchAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-from sklearn.base import BaseEstimator, clone
 
 
 class GridSearchReduction(BMImp, BaseEstimator):

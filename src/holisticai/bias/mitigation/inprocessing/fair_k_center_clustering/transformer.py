@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.metrics.pairwise import pairwise_distances, pairwise_distances_argmin
+
 from holisticai.bias.mitigation.inprocessing.fair_k_center_clustering.algorithms import (
     fair_k_center_approx,
     heuristic_greedy_on_each_group,
@@ -8,8 +11,6 @@ from holisticai.bias.mitigation.inprocessing.fair_k_center_clustering.algorithms
 )
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
-from sklearn.base import BaseEstimator
-from sklearn.metrics.pairwise import pairwise_distances, pairwise_distances_argmin
 
 STRATEGIES_CATALOG = {
     "Fair K-Center": fair_k_center_approx,

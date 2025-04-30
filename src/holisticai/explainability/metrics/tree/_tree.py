@@ -1,4 +1,5 @@
 import numpy as np
+
 from holisticai.utils.surrogate_models import get_features, get_number_of_rules
 
 

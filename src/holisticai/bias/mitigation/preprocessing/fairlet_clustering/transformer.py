@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import numpy as np
+from sklearn.base import BaseEstimator
+from sklearn.metrics.pairwise import pairwise_distances_argmin
+
 from holisticai.bias.mitigation.commons.fairlet_clustering.decompositions import (
     DecompositionMixin,
     ScalableFairletDecomposition,
@@ -8,8 +11,6 @@ from holisticai.bias.mitigation.commons.fairlet_clustering.decompositions import
 )
 from holisticai.utils.models.cluster import KCenters, KMedoids
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
-from sklearn.base import BaseEstimator
-from sklearn.metrics.pairwise import pairwise_distances_argmin
 
 DECOMPOSITION_CATALOG = {
     "Scalable": ScalableFairletDecomposition,

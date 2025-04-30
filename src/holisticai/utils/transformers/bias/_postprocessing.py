@@ -2,6 +2,7 @@ import inspect
 
 import numpy as np
 import pandas as pd
+
 from holisticai.utils._validation import _check_valid_y_proba
 from holisticai.utils.obj_rep.object_repr import BMReprObj
 from holisticai.utils.transformers._transformer_base import BMTransformerBase

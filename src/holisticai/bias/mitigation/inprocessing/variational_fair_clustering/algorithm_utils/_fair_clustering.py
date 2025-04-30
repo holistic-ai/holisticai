@@ -3,6 +3,8 @@ import math
 from collections import defaultdict
 
 import numpy as np
+from sklearn.cluster import KMeans
+
 from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm_utils._bound_update import (
     BoundUpdate,
     normalize_2,
@@ -22,7 +24,6 @@ from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorit
 from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm_utils._utils import (
     get_fair_accuracy_proportional,
 )
-from sklearn.cluster import KMeans
 
 logger = logging.getLogger()
 
