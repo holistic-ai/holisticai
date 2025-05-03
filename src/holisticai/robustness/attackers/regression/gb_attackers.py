@@ -1,7 +1,8 @@
 import numpy as np
 import numpy.linalg as la
-from holisticai.robustness.attackers.regression.gb_base import GDPoisoner
 from sklearn import linear_model
+
+from holisticai.robustness.attackers.regression.gb_base import GDPoisoner
 
 
 class LinRegGDPoisoner(GDPoisoner):

@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
+
 from holisticai.typing import ArrayLike
 from holisticai.utils.models.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import LabelEncoder
 
 try:
     import jax.numpy as jnp

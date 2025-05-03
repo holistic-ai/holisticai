@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
+# sklearn imports
+from sklearn.metrics import roc_curve
+
 # utils
 from holisticai.utils import get_colors
 from holisticai.utils._validation import _check_binary, _regression_checks
-
-# sklearn imports
-from sklearn.metrics import roc_curve
 
 
 def abroca_plot(group_a, group_b, y_score, y_true, ax=None, size=None, title=None):

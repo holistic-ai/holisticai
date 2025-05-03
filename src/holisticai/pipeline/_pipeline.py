@@ -1,9 +1,10 @@
 import inspect
 
-from holisticai.pipeline._pipeline_helper import PipelineHelper
-from holisticai.utils.obj_rep.object_repr import PipelineReprObj
 from sklearn.pipeline import Pipeline as SKLPipeline
 from sklearn.utils.metaestimators import available_if
+
+from holisticai.pipeline._pipeline_helper import PipelineHelper
+from holisticai.utils.obj_rep.object_repr import PipelineReprObj
 
 
 def _fulfill_conditions(fn_name: str):

@@ -1,8 +1,9 @@
 import ipywidgets as widgets  # type: ignore
 import matplotlib.pyplot as plt
+from IPython.display import display
+
 from holisticai.bias.plots._bias_exploratory_plots import group_pie_plot, histogram_plot
 from holisticai.bias.plots._bias_multiclass_plots import accuracy_bar_plot, frequency_matrix_plot, frequency_plot
-from IPython.display import display
 
 
 def binary_classification_data_exploration(dataset):

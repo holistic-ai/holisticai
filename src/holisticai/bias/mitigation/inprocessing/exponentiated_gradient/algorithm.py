@@ -4,6 +4,8 @@ import sys
 
 import numpy as np
 import pandas as pd
+from sklearn.utils import check_random_state
+
 from holisticai.bias.mitigation.inprocessing.commons._conventions import (
     ACCURACY_MUL,
     MIN_ITER,
@@ -14,7 +16,6 @@ from holisticai.bias.mitigation.inprocessing.commons._conventions import (
     SHRINK_REGRET,
 )
 from holisticai.bias.mitigation.inprocessing.exponentiated_gradient._lagrangian import Lagrangian
-from sklearn.utils import check_random_state
 
 
 class ExponentiatedGradientAlgorithm:

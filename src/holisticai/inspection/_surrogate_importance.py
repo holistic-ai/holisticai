@@ -4,11 +4,12 @@ from typing import Literal, overload
 
 import numpy as np
 import pandas as pd
-from holisticai.inspection._utils import group_index_samples_by_learning_task
-from holisticai.utils._definitions import ConditionalImportances, Importances, ModelProxy
 from numpy.random import RandomState
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error
+
+from holisticai.inspection._utils import group_index_samples_by_learning_task
+from holisticai.utils._definitions import ConditionalImportances, Importances, ModelProxy
 
 metric_scores = {
     "binary_classification": accuracy_score,

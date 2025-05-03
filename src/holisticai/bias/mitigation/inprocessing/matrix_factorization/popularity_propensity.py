@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 import numpy as np
+
 from holisticai.bias.mitigation.inprocessing.matrix_factorization.common_utils.propensity_utils import (
     popularity_model_propensity,
 )

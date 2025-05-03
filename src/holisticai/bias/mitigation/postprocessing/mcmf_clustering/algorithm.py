@@ -1,9 +1,10 @@
 import logging
 
 import numpy as np
-from holisticai.utils.transformers.bias import SensitiveGroups
 from scipy.optimize import linprog
 from scipy.sparse import lil_matrix
+
+from holisticai.utils.transformers.bias import SensitiveGroups
 
 logger = logging.getLogger(__name__)
 

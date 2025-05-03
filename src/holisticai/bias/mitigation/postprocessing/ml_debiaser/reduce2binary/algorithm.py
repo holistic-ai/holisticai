@@ -1,6 +1,7 @@
 import copy
 
 import numpy as np
+
 from holisticai.bias.mitigation.postprocessing.ml_debiaser.randomized_threshold.algorithm import (
     RandomizedThresholdAlgorithm,
 )

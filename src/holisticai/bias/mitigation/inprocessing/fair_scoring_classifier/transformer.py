@@ -4,10 +4,11 @@ from typing import Literal
 
 import numpy as np
 import pandas as pd
+from sklearn.base import BaseEstimator
+
 from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.algorithm import FairScoreClassifierAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
-from sklearn.base import BaseEstimator
 
 
 class FairScoreClassifier(BaseEstimator, BMImp):

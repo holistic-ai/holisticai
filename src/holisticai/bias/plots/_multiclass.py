@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib import pyplot as plt
 
 # Import metrics
 from holisticai.bias.metrics import frequency_matrix
@@ -9,7 +10,6 @@ from holisticai.utils import get_colors
 
 # utils
 from holisticai.utils._validation import _multiclass_checks
-from matplotlib import pyplot as plt
 
 
 def frequency_plot(p_attr, y_pred, ax=None, size=None, title=None):

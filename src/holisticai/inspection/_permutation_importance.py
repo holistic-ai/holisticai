@@ -4,6 +4,9 @@ from typing import Any, Literal, overload
 
 import numpy as np
 import pandas as pd
+from numpy.random import RandomState
+from sklearn.metrics import accuracy_score, mean_squared_error
+
 from holisticai.inspection._utils import group_index_samples_by_learning_task
 from holisticai.utils._commons import get_columns, get_item
 from holisticai.utils._definitions import (
@@ -11,8 +14,6 @@ from holisticai.utils._definitions import (
     Importances,
     ModelProxy,
 )
-from numpy.random import RandomState
-from sklearn.metrics import accuracy_score, mean_squared_error
 
 metric_scores = {
     "binary_classification": accuracy_score,

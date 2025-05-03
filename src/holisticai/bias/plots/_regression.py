@@ -1,14 +1,14 @@
 # Base Imports
 import numpy as np
 import seaborn as sns
-
-# utils
-from holisticai.utils import get_colors
-from holisticai.utils._validation import _multiclass_checks, _regression_checks
 from matplotlib import pyplot as plt
 
 # sklearn imports
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# utils
+from holisticai.utils import get_colors
+from holisticai.utils._validation import _multiclass_checks, _regression_checks
 
 
 def success_rate_curve(group_a, group_b, y_pred, ax=None, size=None, title=None):

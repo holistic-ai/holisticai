@@ -2,10 +2,11 @@ import logging
 
 import numpy as np
 import pandas as pd
-from holisticai.robustness.attackers.regression.initializers import adaptive, inf_flip, randflip, randflipnobd
-from holisticai.robustness.attackers.regression.utils import one_hot_encode_columns, revert_one_hot_encoding
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
+
+from holisticai.robustness.attackers.regression.initializers import adaptive, inf_flip, randflip, randflipnobd
+from holisticai.robustness.attackers.regression.utils import one_hot_encode_columns, revert_one_hot_encoding
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger()

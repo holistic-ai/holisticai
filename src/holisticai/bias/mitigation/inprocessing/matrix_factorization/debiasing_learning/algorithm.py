@@ -1,5 +1,6 @@
 import numpy as np
 import scipy
+
 from holisticai.bias.mitigation.inprocessing.matrix_factorization.debiasing_learning.algorithm_utils import (
     ParameterSerializer,
     Problem,

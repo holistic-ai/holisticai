@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-from holisticai.utils._recommender_tools import entropy
-from holisticai.utils._validation import _clustering_checks
 
 # sklearn imports
 from sklearn.metrics import (
@@ -9,6 +7,9 @@ from sklearn.metrics import (
     mean_absolute_error,
     silhouette_samples,
 )
+
+from holisticai.utils._recommender_tools import entropy
+from holisticai.utils._validation import _clustering_checks
 
 
 def cluster_balance(group_a, group_b, y_pred):

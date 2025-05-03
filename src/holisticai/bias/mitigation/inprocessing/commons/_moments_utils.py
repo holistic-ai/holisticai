@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+
 from holisticai.bias.mitigation.inprocessing.commons._conventions import _EVENT, _GROUP_ID, _LABEL, _SIGNED
 
 

@@ -1,9 +1,10 @@
 from functools import partial
 
 import numpy as np
-from holisticai.utils.transformers.bias import SensitiveGroups
 from scipy.stats import multivariate_normal
 from sklearn.metrics import accuracy_score
+
+from holisticai.utils.transformers.bias import SensitiveGroups
 
 
 def prob(dist, x):

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Callable, Literal, Union
 
 import numpy as np
 import pandas as pd
+
 from holisticai.utils._commons import get_number_of_feature_above_threshold_importance
 from holisticai.utils._validation import _array_like_to_numpy
 from holisticai.utils.obj_rep.object_repr import ReprObj

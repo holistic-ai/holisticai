@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
-from holisticai.bias.mitigation.inprocessing.commons._conventions import PRECISION
 from sklearn import clone
+
+from holisticai.bias.mitigation.inprocessing.commons._conventions import PRECISION
 
 
 class Lagrangian:

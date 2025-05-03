@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import Literal, Union
 
 import numpy as np
+from numpy.random import RandomState
+
 from holisticai.utils.surrogate_models._trees import (
     DecisionTreeClassifier,
     DecisionTreeRegressor,
 )
-from numpy.random import RandomState
 
 Surrogate = Union[DecisionTreeClassifier, DecisionTreeRegressor]
 LearningTask = Literal["binary_classification", "multi_classification", "regression"]

@@ -4,7 +4,6 @@ import logging
 from typing import TYPE_CHECKING, Literal, get_args
 
 import numpy as np
-from holisticai.inspection import compute_permutation_importance
 from sklearn.feature_selection import (
     SelectPercentile,
     VarianceThreshold,
@@ -12,8 +11,11 @@ from sklearn.feature_selection import (
     f_regression,
 )
 
+from holisticai.inspection import compute_permutation_importance
+
 if TYPE_CHECKING:
     import pandas as pd
+
     from holisticai.utils import Importances, ModelProxy
 
 logger = logging.getLogger(__name__)

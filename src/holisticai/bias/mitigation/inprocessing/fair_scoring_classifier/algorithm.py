@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 import numpy as np
+
 from holisticai.bias.mitigation.inprocessing.fair_scoring_classifier.utils import get_class_count, get_class_indexes
 
 logger = logging.getLogger(__name__)

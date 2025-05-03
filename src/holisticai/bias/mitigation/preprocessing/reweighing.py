@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+
 from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 from holisticai.utils.transformers.bias import SensitiveGroups
 
