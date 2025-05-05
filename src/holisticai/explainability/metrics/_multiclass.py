@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pandas as pd
+
 from holisticai.explainability.metrics.global_feature_importance import (
     AlphaScore,
     PositionParity,

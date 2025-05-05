@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+
 from holisticai.bias.mitigation.inprocessing.two_sided_fairness.algorithm import FairRecAlg
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 

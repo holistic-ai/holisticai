@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib import patches
+from matplotlib import pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+from scipy.spatial.distance import jensenshannon
+
 from holisticai.explainability.metrics.global_feature_importance import fluctuation_ratio
 from holisticai.explainability.metrics.local_feature_importance import (
     compute_importance_distribution,
@@ -9,10 +14,6 @@ from holisticai.explainability.metrics.local_feature_importance import (
     rank_consistency,
 )
 from holisticai.utils import Importances
-from matplotlib import patches
-from matplotlib import pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
-from scipy.spatial.distance import jensenshannon
 
 
 def plot_feature_importance(feature_importance: Importances, alpha=0.8, top_n=20, ax=None):

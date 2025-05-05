@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+
 from holisticai.bias.mitigation.postprocessing.fair_topk.algorithm_utils.fail_prob import (
     RecursiveNumericFailProbabilityCalculator,
 )

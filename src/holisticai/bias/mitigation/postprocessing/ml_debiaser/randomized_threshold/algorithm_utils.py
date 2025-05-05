@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+
 from holisticai.bias.mitigation.inprocessing.commons import Logging
 
 

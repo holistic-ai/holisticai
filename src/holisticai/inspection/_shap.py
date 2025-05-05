@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from numpy.random import RandomState
+
 from holisticai.datasets._dataset import Dataset
 from holisticai.inspection import group_mask_samples_by_learning_task
 from holisticai.utils import LocalImportances, ModelProxy
-from numpy.random import RandomState
 
 
 def compute_shap_feature_importance(

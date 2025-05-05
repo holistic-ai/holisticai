@@ -2,8 +2,9 @@ from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-from holisticai.utils import Importances
 from sklearn.tree._export import _MPLTreeExporter
+
+from holisticai.utils import Importances
 
 
 def _color_brew(n):

@@ -1,7 +1,8 @@
+from sklearn.pipeline import Pipeline as SKLPipeline
+
 from holisticai.pipeline.handlers._estimator import EstimatorHandler
 from holisticai.pipeline.handlers._pipeline_params import PipelineParametersHandler
 from holisticai.pipeline.handlers._utransformers import UTransformersHandler
-from sklearn.pipeline import Pipeline as SKLPipeline
 
 SUPPORTED_FUNCTIONS = [
     "fit",

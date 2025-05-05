@@ -4,9 +4,10 @@ from typing import TYPE_CHECKING, Literal
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score, mean_squared_error
+
 from holisticai.utils.obj_rep.object_repr import ReprObj
 from holisticai.utils.surrogate_models._base import SurrogateBase
-from sklearn.metrics import accuracy_score, mean_squared_error
 
 if TYPE_CHECKING:
     from numpy.random import RandomState

@@ -4,11 +4,12 @@ import numbers
 from typing import TYPE_CHECKING
 
 import numpy as np
-from holisticai.utils._commons import get_columns
-from holisticai.utils._definitions import ModelProxy, PartialDependence
 from joblib import Parallel, delayed
 from sklearn.inspection import partial_dependence
 from sklearn.metrics import accuracy_score, r2_score
+
+from holisticai.utils._commons import get_columns
+from holisticai.utils._definitions import ModelProxy, PartialDependence
 
 if TYPE_CHECKING:
     import pandas as pd

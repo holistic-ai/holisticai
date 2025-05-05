@@ -2,6 +2,7 @@ import logging
 
 import numpy as np
 import pandas as pd
+
 from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm_utils._fair_clustering import (
     FairClustering,
 )

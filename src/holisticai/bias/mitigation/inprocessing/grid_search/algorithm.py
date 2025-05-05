@@ -2,8 +2,9 @@ import copy
 import logging
 from typing import Any
 
-from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
 from joblib import Parallel, delayed
+
+from holisticai.bias.mitigation.inprocessing.grid_search._grid_generator import GridGenerator
 
 logger = logging.getLogger(__name__)
 

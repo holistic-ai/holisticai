@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import numpy as np
+from sklearn.base import BaseEstimator
+
 from holisticai.bias.mitigation.inprocessing.fair_k_mediam_clustering.algorithm import KMediamClusteringAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
-from sklearn.base import BaseEstimator
 
 
 class FairKMedianClustering(BaseEstimator, BMImp):

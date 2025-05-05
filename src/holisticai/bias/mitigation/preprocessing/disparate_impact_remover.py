@@ -1,4 +1,5 @@
 import numpy as np
+
 from holisticai.bias.mitigation.commons.disparate_impact_remover._numerical_repairer import (
     NumericalRepairer,
 )

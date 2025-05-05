@@ -1,4 +1,6 @@
 import numpy as np
+from sklearn.metrics import pairwise_distances_chunked as pdist_chunk
+
 from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm_utils._bound_update import (
     get_S_discrete,
 )
@@ -12,7 +14,6 @@ from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorit
     reduce_func,
 )
 from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm_utils._utils import create_affinity
-from sklearn.metrics import pairwise_distances_chunked as pdist_chunk
 
 
 class KUtils:

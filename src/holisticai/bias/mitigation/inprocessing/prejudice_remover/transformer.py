@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import numpy as np
+from sklearn.base import BaseEstimator, ClassifierMixin
+
 from holisticai.bias.mitigation.inprocessing.prejudice_remover.algorithm import PrejudiceRemoverAlgorithm
 from holisticai.bias.mitigation.inprocessing.prejudice_remover.algorithm_utils import ObjectiveFunction, PRLogger
 from holisticai.bias.mitigation.inprocessing.prejudice_remover.losses import PRBinaryCrossEntropy
 from holisticai.bias.mitigation.inprocessing.prejudice_remover.model import PRLogiticRegression, PRParamInitializer
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-from sklearn.base import BaseEstimator, ClassifierMixin
 
 
 class PrejudiceRemover(BaseEstimator, ClassifierMixin, BMImp):

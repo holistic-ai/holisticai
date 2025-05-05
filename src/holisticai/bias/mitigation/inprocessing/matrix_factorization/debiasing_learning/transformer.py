@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import scipy
+
 from holisticai.bias.mitigation.inprocessing.matrix_factorization.debiasing_learning.algorithm import (
     DebiasingLearningAlgorithm,
 )

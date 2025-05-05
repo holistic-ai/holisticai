@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable
 
-from holisticai.security.commons import BlackBoxAttack
-from holisticai.security.metrics._utils import check_valid_output_type
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score, mean_absolute_error, mean_squared_error
+
+from holisticai.security.commons import BlackBoxAttack
+from holisticai.security.metrics._utils import check_valid_output_type
 
 if TYPE_CHECKING:
     import pandas as pd

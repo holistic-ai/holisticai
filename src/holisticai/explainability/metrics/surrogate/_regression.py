@@ -2,6 +2,7 @@ from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
+
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import (
     FeatureImportanceSpread,
 )

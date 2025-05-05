@@ -11,13 +11,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from scipy.ndimage import zoom
+
 from holisticai.robustness.attackers.classification.commons import (
     format_function_predict_proba,
     to_categorical,
     x_array_to_df,
     x_to_nd_array,
 )
-from scipy.ndimage import zoom
 
 if TYPE_CHECKING:
     import pandas as pd

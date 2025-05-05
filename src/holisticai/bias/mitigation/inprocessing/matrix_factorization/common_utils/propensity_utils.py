@@ -1,4 +1,5 @@
 import numpy as np
+
 from holisticai.bias.mitigation.inprocessing.matrix_factorization.common_utils.utils import calculate_popularity_model
 
 

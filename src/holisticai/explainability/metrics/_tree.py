@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+
 from holisticai.explainability.metrics.tree import (
     TreeDepthVariance,
     TreeNumberOfFeatures,

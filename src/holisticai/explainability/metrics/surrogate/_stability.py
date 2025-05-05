@@ -2,8 +2,9 @@ from copy import deepcopy
 from typing import Any
 
 import numpy as np
-from holisticai.utils.surrogate_models import Surrogate, get_features
 from sklearn.utils import resample
+
+from holisticai.utils.surrogate_models import Surrogate, get_features
 
 
 class FeaturesStability:

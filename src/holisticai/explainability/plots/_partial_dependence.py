@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import cm
+from scipy.interpolate import interp1d
+
 from holisticai.explainability.metrics.global_feature_importance._fluctuation_ratio import fluctuation_ratio
 from holisticai.explainability.metrics.global_feature_importance._xai_ease_score import XAIEaseAnnotator
 from holisticai.utils import Importances, PartialDependence
-from matplotlib import cm
-from scipy.interpolate import interp1d
 
 
 def plot_partial_dependence(

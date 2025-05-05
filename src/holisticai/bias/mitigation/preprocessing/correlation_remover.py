@@ -1,6 +1,7 @@
 import jax.numpy as jnp
-from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 from jax import jit
+
+from holisticai.utils.transformers.bias import BMPreprocessing as BMPre
 
 
 @jit

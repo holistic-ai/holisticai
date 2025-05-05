@@ -1,5 +1,6 @@
-from holisticai.bias.mitigation.postprocessing.fair_topk.algorithm_utils import mtable_generator
 from scipy.stats import binom
+
+from holisticai.bias.mitigation.postprocessing.fair_topk.algorithm_utils import mtable_generator
 
 EPS = 0.0000000000000001
 

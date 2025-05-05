@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 import numpy as np
+
 from holisticai.utils.models.recommender._rsbase import RecommenderSystemBase
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 

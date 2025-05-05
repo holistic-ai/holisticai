@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import numpy as np
+
 from holisticai.robustness.attackers.classification.commons import x_array_to_df, x_to_nd_array
 
 if TYPE_CHECKING:
