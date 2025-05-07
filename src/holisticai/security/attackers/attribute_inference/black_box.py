@@ -8,17 +8,13 @@ import logging
 from typing import Optional, Union
 
 import numpy as np
-from holisticai.security.attackers.attribute_inference.attack import AttributeInferenceAttack
 from holisticai.security.attackers.attribute_inference.dataset_utils import AttributeInferenceDataPreprocessor
 from holisticai.security.attackers.attribute_inference.utils import get_attack_model, get_feature_index
-from holisticai.security.attackers.attribute_inference.wrappers.classification.classifier import ClassifierMixin
-from holisticai.security.attackers.attribute_inference.wrappers.estimator import BaseEstimator
-from holisticai.security.attackers.attribute_inference.wrappers.regression.regressor import RegressorMixin
 
 logger = logging.getLogger(__name__)
 
 
-class AttributeInferenceBlackBox(AttributeInferenceAttack):
+class AttributeInferenceBlackBox():
     """
     Implementation of a simple black-box attribute inference attack.
 
@@ -47,14 +43,6 @@ class AttributeInferenceBlackBox(AttributeInferenceAttack):
         attack-model. Only applicable when `estimator` is a regressor and if `scale_range` is not supplied.
     """
 
-    attack_params = [
-        *AttributeInferenceAttack.attack_params,
-        "prediction_normal_factor",
-        "scale_range",
-        "attack_model_type",
-    ]
-    _estimator_requirements = (BaseEstimator, (ClassifierMixin, RegressorMixin))
-
     def __init__(
         self,
         estimator,
@@ -64,27 +52,20 @@ class AttributeInferenceBlackBox(AttributeInferenceAttack):
         scale_range: Optional[tuple[float, float]] = None,
         prediction_normal_factor: Optional[float] = 1,
     ):
-        super().__init__(estimator=estimator, attack_feature=attack_feature)
 
         self._values: Optional[list] = None
         self._nb_classes: Optional[int] = None
         self._attack_model_type = attack_model_type
         self._attack_model = attack_model
-
-        if attack_model:
-            if ClassifierMixin not in type(attack_model).__mro__:
-                raise ValueError("Attack model must be of type Classifier.")
-            self.attack_model = attack_model
-        else:
-            self.attack_model = get_attack_model(attack_model_type)
+        self.estimator = estimator
+        self.attack_feature = attack_feature
+        self.attack_model = get_attack_model(attack_model_type)
 
         self.prediction_normal_factor = prediction_normal_factor
         self.scale_range = scale_range
-        is_regression = ClassifierMixin not in type(self.estimator).__mro__
         self._check_params()
         self.attack_feature = get_feature_index(self.attack_feature)
         self.ai_preprocessor = AttributeInferenceDataPreprocessor(
-            is_regression=is_regression,
             scale_range=scale_range,
             prediction_normal_factor=prediction_normal_factor,
             attack_feature=attack_feature,
@@ -104,7 +85,6 @@ class AttributeInferenceBlackBox(AttributeInferenceAttack):
             Predictions of the original model for x.
         """
 
-        # train attack model
         attack_x, attack_y = self.ai_preprocessor.fit_transform(x, y, pred)
         self._values = self.ai_preprocessor._values  # noqa: SLF001
         self.attack_model.fit(attack_x, attack_y)
@@ -164,6 +144,3 @@ class AttributeInferenceBlackBox(AttributeInferenceAttack):
 
         if self._attack_model_type not in ["nn", "rf"]:
             raise ValueError("Illegal value for parameter `attack_model_type`.")
-
-        if RegressorMixin not in type(self.estimator).__mro__ and self.prediction_normal_factor != 1:
-            raise ValueError("Prediction normal factor is only applicable to regressor models.")

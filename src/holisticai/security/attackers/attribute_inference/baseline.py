@@ -1,54 +1,44 @@
-# from typing import Optional, Union, TYPE_CHECKING
 import numpy as np
-from holisticai.security.attackers.attribute_inference.attack import AttributeInferenceAttack
 from holisticai.security.attackers.attribute_inference.dataset_utils import AttributeInferenceDataPreprocessor
 from holisticai.security.attackers.attribute_inference.utils import get_attack_model, get_feature_index
-from sklearn.base import ClassifierMixin
 
 
-class AttributeInferenceBaseline(AttributeInferenceAttack):
+class AttributeInferenceBaseline():
     """
-    Implementation of a baseline attribute inference, not using a model.
-
-    The idea is to train a simple neural network to learn the attacked feature from the rest of the features. Should
-    be used to compare with other attribute inference results.
-
+    Attribute Inference Attack using a baseline model.
+    
+    This attack uses a baseline model to infer the value of a specific feature in the dataset.
+    The attack model is trained on the remaining features in the dataset.
+    
     Parameters
     ----------
-    attack_model_type : str
-        The type of default attack model to train, optional. Should be one of `nn` (for neural network, default) or `rf`
-        (for random forest). If `attack_model` is supplied, this option will be ignored.
-    attack_model : object
-        The attack model to train, optional. If none is provided, a default model will be created.
-    attack_feature : int or slice
-        The index of the feature to be attacked or a slice representing multiple indexes in case of a one-hot encoded
-        feature.
+    attack_model_type : str, default="nn"
+        The type of model to use for the attack. Options are "nn" for neural network or "tree" for decision tree.
+    attack_feature : int or slice, default=0
+        The index or slice of the feature to attack. If a slice is provided, it should be of size 1.
     """
-
-    _estimator_requirements = ()
-
     def __init__(
         self,
         attack_model_type="nn",
-        attack_model=None,
         attack_feature=0,
     ):
-        super().__init__(estimator=None, attack_feature=attack_feature)
-
         self._values = None
         self._nb_classes = None
 
-        if attack_model:
-            if ClassifierMixin not in type(attack_model).__mro__:
-                raise ValueError("Attack model must be of type Classifier.")
-            self.attack_model = attack_model
-        else:
-            self.attack_model = get_attack_model(attack_model_type)
+        self.attack_model = get_attack_model(attack_model_type)
+        self.attack_feature = attack_feature
 
         self._check_params()
         self.attack_feature = get_feature_index(self.attack_feature)
         self.ai_preprocessor = AttributeInferenceDataPreprocessor(attack_feature=attack_feature)
 
+    def _check_params(self) -> None:
+        if not isinstance(self.attack_feature, int) and not isinstance(self.attack_feature, slice):
+            raise TypeError("Attack feature must be either an integer or a slice object.")
+
+        if isinstance(self.attack_feature, int) and self.attack_feature < 0:
+            raise ValueError("Attack feature index must be non-negative.")
+        
     def fit(self, x: np.ndarray) -> None:
         """
         Train the attack model.
@@ -96,10 +86,3 @@ class AttributeInferenceBaseline(AttributeInferenceAttack):
                     for index in range(len(value)):
                         np.place(column, [column == index], value[index])
         return np.array(predictions)
-
-    def _check_params(self) -> None:
-        if not isinstance(self.attack_feature, int) and not isinstance(self.attack_feature, slice):
-            raise TypeError("Attack feature must be either an integer or a slice object.")
-
-        if isinstance(self.attack_feature, int) and self.attack_feature < 0:
-            raise ValueError("Attack feature index must be non-negative.")

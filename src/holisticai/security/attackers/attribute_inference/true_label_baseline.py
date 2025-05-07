@@ -8,67 +8,29 @@ import logging
 from typing import Optional, Union
 
 import numpy as np
-from holisticai.security.attackers.attribute_inference.attack import AttributeInferenceAttack
 from holisticai.security.attackers.attribute_inference.dataset_utils import AttributeInferenceDataPreprocessor
 from holisticai.security.attackers.attribute_inference.utils import get_attack_model, get_feature_index
-from sklearn.base import ClassifierMixin
 
 logger = logging.getLogger(__name__)
 
 
-class AttributeInferenceBaselineTrueLabel(AttributeInferenceAttack):
-    """
-    Implementation of a baseline attribute inference, not using a model.
-
-    The idea is to train a simple neural network to learn the attacked feature from the rest of the features, and the
-    true label. Should be used to compare with other attribute inference results.
-
-    Parameters
-    ----------
-    attack_model_type : str
-        The type of default attack model to train, optional. Should be one of `nn` (for neural network, default) or `rf`
-        (for random forest). If `attack_model` is supplied, this option will be ignored.
-    attack_model : object
-        The attack model to train, optional. If none is provided, a default model will be created.
-    attack_feature : int or slice
-        The index of the feature to be attacked or a slice representing multiple indexes in case of a one-hot encoded
-        feature.
-    is_regression : bool
-        Whether the model is a regression model. Default is False (classification).
-    scale_range : tuple
-        If supplied, the class labels (both true and predicted) will be scaled to the given range. Only applicable when
-        `is_regression` is True.
-    prediction_normal_factor : float
-        If supplied, the class labels (both true and predicted) are multiplied by the factor when used as inputs to the
-        attack-model. Only applicable when `is_regression` is True and if `scale_range` is not supplied.
-    """
-
-    _estimator_requirements = ()
-
+class AttributeInferenceBaselineTrueLabel():
     def __init__(
         self,
         attack_model_type: str = "nn",
-        attack_model=None,
         attack_feature: Union[int, slice] = 0,
         is_regression: Optional[bool] = False,
         scale_range: Optional[tuple[float, float]] = None,
         prediction_normal_factor: float = 1,
     ):
-        super().__init__(estimator=None, attack_feature=attack_feature)
-
+        
         self._values: Optional[list] = None
         self._nb_classes: Optional[int] = None
-
-        if attack_model:
-            if ClassifierMixin not in type(attack_model).__mro__:
-                raise ValueError("Attack model must be of type Classifier.")
-            self.attack_model = attack_model
-        else:
-            self.attack_model = get_attack_model(attack_model_type)
-
+        self.attack_model = get_attack_model(attack_model_type)
         self.prediction_normal_factor = prediction_normal_factor
         self.scale_range = scale_range
         self.is_regression = is_regression
+        self.attack_feature = attack_feature
         self._check_params()
         self.attack_feature = get_feature_index(self.attack_feature)
         self.ai_preprocessor = AttributeInferenceDataPreprocessor(
@@ -78,6 +40,13 @@ class AttributeInferenceBaselineTrueLabel(AttributeInferenceAttack):
             attack_feature=attack_feature,
         )
 
+    def _check_params(self) -> None:
+        if not isinstance(self.attack_feature, int) and not isinstance(self.attack_feature, slice):
+            raise TypeError("Attack feature must be either an integer or a slice object.")
+
+        if isinstance(self.attack_feature, int) and self.attack_feature < 0:
+            raise ValueError("Attack feature index must be positive.")
+        
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
         """
         Train the attack model.
@@ -136,10 +105,3 @@ class AttributeInferenceBaselineTrueLabel(AttributeInferenceAttack):
                         np.place(column, [column == index], self._values[i][index])
                     i += 1
         return np.array(predictions)
-
-    def _check_params(self) -> None:
-        if not isinstance(self.attack_feature, int) and not isinstance(self.attack_feature, slice):
-            raise TypeError("Attack feature must be either an integer or a slice object.")
-
-        if isinstance(self.attack_feature, int) and self.attack_feature < 0:
-            raise ValueError("Attack feature index must be positive.")
