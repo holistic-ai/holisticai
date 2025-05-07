@@ -2,6 +2,8 @@ from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score
+
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import FeatureImportanceSpread
 from holisticai.explainability.metrics.global_feature_importance._surrogate import (
     surrogate_accuracy_score,
@@ -20,7 +22,6 @@ from holisticai.explainability.metrics.tree._tree import (
 )
 from holisticai.typing import ArrayLike
 from holisticai.utils.surrogate_models import BinaryClassificationSurrogate, MultiClassificationSurrogate
-from sklearn.metrics import accuracy_score
 
 
 class AccuracyDegradation:
@@ -30,8 +31,7 @@ class AccuracyDegradation:
     def __call__(self, y, y_pred, y_surrogate):
         Pb = accuracy_score(y, y_pred)
         Ps = accuracy_score(y, y_surrogate)
-        D = 2 * (Pb - Ps) / (Pb + Ps)  # Normalized difference between the two SMAPE values
-        return D
+        return 2 * (Pb - Ps) / (Pb + Ps)  # Normalized difference between the two SMAPE values
 
 
 def surrogate_accuracy_degradation(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):
@@ -124,7 +124,8 @@ def classification_surrogate_explainability_metrics(
     elif len(np.unique(y_pred)) > 2:
         surrogate = MultiClassificationSurrogate(X, y_pred=y_pred, model_type=surrogate_type)
     else:
-        raise ValueError("y_pred must have at least two unique values")
+        msg = "y_pred must have at least two unique values"
+        raise ValueError(msg)
 
     y_surrogate = surrogate.predict(X)
     results = {}

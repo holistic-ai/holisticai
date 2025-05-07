@@ -1,9 +1,10 @@
 import logging
 
 import numpy as np
-from holisticai.utils.transformers.bias import SensitiveGroups
 from scipy.optimize import linprog
 from scipy.sparse import lil_matrix
+
+from holisticai.utils.transformers.bias import SensitiveGroups
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +47,12 @@ class Algorithm:
         if self.metric == "L1":
             norm_p = 1
             d = np.linalg.norm(centroids[:, None, :] - X[None, ...], ord=norm_p, axis=-1)
-            w = (-d).reshape(-1)
-            return w
+            return (-d).reshape(-1)
 
         if self.metric == "L2":
             norm_p = 2
             d = np.linalg.norm(centroids[:, None, :] - X[None, ...], ord=norm_p, axis=-1)
-            w = (-d).reshape(-1)
-            return w
+            return (-d).reshape(-1)
 
         message = f"Penalty Weights not implemented : {self.metric}"
         raise NotImplementedError(message)
@@ -74,7 +73,8 @@ class Algorithm:
             w = np.mean(d, axis=0) - np.sum(d * z_mod, axis=0)
             return np.sum(w * (1 - np.sum(z_mod * z_pred, axis=0)))
 
-        raise NotImplementedError(f"Cost Function not implemented : {self.metric}")
+        msg = f"Cost Function not implemented : {self.metric}"
+        raise NotImplementedError(msg)
 
     def transform(
         self,

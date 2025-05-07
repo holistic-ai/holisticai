@@ -1,14 +1,14 @@
 # Base Imports
 import numpy as np
 import seaborn as sns
-
-# utils
-from holisticai.utils import get_colors
-from holisticai.utils._validation import _multiclass_checks, _regression_checks
 from matplotlib import pyplot as plt
 
 # sklearn imports
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# utils
+from holisticai.utils import get_colors
+from holisticai.utils._validation import _multiclass_checks, _regression_checks
 
 
 def success_rate_curve(group_a, group_b, y_pred, ax=None, size=None, title=None):
@@ -154,7 +154,8 @@ def statistical_parity_curve(group_a, group_b, y_pred, x_axis="score", ax=None, 
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : quantile, score")
+        msg = "x_axis is not one of : quantile, score"
+        raise ValueError(msg)
 
     return ax
 
@@ -239,7 +240,8 @@ def disparate_impact_curve(group_a, group_b, y_pred, x_axis="score", ax=None, si
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : score, quantile")
+        msg = "x_axis is not one of : score, quantile"
+        raise ValueError(msg)
 
     return ax
 
@@ -335,7 +337,8 @@ def success_rate_curves(p_attr, y_pred, groups=None, x_axis="score", ax=None, si
         ax.legend()
 
     else:
-        raise ValueError("x_axis is not one of : score, quantile")
+        msg = "x_axis is not one of : score, quantile"
+        raise ValueError(msg)
 
     return ax
 

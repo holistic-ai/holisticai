@@ -1,6 +1,7 @@
 import math
 
 import numpy as np
+
 from holisticai.bias.mitigation.inprocessing.commons import Logging
 
 
@@ -28,8 +29,7 @@ class DebiaserOptimizer:
 
         lambda_gradient = self.eps0 + self.rho - mean_xi
         mu_gradient = self.eps0 - self.rho + mean_xi
-        gradients = {"lambda": lambda_gradient, "mu": mu_gradient}
-        return gradients
+        return {"lambda": lambda_gradient, "mu": mu_gradient}
 
     def update_parameters(self, gradients):
         """

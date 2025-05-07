@@ -13,8 +13,7 @@ class PRBinaryCrossEntropy:
         f = self.freg(sigma, groups)
         # l2 regularizer
         reg = np.sum(coef * coef)
-        loss = -L + self.eta * f + 0.5 * self.C * reg
-        return loss
+        return -L + self.eta * f + 0.5 * self.C * reg
 
     def gradient(self, X, y, sigma, groups, coef):
         L = self.xent.gradient(X, y, sigma, groups)
@@ -22,8 +21,7 @@ class PRBinaryCrossEntropy:
         # l2 regularizer
         reg = coef
         # sum
-        loss = np.reshape(-L + self.eta * f + self.C * reg, [-1])
-        return loss
+        return np.reshape(-L + self.eta * f + self.C * reg, [-1])
 
 
 class BinaryFairnessRegularizer:
@@ -81,8 +79,7 @@ class BinaryFairnessRegularizer:
         f3 = (sigma - pi) / (pi * (1.0 - pi))
 
         f4 = (f1[:, np.newaxis] * d_sigma + f2[:, np.newaxis] * d_rho_s) - np.outer(f3, d_pi)
-        f = op_by_group(f4, groups, reduce_op=np.sum, axis=0)
-        return f
+        return op_by_group(f4, groups, reduce_op=np.sum, axis=0)
 
 
 class BinaryCrossEntropy:
@@ -95,8 +92,7 @@ class BinaryCrossEntropy:
         # likelihood
         # l(si) = \sum_{x,y in D st s=si} (y - sigma(x, si)) x
         loss = (y - sigma)[:, np.newaxis] * X
-        L = op_by_group(loss, groups, reduce_op=np.sum, axis=0)
-        return L
+        return op_by_group(loss, groups, reduce_op=np.sum, axis=0)
 
 
 def op_by_group(matrix, groups, reduce_op, axis=None):

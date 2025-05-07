@@ -11,8 +11,7 @@ class Losses:
         e = 1 - s
 
         # Setting up the coefficients for the objective function
-        obj_coefs = np.array([[(s - e) * r[0], (e - s) * r[1]] for r in dr]).flatten()
-        return obj_coefs
+        return np.array([[(s - e) * r[0], (e - s) * r[1]] for r in dr]).flatten()
 
 
 class ConstraintBase:

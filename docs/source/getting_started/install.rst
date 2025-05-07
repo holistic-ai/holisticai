@@ -9,7 +9,10 @@ You can install the library with `pip` using the following command:
 
   # Basic installation of the library 
   pip install holisticai
-  
+
+  # Additional packages for handle datasets and visualization 
+  pip install holisticai[datasets]
+
   # bias mitigation support
   pip install holisticai[bias] 
 

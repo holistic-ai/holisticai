@@ -47,7 +47,8 @@ def _validate_and_extract_data(data):
     # Check if data is a pandas DataFrame
     if isinstance(data, pd.DataFrame):
         if data.shape[1] != 2:
-            raise ValueError("Data should have exactly two columns.")
+            msg = "Data should have exactly two columns."
+            raise ValueError(msg)
         data_vals = data.values  # Convert DataFrame to NumPy array
     # Check if data is a pandas Series
     elif isinstance(data, pd.Series):
@@ -57,7 +58,8 @@ def _validate_and_extract_data(data):
         data_vals = data
     # Raise error if the data is not a DataFrame or NumPy array
     else:
-        raise TypeError("Data must be either a pandas DataFrame or a NumPy array.")
+        msg = "Data must be either a pandas DataFrame or a NumPy array."
+        raise TypeError(msg)
 
     return data_vals
 
@@ -92,7 +94,8 @@ def plot_graph(X, y, test_indices=None):
     # If test_indices are provided, outline the selected points
     if test_indices is not None:
         if not isinstance(test_indices, (np.ndarray, list)):
-            raise TypeError("test_indices must be either a list or a NumPy array.")
+            msg = "test_indices must be either a list or a NumPy array."
+            raise TypeError(msg)
 
         plt.scatter(
             X_vals[test_indices, 0], X_vals[test_indices, 1], facecolors="none", edgecolors="red", linewidths=2, s=150

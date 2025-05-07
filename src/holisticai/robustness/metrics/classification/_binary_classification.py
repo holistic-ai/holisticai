@@ -36,7 +36,8 @@ def adversarial_accuracy(y, y_pred, y_adv_pred):
         y_pred = np.array(y_pred)
         y_adv_pred = np.array(y_adv_pred)
     except Exception as e:
-        raise ValueError("One or more inputs could not be converted to a numpy array.") from e
+        msg = "One or more inputs could not be converted to a numpy array."
+        raise ValueError(msg) from e
 
     if y is None:
         idxs = y_pred == y_adv_pred
@@ -91,11 +92,13 @@ def empirical_robustness(
         y_pred = np.array(y_pred)
         y_adv_pred = np.array(y_adv_pred)
     except Exception as e:
-        raise ValueError("One or more inputs could not be converted to a numpy array.") from e
+        msg = "One or more inputs could not be converted to a numpy array."
+        raise ValueError(msg) from e
 
     # Verify that `norm` has the correct type
     if not isinstance(norm, int):
-        raise TypeError("norm must be of type int")
+        msg = "norm must be of type int"
+        raise TypeError(msg)
 
     idxs = y_adv_pred != y_pred
     if np.sum(idxs) == 0.0:

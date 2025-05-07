@@ -7,11 +7,14 @@ predictions. It is an advanced version of the Boundary attack.
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
-import pandas as pd
+
 from holisticai.robustness.attackers.classification.commons import x_array_to_df, x_to_nd_array
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 class HopSkipJump:
@@ -102,7 +105,7 @@ class HopSkipJump:
         return np.array(self.predictor(x_df))
 
     def generate(
-        self, x_df: pd.DataFrame, y: Optional[np.ndarray] = None, mask: Optional[np.ndarray] = None, x_adv_init=None
+        self, x_df: pd.DataFrame, y: np.ndarray | None = None, mask: np.ndarray | None = None, x_adv_init=None
     ) -> pd.DataFrame:
         """
         Generate adversarial samples and return them in an array.
@@ -137,7 +140,8 @@ class HopSkipJump:
         if y is None:
             # Throw error if attack is targeted, but no targets are provided
             if self.targeted:  # pragma: no cover
-                raise ValueError("Target labels `y` need to be provided for a targeted attack.")
+                msg = "Target labels `y` need to be provided for a targeted attack."
+                raise ValueError(msg)
 
             # Use model predictions as correct outputs
             y = self.predict(x)
@@ -210,7 +214,7 @@ class HopSkipJump:
         y_p: int,
         init_pred: int,
         adv_init: np.ndarray,
-        mask: Optional[np.ndarray],
+        mask: np.ndarray | None,
     ) -> np.ndarray:
         """
         Internal attack function for one example.
@@ -244,9 +248,7 @@ class HopSkipJump:
             return x
 
         # If an initial adversarial example found, then go with HopSkipJump attack
-        x_adv = self._attack(initial_sample[0], x, initial_sample[1], mask)
-
-        return x_adv
+        return self._attack(initial_sample[0], x, initial_sample[1], mask)
 
     def _init_sample(
         self,
@@ -255,8 +257,8 @@ class HopSkipJump:
         y_p: int,
         init_pred: int,
         adv_init: np.ndarray,
-        mask: Optional[np.ndarray],
-    ) -> Optional[Union[np.ndarray, tuple[np.ndarray, int]]]:
+        mask: np.ndarray | None,
+    ) -> np.ndarray | tuple[np.ndarray, int] | None:
         """
         Find initial adversarial example for the attack.
 
@@ -349,7 +351,7 @@ class HopSkipJump:
         initial_sample: np.ndarray,
         original_sample: np.ndarray,
         target: int,
-        mask: Optional[np.ndarray],
+        mask: np.ndarray | None,
     ) -> np.ndarray:
         """
         Main function for the boundary attack.
@@ -435,8 +437,8 @@ class HopSkipJump:
         current_sample: np.ndarray,
         original_sample: np.ndarray,
         target: int,
-        norm: Union[int, float, str],  # noqa: PYI041
-        threshold: Optional[float] = None,
+        norm: int | float | str,  # noqa: PYI041
+        threshold: float | None = None,
     ) -> np.ndarray:
         """
         Binary search to approach the boundary.
@@ -494,14 +496,12 @@ class HopSkipJump:
             lower_bound = np.where(satisfied == 0, alpha, lower_bound)
             upper_bound = np.where(satisfied == 1, alpha, upper_bound)
 
-        result = self._interpolate(
+        return self._interpolate(
             current_sample=current_sample,
             original_sample=original_sample,
             alpha=float(upper_bound),
             norm=norm,
         )
-
-        return result
 
     def _compute_delta(
         self,
@@ -543,7 +543,7 @@ class HopSkipJump:
         num_eval: int,
         delta: float,
         target: int,
-        mask: Optional[np.ndarray],
+        mask: np.ndarray | None,
     ) -> np.ndarray:
         """
         Compute the update in Eq.(14).
@@ -603,9 +603,7 @@ class HopSkipJump:
             grad = np.mean(f_val * rnd_noise, axis=0)
 
         # Compute update
-        result = grad / np.linalg.norm(grad) if self.norm == 2 else np.sign(grad)
-
-        return result
+        return grad / np.linalg.norm(grad) if self.norm == 2 else np.sign(grad)
 
     def _adversarial_satisfactory(self, samples: np.ndarray, target: int) -> np.ndarray:
         """
@@ -626,16 +624,14 @@ class HopSkipJump:
         samples = np.clip(samples, self._clip_min, self._clip_max)
         preds = self.predict(samples)
 
-        result = preds == target if self.targeted else preds != target
-
-        return result
+        return preds == target if self.targeted else preds != target
 
     @staticmethod
     def _interpolate(
         current_sample: np.ndarray,
         original_sample: np.ndarray,
         alpha: float,
-        norm: Union[int, float, str],  # noqa: PYI041
+        norm: int | float | str,  # noqa: PYI041
     ) -> np.ndarray:
         """
         Interpolate a new sample based on the original and the current samples.

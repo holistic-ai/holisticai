@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import sys
-from typing import Optional
 
 import numpy as np
 import pandas as pd
+from sklearn.utils import check_random_state
+
 from holisticai.bias.mitigation.inprocessing.commons._conventions import (
     ACCURACY_MUL,
     MIN_ITER,
@@ -15,7 +16,6 @@ from holisticai.bias.mitigation.inprocessing.commons._conventions import (
     SHRINK_REGRET,
 )
 from holisticai.bias.mitigation.inprocessing.exponentiated_gradient._lagrangian import Lagrangian
-from sklearn.utils import check_random_state
 
 
 class ExponentiatedGradientAlgorithm:
@@ -31,12 +31,12 @@ class ExponentiatedGradientAlgorithm:
         self,
         estimator,
         constraints,
-        eps: Optional[float] = 0.01,
-        max_iter: Optional[int] = 50,
-        nu: Optional[float] = None,
-        eta0: Optional[float] = 2.0,
-        verbose: Optional[int] = 0,
-        seed: Optional[int] = None,
+        eps: float | None = 0.01,
+        max_iter: int | None = 50,
+        nu: float | None = None,
+        eta0: float | None = 2.0,
+        verbose: int | None = 0,
+        seed: int | None = None,
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -55,8 +55,7 @@ class ExponentiatedGradientAlgorithm:
 
         def compute_default_nu(h):
             absolute_error = (h(X) - self.constraints.y_as_series).abs()
-            nu = ACCURACY_MUL * absolute_error.std() / np.sqrt(self.constraints.total_samples)
-            return nu
+            return ACCURACY_MUL * absolute_error.std() / np.sqrt(self.constraints.total_samples)
 
         eta = self.eta0 / B
         gap_LP = np.inf

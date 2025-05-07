@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Union
-
 import numpy as np
 import pandas as pd
 from numpy.random import RandomState
@@ -14,8 +12,8 @@ from holisticai.utils import LocalImportances, ModelProxy
 def compute_shap_feature_importance(
     proxy: ModelProxy,
     X: pd.DataFrame,
-    max_samples: Union[int, None] = None,
-    random_state: Union[RandomState, None] = None,
+    max_samples: int | None = None,
+    random_state: RandomState | None = None,
 ) -> LocalImportances:
     if random_state is None:
         random_state = RandomState(42)
@@ -57,7 +55,8 @@ class SHAPImportanceCalculator:
         try:
             import shap  # type: ignore
         except ImportError:
-            raise ImportError("SHAP is not installed. Please install it using 'pip install shap'") from None
+            msg = "SHAP is not installed. Please install it using 'pip install shap'"
+            raise ImportError(msg) from None
 
         self.explainer = shap.Explainer(proxy.predict, X[:100])
 

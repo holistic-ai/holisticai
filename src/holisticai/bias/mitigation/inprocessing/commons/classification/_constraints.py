@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 import pandas as pd
+
 from holisticai.bias.mitigation.inprocessing.commons._conventions import (
     _ALL,
     _EVENT,
@@ -43,7 +42,7 @@ class ClassificationConstraint(BaseMoment):
         y,
         sensitive_features: pd.Series,
         event: pd.Series,
-        utilities: Optional[np.ndarray] = None,
+        utilities: np.ndarray | None = None,
     ):
         """
         Description
@@ -135,8 +134,7 @@ class ClassificationConstraint(BaseMoment):
 
         signed_weights = self.tags.apply(get_signed_weight, axis=1)
         utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
-        signed_weights = utility_diff.T * signed_weights
-        return signed_weights
+        return utility_diff.T * signed_weights
 
     def default_objective(self):
         return ErrorRate()
@@ -147,8 +145,7 @@ class ClassificationConstraint(BaseMoment):
         utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         predictions = np.squeeze(predictor(self.X))
         pred = utility_diff.T * predictions + self.utilities[:, 0]
-        g_signed = -self.U.T.dot(pred) / self.total_samples
-        return g_signed  # self._gamma_signed(pred)
+        return -self.U.T.dot(pred) / self.total_samples
 
     def _gamma_signed(self, pred):
         self.tags[_PRED] = pred
@@ -157,7 +154,7 @@ class ClassificationConstraint(BaseMoment):
         expect_group_event = tags.groupby(level=[_EVENT, _GROUP_ID]).mean()
         expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * expect_group_event[_PRED] - expect_event[_PRED]
         expect_group_event[_LOWER_BOUND_DIFF] = -expect_group_event[_PRED] + self.ratio * expect_event[_PRED]
-        gamma_signed = pd.concat(
+        return pd.concat(
             [
                 expect_group_event[_UPPER_BOUND_DIFF],
                 expect_group_event[_LOWER_BOUND_DIFF],
@@ -165,7 +162,6 @@ class ClassificationConstraint(BaseMoment):
             keys=["+", "-"],
             names=["signed", _EVENT, _GROUP_ID],
         )
-        return gamma_signed
 
     def _get_basis(self):
         pos_basis = pd.DataFrame()
@@ -185,7 +181,7 @@ class ClassificationConstraint(BaseMoment):
         self.basis = {"+": pos_basis, "-": neg_basis}
 
     def _get_index_format(self):
-        index = (
+        return (
             pd.DataFrame(
                 [
                     {_SIGNED: signed, _EVENT: e, _GROUP_ID: g}
@@ -197,7 +193,6 @@ class ClassificationConstraint(BaseMoment):
             .set_index([_SIGNED, _EVENT, _GROUP_ID])
             .index
         )
-        return index
 
 
 class DemographicParity(ClassificationConstraint):

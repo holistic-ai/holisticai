@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import Counter
-from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -55,18 +54,20 @@ class Anonymize:
     def __init__(
         self,
         k: int,
-        quasi_identifiers: Union[np.ndarray, list],
-        features: Optional[list] = None,
-        features_names: Optional[list] = None,
-        quasi_identifer_slices: Optional[list] = None,
-        categorical_features: Optional[list] = None,
-        is_regression: Optional[bool] = False,
-        train_only_QI: Optional[bool] = False,
+        quasi_identifiers: np.ndarray | list,
+        features: list | None = None,
+        features_names: list | None = None,
+        quasi_identifer_slices: list | None = None,
+        categorical_features: list | None = None,
+        is_regression: bool | None = False,
+        train_only_QI: bool | None = False,
     ):
         if k < 2:
-            raise ValueError("k should be a positive integer with a value of 2 or higher")
+            msg = "k should be a positive integer with a value of 2 or higher"
+            raise ValueError(msg)
         if quasi_identifiers is None or len(quasi_identifiers) < 1:
-            raise ValueError("The list of quasi-identifiers cannot be empty")
+            msg = "The list of quasi-identifiers cannot be empty"
+            raise ValueError(msg)
 
         self.k = k
         self.quasi_identifiers = quasi_identifiers
@@ -99,22 +100,25 @@ class Anonymize:
         if X_train.shape[1] != 0:
             self.features = list(range(X_train.shape[1]))
         else:
-            raise ValueError("No data provided")
+            msg = "No data provided"
+            raise ValueError(msg)
 
         if self.features_names is None:
             # if no names provided, use numbers instead
             self.features_names = self.features
 
         if not set(self.quasi_identifiers).issubset(set(self.features_names)):
-            raise ValueError(
+            msg = (
                 "Quasi identifiers should bs a subset of the supplied features or indexes in range of "
                 "the data columns"
             )
+            raise ValueError(msg)
         if self.categorical_features and not set(self.categorical_features).issubset(set(self.features_names)):
-            raise ValueError(
+            msg = (
                 "Categorical features should bs a subset of the supplied features or indexes in range of "
                 "the data columns"
             )
+            raise ValueError(msg)
 
         # transform quasi identifiers to indexes
         self.quasi_identifiers = [i for i, v in enumerate(self.features_names) if v in self.quasi_identifiers]
@@ -133,10 +137,12 @@ class Anonymize:
 
     def _anonymize(self, x, y):
         if x.shape[0] != y.shape[0]:
-            raise ValueError("x and y should have same number of rows")
+            msg = "x and y should have same number of rows"
+            raise ValueError(msg)
         if any(x.select_dtypes(include="category").columns):
             if not self.categorical_features:
-                raise ValueError("when supplying an array with non-numeric data, categorical_features must be defined")
+                msg = "when supplying an array with non-numeric data, categorical_features must be defined"
+                raise ValueError(msg)
             x_prepared = self._modify_categorical_features(x)
         else:
             x_prepared = x
@@ -252,5 +258,4 @@ class Anonymize:
                 ("cat", categorical_transformer, categorical_features),
             ]
         )
-        encoded = preprocessor.fit_transform(x)
-        return encoded
+        return preprocessor.fit_transform(x)

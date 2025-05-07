@@ -1,6 +1,7 @@
 import copy
 
 import numpy as np
+
 from holisticai.bias.mitigation.postprocessing.ml_debiaser.randomized_threshold.algorithm import (
     RandomizedThresholdAlgorithm,
 )
@@ -60,13 +61,16 @@ class Reduce2BinaryAlgorithm:
             If True, display progress.
         """
         if num_classes < 2:
-            raise ValueError("Number of classes (must be >= 2).")
+            msg = "Number of classes (must be >= 2)."
+            raise ValueError(msg)
 
         if eps < 0:
-            raise ValueError("eps must be non-negative.")
+            msg = "eps must be non-negative."
+            raise ValueError(msg)
 
         if gamma <= 0:
-            raise ValueError("gamma must be a strictly positive number.")
+            msg = "gamma must be a strictly positive number."
+            raise ValueError(msg)
 
         self.num_groups = 1
         self.gamma = gamma
@@ -127,10 +131,11 @@ class Reduce2BinaryAlgorithm:
         """
 
         if len(y_prob.shape) != 2:
-            raise ValueError(
+            msg = (
                 "Original prob scores must be a 2-dimensional array."
                 "Use RandomizedThreshold for binary classification."
             )
+            raise ValueError(msg)
 
         y_prob_scores = copy.deepcopy(y_prob)
 
@@ -160,5 +165,4 @@ class Reduce2BinaryAlgorithm:
             self.logger.update(iteration=iteration + 1, primal_residual=r, dual_residual=s)
 
         z_mat = np.maximum(z_mat, 0)
-        z_mat = z_mat / np.sum(z_mat, axis=1, keepdims=True)
-        return z_mat
+        return z_mat / np.sum(z_mat, axis=1, keepdims=True)

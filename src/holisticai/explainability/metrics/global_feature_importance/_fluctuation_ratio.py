@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
-from holisticai.typing import ArrayLike, MatrixLike
-from holisticai.utils import Importances, PartialDependence
 from scipy.interpolate import interp1d
+
+if TYPE_CHECKING:
+    from holisticai.typing import ArrayLike, MatrixLike
+    from holisticai.utils import Importances, PartialDependence
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +29,7 @@ def get_fluctuations_from_individuals(grid_values: ArrayLike, individuals: Matri
 
 def fluctuation_ratio(
     partial_dependencies: PartialDependence,
-    importances: Optional[Importances] = None,
+    importances: Importances | None = None,
     top_n=-1,
     label=0,
     weighted=False,

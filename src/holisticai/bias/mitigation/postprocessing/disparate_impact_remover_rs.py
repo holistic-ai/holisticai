@@ -61,15 +61,15 @@ class DisparateImpactRemoverRS(BMPos):
 
     def _assert_parameters(self, repair_level):
         if not 0.0 <= repair_level <= 1.0:
-            raise ValueError("'repair_level' must be between 0.0 and 1.0.")
+            msg = "'repair_level' must be between 0.0 and 1.0."
+            raise ValueError(msg)
 
     def _filter_invalid_examples(self, rankings):
         new_rankings = []
         for _, ranking in rankings.groupby(self.query_col):
             if (ranking[self.group_col].sum() > 0).any():
                 new_rankings.append(ranking)
-        new_rankings = pd.concat(new_rankings, axis=0).reset_index(drop=True)
-        return new_rankings
+        return pd.concat(new_rankings, axis=0).reset_index(drop=True)
 
     def fit_transform(self, rankings: pd.DataFrame):
         """
@@ -142,9 +142,8 @@ class DisparateImpactRemoverRS(BMPos):
         new_ranking = ranking.copy()
         new_ranking[self.score_col] = new_data_matrix
         new_ranking = new_ranking.reset_index(drop=True)
-        new_ranking = (
+        return (
             new_ranking.groupby(self.query_col)
             .apply(lambda df: df.sort_values(self.score_col, ascending=False))
             .reset_index(drop=True)
         )
-        return new_ranking

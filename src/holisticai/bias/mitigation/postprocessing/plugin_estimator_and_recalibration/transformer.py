@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+
 from holisticai.bias.mitigation.postprocessing.plugin_estimator_and_recalibration.algorithm import (
     PluginEstimationAndCalibrationAlgorithm,
 )

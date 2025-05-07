@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import pandas as pd
+
 from holisticai.bias.mitigation.postprocessing.fair_topk.algorithm_utils.fail_prob import (
     RecursiveNumericFailProbabilityCalculator,
 )
@@ -57,13 +56,13 @@ class FairTopK(BMPost):
 
     def __init__(
         self,
-        top_n: Optional[int],
-        p: Optional[float],
-        alpha: Optional[float],
-        query_col: Optional[str] = "query_id",
-        doc_col: Optional[str] = "doc_id",
-        group_col: Optional[str] = "group_id",
-        score_col: Optional[str] = "score",
+        top_n: int | None,
+        p: float | None,
+        alpha: float | None,
+        query_col: str | None = "query_id",
+        doc_col: str | None = "doc_id",
+        group_col: str | None = "group_id",
+        score_col: str | None = "score",
     ):
         # check the parameters first
         validate_basic_parameters(top_n, p, alpha)
@@ -97,7 +96,8 @@ class FairTopK(BMPost):
         """
         if p_attr is None:
             if self.group_col not in rankings.columns:
-                raise ValueError("protected groups must be provided")
+                msg = "protected groups must be provided"
+                raise ValueError(msg)
             new_rankings = rankings
         else:
             if self.group_col in rankings.columns:

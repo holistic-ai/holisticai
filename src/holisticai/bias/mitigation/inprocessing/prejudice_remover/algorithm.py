@@ -1,6 +1,7 @@
 import numpy as np
-from holisticai.utils.transformers.bias import SensitiveGroups
 from scipy.optimize import fmin_cg
+
+from holisticai.utils.transformers.bias import SensitiveGroups
 
 
 class PrejudiceRemoverAlgorithm:

@@ -2,6 +2,7 @@ from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
+
 from holisticai.explainability.metrics.global_feature_importance._importance_spread import (
     FeatureImportanceSpread,
 )
@@ -31,8 +32,7 @@ class MSEDegradation:
     def __call__(self, y, y_pred, y_surrogate):
         Pb = surrogate_mean_squared_error(y, y_pred)
         Ps = surrogate_mean_squared_error(y, y_surrogate)
-        D = max(0, 2 * (Ps - Pb) / (Pb + Ps))
-        return D
+        return max(0, 2 * (Ps - Pb) / (Pb + Ps))
 
 
 def surrogate_mean_squared_error_degradation(y: ArrayLike, y_pred: ArrayLike, y_surrogate: ArrayLike):

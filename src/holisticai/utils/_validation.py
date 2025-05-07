@@ -226,7 +226,8 @@ def _array_like_to_numpy(arr, name=""):
             return np.array([out])
         if len(out.shape) == 1:
             return out
-        raise ValueError(f"input is not 1d array-like.: {out}")
+        msg = f"input is not 1d array-like.: {out}"
+        raise ValueError(msg)
     except TypeError as e:
         msg = f"input {name} is not array-like. This includes numpy 1d arrays, lists,\
             pandas Series or pandas 1d DataFrame"
@@ -272,14 +273,16 @@ def _matrix_like_to_dataframe(arr, name=""):  # noqa: ARG001
             return pd.DataFrame(out, columns=columns)
         ValueError("input is not matrix-like.")
     except TypeError as e:
-        raise TypeError("input is not matrix-like.") from e
+        msg = "input is not matrix-like."
+        raise TypeError(msg) from e
 
 
 def _array_like_to_series(arr, name=""):  # noqa: ARG001
     num_dimensions = 1
 
     def raise_value_error():
-        raise ValueError("input is not array-like.")
+        msg = "input is not array-like."
+        raise ValueError(msg)
 
     try:
         out = np.squeeze(np.asarray(arr))
@@ -287,7 +290,8 @@ def _array_like_to_series(arr, name=""):  # noqa: ARG001
             return pd.Series(out)
         raise_value_error()
     except TypeError as e:
-        raise TypeError("input is not array-like.") from e
+        msg = "input is not array-like."
+        raise TypeError(msg) from e
 
 
 def _coerce_and_check_arr(arr, name="input"):
@@ -607,7 +611,8 @@ def _check_numerical_dataframe(df: pd.DataFrame):
     try:
         return df.astype(float)
     except ValueError as e:
-        raise ValueError("DataFrame cannot be converted to numerical values") from e
+        msg = "DataFrame cannot be converted to numerical values"
+        raise ValueError(msg) from e
 
 
 def _check_columns(df: pd.DataFrame, column: str):

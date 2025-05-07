@@ -1,4 +1,5 @@
 import numpy as np
+
 from holisticai.utils.surrogate_models import get_features, get_number_of_rules
 
 
@@ -338,8 +339,7 @@ class TreeDepthVariance:
         """
         depths, _ = get_depths_counts(0, tree, [], [])
         mean_depth = np.mean(depths)
-        variance = np.mean((depths - mean_depth) ** 2)
-        return variance
+        return np.mean((depths - mean_depth) ** 2)
 
 
 def tree_depth_variance(tree):

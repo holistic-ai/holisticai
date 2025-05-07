@@ -2,8 +2,9 @@ from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-from holisticai.utils import Importances
 from sklearn.tree._export import _MPLTreeExporter
+
+from holisticai.utils import Importances
 
 
 def _color_brew(n):
@@ -25,9 +26,11 @@ def _color_brew(n):
     for i in range(n):
         color = cmap(0.075 + 0.875 * i / n)[:3]  # Get RGB values from cmap
         if color[0] > 1 or color[1] > 1 or color[2] > 1:
-            raise ValueError("Color values must be in the range [0, 1] 1")
+            msg = "Color values must be in the range [0, 1] 1"
+            raise ValueError(msg)
         if color[0] < 0 or color[1] < 0 or color[2] < 0:
-            raise ValueError("Color values must be in the range [0, 1] 0")
+            msg = "Color values must be in the range [0, 1] 0"
+            raise ValueError(msg)
         rgb = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
         color_list.append(rgb)
 
@@ -119,7 +122,8 @@ def plot_surrogate(feature_importance: Importances, ax=None, **kargs):
     """
 
     if "surrogate" not in feature_importance.extra_attrs:
-        raise ValueError("Surrogate key does not exist in feature_importance.extra_attrs")
+        msg = "Surrogate key does not exist in feature_importance.extra_attrs"
+        raise ValueError(msg)
 
     if ax is None:
         _, ax = plt.subplots(1, 1, figsize=(30, 10))

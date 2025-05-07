@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import TYPE_CHECKING
 
-import pandas as pd
 from holisticai.security.commons.data_minimization._modificators import ModifierHandler, ModifierType
 from holisticai.security.commons.data_minimization._selectors import SelectorsHandler, SelectorType
-from holisticai.utils import ModelProxy
+
+if TYPE_CHECKING:
+    import pandas as pd
+
+    from holisticai.utils import ModelProxy
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +18,8 @@ class DataMinimizer:
     def __init__(
         self,
         proxy: ModelProxy,
-        selector_types: Optional[list[SelectorType]] = None,
-        modifier_types: Optional[list[ModifierType]] = None,
+        selector_types: list[SelectorType] | None = None,
+        modifier_types: list[ModifierType] | None = None,
     ):
         if modifier_types is None:
             modifier_types = ["Average", "Permutation"]

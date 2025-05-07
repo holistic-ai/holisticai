@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from holisticai.bias.mitigation.commons.disparate_impact_remover._categorical_repairer import CategoricalRepairer
 from holisticai.bias.mitigation.commons.disparate_impact_remover._utils import (
     freedman_diaconis_bin_size as bin_calculator,
@@ -46,7 +44,7 @@ class NumericalRepairer:
         feature_to_repair: int,
         repair_level: float,
         kdd: bool = False,
-        features_to_ignore: Optional[list[str]] = None,
+        features_to_ignore: list[str] | None = None,
     ):
         if features_to_ignore is None:
             features_to_ignore = []

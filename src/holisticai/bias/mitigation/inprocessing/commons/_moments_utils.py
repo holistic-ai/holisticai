@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+
 from holisticai.bias.mitigation.inprocessing.commons._conventions import _EVENT, _GROUP_ID, _LABEL, _SIGNED
 
 
@@ -59,12 +60,11 @@ class BaseMoment:
             lambda_neg = -lambda_pos
             lambda_pos[lambda_pos < 0.0] = 0.0
             lambda_neg[lambda_neg < 0.0] = 0.0
-            lambda_projected = pd.concat(
+            return pd.concat(
                 [lambda_pos, lambda_neg],
                 keys=["+", "-"],
                 names=[_SIGNED, _EVENT, _GROUP_ID],
             )
-            return lambda_projected
         return lambda_vec
 
     def bound(self):

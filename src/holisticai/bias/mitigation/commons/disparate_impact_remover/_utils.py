@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 import random
 from copy import deepcopy
-from typing import Union
 
 import numpy as np
 from holisticai.bias.mitigation.commons.disparate_impact_remover._categorical_feature import CategoricalFeature
@@ -32,7 +31,7 @@ def get_categories_count_norm(categories, all_stratified_groups, count_dict, gro
     dict
         The dictionary containing the normalized count for each category.
     """
-    norm = {
+    return {
         cat: SparseList(
             data=(
                 count_dict[cat][i] * (1.0 / len(group_features[group].data)) if group_features[group].data else 0.0
@@ -41,7 +40,6 @@ def get_categories_count_norm(categories, all_stratified_groups, count_dict, gro
         )
         for cat in categories
     }
-    return norm
 
 
 def gen_desired_dist(group_index, cat, col_id, median, repair_level, norm_counts, feature_to_remove, mode):
@@ -158,7 +156,7 @@ def get_categories_count(categories, all_stratified_groups, group_feature):
     dict
         The dictionary containing the count for each category.
     """
-    count_dict = {
+    return {
         cat: SparseList(
             data=(
                 group_feature[group].category_count[cat] if cat in group_feature[group].category_count else 0
@@ -167,8 +165,6 @@ def get_categories_count(categories, all_stratified_groups, group_feature):
         )
         for cat in categories
     }
-
-    return count_dict
 
 
 def gen_desired_count(group_index, group, category, median, group_features, repair_level, categories_count):
@@ -200,8 +196,7 @@ def gen_desired_count(group_index, group, category, median, group_features, repa
     med = median[category]
     size = len(group_features[group].data)
     count = categories_count[category][group_index]
-    des_count = math.floor(((1 - repair_level) * count) + (repair_level) * med * size)
-    return des_count
+    return math.floor(((1 - repair_level) * count) + (repair_level) * med * size)
 
 
 def flow_on_group_features(all_stratified_groups, group_features, repair_generator):
@@ -283,7 +278,7 @@ def get_count_norm(count, group_feature_data):
     return 0.0
 
 
-def get_column_type(values: Union[list, np.ndarray]):
+def get_column_type(values: list | np.ndarray):
     """
     Get the type of the column.
 
@@ -322,7 +317,8 @@ def get_median(values, kdd):
         The median of the list of values.
     """
     if not values:
-        raise ValueError("Cannot calculate median of list with no values!")
+        msg = "Cannot calculate median of list with no values!"
+        raise ValueError(msg)
 
     sorted_values = deepcopy(values)
     sorted_values.sort()  # Not calling `sorted` b/c `sorted_values` may not be list.
@@ -450,9 +446,7 @@ def make_histogram_bins(bin_size_calculator, data, col_id):
                 index_bins[bin_num].append(row_index)
                 break
 
-    index_bins = [b for b in index_bins if b]
-
-    return index_bins
+    return [b for b in index_bins if b]
 
 
 def freedman_diaconis_bin_size(feature_values):

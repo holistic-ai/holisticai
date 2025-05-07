@@ -1,4 +1,5 @@
 import numpy as np
+
 from holisticai.utils.transformers.bias import SensitiveGroups
 
 
@@ -42,8 +43,7 @@ class WassersteinBarycenterAlgorithm:
         t_values = np.linspace(self.minY, self.maxY, 100)
         tmp1 = np.sum(yl_masked1[:, None] < t_values, axis=0) / n1
         dist = np.abs(tmp1 - tmp2)
-        ts = t_values[np.argmin(dist)]
-        return ts
+        return t_values[np.argmin(dist)]
 
     def _update_yt(self, yt, group):
         if group == self.group_values[self.im]:
@@ -59,5 +59,4 @@ class WassersteinBarycenterAlgorithm:
         ST = self._sensgroups.transform(sensitive_groups, convert_numeric=True)
         noise = self.eps * np.random.randn(len(y_pred)).squeeze()
         YT = y_pred + noise
-        YF = np.array([self._update_yt(yt, st) for yt, st in zip(YT, ST)])
-        return YF
+        return np.array([self._update_yt(yt, st) for yt, st in zip(YT, ST)])

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 import jax
 import jax.numpy as jnp
 import numpy as np
 import pandas as pd
+
 from holisticai.bias.mitigation.inprocessing.adversarial_debiasing.models import (
     ADModel,
     AdversarialModel,
@@ -26,7 +26,8 @@ def is_numeric(df):
         return all(pd.api.types.is_numeric_dtype(df[col]) for col in df.columns)
     if isinstance(df, np.ndarray):
         return np.issubdtype(df.dtype, np.number)
-    raise ValueError("Input must be a pandas DataFrame or numpy array.")
+    msg = "Input must be a pandas DataFrame or numpy array."
+    raise ValueError(msg)
 
 
 class AdversarialDebiasing(BMImp):
@@ -95,19 +96,19 @@ class AdversarialDebiasing(BMImp):
 
     def __init__(
         self,
-        features_dim: Optional[int] = None,
-        keep_prob: Optional[float] = 0.1,
-        hidden_size: Optional[int] = 128,
-        batch_size: Optional[int] = 32,
-        shuffle: Optional[bool] = True,
-        epochs: Optional[int] = 10,
-        learning_rate: Optional[float] = 0.01,
-        use_debias: Optional[bool] = True,
-        adversary_loss_weight: Optional[float] = 0.1,
-        verbose: Optional[int] = 1,
-        print_interval: Optional[int] = 100,
-        device: Optional[str] = "cpu",
-        seed: Optional[int] = None,
+        features_dim: int | None = None,
+        keep_prob: float | None = 0.1,
+        hidden_size: int | None = 128,
+        batch_size: int | None = 32,
+        shuffle: bool | None = True,
+        epochs: int | None = 10,
+        learning_rate: float | None = 0.01,
+        use_debias: bool | None = True,
+        adversary_loss_weight: float | None = 0.1,
+        verbose: int | None = 1,
+        print_interval: int | None = 100,
+        device: str | None = "cpu",
+        seed: int | None = None,
     ):
         # default classifier config
         self.features_dim = features_dim
@@ -179,7 +180,8 @@ class AdversarialDebiasing(BMImp):
         params = self._load_data(X=X, y=y, group_a=group_a, group_b=group_b)
         x = pd.DataFrame(params["X"])
         if not is_numeric(x):
-            raise ValueError("Adversarial Debiasing only works with numeric features.")
+            msg = "Adversarial Debiasing only works with numeric features."
+            raise ValueError(msg)
 
         y = pd.Series(params["y"])
         group_a = pd.Series(params["group_a"])
@@ -245,7 +247,8 @@ class AdversarialDebiasing(BMImp):
         np.ndarray: Predicted output per sample.
         """
         if not is_numeric(X):
-            raise ValueError("Adversarial Debiasing only works with numeric features.")
+            msg = "Adversarial Debiasing only works with numeric features."
+            raise ValueError(msg)
         p = self.predict_proba(X)
         return np.argmax(p, axis=1).ravel()
 
@@ -268,7 +271,8 @@ class AdversarialDebiasing(BMImp):
         np.ndarray: Predicted matrix probability per sample.
         """
         if not is_numeric(X):
-            raise ValueError("Adversarial Debiasing only works with numeric features.")
+            msg = "Adversarial Debiasing only works with numeric features."
+            raise ValueError(msg)
 
         proba = np.empty((X.shape[0], 2))
         proba[:, 1] = self._predict_proba(X)
@@ -294,7 +298,7 @@ class AdversarialDebiasing(BMImp):
         np.ndarray: Predicted probability per sample.
         """
         if not is_numeric(X):
-            raise ValueError("Adversarial Debiasing only works with numeric features.")
+            msg = "Adversarial Debiasing only works with numeric features."
+            raise ValueError(msg)
 
-        p = self._predict(X).reshape([-1])
-        return p
+        return self._predict(X).reshape([-1])

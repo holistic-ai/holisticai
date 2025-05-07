@@ -1,16 +1,23 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
-import jax.numpy as jnp
 import numpy as np
-import pandas as pd
-from holisticai.typing import ArrayLike
-from holisticai.utils.models.neighbors import KNeighborsClassifier
-from jax.nn import one_hot
 from sklearn.preprocessing import LabelEncoder
 
+from holisticai.typing import ArrayLike
+from holisticai.utils.models.neighbors import KNeighborsClassifier
+
+try:
+    import jax.numpy as jnp
+    from jax.nn import one_hot
+except ImportError:
+    jnp = None
+    one_hot = None
+
+
 if TYPE_CHECKING:
+    import pandas as pd
     from numpy.typing import ArrayLike
 
 
@@ -48,13 +55,16 @@ def transform_label_to_numerical_label(labels: np.ndarray, le: LabelEncoder = No
     return np.array(labels)
 
 
-def check_and_transform_label_format(labels: np.ndarray) -> jnp.ndarray:
+def check_and_transform_label_format(labels: np.ndarray):
     """
     Check label format and transform to one-hot-encoded labels if necessary
 
     :param labels: An array of integer or string labels of shape `(nb_samples,)`, `(nb_samples, 1)` or `(nb_samples, nb_classes)`.
     :return: Labels with shape `(nb_samples, nb_classes)` (one-hot) or `(nb_samples,)` (index).
     """
+    if one_hot is None or jnp is None:
+        msg = "jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`."
+        raise ImportError(msg)
 
     labels = jnp.array(labels)
     return_one_hot = True
@@ -102,7 +112,11 @@ class ShaprScore:
         batch_size=500,
         train_size=1.0,
         aggregated=True,
-    ) -> Union[np.ndarray, float]:
+    ) -> np.ndarray | float:
+        if one_hot is None or jnp is None:
+            msg = "jax or jax.nn is not installed. Please install it with `pip install jax jaxlib`."
+            raise ImportError(msg)
+
         y_train, le = transform_label_to_numerical_label(y_train)
         y_test = transform_label_to_numerical_label(y_test, le)
         y_pred_train = transform_label_to_numerical_label(y_pred_train, le)
@@ -152,7 +166,7 @@ def shapr_score(
     y_pred_test: pd.Series,
     batch_size=500,
     train_size=1.0,
-) -> jnp.ndarray:
+):
     """
     Compute the SHAPr membership privacy risk metric [1]_ for the given classifier and training set.
 

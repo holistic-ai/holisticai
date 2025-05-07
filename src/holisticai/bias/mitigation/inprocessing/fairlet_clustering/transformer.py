@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional, Union
-
 import numpy as np
+from sklearn.base import BaseEstimator
+
 from holisticai.bias.mitigation.commons.fairlet_clustering.decompositions import (
     DecompositionMixin,
     ScalableFairletDecomposition,
@@ -13,7 +13,6 @@ from holisticai.bias.mitigation.inprocessing.fairlet_clustering.algorithm import
 )
 from holisticai.utils.models.cluster import KCenters, KMedoids
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
-from sklearn.base import BaseEstimator
 
 DECOMPOSITION_CATALOG = {
     "Scalable": ScalableFairletDecomposition,
@@ -65,12 +64,12 @@ class FairletClustering(BaseEstimator, BMImp):
 
     def __init__(
         self,
-        n_clusters: Optional[int],
-        decomposition: Union[str, DecompositionMixin] = "Vanilla",
-        clustering_model: Optional[str] = "KCenters",
-        p: Optional[str] = 1,
-        q: Optional[float] = 3,
-        seed: Optional[int] = None,
+        n_clusters: int | None,
+        decomposition: str | DecompositionMixin = "Vanilla",
+        clustering_model: str | None = "KCenters",
+        p: str | None = 1,
+        q: float | None = 3,
+        seed: int | None = None,
     ):
         if decomposition in ["Scalable", "Vanilla"]:
             self.decomposition = DECOMPOSITION_CATALOG[decomposition](p=p, q=q)

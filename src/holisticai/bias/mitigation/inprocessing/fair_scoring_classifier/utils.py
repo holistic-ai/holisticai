@@ -17,8 +17,7 @@ def get_indexes_from_names(df, names):
     -------
     list : list of index
     """
-    indexes = [df.columns.get_loc(item) for item in names]
-    return indexes
+    return [df.columns.get_loc(item) for item in names]
 
 
 def process_y(y):
@@ -36,8 +35,7 @@ def process_y(y):
     -------
     y_processed (list of labels)
     """
-    y_processed = [i for line in y for i, val in enumerate(line) if val == 1]
-    return y_processed
+    return [i for line in y for i, val in enumerate(line) if val == 1]
 
 
 def get_majority_class(y):
@@ -210,8 +208,7 @@ def predict(x, l_lists):
 
 
 def format_labels(y):
-    y_formatted = [i for labels in y for i in range(len(labels)) if labels[i] == 1]
-    return y_formatted
+    return [i for labels in y for i in range(len(labels)) if labels[i] == 1]
 
 
 def get_accuracy(x, y, l_lists):
@@ -238,15 +235,11 @@ def get_accuracy(x, y, l_lists):
     y_pred = predict(x, l_lists)
     y = format_labels(y)
     y_pred = format_labels(y_pred)
-    accuracy = accuracy_score(y, y_pred)
-
-    return accuracy
+    return accuracy_score(y, y_pred)
 
 
 def get_balanced_accuracy(x, y, l_lists):
     y_pred = predict(x, l_lists)
     y = format_labels(y)
     y_pred = format_labels(y_pred)
-    balanced_accuracy = balanced_accuracy_score(y, y_pred)
-
-    return balanced_accuracy
+    return balanced_accuracy_score(y, y_pred)

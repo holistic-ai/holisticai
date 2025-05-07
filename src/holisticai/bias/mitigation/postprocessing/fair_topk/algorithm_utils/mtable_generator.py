@@ -22,10 +22,12 @@ class MTableGenerator:
 
     def m(self, k):
         if k < 1:
-            raise ValueError("Parameter k must be at least 1")
+            msg = "Parameter k must be at least 1"
+            raise ValueError(msg)
 
         if k > self.k:
-            raise ValueError(f"Parameter k must be at most {self.k}")
+            msg = f"Parameter k must be at most {self.k}"
+            raise ValueError(msg)
 
         result = stats.binom.ppf(self.alpha, k, self.p)
         return 0 if result < 0 else result
@@ -47,7 +49,8 @@ def compute_aux_mtable(mtable):
     Stores the inverse of an mTable entry and the size of the block with respect to the inverse
     """
     if not (isinstance(mtable, pd.DataFrame)):
-        raise TypeError("Internal mtable must be a DataFrame")
+        msg = "Internal mtable must be a DataFrame"
+        raise TypeError(msg)
 
     aux_mtable = pd.DataFrame(columns=["inv", "block"])
     last_m_seen = 0
@@ -60,6 +63,7 @@ def compute_aux_mtable(mtable):
             aux_mtable.loc[position] = [position, position - last_position]
             last_position = position
         elif mtable.at[position, "m"] != last_m_seen:
-            raise RuntimeError("Inconsistent mtable")
+            msg = "Inconsistent mtable"
+            raise RuntimeError(msg)
 
     return aux_mtable

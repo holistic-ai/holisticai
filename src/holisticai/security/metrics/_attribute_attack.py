@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Union
+from typing import TYPE_CHECKING, Any, Callable
 
-import pandas as pd
-from holisticai.security.commons import BlackBoxAttack
-from holisticai.security.metrics._utils import check_valid_output_type
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score, mean_absolute_error, mean_squared_error
+
+from holisticai.security.commons import BlackBoxAttack
+from holisticai.security.metrics._utils import check_valid_output_type
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def to_numerical_or_categorical(y: pd.Series):
@@ -17,7 +20,8 @@ def to_numerical_or_categorical(y: pd.Series):
         return y.astype("category")
 
     if len(y.unique()) < 2:
-        raise ValueError("The target variable must have more than 1 unique value")
+        msg = "The target variable must have more than 1 unique value"
+        raise ValueError(msg)
     return y.astype("category")
 
 
@@ -33,7 +37,7 @@ class AttributeAttackScore:
         y_test: pd.Series,
         attribute_attack: str,
         attack_train_ratio: float = 0.5,
-        metric_fn: Union[str, Callable, None] = None,
+        metric_fn: str | Callable | None = None,
         attacker_estimator: Any = None,
     ) -> float:
         check_valid_output_type(y_train)

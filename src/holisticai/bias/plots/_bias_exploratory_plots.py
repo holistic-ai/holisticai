@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
 from holisticai.bias.metrics import confusion_matrix
 
 # utils
@@ -40,7 +41,8 @@ def group_pie_plot(y_feat, ax=None, size=None, title=None):
         labels = value_counts.index.tolist()
 
     else:
-        raise TypeError("input is not a numpy array or pandas series")
+        msg = "input is not a numpy array or pandas series"
+        raise TypeError(msg)
 
     # calculations
     n_b = np.sum(value_counts / np.sum(value_counts) > 0.02)

@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import Literal
 
 import numpy as np
-from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 from scipy.optimize import linprog
 from sklearn.metrics import confusion_matrix
+
+from holisticai.utils.transformers.bias import BMPostprocessing as BMPost
 
 
 class EqualizedOdds(BMPost):

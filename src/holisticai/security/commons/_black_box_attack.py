@@ -88,4 +88,5 @@ def classification_security_features(X, y, attacker, attack_feature):
         attacker = BlackBoxAttack(learning_task="classification", attack_feature=attack_feature, attack_train_ratio=0.5)
         attacker.fit(X, y)
         return attacker
-    raise ValueError("Invalid attacker type. Please choose from 'black_box'")
+    msg = "Invalid attacker type. Please choose from 'black_box'"
+    raise ValueError(msg)

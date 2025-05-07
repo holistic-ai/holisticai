@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
+from sklearn.base import BaseEstimator
+
 from holisticai.bias.mitigation.inprocessing.variational_fair_clustering.algorithm import FairClusteringAlgorithm
 from holisticai.utils.transformers.bias import BMInprocessing as BMImp
 from holisticai.utils.transformers.bias import SensitiveGroups
-from sklearn.base import BaseEstimator
 
 
 class VariationalFairClustering(BaseEstimator, BMImp):
@@ -53,13 +52,13 @@ class VariationalFairClustering(BaseEstimator, BMImp):
 
     def __init__(
         self,
-        n_clusters: Optional[int],
-        lipchitz_value: Optional[str] = 1,
-        lmbda: Optional[float] = 0.7,
-        method: Optional[str] = "kmeans",
-        normalize_input: Optional[bool] = True,
-        seed: Optional[int] = None,
-        verbose: Optional[int] = 0,
+        n_clusters: int | None,
+        lipchitz_value: str | None = 1,
+        lmbda: float | None = 0.7,
+        method: str | None = "kmeans",
+        normalize_input: bool | None = True,
+        seed: int | None = None,
+        verbose: int | None = 0,
     ):
         # Constant parameters
         self.algorithm = FairClusteringAlgorithm(

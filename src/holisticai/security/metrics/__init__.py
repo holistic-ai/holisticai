@@ -4,9 +4,8 @@ The :mod:holisticai.privacy.metrics module includes attacks and privacy metrics
 
 from __future__ import annotations
 
-from typing import Union
-
 import pandas as pd
+
 from holisticai.security.metrics._anonymization import k_anonymity, l_diversity
 from holisticai.security.metrics._attribute_attack import AttributeAttackScore, attribute_attack_score
 from holisticai.security.metrics._data_minimization import (
@@ -26,7 +25,7 @@ def classification_privacy_metrics(
     y_pred_train: pd.Series,
     y_pred_test: pd.Series,
     y_pred_test_dm: dict[str, : pd.Series],
-    attribute_attack: Union[str, list[str]],
+    attribute_attack: str | list[str],
 ):
     shapr_score = ShaprScore()
     dm_accuracy_ratio = DataMinimizationAccuracyRatio()
@@ -52,7 +51,7 @@ def regression_privacy_metrics(
     y_test: pd.Series,
     y_pred_test: pd.Series,
     y_pred_test_dm: dict[str, : pd.Series],
-    attribute_attack: Union[str, list[str]],
+    attribute_attack: str | list[str],
 ):
     attr_attack_score = AttributeAttackScore()
     dm_mse_ratio = DataMinimizationMSERatio()

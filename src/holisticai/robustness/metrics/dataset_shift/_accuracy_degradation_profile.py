@@ -27,7 +27,7 @@ environments where test data may change or reduce in size.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -91,8 +91,8 @@ def accuracy_degradation_profile(
     y_test: pd.Series,
     y_pred: pd.Series,
     n_neighbors: int = 5,
-    neighbor_estimator: Optional[Any] = None,
-    baseline_accuracy: Optional[float] = None,
+    neighbor_estimator: Any | None = None,
+    baseline_accuracy: float | None = None,
     threshold_percentual: float = 0.95,
     above_percentual: float = 0.90,
     step_size: float = STEP_SIZE,
@@ -184,7 +184,8 @@ def accuracy_degradation_profile(
 
     # Check if the step size is too small
     if step_size < (1 / X_test.shape[0]):
-        raise ValueError("'step_size' is too small (less than 1 divided by the number of samples).")
+        msg = "'step_size' is too small (less than 1 divided by the number of samples)."
+        raise ValueError(msg)
 
     # Validate inputs
     if isinstance(X_test, pd.DataFrame):
@@ -212,9 +213,7 @@ def accuracy_degradation_profile(
     results_summary_df = _summarize_results(results_df, baseline_accuracy, threshold_percentual, above_percentual)
 
     # Apply styling
-    styled_df = _styled_results(results_summary_df)
-
-    return styled_df
+    return _styled_results(results_summary_df)
 
 
 def _validate_inputs(
@@ -287,13 +286,17 @@ def _validate_inputs(
     """
 
     if len(X_test) != len(y_test) or len(y_test) != len(y_pred):
-        raise ValueError("X_test, y_test, and y_pred must have the same length.")
+        msg = "X_test, y_test, and y_pred must have the same length."
+        raise ValueError(msg)
     if not (0 < threshold_percentual <= 1):
-        raise ValueError("threshold_percentual must be between 0 and 1.")
+        msg = "threshold_percentual must be between 0 and 1."
+        raise ValueError(msg)
     if not (0 < above_percentual <= 1):
-        raise ValueError("above_percentual must be between 0 and 1.")
+        msg = "above_percentual must be between 0 and 1."
+        raise ValueError(msg)
     if not (0 < baseline_accuracy <= 1):
-        raise ValueError("baseline_accuracy must be between 0 and 1.")
+        msg = "baseline_accuracy must be between 0 and 1."
+        raise ValueError(msg)
 
 
 def batched(X, batch_size=100):
@@ -368,7 +371,8 @@ def _calculate_accuracies(
 
     # Validate step_size input
     if not (0 < step_size <= 1):
-        raise ValueError("step_size must be between 0 and 1.")
+        msg = "step_size must be between 0 and 1."
+        raise ValueError(msg)
 
     # Auxiliary data structures
     full_set_size = X_test.shape[0]
@@ -565,5 +569,4 @@ def _styled_results(results_summary_df: pd.DataFrame, decision_column: str = DEC
     pd.DataFrame
         DataFrame with color-coded decisions.
     """
-    styled_df = results_summary_df.style.map(_color_cells, subset=[decision_column])
-    return styled_df
+    return results_summary_df.style.map(_color_cells, subset=[decision_column])

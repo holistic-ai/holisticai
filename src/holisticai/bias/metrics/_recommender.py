@@ -2,6 +2,9 @@
 import numpy as np
 import pandas as pd
 
+# sklearn imports
+from sklearn.metrics import mean_absolute_error
+
 # utils
 from holisticai.utils import mat_to_binary, normalize_tensor
 
@@ -15,9 +18,6 @@ from holisticai.utils._recommender_tools import (
     recommender_rmse,
 )
 from holisticai.utils._validation import _recommender_checks
-
-# sklearn imports
-from sklearn.metrics import mean_absolute_error
 
 
 def aggregate_diversity(mat_pred, top=None, thresh=0.5, normalize=False):
