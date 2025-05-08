@@ -29,6 +29,8 @@ class MLleaks:
     shadow_dataset : tuple
         A tuple containing the shadow training and testing datasets. Each dataset \
         should be a tuple of (X, y), where X is the feature matrix and y is the target vector.
+    clone_model : bool, optional
+        If True, the target model architecture will be cloned before training.
     seed : int, optional
         Random seed for reproducibility. Default is 42.
 
@@ -44,6 +46,7 @@ class MLleaks:
         target_model: BaseEstimator,
         target_dataset: tuple,
         shadow_dataset: tuple,
+        clone_model: bool = False,
         seed: int = 42,
     ):
         if not isinstance(target_model, BaseEstimator):
@@ -66,6 +69,7 @@ class MLleaks:
         self.shadow_dataset = shadow_dataset
         # set random seed for reproducibility
         np.random.seed(seed=seed)
+        self.clone_model = clone_model
 
     def generate_attack_dataset(self) -> tuple:
         """
@@ -82,7 +86,10 @@ class MLleaks:
         X_target_train, _ = target_train
         X_target_test, _ = target_test
         logger.info("Training shadow model...")
-        X_mia_train, y_mia_train = self._train_shadow_model()
+        if self.clone_model:
+            X_mia_train, y_mia_train = self._train_shadow_models()
+        else:
+            X_mia_train, y_mia_train = self._train_shadow_model()
         target_train_preds, target_test_preds = self._get_probs(self.target_model, X_target_train, X_target_test)
         logger.info("Creating attacker dataset...")
         X_mia_test, y_mia_test = self._create_attacker_dataset(target_train_preds, target_test_preds)
@@ -179,6 +186,55 @@ class MLleaks:
         self.shadow_model = self.train_model(X_shadow_train, y_shadow_train)
         shadow_train_preds, shadow_test_preds = self._get_probs(self.shadow_model, X_shadow_train, X_shadow_test)
         return self._create_attacker_dataset(shadow_train_preds, shadow_test_preds)
+
+    def _train_shadow_models(self) -> tuple:
+        """
+        Trains multiple shadow models and creates the attacker dataset.
+        This method trains multiple shadow models (MLP, Random Forest, and Logistic Regression) \
+        using the shadow dataset to avoid clone the target model.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the attacker dataset created from the shadow \
+            models' predictions on the shadow training and testing data.
+        """
+        # import mlp classifier
+        # import random forest classifier
+        from sklearn.ensemble import RandomForestClassifier
+
+        # import logistic regression
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.neural_network import MLPClassifier
+
+        shadow_train, shadow_test = self.shadow_dataset
+        X_shadow_train, y_shadow_train = shadow_train
+        X_shadow_test, _ = shadow_test
+        # train mlp classifier with shadow dataset
+        mlp_model = MLPClassifier(random_state=42)
+        mlp_model.fit(X_shadow_train, y_shadow_train)
+        mlp_train_preds, mlp_test_preds = self._get_probs(mlp_model, X_shadow_train, X_shadow_test)
+        mlp_train_preds = np.array(mlp_train_preds)
+        mlp_test_preds = np.array(mlp_test_preds)
+
+        # train random forest classifier with shadow dataset
+        rf_model = RandomForestClassifier(random_state=42)
+        rf_model.fit(X_shadow_train, y_shadow_train)
+        rf_train_preds, rf_test_preds = self._get_probs(rf_model, X_shadow_train, X_shadow_test)
+        rf_train_preds = np.array(rf_train_preds)
+        rf_test_preds = np.array(rf_test_preds)
+
+        # train logistic regression with shadow dataset
+        lr_model = LogisticRegression(random_state=42)
+        lr_model.fit(X_shadow_train, y_shadow_train)
+        lr_train_preds, lr_test_preds = self._get_probs(lr_model, X_shadow_train, X_shadow_test)
+        lr_train_preds = np.array(lr_train_preds)
+        lr_test_preds = np.array(lr_test_preds)
+
+        training_preds = np.concatenate((mlp_train_preds, rf_train_preds, lr_train_preds), axis=0)
+        testing_preds = np.concatenate((mlp_test_preds, rf_test_preds, lr_test_preds), axis=0)
+
+        return self._create_attacker_dataset(training_preds, testing_preds)
 
     def _create_attacker_dataset(self, train_preds: np.ndarray, test_preds: np.ndarray, shuffle: bool = True) -> tuple:
         """
