@@ -49,6 +49,15 @@ def ml_leaks_instance(tgt_shw_dataset):
     return MLleaks(target_model, target_dataset, shadow_dataset)
 
 
+@pytest.fixture
+def ml_leaks_no_clone_instance(tgt_shw_dataset):
+    target_dataset, shadow_dataset = tgt_shw_dataset
+    X_target_train, y_target_train = target_dataset[0]
+    target_model = RandomForestClassifier(random_state=42)
+    target_model.fit(X_target_train, y_target_train)
+    return MLleaks(target_model, target_dataset, shadow_dataset, clone_model=True)
+
+
 def test_generate_attack_dataset(ml_leaks_instance):
     train_data, test_data = ml_leaks_instance.generate_attack_dataset()
     assert len(train_data) == 2
@@ -80,4 +89,14 @@ def test_create_attacker_dataset(ml_leaks_instance):
     assert X_mia_train.shape[0] == 200
     assert X_mia_test.shape[0] == 200
     assert np.sum(y_mia_train) == 100  # 100 training samples labeled as 1
+    assert np.sum(y_mia_test) == 100  # 100 testing samples labeled as 1
+
+
+def test_create_attacker_dataset_no_clone(ml_leaks_no_clone_instance):
+    train_data, test_data = ml_leaks_no_clone_instance.generate_attack_dataset()
+    X_mia_train, y_mia_train = train_data
+    X_mia_test, y_mia_test = test_data
+    assert X_mia_train.shape[0] == 600
+    assert X_mia_test.shape[0] == 200
+    assert np.sum(y_mia_train) == 300  # 100 training samples labeled as 1
     assert np.sum(y_mia_test) == 100  # 100 testing samples labeled as 1
