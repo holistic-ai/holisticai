@@ -67,6 +67,8 @@ Security in machine learning involves practices and measures to protect AI model
      - Metrics for evaluating security in classification and regression tasks.
    * - `Mitigation <security/mitigation.html>`_
      - Strategies for enhancing security and robustness in learning tasks.
+   * - `Attackers <security/attackers.html>`_
+     - Techniques and strategies to simulate attacks and test model security.
 
 Robustness
 ----------
