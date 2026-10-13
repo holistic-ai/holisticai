@@ -36,7 +36,7 @@
   <a href="https://holisticai.com">holisticai.com</a>
 </p>
 
-An open-source library for assessing and improving the trustworthiness of AI
+An open-source library for assessing and improving the safety aspects of AI
 systems. It answers five questions a validation accuracy cannot: does the model
 treat groups differently, can its decisions be accounted for, does it hold up
 under shift and attack, what does it leak about its training data, and is it
